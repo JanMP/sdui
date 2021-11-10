@@ -61,7 +61,7 @@ createTableDataAPI = ({
   exportTableRole
   getPreSelectPipeline
   getProcessorPipeline,
-  # CHECK if they work or if we should get rid of the following props:
+  # CHECK if they work or if we should get rid of the following:
   getRowsPipeline, getRowCountPipeline, getExportPipeline
   rowsCollection, rowCountCollection
   makeFormDataFetchMethodRunFkt, makeSubmitMethodRunFkt, makeDeleteMethodRunFkt
