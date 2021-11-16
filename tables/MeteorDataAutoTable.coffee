@@ -1,9 +1,9 @@
 import {Meteor} from 'meteor/meteor'
 import {Mongo} from 'meteor/mongo'
 import React, {useState, useEffect, useRef} from 'react'
-import meteorApply from '/common/meteorApply.coffee'
-import EditableDataTable from './EditableDataTable'
-import ErrorBoundary from './ErrorBoundary'
+import {meteorApply} from '/common/meteorApply.coffee'
+import {EditableDataTable} from './EditableDataTable.coffee'
+import {ErrorBoundary} from './ErrorBoundary.coffee'
 import {useTracker} from 'meteor/react-meteor-data'
 import {toast} from 'react-toastify'
 import {useCurrentUserIsInRole} from '/common/roleChecks.coffee'
@@ -14,7 +14,7 @@ import _ from 'lodash'
 
 defaultQuery = {} # ensures equality between runs
 
-export default MeteorDataAutoTable = (props) ->
+export MeteorDataAutoTable = (props) ->
   {
   sourceName, listSchemaBridge,
   rowsCollection, rowCountCollection

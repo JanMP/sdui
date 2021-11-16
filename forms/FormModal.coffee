@@ -1,12 +1,12 @@
 import React from 'react'
 
-import AutoForm from './uniforms-custom/AutoForm'
-import AutoField from './uniforms-custom/AutoField'
+import AutoForm from './uniforms-custom/AutoForm.tsx'
+import AutoField from './uniforms-custom/AutoField.tsx'
 
 import Modal from 'react-modal'
 
 
-export default FormModal = ({schemaBridge, onSubmit, model,
+export FormModal = ({schemaBridge, onSubmit, model,
 isOpen, onRequestClose, header, children, disabled = false, readOnly}) ->
 
   <Modal

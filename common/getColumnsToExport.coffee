@@ -1,4 +1,4 @@
-export default getColumnsToExport = ({schema}) ->
+export getColumnsToExport = ({schema}) ->
   schema._firstLevelSchemaKeys
   .filter (key) ->
     options = schema._schema[key].autotable ? {}

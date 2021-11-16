@@ -1,5 +1,5 @@
 import React, {useEffect, useState, useRef} from "react"
-import AutoTableAutoField from "./AutoTableAutoField"
+import {AutoTableAutoField} from "./AutoTableAutoField.coffee"
 import {
   Column, defaultTableRowRenderer, Table, CellMeasurer, CellMeasurerCache,
   InfiniteLoader
@@ -89,7 +89,7 @@ deleteButtonCellRenderer = ({onDelete = ->}) ->
       </button>
     </div>
 
-# TODO move into sdui-forms
+# TODO move into /forms ?
 SearchInput = ({value, onChange}) ->
 
   [isValid, setIsValid] = useState true
@@ -118,7 +118,7 @@ SearchInput = ({value, onChange}) ->
   />
 
 
-export default DataTable = ({
+export DataTable = ({
   name,
   schemaBridge,
   rows, limit, totalRowCount,

@@ -1,4 +1,4 @@
-export default downloadAsFile = ({dataString, mimeType, fileName}) ->
+export downloadAsFile = ({dataString, mimeType, fileName}) ->
   unless dataString?
     throw new Error 'no dataString given for downloadAsFile'
   mimeType ?= 'text/csv;charset=utf-8'

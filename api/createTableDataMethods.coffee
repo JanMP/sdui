@@ -2,12 +2,12 @@ import {Meteor} from 'meteor/meteor'
 import {Mongo} from 'meteor/mongo'
 import {ValidatedMethod} from 'meteor/mdg:validated-method'
 import SimpleSchema from 'simpl-schema'
-import schemaWithId from '../common/schemaWithId.coffee'
+import {schemaWithId} from '../common/schemaWithId.coffee'
 import {currentUserMustBeInRole} from '../common/roleChecks.coffee'
 
 import _ from 'lodash'
 
-export default createTableDataMethods = ({
+export createTableDataMethods = ({
 viewTableRole, editRole, exportTableRole,
 sourceName, collection,
 useObjectIds,

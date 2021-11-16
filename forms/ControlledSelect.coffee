@@ -3,7 +3,7 @@ import { Select } from 'react-functional-select'
 import isEqual from 'lodash/isEqual'
 
 # CHECK if we should rather get rid of this and use react-select directly
-export default ControlledSelect = ({value, options, onChange, disabled, multiple, themeConfig}) ->
+export ControlledSelect = ({value, options, onChange, disabled, multiple, themeConfig}) ->
   
   themeConfig ?=
     control:

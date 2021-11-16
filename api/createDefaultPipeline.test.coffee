@@ -6,7 +6,7 @@ chai.use deepEqualInAnyOrder
 import SimpleSchema from 'simpl-schema'
 import _ from 'lodash'
 
-import createDefaultPipeline from './createDefaultPipeline'
+import {createDefaultPipeline} from './createDefaultPipeline.coffee'
 
 # import importTestFaelle from '/imports/api/importTestFaelle'
 # import {Faelle} from '/imports/api/Faelle'

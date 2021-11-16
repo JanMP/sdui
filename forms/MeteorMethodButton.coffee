@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react'
-import meteorApply from '../common/meteorApply.coffee'
+import {meteorApply} from '../common/meteorApply.coffee'
 import {toast} from 'react-toastify'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faSpinner} from '@fortawesome/free-solid-svg-icons/faSpinner'
@@ -8,7 +8,7 @@ import _ from 'lodash'
 
 import ConfirmationModal from './ConfirmationModal'
 
-export default MeteorMethodButton = ({method, data, options, handler, label, icon, className,
+export MeteorMethodButton = ({method, data, options, handler, label, icon, className,
 onSuccess, successMsg, onError, errorMsg, disabled, confirmation}) ->
 
   data ?= {}

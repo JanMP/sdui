@@ -16,7 +16,7 @@ passwordSchema = new SimpleSchema
 
 passwordSchemaBridge = new SimpleSchemaBridge passwordSchema
 
-export default SetPasswordForm = ({token}) ->
+export SetPasswordForm = ({token}) ->
   
   setPassword = ({password}) ->
     Accounts.resetPassword token, password, (error) ->

@@ -1,10 +1,10 @@
 import React from 'react'
-import DynamicField from '/forms/DynamicField.coffee'
+import {DynamicField} from '/forms/DynamicField.coffee'
 
 ###*
-  @type {(row: object, columnKey: string, schemaBridge: any, onChangeField: function, mayEdit: boolean) =>}
+  @type {({row, columnKey, schemaBridge, onChangeField, mayEdit}:{row: object, columnKey: string, schemaBridge: any, onChangeField: function, mayEdit: boolean}) =>}
   ###
-export default DynamicTableField = ({row, columnKey, schemaBridge, onChangeField, mayEdit}) ->
+export DynamicTableField = ({row, columnKey, schemaBridge, onChangeField, mayEdit}) ->
 
   onChange = (d) ->
     onChangeField

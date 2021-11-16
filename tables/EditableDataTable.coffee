@@ -1,11 +1,11 @@
 import React, {useState, useEffect, useRef} from 'react'
 # import {Button, Icon, Modal} from 'semantic-ui-react'
-import DataTable from './DataTable'
-import ErrorBoundary from './ErrorBoundary'
-import ConfirmationModal from '/forms/ConfirmationModal.coffee'
-import FormModal from '/forms/FormModal.coffee'
+import {DataTable} from './DataTable.coffee'
+import {ErrorBoundary} from './ErrorBoundary.coffee'
+import {ConfirmationModal} from '/forms/ConfirmationModal.coffee'
+import {FormModal} from '/forms/FormModal.coffee'
 
-export default EditableDataTable = ({
+export EditableDataTable = ({
   name
   listSchemaBridge, formSchemaBridge
   rows, totalRowCount, loadMoreRows, onRowClick,

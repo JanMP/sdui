@@ -8,7 +8,7 @@ import _ from 'lodash'
 style =
   padding: "4px 0"
 
-export default AutoTableAutoField = ({row, columnKey, schemaBridge, onChangeField, measure, mayEdit}) ->
+export AutoTableAutoField = ({row, columnKey, schemaBridge, onChangeField, measure, mayEdit}) ->
   fieldSchema = schemaBridge.schema._schema[columnKey]
   inner =
     if (component = fieldSchema.autotable?.component)?

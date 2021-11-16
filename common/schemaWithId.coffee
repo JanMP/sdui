@@ -7,4 +7,4 @@ idSchema =
   , requiredByDefault: false
 
 #* @type {(SimpleSchema) => SimpleSchema}
-export default schemaWithId = (schema) -> (_.cloneDeep schema).extend idSchema
+export schemaWithId = (schema) -> (_.cloneDeep schema).extend idSchema
