@@ -6,7 +6,7 @@ import {faSpinner} from '@fortawesome/free-solid-svg-icons/faSpinner'
 import _ from 'lodash'
 
 
-import ConfirmationModal from './ConfirmationModal'
+import {ConfirmationModal} from './ConfirmationModal'
 
 export MeteorMethodButton = ({method, data, options, handler, label, icon, className,
 onSuccess, successMsg, onError, errorMsg, disabled, confirmation}) ->

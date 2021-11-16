@@ -5,4 +5,5 @@
 export {userWithIdIsInRole, currentUserIsInRole, useCurrentUserIsInRole, currentUserMustBeInRole} from './common/roleChecks.coffee'
 export {createTableDataAPI} from './api/createTableDataAPI.coffee'
 export {MeteorMethodButton} from './forms/MeteorMethodButton.coffee'
-export {AutoForm} from './forms/uniforms-custom/AutoForm.tsx'
+export {MeteorDataAutoTable} from './tables/MeteorDataAutoTable.coffee'
+export {default as AutoForm} from './forms/uniforms-custom/AutoForm.tsx'

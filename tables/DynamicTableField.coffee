@@ -1,5 +1,5 @@
 import React from 'react'
-import {DynamicField} from '/forms/DynamicField.coffee'
+import {DynamicField} from '../forms/DynamicField.coffee'
 
 ###*
   @type {({row, columnKey, schemaBridge, onChangeField, mayEdit}:{row: object, columnKey: string, schemaBridge: any, onChangeField: function, mayEdit: boolean}) =>}
