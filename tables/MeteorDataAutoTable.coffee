@@ -162,7 +162,7 @@ export MeteorDataAutoTable = (props) ->
 
   loadMoreRows = ({startIndex, stopIndex}) ->
     if stopIndex >= limit
-      setLimit limit+perLoad
+      setLimit limit + perLoad
     new Promise (res, rej) ->
       resolveRef.current = res
       rejectRef.current = rej

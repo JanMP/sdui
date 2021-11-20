@@ -24,7 +24,7 @@ newCache = -> new CellMeasurerCache
 
 resizableHeaderRenderer = ({onResizeRows, isLastOne}) ->
   ({columnData, dataKey, disableSort, label, sortBy, sortDirection}) ->
-  
+
     onDrag = (e, {deltaX}) ->
       onResizeRows {dataKey, deltaX}
     
@@ -163,7 +163,7 @@ export DataTable = ({
         not (options.hide ? false)
 
   initialColumnWidths = columnKeys.map (key, i, arr) ->
-    schema._schema[key].autotable?.columnWidth ? 1/(if arr.length then arr.length else 20)
+    schema._schema[key].autotable?.columnWidth ? 1 / (if arr.length then arr.length else 20)
 
   getColumnWidthsFromLocalStorage = ->
     if global.localStorage
@@ -184,13 +184,13 @@ export DataTable = ({
 
   onResizeRows = ({dataKey, deltaX}) ->
     prevWidths = columnWidths
-    ratioDeltaX = deltaX/totalColumnsWidth
+    ratioDeltaX = deltaX / totalColumnsWidth
     i = _.findIndex columnKeys, (key) -> key is dataKey
     prevWidths[i] += ratioDeltaX
-    prevWidths[i+1] -= ratioDeltaX
+    prevWidths[i + 1] -= ratioDeltaX
     setColumnWidths prevWidths
     saveColumnWidthsToLocalStorage prevWidths
-    setDebouncedResetTrigger debouncedResetTrigger+1
+    setDebouncedResetTrigger debouncedResetTrigger + 1
 
   sort = ({event, defaultSortDirection, sortBy, sortDirection}) ->
     if 'sort-click-target' in event?.nativeEvent?.srcElement?.classList
@@ -227,7 +227,7 @@ export DataTable = ({
     columnKeys.map (key, i, arr) ->
       schemaForKey = schema._schema[key]
       options = schemaForKey.autotable ? {}
-      isLastOne = i is arr.length-1
+      isLastOne = i is arr.length - 1
       className = if options.overflow then 'overflow'
       headerRenderer = resizableHeaderRenderer({onResizeRows, isLastOne}) #unless isLastOne
       <Column
@@ -298,7 +298,7 @@ export DataTable = ({
             rowHeight={cacheRef.current.rowHeight}
             rowCount={rows?.length ? 0}
             rowGetter={getRow}
-            rowClassName={({index}) -> if index%%2 then 'uneven' else 'even'}
+            rowClassName={({index}) -> if index %% 2 then 'uneven' else 'even'}
             onRowsRendered={onRowsRendered}
             ref={tableRef}
             overscanRowCount={overscanRowCount}
