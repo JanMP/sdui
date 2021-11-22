@@ -57,7 +57,7 @@ signupSchemaBridge = new SimpleSchemaBridge signupSchema
 emailSchemaBridge = new SimpleSchemaBridge emailSchema
 
 
-LoginForm = ->
+SignInForm = ->
   login = ({email, password}) ->
     console.log 'login', {email, password}
     Meteor.loginWithPassword email, password, (error) ->
@@ -72,7 +72,7 @@ LoginForm = ->
   />
 
 
-SignupForm = ->
+SignUpForm = ->
   signup = (model) ->
     console.log 'wtf'
     Accounts.createUser model, (error) ->
@@ -97,18 +97,18 @@ EmailForm = ->
     onSubmit={resetPassword}
   />
 
-export default ({allowResetPassword = false}) ->
-  [formToShow, setFormToShow] = useState 'login'
+export LoginForm = ({allowResetPassword = false}) ->
+  [formToShow, setFormToShow] = useState 'sign-in'
   user = useTracker -> Meteor.user()
 
   [Form, loginOrSignupLabel] = switch formToShow
-    when 'login' then [LoginForm, 'Ich habe noch keinen Account']
-    when 'signup' then [SignupForm, 'Ich habe bereits einen Account']
-    when 'resetPassword' then [EmailForm, 'Ich habe noch keinen Account']
+    when 'sign-in' then [SignInForm, 'Ich habe noch keinen Account']
+    when 'sign-up' then [SignUpForm, 'Ich habe bereits einen Account']
+    when 'reset-password' then [EmailForm, 'Ich habe noch keinen Account']
     else [null, 'fnord']
 
   toggleLoginOrSignup = ->
-    if formToShow is 'signup' then setFormToShow 'login' else setFormToShow 'signup'
+    if formToShow is 'sign-up' then setFormToShow 'sign-in' else setFormToShow 'sign-up'
   
 
   <div>

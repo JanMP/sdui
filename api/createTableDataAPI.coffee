@@ -1,8 +1,8 @@
 import {Meteor} from 'meteor/meteor'
 import {Mongo} from 'meteor/mongo'
-import publishTableData from './publishTableData'
-import createTableDataMethods from './createTableDataMethods.coffee'
-import createDefaultPipeline from './createDefaultPipeline.coffee'
+import {publishTableData} from './publishTableData.coffee'
+import {createTableDataMethods} from './createTableDataMethods.coffee'
+import {createDefaultPipeline} from './createDefaultPipeline.coffee'
 import SimpleSchema2Bridge from 'uniforms-bridge-simple-schema-2'
 
 
@@ -47,7 +47,7 @@ import SimpleSchema2Bridge from 'uniforms-bridge-simple-schema-2'
     exportTableRole: string,
   }} export this and import it as props into your react-component
   ###
-createTableDataAPI = ({
+export createTableDataAPI = ({
   sourceName, sourceSchema, collection
   useObjectIds
   listSchema
@@ -77,15 +77,18 @@ createTableDataAPI = ({
 
   unless viewTableRole?
     viewTableRole = 'any'
-    console.warn "[createAutoDataTableBackend #{sourceName}]: no viewTableRole defined for AutoDataTableBackend #{sourceName}, using '#{viewTableRole}' instead."
+    console.warn "[createAutoDataTableBackend #{sourceName}]:
+      no viewTableRole defined for AutoDataTableBackend #{sourceName}, using '#{viewTableRole}' instead."
 
   if canEdit and not editRole?
     editRole = viewTableRole
-    console.warn "[createAutoDataTableBackend #{sourceName}]: no editRole defined for AutoDataTableBackend #{sourceName}, using '#{editRole}' instead."
+    console.warn "[createAutoDataTableBackend #{sourceName}]:
+      no editRole defined for AutoDataTableBackend #{sourceName}, using '#{editRole}' instead."
 
   if canExport and not exportTableRole?
     exportTableRole = viewTableRole
-    console.warn "[createAutoDataTableBackend #{sourceName}]: no exportTableRole defined for AutoDataTableBackend #{sourceName}, using '#{exportTableRole}' instead."
+    console.warn "[createAutoDataTableBackend #{sourceName}]:
+      no exportTableRole defined for AutoDataTableBackend #{sourceName}, using '#{exportTableRole}' instead."
   
   getPreSelectPipeline ?= -> []
   getProcessorPipeline ?= -> []
@@ -138,5 +141,3 @@ createTableDataAPI = ({
     editRole
     exportTableRole
   }
-
-export default createTableDataAPI

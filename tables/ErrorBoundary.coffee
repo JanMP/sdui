@@ -1,7 +1,7 @@
 import {Meteor} from 'meteor/meteor'
 import React, {Fragment} from 'react'
 
-export default class ErrorBoundary extends React.Component
+export class ErrorBoundary extends React.Component
   constructor: (props) ->
     super props
     @state = hasError: false

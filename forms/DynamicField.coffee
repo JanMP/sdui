@@ -6,7 +6,7 @@ import SimpleSchema2Bridge from 'uniforms-bridge-simple-schema-2'
 import _ from 'lodash'
 
 
-export default DynamicField = ({schemaBridge, fieldName, label, value, onChange, validate, mayEdit = true}) ->
+export DynamicField = ({schemaBridge, fieldName, label, value, onChange, validate, mayEdit = true}) ->
 
   return null unless schemaBridge?.schema? and fieldName?
 

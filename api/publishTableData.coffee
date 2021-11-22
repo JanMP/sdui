@@ -1,9 +1,10 @@
 import {Meteor} from 'meteor/meteor'
-import { ReactiveAggregate } from 'meteor/tunguska:reactive-aggregate'
+import {ReactiveAggregate} from 'meteor/tunguska:reactive-aggregate'
 import {userWithIdIsInRole} from '../common/roleChecks.coffee'
 
-export default publishTableData = ({viewTableRole, sourceName, collection,
+export publishTableData = ({viewTableRole, sourceName, collection,
 getRowsPipeline, getRowCountPipeline, debounceDelay = 500})  ->
+  
   if Meteor.isServer
   
     unless collection?

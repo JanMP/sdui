@@ -1,7 +1,7 @@
-import getColumnsToExport from '../common/getColumnsToExport'
+import {getColumnsToExport} from '../common/getColumnsToExport.coffee'
 import _ from 'lodash'
 
-export default createDefaultPipeline = ({getPreSelectPipeline, getProcessorPipeline, listSchema}) ->
+export createDefaultPipeline = ({getPreSelectPipeline, getProcessorPipeline, listSchema}) ->
 
   getPreSelectPipeline ?= -> []
   getProcessorPipeline ?= -> []

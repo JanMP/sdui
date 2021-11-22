@@ -1,20 +1,20 @@
 import {Meteor} from 'meteor/meteor'
 import {Mongo} from 'meteor/mongo'
 import React, {useState, useEffect, useRef} from 'react'
-import meteorApply from '/common/meteorApply.coffee'
-import EditableDataTable from './EditableDataTable'
-import ErrorBoundary from './ErrorBoundary'
+import {meteorApply} from '../common/meteorApply.coffee'
+import {EditableDataTable} from './EditableDataTable.coffee'
+import {ErrorBoundary} from './ErrorBoundary.coffee'
 import {useTracker} from 'meteor/react-meteor-data'
 import {toast} from 'react-toastify'
-import {useCurrentUserIsInRole} from '/common/roleChecks.coffee'
-import getColumnsToExport from '/common/getColumnsToExport.coffee'
+import {useCurrentUserIsInRole} from '../common/roleChecks.coffee'
+import {getColumnsToExport} from '../common/getColumnsToExport.coffee'
 import Papa from 'papaparse'
-import downloadAsFile from '/common/downloadAsFile.coffee'
+import {downloadAsFile} from '../common/downloadAsFile.coffee'
 import _ from 'lodash'
 
 defaultQuery = {} # ensures equality between runs
 
-export default MeteorDataAutoTable = (props) ->
+export MeteorDataAutoTable = (props) ->
   {
   sourceName, listSchemaBridge,
   rowsCollection, rowCountCollection
@@ -162,7 +162,7 @@ export default MeteorDataAutoTable = (props) ->
 
   loadMoreRows = ({startIndex, stopIndex}) ->
     if stopIndex >= limit
-      setLimit limit+perLoad
+      setLimit limit + perLoad
     new Promise (res, rej) ->
       resolveRef.current = res
       rejectRef.current = rej
