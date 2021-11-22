@@ -1,7 +1,7 @@
 import React, {useState, useEffect, useRef} from 'react'
 # import {Button, Icon, Modal} from 'semantic-ui-react'
 import {DataTable} from './DataTable.coffee'
-import {ErrorBoundary} from './ErrorBoundary.coffee'
+import {ErrorBoundary} from '../common/ErrorBoundary.coffee'
 import {ConfirmationModal} from '../forms/ConfirmationModal.coffee'
 import {FormModal} from '../forms/FormModal.coffee'
 

@@ -15,6 +15,6 @@ export class ErrorBoundary extends React.Component
 
   render: ->
     if @state.hasError
-      <div className="bg-red-200">error</div>
+      <div className="error-boundary">error</div>
     else
       @props.children
