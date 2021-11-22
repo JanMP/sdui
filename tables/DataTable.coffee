@@ -48,9 +48,9 @@ resizableHeaderRenderer = ({onResizeRows, isLastOne}) ->
     </React.Fragment>
 
 
-cellRenderer = ({schemaBridge, onChangeField, cache, mayEdit}) ->
+cellRenderer = ({listSchemaBridge, onChangeField, cache, mayEdit}) ->
   ({dataKey, parent, rowIndex, columnIndex, cellData, rowData}) ->
-    options = schemaBridge.schema._schema[dataKey].autotable ? {}
+    options = listSchemaBridge.schema._schema[dataKey].autotable ? {}
     cache.clear {rowIndex, columnIndex}
     <CellMeasurer
       cache={cache}
@@ -63,7 +63,7 @@ cellRenderer = ({schemaBridge, onChangeField, cache, mayEdit}) ->
         <AutoTableAutoField
           row={rowData}
           columnKey={dataKey}
-          schemaBridge={schemaBridge}
+          schemaBridge={listSchemaBridge}
           onChangeField={onChangeField}
           measure={measure}
           mayEdit={mayEdit}
@@ -120,7 +120,7 @@ SearchInput = ({value, onChange}) ->
 
 export DataTable = ({
   name,
-  schemaBridge,
+  listSchemaBridge,
   rows, limit, totalRowCount,
   loadMoreRows = (args...) -> console.log "loadMoreRows default stump called with arguments:", args...
   useSort, sortColumn, sortDirection,
@@ -138,7 +138,7 @@ export DataTable = ({
   overscanRowCount = 10
 }) ->
 
-  schema = schemaBridge.schema
+  schema = listSchemaBridge.schema
 
   deleteColumnWidth = 50
 
@@ -236,7 +236,7 @@ export DataTable = ({
         dataKey={key}
         label={schemaForKey.label}
         width={columnWidths[i] * totalColumnsWidth}
-        cellRenderer={cellRenderer {schemaBridge, onChangeField, mayEdit, cache: cacheRef.current}}
+        cellRenderer={cellRenderer {listSchemaBridge, onChangeField, mayEdit, cache: cacheRef.current}}
         headerRenderer={headerRenderer}
       />
 

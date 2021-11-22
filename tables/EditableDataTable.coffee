@@ -89,7 +89,7 @@ export EditableDataTable = ({
       <DataTable
         {{
           name
-          schemaBridge: listSchemaBridge,
+          listSchemaBridge,
           rows, totalRowCount, loadMoreRows, onRowClick,
           sortColumn, sortDirection, onChangeSort, useSort
           canSearch, search, onChangeSearch
