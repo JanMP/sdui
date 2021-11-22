@@ -1,5 +1,6 @@
 import React, {useEffect, useState, useRef} from "react"
 import {AutoTableAutoField} from "./AutoTableAutoField.coffee"
+import {SearchInput} from "./SearchInput.coffee"
 import {
   Column, defaultTableRowRenderer, Table, CellMeasurer, CellMeasurerCache,
   InfiniteLoader
@@ -88,34 +89,6 @@ deleteButtonCellRenderer = ({onDelete = ->}) ->
         <FontAwesomeIcon icon={faTrash}/>
       </button>
     </div>
-
-# TODO move into /forms ?
-SearchInput = ({value, onChange}) ->
-
-  [isValid, setIsValid] = useState true
-  [displayValue, setDisplayValue] = useState value
-  [debouncedValue, setDebouncedValue] = useDebounce value, 500
-
-  useEffect ->
-    onChange debouncedValue
-  , [debouncedValue]
-  
-  handleSearchChange = (newValue) ->
-    try
-      new RegExp newValue unless newValue is ''
-      setIsValid true
-      setDebouncedValue newValue
-    catch error
-      setIsValid false
-    finally
-      setDisplayValue newValue
-
-  <input
-    className="search-input"
-    type="text"
-    value={displayValue}
-    onChange={(e) -> handleSearchChange e.target.value}
-  />
 
 
 export DataTable = ({
