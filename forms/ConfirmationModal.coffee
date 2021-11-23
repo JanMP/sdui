@@ -1,7 +1,11 @@
 import React, {useState} from 'react'
 import Modal from 'react-modal'
+import {useTw} from '../config.coffee'
+
 
 export ConfirmationModal = ({text, onConfirm = ->, onCancel = ->, isOpen, setIsOpen}) ->
+
+  tw = useTw()
 
   handleOkClick = ->
     setIsOpen false
@@ -18,8 +22,8 @@ export ConfirmationModal = ({text, onConfirm = ->, onCancel = ->, isOpen, setIsO
     overlayClassName="overlay"
   >
     <div>{text}</div>
-    <div className="button-row">
-      <button className="cancel-button" onClick={handleCancelClick} >Abbrechen</button>
-      <button className="ok-button" onClick={handleOkClick} >OK</button>
+    <div className={tw"mt-4 flex justify-end"}>
+      <button className={tw"bg-secondary"} onClick={handleCancelClick} >Abbrechen</button>
+      <button className={tw"ml-2 bg-primary"} onClick={handleOkClick} >OK</button>
     </div>
   </Modal>

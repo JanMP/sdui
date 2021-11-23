@@ -38,6 +38,7 @@ export DataList = ({
   canExport, onExportTable = (args...) -> console.log "onExportTable default stump called with arguments:", args...
   mayExport
   overscanRowCount = 10
+  ListItem = DefaultListItem
 }) ->
 
   schema = listSchemaBridge.schema
@@ -96,7 +97,7 @@ export DataList = ({
         parent={parent}
         rowIndex={index}
       >
-        <DefaultListItem row={getRow {index}}/>
+        <ListItem row={getRow {index}} onDelete={onDelete}/>
       </CellMeasurer>
     </div>
 
