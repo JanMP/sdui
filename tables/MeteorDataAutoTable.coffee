@@ -41,6 +41,7 @@ export MeteorDataAutoTable = (props) ->
   setValueMethodName
   exportRowsMethodName
   viewTableRole, editRole, exportTableRole
+  Header
   } = props
 
   # we only support usePubSub = true atm
@@ -238,5 +239,6 @@ export MeteorDataAutoTable = (props) ->
       canExport, onExportTable
       mayExport
       isLoading
+      Header
     }...} />
   </ErrorBoundary>

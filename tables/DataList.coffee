@@ -14,6 +14,8 @@ import {faSortUp} from '@fortawesome/free-solid-svg-icons/faSortUp'
 import {faSortDown} from '@fortawesome/free-solid-svg-icons/faSortDown'
 import {faTrash} from '@fortawesome/free-solid-svg-icons/faTrash'
 import {DefaultListItem} from './DefaultListItem.coffee'
+import {DefaultHeader} from './DefaultHeader.coffee'
+
 
 newCache = -> new CellMeasurerCache
   fixedWidth: true
@@ -39,6 +41,7 @@ export DataList = ({
   mayExport
   overscanRowCount = 10
   ListItem = DefaultListItem
+  Header = DefaultHeader
 }) ->
 
   schema = listSchemaBridge.schema
@@ -105,44 +108,19 @@ export DataList = ({
   <div ref={contentContainerRef} style={height: '100%'} className="bg-white">
   
     <div ref={headerContainerRef} style={margin: '10px'}>
-      <div style={display: 'flex', justifyContent: 'space-between'}>
-        <div>{rows?.length}/{totalRowCount}</div>
-        <div>
-          <div style={textAlign: 'center'}>
-            {
-              if canSearch
-                <SearchInput
-                  size="small"
-                  value={search}
-                  onChange={onChangeSearch}
-                />
-            }
-          </div>
-        </div>
-        <div>
-          <div style={textAlign: 'right'}>
-            {
-              if canExport
-                <button
-                  className="icon-button"
-                  onClick={onExportTable} disabled={not mayExport}
-                >
-                  <FontAwesomeIcon icon={faFileDownload}/>
-                </button>
-            }
-            {
-              if canAdd
-                <button
-                  className="icon-button"
-                  style={marginLeft: '1rem'}
-                  onClick={onAdd} disabled={not mayEdit}
-                >
-                  <FontAwesomeIcon icon={faPlus}/>
-                </button>
-            }
-          </div>
-        </div>
-      </div>
+      <Header
+        rowsLoaded={rows?.length}
+        totalRowCount={totalRowCount}
+        canSearch={canSearch}
+        search={search}
+        onChangeSearch={onChangeSearch}
+        canExport={canExport}
+        onExportTable={onExportTable}
+        mayExport={mayExport}
+        canAdd={canAdd}
+        onAdd={onAdd}
+        mayEdit={mayEdit}
+      />
     </div>
    
       <InfiniteLoader
