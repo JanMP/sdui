@@ -13,7 +13,7 @@ import {faFileDownload} from '@fortawesome/free-solid-svg-icons/faFileDownload'
 import {faSortUp} from '@fortawesome/free-solid-svg-icons/faSortUp'
 import {faSortDown} from '@fortawesome/free-solid-svg-icons/faSortDown'
 import {faTrash} from '@fortawesome/free-solid-svg-icons/faTrash'
-
+import {DefaultListItem} from './DefaultListItem.coffee'
 
 newCache = -> new CellMeasurerCache
   fixedWidth: true
@@ -96,9 +96,7 @@ export DataList = ({
         parent={parent}
         rowIndex={index}
       >
-        <pre>
-          {JSON.stringify (getRow {index}), null, 2}
-        </pre>
+        <DefaultListItem row={getRow {index}}/>
       </CellMeasurer>
     </div>
 
