@@ -15,9 +15,6 @@ import _ from 'lodash'
 defaultQuery = {} # ensures equality between runs
 
 export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponents}) ->
-  
-  console.log dataOptions
-  
   {
   sourceName, listSchemaBridge,
   rowsCollection, rowCountCollection
