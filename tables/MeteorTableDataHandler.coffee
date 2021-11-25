@@ -14,7 +14,10 @@ import _ from 'lodash'
 
 defaultQuery = {} # ensures equality between runs
 
-export MeteorDataAutoList = (props) ->
+export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponents}) ->
+  
+  console.log dataOptions
+  
   {
   sourceName, listSchemaBridge,
   rowsCollection, rowCountCollection
@@ -41,8 +44,7 @@ export MeteorDataAutoList = (props) ->
   setValueMethodName
   exportRowsMethodName
   viewTableRole, editRole, exportTableRole,
-  ListItem
-  } = props
+  } = dataOptions
 
   # we only support usePubSub = true atm
   usePubSub = true
@@ -224,7 +226,7 @@ export MeteorDataAutoList = (props) ->
 
 
   <ErrorBoundary>
-    <DataList {{
+    <DisplayComponent {{
       name: sourceName,
       listSchemaBridge, formSchemaBridge
       rows, totalRowCount, loadMoreRows, onRowClick,
@@ -239,6 +241,6 @@ export MeteorDataAutoList = (props) ->
       canExport, onExportTable
       mayExport
       isLoading
-      ListItem
+      customComponents
     }...} />
   </ErrorBoundary>

@@ -4,14 +4,22 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faTrash} from '@fortawesome/free-solid-svg-icons/faTrash'
 import {MeteorMethodButton} from '../forms/MeteorMethodButton.coffee'
 
-export DefaultListItem = ({row, onDelete}) ->
+DefaultListItemContent = ({row}) ->
   tw = useTw()
-  row ?= "no value for row given"
+
+  <div className={tw"bg-red-100"}>{JSON.stringify row, null, 2}</div>
+
+
+export DefaultListItem = ({row, onDelete, ListItemContent}) ->
+  
+  tw = useTw()
+  row ?= "no value"
+  ListItemContent ?= DefaultListItemContent
 
   <div className={tw"p-2"}>
     <pre className={tw"p-2 rounded-lg shadow flex justify-between"}>
-      <div>{JSON.stringify row, null, 2}</div>
-      <div className={tw"p-2"}>
+      <DefaultListItemContent row={row}/>
+      <div className={tw"p-2 bg-blue-100"}>
         <MeteorMethodButton
           handler={-> onDelete id: row._id}
           icon={faTrash}
