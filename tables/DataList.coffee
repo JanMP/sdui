@@ -109,7 +109,7 @@ export DataList = ({
   
     <div ref={headerContainerRef} style={margin: '10px'}>
       <Header
-        rowsLoaded={rows?.length}
+        loadedRowCount={rows?.length}
         totalRowCount={totalRowCount}
         canSearch={canSearch}
         search={search}

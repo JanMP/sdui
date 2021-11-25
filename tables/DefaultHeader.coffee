@@ -6,7 +6,7 @@ import {SearchInput} from "./SearchInput.coffee"
 import {useTw} from '../config.coffee'
 
 export DefaultHeader = ({
-  loadedRowsCount, totalRowCount
+  loadedRowCount, totalRowCount
   canSearch, search, onChangeSearch
   canExport, onExportTable, mayExport,
   canAdd, onAdd, mayEdit
@@ -15,7 +15,7 @@ export DefaultHeader = ({
   tw = useTw()
 
   <div className={tw"flex justify-between"}>
-    <div>{loadedRowsCount}/{totalRowCount}</div>
+    <div>{loadedRowCount}/{totalRowCount}</div>
     <div>
       <div className={tw"text-center"}>
         {
