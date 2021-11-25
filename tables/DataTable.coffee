@@ -10,11 +10,10 @@ import {useThrottle} from '@react-hook/throttle'
 import useSize from '@react-hook/size'
 import _ from 'lodash'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faPlus} from '@fortawesome/free-solid-svg-icons/faPlus'
-import {faFileDownload} from '@fortawesome/free-solid-svg-icons/faFileDownload'
 import {faSortUp} from '@fortawesome/free-solid-svg-icons/faSortUp'
 import {faSortDown} from '@fortawesome/free-solid-svg-icons/faSortDown'
 import {faTrash} from '@fortawesome/free-solid-svg-icons/faTrash'
+import {DefaultHeader} from './DefaultHeader.coffee'
 
 
 newCache = -> new CellMeasurerCache
@@ -48,9 +47,9 @@ resizableHeaderRenderer = ({onResizeRows, isLastOne}) ->
     </React.Fragment>
 
 
-cellRenderer = ({schemaBridge, onChangeField, cache, mayEdit}) ->
+cellRenderer = ({listSchemaBridge, onChangeField, cache, mayEdit}) ->
   ({dataKey, parent, rowIndex, columnIndex, cellData, rowData}) ->
-    options = schemaBridge.schema._schema[dataKey].autotable ? {}
+    options = listSchemaBridge.schema._schema[dataKey].autotable ? {}
     cache.clear {rowIndex, columnIndex}
     <CellMeasurer
       cache={cache}
@@ -63,7 +62,7 @@ cellRenderer = ({schemaBridge, onChangeField, cache, mayEdit}) ->
         <AutoTableAutoField
           row={rowData}
           columnKey={dataKey}
-          schemaBridge={schemaBridge}
+          schemaBridge={listSchemaBridge}
           onChangeField={onChangeField}
           measure={measure}
           mayEdit={mayEdit}
@@ -89,38 +88,10 @@ deleteButtonCellRenderer = ({onDelete = ->}) ->
       </button>
     </div>
 
-# TODO move into /forms ?
-SearchInput = ({value, onChange}) ->
-
-  [isValid, setIsValid] = useState true
-  [displayValue, setDisplayValue] = useState value
-  [debouncedValue, setDebouncedValue] = useDebounce value, 500
-
-  useEffect ->
-    onChange debouncedValue
-  , [debouncedValue]
-  
-  handleSearchChange = (newValue) ->
-    try
-      new RegExp newValue unless newValue is ''
-      setIsValid true
-      setDebouncedValue newValue
-    catch error
-      setIsValid false
-    finally
-      setDisplayValue newValue
-
-  <input
-    className="search-input"
-    type="text"
-    value={displayValue}
-    onChange={(e) -> handleSearchChange e.target.value}
-  />
-
 
 export DataTable = ({
   name,
-  schemaBridge,
+  listSchemaBridge,
   rows, limit, totalRowCount,
   loadMoreRows = (args...) -> console.log "loadMoreRows default stump called with arguments:", args...
   useSort, sortColumn, sortDirection,
@@ -136,9 +107,10 @@ export DataTable = ({
   canExport, onExportTable = (args...) -> console.log "onExportTable default stump called with arguments:", args...
   mayExport
   overscanRowCount = 10
+  Header = DefaultHeader
 }) ->
 
-  schema = schemaBridge.schema
+  schema = listSchemaBridge.schema
 
   deleteColumnWidth = 50
 
@@ -236,7 +208,7 @@ export DataTable = ({
         dataKey={key}
         label={schemaForKey.label}
         width={columnWidths[i] * totalColumnsWidth}
-        cellRenderer={cellRenderer {schemaBridge, onChangeField, mayEdit, cache: cacheRef.current}}
+        cellRenderer={cellRenderer {listSchemaBridge, onChangeField, mayEdit, cache: cacheRef.current}}
         headerRenderer={headerRenderer}
       />
 
@@ -244,44 +216,19 @@ export DataTable = ({
   <div ref={contentContainerRef} style={height: '100%'} className="bg-white">
   
     <div ref={headerContainerRef} style={margin: '10px'}>
-      <div style={display: 'flex', justifyContent: 'space-between'}>
-        <div>{rows?.length}/{totalRowCount}</div>
-        <div>
-          <div style={textAlign: 'center'}>
-            {
-              if canSearch
-                <SearchInput
-                  size="small"
-                  value={search}
-                  onChange={onChangeSearch}
-                />
-            }
-          </div>
-        </div>
-        <div>
-          <div style={textAlign: 'right'}>
-            {
-              if canExport
-                <button
-                  className="icon-button"
-                  onClick={onExportTable} disabled={not mayExport}
-                >
-                  <FontAwesomeIcon icon={faFileDownload}/>
-                </button>
-            }
-            {
-              if canAdd
-                <button
-                  className="icon-button"
-                  style={marginLeft: '1rem'}
-                  onClick={onAdd} disabled={not mayEdit}
-                >
-                  <FontAwesomeIcon icon={faPlus}/>
-                </button>
-            }
-          </div>
-        </div>
-      </div>
+      <Header
+        loadedRowCount={rows?.length}
+        totalRowCount={totalRowCount}
+        canSearch={canSearch}
+        search={search}
+        onChangeSearch={onChangeSearch}
+        canExport={canExport}
+        onExportTable={onExportTable}
+        mayExport={mayExport}
+        canAdd={canAdd}
+        onAdd={onAdd}
+        mayEdit={mayEdit}
+      />
     </div>
    
       <InfiniteLoader

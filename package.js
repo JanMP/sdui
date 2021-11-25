@@ -15,6 +15,7 @@ Package.onUse(function(api) {
   api.use('ecmascript');
   api.use('coffeescript');
   api.use('typescript');
+  api.use('reactive-var');
   api.use('alanning:roles');
   api.use('mdg:validated-method');
   api.use('momentjs:moment');

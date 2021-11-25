@@ -2,7 +2,7 @@ import {Meteor} from 'meteor/meteor'
 import {Mongo} from 'meteor/mongo'
 import React, {useState, useEffect, useRef} from 'react'
 import {meteorApply} from '../common/meteorApply.coffee'
-import {EditableDataTable} from './EditableDataTable.coffee'
+import {DataList} from './DataList.coffee'
 import {ErrorBoundary} from '../common/ErrorBoundary.coffee'
 import {useTracker} from 'meteor/react-meteor-data'
 import {toast} from 'react-toastify'
@@ -14,7 +14,7 @@ import _ from 'lodash'
 
 defaultQuery = {} # ensures equality between runs
 
-export MeteorDataAutoTable = (props) ->
+export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponents}) ->
   {
   sourceName, listSchemaBridge,
   rowsCollection, rowCountCollection
@@ -40,8 +40,8 @@ export MeteorDataAutoTable = (props) ->
   submitMethodName, deleteMethodName, fetchEditorDataMethodName
   setValueMethodName
   exportRowsMethodName
-  viewTableRole, editRole, exportTableRole
-  } = props
+  viewTableRole, editRole, exportTableRole,
+  } = dataOptions
 
   # we only support usePubSub = true atm
   usePubSub = true
@@ -223,7 +223,7 @@ export MeteorDataAutoTable = (props) ->
 
 
   <ErrorBoundary>
-    <EditableDataTable {{
+    <DisplayComponent {{
       name: sourceName,
       listSchemaBridge, formSchemaBridge
       rows, totalRowCount, loadMoreRows, onRowClick,
@@ -238,5 +238,6 @@ export MeteorDataAutoTable = (props) ->
       canExport, onExportTable
       mayExport
       isLoading
+      customComponents
     }...} />
   </ErrorBoundary>

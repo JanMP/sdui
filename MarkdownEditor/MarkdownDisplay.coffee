@@ -1,7 +1,7 @@
 import React from 'react'
 import markdownIt from 'markdown-it'
 import container from 'markdown-it-container'
-import tw from '/imports/ui/twind'
+import {tw} from '/imports/ui/twind'
 # import mark from 'markdown-it-mark'
 # import footnote from 'markdown-it-footnote'
 # import emoji from 'markdown-it-emoji'

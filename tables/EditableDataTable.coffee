@@ -21,6 +21,7 @@ export EditableDataTable = ({
   mayExport
   isLoading,
   overscanRowCount
+  Header
 }) ->
 
   onAdd ?= ->
@@ -89,7 +90,7 @@ export EditableDataTable = ({
       <DataTable
         {{
           name
-          schemaBridge: listSchemaBridge,
+          listSchemaBridge,
           rows, totalRowCount, loadMoreRows, onRowClick,
           sortColumn, sortDirection, onChangeSort, useSort
           canSearch, search, onChangeSearch
@@ -101,6 +102,7 @@ export EditableDataTable = ({
           mayExport
           isLoading
           overscanRowCount
+          Header
         }...}
       />
     </ErrorBoundary>
