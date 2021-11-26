@@ -23,7 +23,7 @@ export ConfirmationModal = ({text, onConfirm = ->, onCancel = ->, isOpen, setIsO
   >
     <div>{text}</div>
     <div className={tw"mt-4 flex justify-end"}>
-      <button className={tw"bg-secondary"} onClick={handleCancelClick} >Abbrechen</button>
-      <button className={tw"ml-2 bg-primary"} onClick={handleOkClick} >OK</button>
+      <button className={tw"bg-secondary-400! text-white!"} onClick={handleCancelClick} >Abbrechen</button>
+      <button className={tw"ml-2 bg-primary-400! text-white!"} onClick={handleOkClick} >OK</button>
     </div>
   </Modal>

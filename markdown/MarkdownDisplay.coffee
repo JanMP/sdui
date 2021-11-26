@@ -1,7 +1,6 @@
 import React from 'react'
 import markdownIt from 'markdown-it'
-import container from 'markdown-it-container'
-import {tw} from '/imports/ui/twind'
+# import container from 'markdown-it-container'
 # import mark from 'markdown-it-mark'
 # import footnote from 'markdown-it-footnote'
 # import emoji from 'markdown-it-emoji'
@@ -27,26 +26,15 @@ import {tw} from '/imports/ui/twind'
 #   }
 # };
   
-md =
+getDefaultMdInstance = ->
   markdownIt
     html: true
     linkify: true
     typographer: true
     quotes: '„“‚‘'
-  .use container, 'search-tip',
-    render: (tokens, idx) ->
-      if tokens[idx].nesting is 1
-        "<div class='search-tip'>
-          <div>
-            <img src='/images/Lupe.svg' alt='search-tip'/>
-          </div>
-          <div>"
-      else
-        "</div></div>"
-  .use container, 'logo'
 
   
-export default ({markdown = '', style = {}, contentClass}) ->
-  <div dangerouslySetInnerHTML={__html: md.render(markdown)} style={style} className={contentClass} />
+export MarkdownDisplay = ({markdown = '', contentClass, markdownItInstance = getDefaultMdInstance()}) ->
+  <div dangerouslySetInnerHTML={__html: markdownItInstance.render(markdown)} className={contentClass} />
 
 

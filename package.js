@@ -21,7 +21,8 @@ Package.onUse(function(api) {
   api.use('momentjs:moment');
   api.use('peerlibrary:reactive-publish');
   api.use('tunguska:reactive-aggregate');
-  api.mainModule('sdui.js');
+  api.mainModule('sdui-client.coffee', 'client');
+  api.mainModule('sdui-server.coffee', 'server');
 });
 
 Package.onTest(function(api) {
