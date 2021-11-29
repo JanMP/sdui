@@ -6,4 +6,5 @@ export SdTable = ({dataOptions, customComponents}) ->
   <MeteorTableDataHandler
     dataOptions={dataOptions}
     DisplayComponent={EditableDataTable}
+    customComponents={customComponents}
   />

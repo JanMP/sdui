@@ -21,7 +21,7 @@ export EditableDataTable = ({
   mayExport
   isLoading,
   overscanRowCount
-  Header
+  customComponents
 }) ->
 
   onAdd ?= ->
@@ -102,7 +102,7 @@ export EditableDataTable = ({
           mayExport
           isLoading
           overscanRowCount
-          Header
+          customComponents
         }...}
       />
     </ErrorBoundary>

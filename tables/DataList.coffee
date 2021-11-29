@@ -40,9 +40,13 @@ export DataList = ({
   canExport, onExportTable = (args...) -> console.log "onExportTable default stump called with arguments:", args...
   mayExport
   overscanRowCount = 10
-  ListItem = DefaultListItem
-  Header = DefaultHeader
+  customComponents = {}
 }) ->
+
+  {Header, ListItem} = customComponents
+
+  ListItem ?= DefaultListItem
+  Header ?= DefaultHeader
 
   schema = listSchemaBridge.schema
 

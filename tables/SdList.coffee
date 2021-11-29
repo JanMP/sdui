@@ -6,4 +6,5 @@ export SdList = ({dataOptions, customComponents}) ->
   <MeteorTableDataHandler
     dataOptions={dataOptions}
     DisplayComponent={DataList}
+    customComponents={customComponents}
   />

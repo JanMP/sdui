@@ -107,8 +107,11 @@ export DataTable = ({
   canExport, onExportTable = (args...) -> console.log "onExportTable default stump called with arguments:", args...
   mayExport
   overscanRowCount = 10
-  Header = DefaultHeader
+  customComponents = {}
 }) ->
+
+  {Header} = customComponents
+  Header ?= DefaultHeader
 
   schema = listSchemaBridge.schema
 
