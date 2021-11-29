@@ -90,7 +90,7 @@ deleteButtonCellRenderer = ({onDelete = ->}) ->
 
 
 export DataTable = ({
-  name,
+  sourceName,
   listSchemaBridge,
   rows, limit, totalRowCount,
   loadMoreRows = (args...) -> console.log "loadMoreRows default stump called with arguments:", args...
@@ -140,14 +140,14 @@ export DataTable = ({
   getColumnWidthsFromLocalStorage = ->
     if global.localStorage
       try
-        JSON.parse(global.localStorage.getItem name)?.columnWidths
+        JSON.parse(global.localStorage.getItem sourceName)?.columnWidths
       catch error
         console.error error
 
   saveColumnWidthsToLocalStorage = (newWidths) ->
     if global.localStorage
-      currentEntry = (try JSON.parse global.localStorage.getItem name) ?{}
-      global.localStorage.setItem name, JSON.stringify {currentEntry..., columnWidths: newWidths}
+      currentEntry = (try JSON.parse global.localStorage.getItem sourceName) ?{}
+      global.localStorage.setItem sourceName, JSON.stringify {currentEntry..., columnWidths: newWidths}
 
   [columnWidths, setColumnWidths] = useState getColumnWidthsFromLocalStorage() ? initialColumnWidths
   totalColumnsWidth = contentContainerWidth - if canDelete then deleteColumnWidth else 0
@@ -173,7 +173,7 @@ export DataTable = ({
   useEffect ->
     if (newColumnWidths = getColumnWidthsFromLocalStorage())?
       setColumnWidths newColumnWidths
-  , [name]
+  , [sourceName]
 
   useEffect ->
     cacheRef.current.clearAll()
