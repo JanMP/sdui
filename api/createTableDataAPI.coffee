@@ -45,7 +45,7 @@ import SimpleSchema2Bridge from 'uniforms-bridge-simple-schema-2'
     viewTableRole: string,
     editRole: string,
     exportTableRole: string,
-  }} export this and import it as props into your react-component
+  }} - exoirt this an use it as prop into your react component
   ###
 export createTableDataAPI = ({
   sourceName, sourceSchema, collection

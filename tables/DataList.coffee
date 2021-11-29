@@ -23,7 +23,7 @@ newCache = -> new CellMeasurerCache
   defaultHeight: 200
 
 export DataList = ({
-  name,
+  sourceName,
   listSchemaBridge,
   rows, limit, totalRowCount,
   loadMoreRows = (args...) -> console.log "loadMoreRows default stump called with arguments:", args...

@@ -10,11 +10,10 @@ DefaultListItemContent = ({row}) ->
   <div className={tw"bg-red-100"}>{JSON.stringify row, null, 2}</div>
 
 
-export DefaultListItem = ({row, onDelete, ListItemContent}) ->
+export DefaultListItem = ({row, onDelete, ListItemContent = DefaultListItemContent}) ->
   
   tw = useTw()
   row ?= "no value"
-  ListItemContent ?= DefaultListItemContent
 
   <div className={tw"p-2"}>
     <pre className={tw"p-2 rounded-lg shadow flex justify-between"}>
