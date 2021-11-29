@@ -104,7 +104,7 @@ export DataList = ({
         parent={parent}
         rowIndex={index}
       >
-        <ListItem row={getRow {index}} onDelete={onDelete}/>
+        <ListItem rowData={getRow {index}} index={index} onDelete={onDelete} onClick={onRowClick}/>
       </CellMeasurer>
     </div>
 

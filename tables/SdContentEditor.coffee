@@ -2,9 +2,9 @@ import React from 'react'
 import {MeteorTableDataHandler} from './MeteorTableDataHandler.coffee'
 import {EditableDataList} from './EditableDataList.coffee'
 
-export SdList = ({dataOptions, customComponents}) ->
+export SdContentEditor = ->
   <MeteorTableDataHandler
     dataOptions={dataOptions}
-    DisplayComponent={EditableDataList}
+    DisplayComponent={ContentEditor}
     customComponents={customComponents}
   />
