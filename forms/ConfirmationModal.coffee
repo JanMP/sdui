@@ -2,7 +2,15 @@ import React, {useState} from 'react'
 import Modal from 'react-modal'
 import {useTw} from '../config.coffee'
 
-
+###*
+  @param {Object} args
+  @param {string} args.text
+  @param {() => void} [args.onConfirm]
+  @param {() => void} [args.onCancel]
+  @param {boolean} args.isOpen
+  @param {(newValue : boolean) => void} args.setIsOpen
+  @return void
+  ###
 export ConfirmationModal = ({text, onConfirm = ->, onCancel = ->, isOpen, setIsOpen}) ->
 
   tw = useTw()
