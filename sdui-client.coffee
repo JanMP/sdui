@@ -4,7 +4,7 @@
 # applications. See sdui-tests.js for an example of importing.
 export {userWithIdIsInRole, currentUserIsInRole, useCurrentUserIsInRole, currentUserMustBeInRole} from './common/roleChecks.coffee'
 export {createTableDataAPI} from './api/createTableDataAPI.coffee'
-export {MeteorMethodButton} from './forms/MeteorMethodButton.coffee'
+export {ActionButton} from './forms/ActionButton.coffee'
 export {SdTable} from './tables/SdTable.coffee'
 export {SdList} from './tables/SdList.coffee'
 export {MarkdownEditor} from './markdown/MarkdownEditor.coffee'

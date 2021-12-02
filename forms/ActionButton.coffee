@@ -8,7 +8,7 @@ import _ from 'lodash'
 
 import {ConfirmationModal} from './ConfirmationModal'
 
-export MeteorMethodButton = ({method, data, options, handler, label, icon, className,
+export ActionButton = ({method, data, options, onAction, label, icon, className,
 onSuccess, successMsg, onError, errorMsg, disabled, confirmation}) ->
 
   data ?= {}
@@ -26,8 +26,8 @@ onSuccess, successMsg, onError, errorMsg, disabled, confirmation}) ->
     setModalIsOpen false
     setIsBusy true
     (
-      if handler?
-        new Promise (resolve) -> resolve handler()
+      if onAction?
+        new Promise (resolve) -> resolve onAction()
       else
         meteorApply {method, data, options}
     )
