@@ -79,10 +79,10 @@ deleteButtonCellRenderer = ({onDelete = ->}) ->
       if (id = rowData?._id ? rowData?.id)?
         onDelete {id}
 
-    <div className="mt-2">
+    <div style={paddingTop: ".5rem"}>
       <button
         onClick={onClick}
-        className="icon-button"
+        className="danger icon"
       >
         <FontAwesomeIcon icon={faTrash}/>
       </button>
