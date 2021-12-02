@@ -24,10 +24,11 @@ export DefaultListItem = ({rowData, index, onDelete, onClick, ListItemContent = 
     if index? then onClick {rowData, index}
 
   <div className={tw"p-2"}>
-    <pre className={tw"p-2 rounded-lg shadow flex justify-between"} onClick={handleClick}>
-      <DefaultListItemContent rowData={rowData}/>
-      <div className={tw"p-2 bg-blue-100"}>
+    <pre className={tw"p-2 border border-gray-200 rounded-lg shadow flex justify-between"} onClick={handleClick}>
+      <ListItemContent rowData={rowData}/>
+      <div className={tw"p-2"}>
         <button
+          className="icon danger"
           onClick={handleDeleteButtonClick}
         >
           <FontAwesomeIcon icon={faTrash}/>

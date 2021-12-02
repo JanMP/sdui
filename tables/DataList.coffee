@@ -43,7 +43,7 @@ export DataList = ({
   customComponents = {}
 }) ->
 
-  {Header, ListItem} = customComponents
+  {Header, ListItem, ListItemContent} = customComponents
 
   ListItem ?= DefaultListItem
   Header ?= DefaultHeader
@@ -104,7 +104,7 @@ export DataList = ({
         parent={parent}
         rowIndex={index}
       >
-        <ListItem rowData={getRow {index}} index={index} onDelete={onDelete} onClick={onRowClick}/>
+        <ListItem rowData={getRow {index}} index={index} onDelete={onDelete} onClick={onRowClick} ListItemContent={ListItemContent}/>
       </CellMeasurer>
     </div>
 

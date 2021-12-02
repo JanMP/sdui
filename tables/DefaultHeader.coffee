@@ -14,7 +14,7 @@ export DefaultHeader = ({
 
   tw = useTw()
 
-  <div className={tw"flex justify-between"}>
+  <div className={tw"flex justify-between px-4"}>
     <div>{loadedRowCount}/{totalRowCount}</div>
     <div>
       <div className={tw"text-center"}>
@@ -29,11 +29,11 @@ export DefaultHeader = ({
       </div>
     </div>
     <div>
-      <div>
+      <div className={tw"children:ml-2"}>
         {
           if canExport
             <button
-              className="icon-button"
+              className="icon"
               onClick={onExportTable} disabled={not mayExport}
             >
               <FontAwesomeIcon icon={faFileDownload}/>
@@ -42,8 +42,7 @@ export DefaultHeader = ({
         {
           if canAdd
             <button
-              className="icon-button"
-              style={marginLeft: '1rem'}
+              className="primary icon"
               onClick={onAdd} disabled={not mayEdit}
             >
               <FontAwesomeIcon icon={faPlus}/>
