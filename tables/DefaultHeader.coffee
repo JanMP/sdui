@@ -14,10 +14,9 @@ export DefaultHeader = ({
 
   tw = useTw()
 
-  <div className={tw"flex justify-between px-4"}>
-    <div>{loadedRowCount}/{totalRowCount}</div>
-    <div>
-      <div className={tw"text-center"}>
+  <div className={tw"flex justify-between p-4 border-b-4 border-gray-200 flex-wrap"}>
+    <div className={tw"flex-grow"}>{loadedRowCount}/{totalRowCount}</div>
+    <div className={tw"flex-grow"}>
         {
           if canSearch
             <SearchInput
@@ -26,10 +25,10 @@ export DefaultHeader = ({
               onChange={onChangeSearch}
             />
         }
-      </div>
     </div>
-    <div>
-      <div className={tw"children:ml-2"}>
+  
+    <div className={tw"flex-shrink flex-grow-0 flex-wrap text-right"}>
+      <div className={tw"children:m-1"}>
         {
           if canExport
             <button

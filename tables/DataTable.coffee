@@ -218,7 +218,7 @@ export DataTable = ({
 
   <div ref={contentContainerRef} style={height: '100%'} className="bg-white">
   
-    <div ref={headerContainerRef} style={margin: '10px'}>
+    <div ref={headerContainerRef}>
       <Header
         loadedRowCount={rows?.length}
         totalRowCount={totalRowCount}
