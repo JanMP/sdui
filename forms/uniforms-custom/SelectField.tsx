@@ -2,7 +2,7 @@ import xor from 'lodash/xor';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { HTMLFieldProps, connectField, filterDOMProps } from 'uniforms';
 import setErrorClass from './setErrorClass';
-import { Select as ReactSelect } from 'react-functional-select';
+import ReactSelect from 'react-select';
 import isEqual from 'lodash/isEqual';
 
 const base64: typeof btoa =
