@@ -1,7 +1,6 @@
 import React from 'react'
 
 import AutoForm from './uniforms-custom/AutoForm.tsx'
-import AutoField from './uniforms-custom/AutoField.tsx'
 
 import Modal from 'react-modal'
 
