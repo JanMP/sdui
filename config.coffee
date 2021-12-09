@@ -1,10 +1,19 @@
-import defaultTwind from 'twind'
+
 import {ReactiveVar} from 'meteor/reactive-var'
 import {useTracker} from 'meteor/react-meteor-data'
 
+argsToString = (args...) ->
+  args
+    .map (x) -> "#{x} "
+    .join()
+
+noTwind =
+  tw: argsToString
+  apply: argsToString
+
 export Options =
   new ReactiveVar
-    twind: defaultTwind
+    twind: noTwind
 
 export config = (options) -> Options.set {Options.get()..., options...}
 
