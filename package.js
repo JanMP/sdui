@@ -11,9 +11,9 @@ Package.describe({
 });
 
 Package.onUse(function(api) {
-  api.versionsFrom('2.5');
+  api.versionsFrom('2.5.1');
   api.use('ecmascript');
-  api.use('coffeescript');
+  api.use('coffeescript@2.4.1');
   api.use('typescript');
   api.use('reactive-var');
   api.use('alanning:roles');
