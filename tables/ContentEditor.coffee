@@ -3,10 +3,11 @@ import {DataList} from './DataList.coffee'
 import {ErrorBoundary} from '../common/ErrorBoundary.coffee'
 import {ConfirmationModal} from '../forms/ConfirmationModal.coffee'
 import {useTw} from '../config.coffee'
-import {Fill, LeftResizable, TopResizable, Custom, AnchorType} from 'react-spaces'
+import {Fill, Fixed, LeftResizable, Top, TopResizable, Custom, AnchorType} from 'react-spaces'
 import AutoForm from '../forms/uniforms-custom/AutoForm.tsx'
 import {MarkdownEditor} from '../markdown/MarkdownEditor.coffee'
 import {MarkdownDisplay} from '../markdown/MarkdownDisplay.coffee'
+import useSize from '@react-hook/size'
 import _ from 'lodash'
 
 
@@ -36,12 +37,27 @@ export ContentEditor = (tableOptions) ->
 
   loadEditorData ?= ({id}) -> console.log "loadEditorData id: #{id}"
   
+  tw = useTw()
 
   [editorOpen, setEditorOpen] = useState false
   [model, setModel] = useState {}
 
   [confirmationModalOpen, setConfirmationModalOpen] = useState false
   [idForConfirmationModal, setIdForConfirmationModal] = useState ''
+
+  formContainerRef = useRef null
+  editorContainerRef = useRef null
+
+  [formContainerWidth, formContainerHeight] = useSize formContainerWidth
+  [editorContainerWidth, editorContainerHeight] = useSize editorContainerRef
+
+  useEffect ->
+    console.log {formContainerWidth, formContainerHeight, editorContainerWidth, editorContainerHeight}
+  # , [formContainerWidth, formContainerHeight, editorContainerWidth, editorContainerHeight]
+
+  useEffect ->
+    console.log {formContainerRef, editorContainerRef}
+  , [formContainerRef.current, editorContainerRef.current]
 
   contentKey =
     formSchemaBridge.schema._firstLevelSchemaKeys
@@ -77,7 +93,6 @@ export ContentEditor = (tableOptions) ->
         if formSchemaBridge is listSchemaBridge
           openEditor rows[index]
         else
-          console.log 'loadEditorData'
           loadEditorData id: rowData._id
           ?.then openEditor
 
@@ -118,24 +133,32 @@ export ContentEditor = (tableOptions) ->
       }
       {
         if mayEdit and editorOpen
-          <LeftResizable size="50%">
-            <TopResizable size="50%">
-              <MarkdownEditor
-                value={model?[contentKey]}
-                onChange={setContent}
-                editorWidth={"100%"}
-                editorHeight={"100%"}
-              />
+          <LeftResizable size="40%">
+            <TopResizable size={220}>
+              <div ref={formContainerRef}>
+                <AutoForm
+                  schema={formSchemaBridge}
+                  onChangeModel={setModel}
+                  onSubmit={submitAndClose}
+                  model={model}
+                  children={autoFormChildren}
+                  disabled={formDisabled}
+                  validate="onChange"
+                />
+              </div>
             </TopResizable>
             <Fill>
-              <AutoForm
-                schema={formSchemaBridge}
-                onSubmit={submitAndClose}
-                model={model}
-                children={autoFormChildren}
-                disabled={formDisabled}
-                validate="onChange"
-              />
+              <div
+                ref={editorContainerRef}
+                className={tw"h-full"}
+              >
+                <MarkdownEditor
+                  value={model?[contentKey]}
+                  onChange={setContent}
+                  editorWidth="100%"
+                  editorHeight="100%"
+                />
+              </div>
             </Fill>
           </LeftResizable>
       }
