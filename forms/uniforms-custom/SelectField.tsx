@@ -6,7 +6,9 @@ import ReactSelect from 'react-select';
 import isEqual from 'lodash/isEqual';
 
 const base64: typeof btoa =
-  typeof btoa !== 'undefined' ? btoa : x => Buffer.from(x).toString('base64');
+  typeof btoa === 'undefined'
+    ? /* istanbul ignore next */ x => Buffer.from(x).toString('base64')
+    : btoa;
 const escape = (x: string) => base64(encodeURIComponent(x)).replace(/=+$/, '');
 
 export type SelectFieldProps = HTMLFieldProps<
@@ -33,6 +35,7 @@ function Select({
   onChange,
   placeholder,
   readOnly,
+  required,
   disableItem,
   transform,
   value,
@@ -103,4 +106,4 @@ function Select({
   );
 }
 
-export default connectField(Select, { kind: 'leaf' });
+export default connectField<SelectFieldProps>(Select, { kind: 'leaf' });

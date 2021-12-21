@@ -51,4 +51,4 @@ function Num({
   );
 }
 
-export default connectField(Num, { kind: 'leaf' });
+export default connectField<NumFieldProps>(Num, { kind: 'leaf' });

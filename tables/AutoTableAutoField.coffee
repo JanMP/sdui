@@ -40,4 +40,3 @@ export AutoTableAutoField = ({row, columnKey, schemaBridge, onChangeField, measu
             <div style={whiteSpace: 'normal'}>{row[columnKey]}</div>
 
   <div style={style}>{inner}</div>
-    

@@ -1,6 +1,6 @@
 import React from 'react'
 
-import AutoForm from './uniforms-custom/AutoForm.tsx'
+import {AutoForm} from 'uniforms-custom'
 
 import Modal from 'react-modal'
 
