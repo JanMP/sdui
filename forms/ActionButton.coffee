@@ -78,7 +78,7 @@ onSuccess, successMsg, onError, errorMsg, confirmation, buttonClass, disabled}) 
       disabled={disabled}
       onClick={handleClick}
     >
-      <div className={tw "relative"}>
+      <div className={tw"relative"}>
         <div className={tw if isBusy then "invisible"}>
           {<FontAwesomeIcon icon={icon} fixedWidth /> if icon?}
           {<span> {label}</span> if label?}
