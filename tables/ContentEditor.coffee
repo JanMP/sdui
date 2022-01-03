@@ -10,8 +10,6 @@ import {MarkdownDisplay} from '../markdown/MarkdownDisplay.coffee'
 import _ from 'lodash'
 
 
-DefaultPreview = 
-
 EditorWithCurrentSpace = ({value, onChange})->
   
   space = useCurrentSpace()
