@@ -14,7 +14,7 @@ export DefaultHeader = ({
 
   tw = useTw()
 
-  <div className={tw"flex justify-between p-4 border-b-4 border-gray-200 flex-wrap"}>
+  <div className={tw"flex justify-between p-4 border-b-4 border-gray-200 flex-wrap gap-2"}>
     <div className={tw"flex-grow"}>{loadedRowCount}/{totalRowCount}</div>
     <div className={tw"flex-grow"}>
         {
@@ -26,8 +26,7 @@ export DefaultHeader = ({
             />
         }
     </div>
-  
-    <div className={tw"flex-shrink flex-grow-0 flex-wrap text-right"}>
+    <div className={tw"flex-shrink flex-grow-0 text-right"}>
       <div className={tw"children:m-1"}>
         {
           if canExport

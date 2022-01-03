@@ -1,6 +1,5 @@
 import React, { Ref } from 'react';
 import { HTMLFieldProps, connectField, filterDOMProps } from 'uniforms';
-import setErrorClass from './setErrorClass'
 
 /* istanbul ignore next */
 const DateConstructor = (typeof global === 'object' ? global : window).Date;
@@ -31,7 +30,6 @@ function Date({
       {label && <label htmlFor={id}>{label}</label>}
 
       <input
-        className={setErrorClass(props)}
         disabled={disabled}
         id={id}
         max={dateFormat(max)}

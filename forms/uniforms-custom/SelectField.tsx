@@ -1,9 +1,10 @@
-import xor from 'lodash/xor';
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { HTMLFieldProps, connectField, filterDOMProps } from 'uniforms';
-import setErrorClass from './setErrorClass';
-import ReactSelect from 'react-select';
 import isEqual from 'lodash/isEqual';
+import xor from 'lodash/xor';
+import React, { useState, useEffect, useRef, useCallback, Ref } from 'react';
+import ReactSelect from 'react-select';
+import { HTMLFieldProps, connectField, filterDOMProps } from 'uniforms';
+
+import setErrorClass from './setErrorClass';
 
 const base64: typeof btoa =
   typeof btoa === 'undefined'
@@ -20,6 +21,7 @@ export type SelectFieldProps = HTMLFieldProps<
     disableItem?: (value: string) => boolean;
     inputRef?: Ref<HTMLSelectElement>;
     transform?: (value: string) => string;
+    components?: any;
   }
 >;
 
@@ -39,69 +41,87 @@ function Select({
   disableItem,
   transform,
   value,
+  components,
   ...props
 }: SelectFieldProps) {
-  
   const multiple = fieldType === Array;
   const selectRef = useRef(null);
-  const [oldValue, setOldValue] = useState(null)
+  const [oldValue, setOldValue] = useState(null);
 
-  const optionFromValue = useCallback((value) => {
-    return {
-      key: value,
-      value: value,
-      label: transform ? transform(value) : value
-    };
-  })
+  const optionFromValue = useCallback(
+    value => {
+      return {
+        key: value,
+        value,
+        label: transform ? transform(value) : value,
+      };
+    },
+    [transform],
+  );
 
-  const onOptionChange = useCallback((value) => {
-    const result = (multiple ? value.map(v => v.value) : value.value);
+  const onOptionChange = (value: any) => {
+    console.log('onOptionChange', value)
+    const result = multiple
+      ? value.map((v: { value: any }) => v.value)
+      : value.value;
     onChange(result);
-  }, [multiple])
+  }
+
 
   useEffect(() => {
-    if (isEqual(value, oldValue)) {return}
-    setOldValue(value)
-    selectRef.current?.setValue(multiple ? value.map(optionFromValue) : optionFromValue(value));
-  }, [ value ]);
+    console.log('value Changed', value)
+    // @ts-ignore
+    setOldValue(value);
+    if (isEqual(value, oldValue)) {
+      return;
+    }
+    // @ts-ignore
+    selectRef.current?.setValue(
+      // @ts-ignore
+      multiple ? value.map(optionFromValue) : optionFromValue(value),
+    );
+  }, [value]);
 
   return (
-    <div { ...filterDOMProps(props) } className={ (checkboxes && setErrorClass(props)) || "" }>
-      { label && <label htmlFor={ id }>{ label }</label> }
-      { checkboxes ? (
+    <div
+      {...filterDOMProps(props)}
+      className={(checkboxes && setErrorClass(props)) || ''}
+    >
+      {label && <label htmlFor={id}>{label}</label>}
+      {checkboxes ? (
         allowedValues!.map(item => (
-          <div key={ item }>
+          <div key={item}>
             <input
               checked={
                 fieldType === Array ? value!.includes(item) : value === item
               }
-              disabled={ disableItem?.(item) ?? disabled }
-              id={ `${id}-${escape(item)}` }
-              name={ name }
-              onChange={ () => {
+              disabled={disableItem?.(item) ?? disabled}
+              id={`${id}-${escape(item)}`}
+              name={name}
+              onChange={() => {
                 if (!readOnly) {
-                  onChange(fieldType === Array ? xor([ item ], value) : item);
+                  onChange(fieldType === Array ? xor([item], value) : item);
                 }
-              } }
+              }}
               type="checkbox"
             />
 
-            <label htmlFor={ `${id}-${escape(item)}` }>
-              { transform ? transform(item) : item }
+            <label htmlFor={`${id}-${escape(item)}`}>
+              {transform ? transform(item) : item}
             </label>
           </div>
         ))
       ) : (
         <ReactSelect
-          ref={ selectRef }
-          disabled={ disabled }
-          isMulti={ multiple }
-          isInvalid={ props.error != null }
-          onOptionChange={ onOptionChange }
-          options={ allowedValues?.map(optionFromValue) }
-          themeConfig={{control: {padding: "0 0.75rem", minHeight: '32px'}}}
+          ref={selectRef}
+          isDisabled={disabled}
+          isMulti={multiple}
+          components={components}
+          // @ts-ignore
+          onChange={onOptionChange}
+          options={allowedValues?.map(optionFromValue)}
         />
-      ) }
+      )}
     </div>
   );
 }

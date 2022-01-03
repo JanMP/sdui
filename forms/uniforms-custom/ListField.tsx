@@ -19,12 +19,16 @@ function List({
   ...props
 }: ListFieldProps) {
   return (
-    <ul {...filterDOMProps(props)}>
+    <ul {...filterDOMProps(props)} className="u-list-field">
       {label && (
-        <label>
-          {label}
-          <ListAddField initialCount={initialCount} name="$" />
-        </label>
+        <div>
+          <div className="u-list-field-header">
+            <div>{label}</div>
+            <div>
+              <ListAddField initialCount={initialCount} name="$" />
+            </div>
+          </div>
+        </div>
       )}
 
       {value?.map((item, itemIndex) =>

@@ -11,14 +11,12 @@ export default function SubmitField({
   inputRef,
   readOnly,
   value,
-  className = ''
   ...props
 }: SubmitFieldProps) {
   const { error, state } = useForm();
 
   return (
     <input
-      className={className}
       disabled={disabled === undefined ? !!(error || state.disabled) : disabled}
       readOnly={readOnly}
       ref={inputRef}

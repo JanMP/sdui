@@ -10,9 +10,11 @@ function ListItem({
   children = <AutoField label={null} name="" />,
 }: ListItemFieldProps) {
   return (
-    <div>
-      <ListDelField name="" />
-      {children}
+    <div className="u-list-item-field">
+      <div className="u-list-item-child-container">{children}</div>
+      <div>
+        <ListDelField name="" />
+      </div>
     </div>
   );
 }

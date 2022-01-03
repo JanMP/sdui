@@ -1,6 +1,5 @@
 import React, { Ref } from 'react';
 import { HTMLFieldProps, connectField, filterDOMProps } from 'uniforms';
-import setErrorClass from './setErrorClass'
 
 export type BoolFieldProps = HTMLFieldProps<
   boolean,
@@ -13,7 +12,6 @@ function Bool({
   id,
   inputRef,
   label,
-  labelLinkTo,
   name,
   onChange,
   readOnly,
@@ -23,7 +21,6 @@ function Bool({
   return (
     <div {...filterDOMProps(props)}>
       <input
-        className={setErrorClass(props)}
         checked={value || false}
         disabled={disabled}
         id={id}
@@ -33,9 +30,7 @@ function Bool({
         type="checkbox"
       />
 
-      {label && <label htmlFor={id}>{
-        labelLinkTo ? <a href={labelLinkTo}>{label}</a> : label
-      }</label>}
+      {label && <label htmlFor={id}>{label}</label>}
     </div>
   );
 }

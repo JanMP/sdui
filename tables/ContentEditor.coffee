@@ -3,15 +3,29 @@ import {DataList} from './DataList.coffee'
 import {ErrorBoundary} from '../common/ErrorBoundary.coffee'
 import {ConfirmationModal} from '../forms/ConfirmationModal.coffee'
 import {useTw} from '../config.coffee'
-import {Fill, LeftResizable, TopResizable, Custom, AnchorType} from 'react-spaces'
+import {Fill, LeftResizable, TopResizable, Custom, AnchorType, useCurrentSpace} from 'react-spaces'
 import {AutoForm} from 'uniforms-custom'
 import {MarkdownEditor} from '../markdown/MarkdownEditor.coffee'
 import {MarkdownDisplay} from '../markdown/MarkdownDisplay.coffee'
 import _ from 'lodash'
 
 
-export ContentEditor = (tableOptions) ->
+DefaultPreview = 
 
+EditorWithCurrentSpace = ({value, onChange})->
+  
+  space = useCurrentSpace()
+
+  <MarkdownEditor
+    value={value}
+    onChange={onChange}
+    editorWidth={space.size.width}
+    editorHeight={space.size.height}
+  />
+
+
+export ContentEditor = (tableOptions) ->
+  
   {
     sourceName
     listSchemaBridge, formSchemaBridge
@@ -31,11 +45,12 @@ export ContentEditor = (tableOptions) ->
     customComponents
   } = tableOptions
 
+  {Preview} = customComponents ? {}
+
   onAdd ?= ->
     openEditor {}
 
   loadEditorData ?= ({id}) -> console.log "loadEditorData id: #{id}"
-  
 
   [editorOpen, setEditorOpen] = useState false
   [model, setModel] = useState {}
@@ -43,12 +58,18 @@ export ContentEditor = (tableOptions) ->
   [confirmationModalOpen, setConfirmationModalOpen] = useState false
   [idForConfirmationModal, setIdForConfirmationModal] = useState ''
 
+  useEffect ->
+    console.log {model}
+  , [model]
+
   contentKey =
     formSchemaBridge.schema._firstLevelSchemaKeys
     .find (key) -> formSchemaBridge.schema._schema[key]?.sdContent?.isContent
   
 
-  setContent = (content) -> setModel (model) -> {model..., [contentKey]: content}
+  setContent = (content) -> setModel (currentModel) ->
+    console.log {content, currentModel}
+    {currentModel..., [contentKey]: content}
   
   
   handleOnDelete =
@@ -64,6 +85,7 @@ export ContentEditor = (tableOptions) ->
           onDelete {id}
 
   openEditor = (formModel) ->
+    console.log {formModel}
     setModel formModel
     setEditorOpen true
 
@@ -119,19 +141,20 @@ export ContentEditor = (tableOptions) ->
       {
         if mayEdit and editorOpen
           <LeftResizable size="50%">
-            <TopResizable size="50%">
-              <MarkdownEditor
-                value={model?[contentKey]}
-                onChange={setContent}
-                editorWidth={"100%"}
-                editorHeight={"100%"}
-              />
+            <TopResizable size="20%">
+              <ErrorBoundary>
+                <EditorWithCurrentSpace
+                  value={model?[contentKey]}
+                  onChange={setContent}
+                />
+              </ErrorBoundary>
             </TopResizable>
-            <Fill>
+            <Fill scrollable>
               <AutoForm
                 schema={formSchemaBridge}
                 onSubmit={submitAndClose}
                 model={model}
+                onChangeModel={setModel}
                 children={autoFormChildren}
                 disabled={formDisabled}
                 validate="onChange"
@@ -142,10 +165,17 @@ export ContentEditor = (tableOptions) ->
       {
         if editorOpen
           <Fill>
-            <MarkdownDisplay
-              markdown={model?[contentKey]}
-              contentClass="prose"
-            />
+            <ErrorBoundary>
+              {
+                if Preview?
+                  <Preview content={model}/>
+                else
+                  <MarkdownDisplay
+                    markdown={model?[contentKey]}
+                    contentClass="prose"
+                  />
+              }
+            </ErrorBoundary>
           </Fill>
       }
     </ErrorBoundary>

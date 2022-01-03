@@ -1,6 +1,5 @@
 import React, { Ref } from 'react';
 import { HTMLFieldProps, connectField, filterDOMProps } from 'uniforms';
-import setErrorClass from './setErrorClass'
 
 export type NumFieldProps = HTMLFieldProps<
   number,
@@ -29,7 +28,6 @@ function Num({
       {label && <label htmlFor={id}>{label}</label>}
 
       <input
-        className={setErrorClass(props)}
         disabled={disabled}
         id={id}
         max={max}
