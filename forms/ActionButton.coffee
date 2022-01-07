@@ -25,7 +25,7 @@ import _ from 'lodash'
   @param {boolean?} args.disabled
  ###
 export ActionButton = ({method, data, options, onAction, label, icon,
-onSuccess, successMsg, onError, errorMsg, confirmation, buttonClass, disabled}) ->
+onSuccess, successMsg, onError, errorMsg, confirmation, className, disabled}) ->
 
   data ?= {}
   options ?= {}
@@ -74,7 +74,7 @@ onSuccess, successMsg, onError, errorMsg, confirmation, buttonClass, disabled}) 
         />
     }
     <button
-      className={buttonClass}
+      className={className}
       disabled={disabled}
       onClick={handleClick}
     >
