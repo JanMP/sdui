@@ -3,7 +3,7 @@ import {DataList} from './DataList.coffee'
 import {ErrorBoundary} from '../common/ErrorBoundary.coffee'
 import {ConfirmationModal} from '../forms/ConfirmationModal.coffee'
 import {useTw} from '../config.coffee'
-import {Fill, LeftResizable, TopResizable, Top} from 'react-spaces'
+import {Fill, LeftResizable, BottomResizable, TopResizable, Top} from 'react-spaces'
 import {AutoForm} from 'uniforms-custom'
 import {MarkdownEditor} from '../markdown/MarkdownEditor.coffee'
 import {MarkdownDisplay} from '../markdown/MarkdownDisplay.coffee'
@@ -31,7 +31,7 @@ export ContentEditor = (tableOptions) ->
     customComponents
   } = tableOptions
 
-  {Preview} = customComponents ? {}
+  {Preview, RelatedDataPane} = customComponents ? {}
 
   onAdd ?= ->
     openEditor {}
@@ -69,9 +69,8 @@ export ContentEditor = (tableOptions) ->
 
 
   submitAndClose =
-    (d) ->
-      console.log 'submitAndClose', d
-      submit?(d).then -> setEditorOpen false
+    (model) ->
+      submit?(model).then -> setEditorOpen false
 
   if canEdit
     onRowClick =
@@ -94,29 +93,26 @@ export ContentEditor = (tableOptions) ->
             onConfirm={-> onDelete id: idForConfirmationModal}
           />
       }
-      {
-        if true
-          <LeftResizable size="20%">
-            <DataList
-              {{
-                sourceName
-                listSchemaBridge,
-                rows, totalRowCount, loadMoreRows, onRowClick,
-                sortColumn, sortDirection, onChangeSort, useSort
-                canSearch, search, onChangeSearch
-                canAdd, onAdd
-                canDelete, onDelete: handleOnDelete
-                canEdit, mayEdit
-                onChangeField,
-                canExport, onExportTable
-                mayExport
-                isLoading
-                overscanRowCount
-                customComponents
-              }...}
-            />
-          </LeftResizable>
-      }
+      <LeftResizable size="25%">
+        <DataList
+          {{
+            sourceName
+            listSchemaBridge,
+            rows, totalRowCount, loadMoreRows, onRowClick,
+            sortColumn, sortDirection, onChangeSort, useSort
+            canSearch, search, onChangeSearch
+            canAdd, onAdd
+            canDelete, onDelete: handleOnDelete
+            canEdit, mayEdit
+            onChangeField,
+            canExport, onExportTable
+            mayExport
+            isLoading
+            overscanRowCount
+            customComponents
+          }...}
+        />
+      </LeftResizable>
       {
         if mayEdit and editorOpen
           <LeftResizable size="50%">
@@ -165,6 +161,12 @@ export ContentEditor = (tableOptions) ->
                 }
               </ErrorBoundary>
             </Fill>
+            {
+              if RelatedDataPane?
+                <BottomResizable size="50%" scrollable>
+                  <RelatedDataPane model={model}/>
+                </BottomResizable>
+            }
           </Fill>
       }
     </ErrorBoundary>
