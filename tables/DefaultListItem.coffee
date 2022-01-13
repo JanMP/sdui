@@ -9,7 +9,7 @@ DefaultListItemContent = ({rowData}) ->
   <div className={tw"bg-red-100"}>{JSON.stringify rowData, null, 2}</div>
 
 
-export DefaultListItem = ({rowData, index, onDelete, onClick, ListItemContent = DefaultListItemContent}) ->
+export DefaultListItem = ({rowData, index, canDelete, onDelete, onClick, ListItemContent = DefaultListItemContent}) ->
   
   tw = useTw()
   rowData ?= {}
@@ -26,12 +26,15 @@ export DefaultListItem = ({rowData, index, onDelete, onClick, ListItemContent = 
 
   <div className={tw"p-1 shadow flex justify-between"} onClick={handleClick}>
     <ListItemContent rowData={rowData}/>
-    <div className={tw"p-2"}>
-      <button
-        className="icon danger"
-        onClick={handleDeleteButtonClick}
-      >
-        <FontAwesomeIcon icon={faTrash}/>
-      </button>
-    </div>
+      {
+        if canDelete
+          <div className={tw"p-2"}>
+            <button
+              className="icon danger"
+              onClick={handleDeleteButtonClick}
+            >
+              <FontAwesomeIcon icon={faTrash}/>
+            </button>
+          </div>
+      }
   </div>
