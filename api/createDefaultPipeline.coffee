@@ -48,16 +48,16 @@ export createDefaultPipeline = ({getPreSelectPipeline, getProcessorPipeline, lis
       .mapValues -> 1
       .value()
   
-  defaultGetRowsPipeline = ({search, query = {}, sort = {_id: 1}, limit = 100, skip = 0}) ->
-    [getPreSelectPipeline()...,
+  defaultGetRowsPipeline = ({pub, search, query = {}, sort = {_id: 1}, limit = 100, skip = 0}) ->
+    [getPreSelectPipeline({pub})...,
     {$match: query},
-    getProcessorPipeline()...,
+    getProcessorPipeline({pub})...,
     (searchPipeline {search})...,
     {$sort: sort}, {$skip: skip}, {$limit: limit}]
   
-  defaultGetRowCountPipeline = ({search, query = {}}) ->
-    [getPreSelectPipeline()...,
-    {$match: query}, getProcessorPipeline()..., (searchPipeline {search})...,
+  defaultGetRowCountPipeline = ({pub, search, query = {}}) ->
+    [getPreSelectPipeline({pub})...,
+    {$match: query}, getProcessorPipeline({pub})..., (searchPipeline {search})...,
     {$count: 'count'}, $addFields: _id: "count"]
 
   defaultGetExportPipeline = ({search, query = {}, sort = {_id: 1}}) ->
