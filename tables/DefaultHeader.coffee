@@ -14,13 +14,12 @@ export DefaultHeader = ({
 
   tw = useTw()
 
-  <div className={tw"flex justify-between p-4 border-b-4 border-gray-200 flex-wrap gap-2"}>
+  <div className={tw"flex justify-between p-4 border-b-4 border-secondary-200 flex-wrap gap-2"}>
     <div className={tw"flex-grow"}>{loadedRowCount}/{totalRowCount}</div>
     <div className={tw"flex-grow"}>
         {
           if canSearch
             <SearchInput
-              size="small"
               value={search}
               onChange={onChangeSearch}
             />
