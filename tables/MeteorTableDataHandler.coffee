@@ -255,8 +255,9 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
     meteorApply
       method: submitMethodName
       data: d
-    .then ->
+    .then (results) ->
       getRows()
+      results
     .catch (error) ->
       toast.error "#{error}"
       console.log error

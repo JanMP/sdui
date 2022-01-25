@@ -40,6 +40,7 @@ export ContentEditor = (tableOptions) ->
 
   [editorOpen, setEditorOpen] = useState false
   [model, setModel] = useState {}
+  [selectedRowId, setSelectedRowId] = useState "fnord"
 
   [confirmationModalOpen, setConfirmationModalOpen] = useState false
   [idForConfirmationModal, setIdForConfirmationModal] = useState ''
@@ -67,14 +68,19 @@ export ContentEditor = (tableOptions) ->
     setModel formModel
     setEditorOpen true
 
-
-  submitAndClose =
+  handleSubmit =
     (model) ->
-      submit?(model).then -> setEditorOpen false
+      submit?(model)
+      .then (result) ->
+        if (id = result?.insertedId)?
+          setSelectedRowId id
+          loadEditorData {id}
+          ?.then openEditor
 
   if canEdit
     onRowClick =
       ({rowData, index}) ->
+        setSelectedRowId rowData?._id
         if formSchemaBridge is listSchemaBridge
           openEditor rows[index]
         else
@@ -110,6 +116,7 @@ export ContentEditor = (tableOptions) ->
             isLoading
             overscanRowCount
             customComponents
+            selectedRowId
           }...}
         />
       </LeftResizable>
@@ -117,7 +124,7 @@ export ContentEditor = (tableOptions) ->
         if mayEdit and editorOpen
           <LeftResizable size="50%">
             <TopResizable size="20%" onResizeEnd={-> editorInstance?.current?.editor?.resize()} >
-            <Top size="2rem" className="text-sm bg-stone-200 p-2">Content</Top>
+            <Top size="2rem" className="text-sm bg-secondary-200 p-2">Content</Top>
               <Fill>
                 <ErrorBoundary>
                   <MarkdownEditor
@@ -129,11 +136,11 @@ export ContentEditor = (tableOptions) ->
               </Fill>
             </TopResizable>
             <Fill>
-              <Top size="2rem" className="text-sm bg-stone-200 p-2">Data</Top>
+              <Top size="2rem" className="text-sm bg-secondary-200 p-2">Data</Top>
               <Fill scrollable>
                 <AutoForm
                   schema={formSchemaBridge}
-                  onSubmit={submitAndClose}
+                  onSubmit={handleSubmit}
                   model={model}
                   onChangeModel={setModel}
                   children={autoFormChildren}
@@ -147,7 +154,7 @@ export ContentEditor = (tableOptions) ->
       {
         if editorOpen
           <Fill>
-            <Top size="2rem" className="text-sm bg-stone-200 p-2">Preview</Top>
+            <Top size="2rem" className="text-sm bg-secondary-200 p-2">Preview</Top>
             <Fill scrollable>
               <ErrorBoundary>
                 {
