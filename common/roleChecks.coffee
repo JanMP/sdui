@@ -4,9 +4,9 @@ import {useTracker} from 'meteor/react-meteor-data'
 
 ###*
   For use in subscriptions, where Meteor.userId is unavailable.
-
-  You should never ever use this directly on client side!
-
+  
+  Think about the trustworthiness of the UserId before using this!
+  
   In addition to roles defined via alanning:roles you can specify
   'any', 'logged-in' and 'username-is-admin'
 

@@ -18,7 +18,7 @@ import {DefaultHeader} from './DefaultHeader.coffee'
 
 newCache = -> new CellMeasurerCache
   fixedWidth: true
-  minHeight: 30
+  minHeight: 40
   defaultHeight: 200
 
 resizableHeaderRenderer = ({onResizeRows, isLastOne}) ->
@@ -69,6 +69,22 @@ cellRenderer = ({listSchemaBridge, onChangeField, cache, mayEdit}) ->
         />}
     </CellMeasurer>
 
+actionCellRenderer = ({component}) ->
+({dataKey, parent, rowIndex, columnIndex, cellData, rowData}) ->
+  onClick = (e) ->
+    e.stopPropagation()
+    e.nativeEvent.stopImmediatePropagation()
+    if (id = rowData?._id ? rowData?.id)?
+      onDelete {id}
+
+  <div style={paddingTop: ".5rem"}>
+    <button
+      onClick={onClick}
+      className="danger icon"
+    >
+      <FontAwesomeIcon icon={faTrash}/>
+    </button>
+  </div>
 
 deleteButtonCellRenderer = ({onDelete = ->}) ->
   ({dataKey, parent, rowIndex, columnIndex, cellData, rowData}) ->
@@ -110,8 +126,12 @@ export DataTable = ({
   customComponents = {}
 }) ->
 
-  {Header} = customComponents
+  {Header, actionCell} = customComponents
   Header ?= DefaultHeader
+  {renderer, width} = actionCell ? {}
+
+  if actionCell? and not (renderer? and width?)
+    throw new Error 'actionCell custom Component must have Fields renderer and width'
 
   schema = listSchemaBridge.schema
 
@@ -140,6 +160,7 @@ export DataTable = ({
   initialColumnWidths = columnKeys.map (key, i, arr) ->
     schema._schema[key].sdTable?.columnWidth ? 1 / (if arr.length then arr.length else 20)
 
+  # TODO change handling of columnWidths, so it doesn't break when we change the schema
   getColumnWidthsFromLocalStorage = ->
     if global.localStorage
       try
@@ -258,12 +279,22 @@ export DataTable = ({
             sortDirection={sortDirection}
           >
             {columns}
-            {if canDelete then <Column
-              dataKey="no-data-key"
-              label=""
-              width={deleteColumnWidth}
-              cellRenderer={deleteButtonCellRenderer {onDelete}}
-            />}
+            {
+              if actionCell?.render?
+                <Column
+                  dataKey="no-data-key"
+                  label=""
+                  width={deleteColumnWidth}
+                  cellRenderer={deleteButtonCellRenderer {onDelete}}
+                />
+              else if canDelete
+                <Column
+                  dataKey="no-data-key"
+                  label=""
+                  width={deleteColumnWidth}
+                  cellRenderer={deleteButtonCellRenderer {onDelete}}
+                />
+            }
           </Table>
         }
       </InfiniteLoader>
