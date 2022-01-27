@@ -1,6 +1,6 @@
 import React, { Ref } from 'react';
 import { HTMLFieldProps, connectField, filterDOMProps } from 'uniforms';
-import setErrorClass from './setErrorClass';
+import setClassNamesForProps from './setClassNamesForProps';
 
 export type TextFieldProps = HTMLFieldProps<
   string,
@@ -23,11 +23,9 @@ function Text({
   ...props
 }: TextFieldProps) {
   return (
-    <div {...filterDOMProps(props)}>
-      {label && <label htmlFor={id}>{label}</label>}
-
+    <div className={setClassNamesForProps(props)} {...filterDOMProps(props)}>
+      {label && !props.hasFloatingLabel && <label htmlFor={id}>{label}</label>}
       <input
-        className={setErrorClass(props)}
         autoComplete={autoComplete}
         disabled={disabled}
         id={id}
@@ -39,6 +37,7 @@ function Text({
         type={type}
         value={value ?? ''}
       />
+      {label && props.hasFloatingLabel && <label htmlFor={id}>{label}</label>}
     </div>
   );
 }

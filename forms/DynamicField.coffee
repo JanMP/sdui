@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react'
-import {AutoForm, AutoField} from 'uniforms-custom'
+import {AutoForm, AutoField} from './uniforms-custom'
 import {connectField} from 'uniforms'
 import SimpleSchema2Bridge from 'uniforms-bridge-simple-schema-2'
 import _ from 'lodash'

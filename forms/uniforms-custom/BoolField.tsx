@@ -1,5 +1,6 @@
 import React, { Ref } from 'react';
 import { HTMLFieldProps, connectField, filterDOMProps } from 'uniforms';
+import setClassNamesForProps from './setClassNamesForProps';
 
 export type BoolFieldProps = HTMLFieldProps<
   boolean,
@@ -19,7 +20,7 @@ function Bool({
   ...props
 }: BoolFieldProps) {
   return (
-    <div {...filterDOMProps(props)}>
+    <div className={setClassNamesForProps(props)} {...filterDOMProps(props)}>
       <input
         checked={value || false}
         disabled={disabled}

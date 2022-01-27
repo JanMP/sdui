@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useCallback, Ref } from 'react';
 import ReactSelect from 'react-select';
 import { HTMLFieldProps, connectField, filterDOMProps } from 'uniforms';
 
-import setErrorClass from './setErrorClass';
+import setClassNamesForProps from './setClassNamesForProps';
 
 const base64: typeof btoa =
   typeof btoa === 'undefined'
@@ -60,7 +60,6 @@ function Select({
   );
 
   const onOptionChange = (value: any) => {
-    console.log('onOptionChange', value)
     const result = multiple
       ? value.map((v: { value: any }) => v.value)
       : value.value;
@@ -69,7 +68,6 @@ function Select({
 
 
   useEffect(() => {
-    console.log('value Changed', value)
     // @ts-ignore
     setOldValue(value);
     if (isEqual(value, oldValue)) {
@@ -85,9 +83,9 @@ function Select({
   return (
     <div
       {...filterDOMProps(props)}
-      className={(checkboxes && setErrorClass(props)) || ''}
+      className={(checkboxes && setClassNamesForProps(props)) || ''}
     >
-      {label && <label htmlFor={id}>{label}</label>}
+      {label && !props.hasFloatingLabel && <label htmlFor={id}>{label}</label>}
       {checkboxes ? (
         allowedValues!.map(item => (
           <div key={item}>
@@ -109,6 +107,7 @@ function Select({
             <label htmlFor={`${id}-${escape(item)}`}>
               {transform ? transform(item) : item}
             </label>
+            {label && props.hasFloatingLabel && <label htmlFor={id}>{label}</label>}
           </div>
         ))
       ) : (

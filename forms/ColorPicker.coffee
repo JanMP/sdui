@@ -1,6 +1,6 @@
 import React from 'react'
 import {connectField, filterDOMProps} from 'uniforms'
-import setErrorClass from './uniforms-custom/setErrorClass'
+import setClassNamesForProps from './uniforms-custom/setClassNamesForProps'
 
 export ColorPicker = ({
   disabled, fieldType, id, inputRef, label, name,
@@ -12,7 +12,7 @@ export ColorPicker = ({
     
     <input
       id={id}
-      className={setErrorClass props}
+      className={setClassNamesForProps props}
       type="color"
       disabled={disabled}
       name={name}

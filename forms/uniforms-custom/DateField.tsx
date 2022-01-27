@@ -1,5 +1,6 @@
 import React, { Ref } from 'react';
 import { HTMLFieldProps, connectField, filterDOMProps } from 'uniforms';
+import setClassNamesForProps from './setClassNamesForProps';
 
 /* istanbul ignore next */
 const DateConstructor = (typeof global === 'object' ? global : window).Date;
@@ -26,9 +27,8 @@ function Date({
   ...props
 }: DateFieldProps) {
   return (
-    <div {...filterDOMProps(props)}>
-      {label && <label htmlFor={id}>{label}</label>}
-
+    <div className={setClassNamesForProps(props)} {...filterDOMProps(props)}>
+      {label && !props.hasFloatingLabel &&<label htmlFor={id}>{label}</label>}
       <input
         disabled={disabled}
         id={id}
@@ -49,6 +49,7 @@ function Date({
         type="datetime-local"
         value={dateFormat(value) ?? ''}
       />
+      {label && props.hasFloatingLabel &&<label htmlFor={id}>{label}</label>}
     </div>
   );
 }

@@ -4,7 +4,7 @@ import React, {useState} from 'react'
 import {useTracker} from 'meteor/react-meteor-data'
 import SimpleSchema from 'simpl-schema'
 import SimpleSchemaBridge from 'uniforms-bridge-simple-schema-2'
-import {AutoForm, SubmitField} from 'uniforms-custom'
+import {AutoForm, SubmitField} from './uniforms-custom'
 
 SimpleSchema.extendOptions(['uniforms'])
 
