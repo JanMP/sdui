@@ -79,11 +79,15 @@ onSuccess, successMsg, onError, errorMsg, confirmation, className, disabled}) ->
       onClick={handleClick}
     >
       <div className={tw"relative"}>
-        <div className={tw if isBusy then "invisible"}>
-          {<FontAwesomeIcon icon={icon} fixedWidth /> if icon?}
-          {<span> {label}</span> if label?}
-        </div>
-        {<div className={tw"absolute inset-0"}><FontAwesomeIcon icon={faSpinner} fixedWidth spin/></div> if isBusy}
+        {
+          unless isBusy
+            <div>
+              {<FontAwesomeIcon icon={icon} fixedWidth /> if icon?}
+              {<span> {label}</span> if label?}
+            </div>
+          else
+            <div className={tw "text-base text-white"}><FontAwesomeIcon icon={faSpinner} fixedWidth spin/></div>
+        }
       </div>
     </button>
   </>

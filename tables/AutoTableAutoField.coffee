@@ -5,9 +5,6 @@ import {faCheck} from '@fortawesome/free-solid-svg-icons/faCheck'
 import {faTimes} from '@fortawesome/free-solid-svg-icons/faTimes'
 import _ from 'lodash'
 
-style =
-  padding: "4px 0"
-
 export AutoTableAutoField = ({row, columnKey, schemaBridge, onChangeField, measure, mayEdit}) ->
   fieldSchema = schemaBridge.schema._schema[columnKey]
   inner =
@@ -39,4 +36,4 @@ export AutoTableAutoField = ({row, columnKey, schemaBridge, onChangeField, measu
           else
             <div style={whiteSpace: 'normal'}>{row[columnKey]}</div>
 
-  <div style={style}>{inner}</div>
+  <div style={padding: '1px'}>{inner}</div>

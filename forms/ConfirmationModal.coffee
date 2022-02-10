@@ -28,6 +28,7 @@ export ConfirmationModal = ({text, onConfirm = ->, onCancel = ->, isOpen, setIsO
     onRequestClose={-> setIsOpen false}
     className="modal confirmation-modal"
     overlayClassName="overlay"
+    shouldFocusAfterRender={false}
   >
     <div>{text}</div>
     <div className={tw"mt-4 flex justify-end"}>

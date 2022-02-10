@@ -41,7 +41,6 @@ export TableEditModalHandler = ({tableOptions, DisplayComponent}) ->
       -> console.error 'handleOnDelete has been called despite canDelete false'
     else
       ({id}) ->
-        console.log 'handleOnDelete', {id, deleteConfirmation}
         if deleteConfirmation?
           setIdForConfirmationModal id
           setConfirmationModalOpen true
