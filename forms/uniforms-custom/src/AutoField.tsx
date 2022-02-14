@@ -4,12 +4,12 @@ export { AutoFieldProps } from 'uniforms';
 
 import BoolField from './BoolField';
 import DateField from './DateField';
-import ListField from './ListField';
-import NestField from './NestField';
-import NumField from './NumField';
-import RadioField from './RadioField';
-import SelectField from './SelectField';
-import TextField from './TextField';
+import ListField from '../ListField';
+import NestField from '../NestField';
+import NumField from '../NumField';
+import RadioField from '../RadioField';
+import SelectField from '../SelectField';
+import TextField from '../TextField';
 
 const AutoField = createAutoField(props => {
   if (props.allowedValues) {
