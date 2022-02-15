@@ -1,6 +1,6 @@
 import React from 'react'
 
-import {AutoForm} from './uniforms-custom'
+import {AutoForm} from './uniforms-custom/select-implementation'
 
 import Modal from 'react-modal'
 

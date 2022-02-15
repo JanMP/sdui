@@ -1,6 +1,6 @@
 import React from 'react'
 import {connectField, filterDOMProps} from 'uniforms'
-import setClassNamesForProps from './uniforms-custom/setClassNamesForProps'
+import setClassNamesForProps from './uniforms-custom/select-implementation'
 
 export ColorPicker = ({
   disabled, fieldType, id, inputRef, label, name,

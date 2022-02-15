@@ -5,7 +5,7 @@ import setClassNamesForProps from './setClassNamesForProps';
 export type TextFieldProps = HTMLFieldProps<
   string,
   HTMLDivElement,
-  { inputRef?: Ref<HTMLInputElement> }
+  { inputRef?: Ref<HTMLInputElement>; hasFloatingLabel?: boolean }
 >;
 
 function Text({

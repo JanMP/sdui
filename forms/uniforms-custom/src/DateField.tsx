@@ -9,7 +9,7 @@ const dateFormat = (value?: Date) => value?.toISOString().slice(0, -8);
 export type DateFieldProps = HTMLFieldProps<
   Date,
   HTMLDivElement,
-  { inputRef?: Ref<HTMLInputElement>; max?: Date; min?: Date }
+  { inputRef?: Ref<HTMLInputElement>; max?: Date; min?: Date; hasFloatingLabel?: boolean }
 >;
 
 function Date({

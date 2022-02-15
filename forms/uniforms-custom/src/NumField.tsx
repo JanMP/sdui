@@ -5,7 +5,7 @@ import setClassNamesForProps from './setClassNamesForProps';
 export type NumFieldProps = HTMLFieldProps<
   number,
   HTMLDivElement,
-  { decimal?: boolean; inputRef?: Ref<HTMLInputElement> }
+  { decimal?: boolean; inputRef?: Ref<HTMLInputElement>; hasFloatingLabel?: boolean }
 >;
 
 function Num({

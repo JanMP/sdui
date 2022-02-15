@@ -22,6 +22,7 @@ export type SelectFieldProps = HTMLFieldProps<
     inputRef?: Ref<HTMLSelectElement>;
     transform?: (value: string) => string;
     components?: any;
+    hasFloatingLabel?: boolean
   }
 >;
 

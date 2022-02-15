@@ -4,6 +4,7 @@ const setClassNamesForProps = (props: object) => {
 
   // @ts-ignore
   const showError = props.error != null
+  // @ts-ignore
   const hasFloatingLabel = props.hasFloatingLabel
 
   return classnames({

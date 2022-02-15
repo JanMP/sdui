@@ -5,7 +5,7 @@ import setClassNamesForProps from './setClassNamesForProps';
 export type LongTextFieldProps = HTMLFieldProps<
   string,
   HTMLDivElement,
-  { inputRef?: Ref<HTMLTextAreaElement> }
+  { inputRef?: Ref<HTMLTextAreaElement>; hasFloatingLabel?: boolean }
 >;
 
 function LongText({
