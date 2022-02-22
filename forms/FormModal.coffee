@@ -22,7 +22,6 @@ isOpen, onRequestClose, header, children, disabled = false, readOnly}) ->
       model={model}
       children={children}
       disabled={disabled}
-      validate="onChange"
       shouldFocusAfterRender={false}
     />
   </Modal>
