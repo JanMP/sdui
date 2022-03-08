@@ -86,7 +86,7 @@ onSuccess, successMsg, onError, errorMsg, confirmation, className, disabled}) ->
               {<span> {label}</span> if label?}
             </div>
           else
-            <div className={tw "text-base text-white"}><FontAwesomeIcon icon={faSpinner} fixedWidth spin/></div>
+            <div className={tw "text-base"}><FontAwesomeIcon icon={faSpinner} fixedWidth spin/></div>
         }
       </div>
     </button>

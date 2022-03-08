@@ -45,6 +45,7 @@ function ListAdd({
   return (
     // @ts-ignore
     <button className="icon ok"
+      type="button"
       {...filterDOMProps(props)}
       onClick={onAction}
     >

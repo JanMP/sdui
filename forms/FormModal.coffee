@@ -13,6 +13,7 @@ isOpen, onRequestClose, header, children, disabled = false, readOnly}) ->
     onRequestClose={onRequestClose}
     className="modal"
     overlayClassName="overlay"
+    shouldFocusAfterRender={false}
   >
     {if header? then <h2> {header} </h2>}
     
@@ -22,6 +23,5 @@ isOpen, onRequestClose, header, children, disabled = false, readOnly}) ->
       model={model}
       children={children}
       disabled={disabled}
-      shouldFocusAfterRender={false}
     />
   </Modal>

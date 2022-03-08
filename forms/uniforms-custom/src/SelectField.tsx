@@ -43,6 +43,7 @@ function Select({
   transform,
   value,
   components,
+  sdTable,
   ...props
 }: SelectFieldProps) {
   const multiple = fieldType === Array;
