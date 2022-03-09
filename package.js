@@ -1,6 +1,6 @@
 Package.describe({
   name: 'janmp:sdui',
-  version: '0.0.3',
+  version: '0.0.4',
   // Brief, one-line summary of the package.
   summary: 'Some high level React components and setup for backend.',
   // URL to the Git repository containing the source code for this package.
@@ -21,6 +21,7 @@ Package.onUse(function(api) {
   api.use('momentjs:moment@2.29.1');
   api.use('peerlibrary:reactive-publish@0.10.0');
   api.use('tunguska:reactive-aggregate@1.3.7');
+  api.use('mizzao:user-status@1.0.1');
   api.addFiles('css/sdui.css', 'client');
   api.mainModule('sdui-client.coffee', 'client');
   api.mainModule('sdui-server.coffee', 'server');

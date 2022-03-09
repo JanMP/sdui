@@ -33,6 +33,7 @@ import SimpleSchema2Bridge from 'uniforms-bridge-simple-schema-2'
     makeSubmitMethodRunFkt?,
     makeDeleteMethodRunFkt?,
     debounceDelay?: number
+    observers?: Array
   }}
   @return {{
     sourceName: string, listSchemaBridge, formSchemaBridge,
@@ -66,6 +67,7 @@ export createTableDataAPI = ({
   rowsCollection, rowCountCollection
   makeFormDataFetchMethodRunFkt, makeSubmitMethodRunFkt, makeDeleteMethodRunFkt
   debounceDelay
+  observers
 }) ->
 
   # check required props and setup defaults for optional props
@@ -117,7 +119,7 @@ export createTableDataAPI = ({
   
   publishTableData {
     viewTableRole, sourceName, collection,
-    getRowsPipeline, getRowCountPipeline, debounceDelay
+    getRowsPipeline, getRowCountPipeline, debounceDelay, observers
     }
 
   createTableDataMethods {
