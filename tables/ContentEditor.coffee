@@ -122,8 +122,8 @@ export ContentEditor = (tableOptions) ->
       </LeftResizable>
       {
         if mayEdit and editorOpen
-          <LeftResizable size="50%">
-            <TopResizable size="20%" onResizeEnd={-> editorInstance?.current?.editor?.resize()} >
+          <LeftResizable size="50%" onResizeEnd={-> editorInstance?.current?.editor?.resize()}>
+            <TopResizable size="20%" onResizeEnd={-> editorInstance?.current?.editor?.resize()}>
             <Top size="2rem" className="text-sm bg-secondary-200 p-2">Content</Top>
               <Fill>
                 <ErrorBoundary>
