@@ -448,6 +448,16 @@ Ensure the default browser behavior of the `hidden` attribute.
   --tw-sepia: var(--tw-empty,/*!*/ /*!*/);
   --tw-drop-shadow: var(--tw-empty,/*!*/ /*!*/);
   --tw-filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
+  --tw-backdrop-blur: var(--tw-empty,/*!*/ /*!*/);
+  --tw-backdrop-brightness: var(--tw-empty,/*!*/ /*!*/);
+  --tw-backdrop-contrast: var(--tw-empty,/*!*/ /*!*/);
+  --tw-backdrop-grayscale: var(--tw-empty,/*!*/ /*!*/);
+  --tw-backdrop-hue-rotate: var(--tw-empty,/*!*/ /*!*/);
+  --tw-backdrop-invert: var(--tw-empty,/*!*/ /*!*/);
+  --tw-backdrop-opacity: var(--tw-empty,/*!*/ /*!*/);
+  --tw-backdrop-saturate: var(--tw-empty,/*!*/ /*!*/);
+  --tw-backdrop-sepia: var(--tw-empty,/*!*/ /*!*/);
+  --tw-backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);
 }
 
 .container {
@@ -488,12 +498,19 @@ Ensure the default browser behavior of the `hidden` attribute.
   position: static;
 }
 
+.absolute {
+  position: absolute;
+}
+
 .relative {
   position: relative;
 }
 
-.m-1 {
-  margin: 0.25rem;
+.inset-0 {
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  left: 0px;
 }
 
 .mt-4 {
@@ -508,12 +525,12 @@ Ensure the default browser behavior of the `hidden` attribute.
   display: flex;
 }
 
-.hidden {
-  display: none;
+.grid {
+  display: grid;
 }
 
-.h-12 {
-  height: 3rem;
+.hidden {
+  display: none;
 }
 
 .min-w-\[5rem\] {
@@ -548,6 +565,10 @@ Ensure the default browser behavior of the `hidden` attribute.
   flex-wrap: wrap;
 }
 
+.place-items-center {
+  place-items: center;
+}
+
 .justify-end {
   justify-content: flex-end;
 }
@@ -558,10 +579,6 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .gap-2 {
   gap: 0.5rem;
-}
-
-.rounded {
-  border-radius: 0.25rem;
 }
 
 .border-b-4 {
@@ -578,9 +595,12 @@ Ensure the default browser behavior of the `hidden` attribute.
   background-color: rgb(254 226 226 / var(--tw-bg-opacity));
 }
 
-.bg-blue-100 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(219 234 254 / var(--tw-bg-opacity));
+.bg-transparent {
+  background-color: transparent;
+}
+
+.bg-none {
+  background-image: none;
 }
 
 .p-2 {
@@ -593,10 +613,6 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .p-1 {
   padding: 0.25rem;
-}
-
-.text-center {
-  text-align: center;
 }
 
 .text-right {
@@ -619,6 +635,27 @@ Ensure the default browser behavior of the `hidden` attribute.
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 
+.blur-sm {
+  --tw-blur: blur(4px);
+  filter: var(--tw-filter);
+}
+
+.blur-xl {
+  --tw-blur: blur(24px);
+  filter: var(--tw-filter);
+}
+
+.blur {
+  --tw-blur: blur(8px);
+  filter: var(--tw-filter);
+}
+
 .filter {
   filter: var(--tw-filter);
+}
+
+.backdrop-blur-sm {
+  --tw-backdrop-blur: blur(4px);
+  -webkit-backdrop-filter: var(--tw-backdrop-filter);
+          backdrop-filter: var(--tw-backdrop-filter);
 }
