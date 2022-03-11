@@ -157,14 +157,15 @@ export DataTable = ({
       else
         not (options.hide ? false)
 
-  initialColumnWidths = columnKeys.map (key, i, arr) ->
+  defaultColumnWidths = columnKeys.map (key, i, arr) ->
     schema._schema[key].sdTable?.columnWidth ? 1 / (if arr.length then arr.length else 20)
 
   # TODO change handling of columnWidths, so it doesn't break when we change the schema
   getColumnWidthsFromLocalStorage = ->
     if global.localStorage
       try
-        JSON.parse(global.localStorage.getItem sourceName)?.columnWidths
+        savedColumnWidths = JSON.parse(global.localStorage.getItem sourceName)?.columnWidths
+        if savedColumnWidths.length is defaultColumnWidths.length then savedColumnWidths
       catch error
         console.error error
 
@@ -173,7 +174,7 @@ export DataTable = ({
       currentEntry = (try JSON.parse global.localStorage.getItem sourceName) ?{}
       global.localStorage.setItem sourceName, JSON.stringify {currentEntry..., columnWidths: newWidths}
 
-  [columnWidths, setColumnWidths] = useState getColumnWidthsFromLocalStorage() ? initialColumnWidths
+  [columnWidths, setColumnWidths] = useState getColumnWidthsFromLocalStorage() ? defaultColumnWidths
   totalColumnsWidth = contentContainerWidth - if canDelete then deleteColumnWidth else 0
 
   [debouncedResetTrigger, setDebouncedResetTrigger] = useThrottle 0, 30
