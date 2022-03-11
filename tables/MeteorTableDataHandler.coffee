@@ -228,7 +228,7 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
 
   subRows = useTracker ->
     return unless usePubSub
-    rowsCollection.find({}, {sort, limit}).fetch()
+    rowsCollection.find(query, {sort, limit}).fetch()
 
   useEffect ->
     unless _.isEqual subRows, rows
