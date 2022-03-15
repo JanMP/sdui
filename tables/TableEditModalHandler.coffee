@@ -12,8 +12,8 @@ export TableEditModalHandler = ({tableOptions, DisplayComponent}) ->
     rows, totalRowCount, loadMoreRows, onRowClick,
     sortColumn, sortDirection, onChangeSort, useSort
     canSearch, search, onChangeSearch
-    canAdd, onAdd
-    canDelete, onDelete, deleteConfirmation
+    canAdd
+    canDelete, onDelete
     canEdit, mayEdit, submit
     autoFormChildren, formDisabled, formReadOnly
     loadEditorData
@@ -25,9 +25,8 @@ export TableEditModalHandler = ({tableOptions, DisplayComponent}) ->
     customComponents
   } = tableOptions
 
-  onAdd ?= ->
-    openModal {}
-
+  onRowClick ?= ({rowData, index}) -> console.log 'onRowClick', {rowData, index}
+  onAdd = -> openModal {}
   loadEditorData ?= ({id}) -> console.log "loadEditorData id: #{id}"
 
   [modalOpen, setModalOpen] = useState false
@@ -35,6 +34,9 @@ export TableEditModalHandler = ({tableOptions, DisplayComponent}) ->
 
   [confirmationModalOpen, setConfirmationModalOpen] = useState false
   [idForConfirmationModal, setIdForConfirmationModal] = useState ''
+
+  # TODO make optional (again) and i18n
+  deleteConfirmation = "Soll der Eintrag wirklich gelöscht werden?"
 
   handleOnDelete =
     unless canDelete
@@ -78,7 +80,7 @@ export TableEditModalHandler = ({tableOptions, DisplayComponent}) ->
         />
     }
     {
-      if canDelete and deleteConfirmation?
+      if canDelete
         <ConfirmationModal
           isOpen={confirmationModalOpen}
           setIsOpen={setConfirmationModalOpen}

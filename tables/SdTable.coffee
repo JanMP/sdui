@@ -1,10 +1,17 @@
 import React from 'react'
 import {MeteorTableDataHandler} from './MeteorTableDataHandler.coffee'
-import {EditableDataTable} from './EditableDataTable.coffee'
+import {TableEditModalHandler} from './TableEditModalHandler.coffee'
+import {DataTable} from './DataTable.coffee'
+
+DisplayComponent = (tableOptions) ->
+  <TableEditModalHandler
+    tableOptions={tableOptions}
+    DisplayComponent={DataTable}
+  />
 
 export SdTable = ({dataOptions, customComponents}) ->
   <MeteorTableDataHandler
     dataOptions={dataOptions}
-    DisplayComponent={EditableDataTable}
+    DisplayComponent={DisplayComponent}
     customComponents={customComponents}
   />
