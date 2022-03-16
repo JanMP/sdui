@@ -16,83 +16,20 @@ import _ from 'lodash'
 defaultQuery = {} # ensures equality between runs
 
 ###*
-  @typedef {Object} SDTableDataOptionsType
-  @property {string} sourceName
-  @property {any} listSchemaBridge
-  @property {Mongo.Collection} rowsCollection
-  @property {Mongo.Collection} rowCountCollection
-  @property {Object?} query - defaults to defaultQuery
-  @property {number?} perLoad - defaults to 500
-  @property {boolean?} canEdit - defaults to false
-  @property {any} formSchemaBridge
-  @property {boolean?} canSearch - defaults to false
-  @property {boolean?} canAdd - defaults to false
-  @property {() => void} onAdd
-  @property {boolean?} canDelete - defaults to false
-  @property {string?} deleteConfirmation - defaults to "Soll der Eintrag wirklich gelöscht werden?"
-  @property {(id: string) => void} onDelete
-  @property {boolean?} canExport - defaults to false
-  @property {() => void} onExportTable
-  @property {(id: string) => void} onRowClick
-  @property {[any]?} autoFormChildren
-  @property {boolean?} formDisabled - defaults to false
-  @property {boolean?} formReadOnly - defaults to false
-  @property {boolean?} useSort - defaults to true
-  @property {string?} getRowCountMethodName - defaults to method name set up by createTableDataAPI
-  @property {string?} getRowMethodName - defaults to method name set up by createTableDataAPI
-  @property {string?} rowPublicationName - defaults to method name set up by createTableDataAPI
-  @property {string?} rowCountPublicationName - defaults to method name set up by createTableDataAPI
-  @property {string?} submitMethodName - defaults to method name set up by createTableDataAPI
-  @property {string?} deleteMethodName - defaults to method name set up by createTableDataAPI
-  @property {string?} fetchEditorDataMethodName - defaults to method name set up by createTableDataAPI
-  @property {string?} setValueMethodName - defaults to method name set up by createTableDataAPI
-  @property {string?} exportRowsMethodName - defaults to method name set up by createTableDataAPI
-  @property {string} viewTableRole
-  @property {string} editRole
-  @property {string} exportTableRole
+  @typedef {import("../interfaces").DataTableOptions} DataTableOptions
+  ###
+###*
+  @typedef {import("../interfaces").DataTableDisplayOptions} DataTableDisplayOptions
   ###
 
 ###*
-  @typedef {Object} SDTableDisplayComponentArgumentsType
-  @property {string} sourceName
-  @property {any} listSchemaBridge
-  @property {any} formSchemaBridge
-  @property {Array} rows
-  @property {number} totalRowCount
-  @property {any} loadMoreRows
-  @property {(id: string) => void} onRowClick
-  @property {any} sortColumn
-  @property {any} sortDirection
-  @property {() => void} onChangeSort
-  @property {boolean?} useSort
-  @property {boolean?} canSearch
-  @property {string} search
-  @property {() => void} onChangeSearch
-  @property {boolean?} canAdd
-  @property {() => void} onAdd
-  @property {boolean?} canDelete
-  @property {boolean?} onDelete
-  @property {string} deleteConfirmation
-  @property {boolean?} canEdit
-  @property {boolean?} mayEdit
-  @property {() => void} submit
-  @property {[any]} autoFormChildren
-  @property {boolean?} formDisabled
-  @property {boolean?} formReadOnly
-  @property {(id: string) => void} loadEditorData
-  @property {() => void} onChangeField
-  @property {boolean?} canExport
-  @property {() => void} onExportTable
-  @property {boolean?} mayExport
-  @property {boolean} isLoading
-  @property {Object} customComponents
-  ###  
-
-###*
-  @param {Object} args
-  @param {SDTableDataOptionsType} args.dataOptions
-  @param {(SDTableDisplayComponentArgumentsType) => JSX.Element} args.DisplayComponent
-  @param {Object} args.customComponents
+  @type {
+    (options: {
+      dataOptions: DataTableOptions,
+      DisplayComponent: {(options: TableDataDisplayOptions) => JSX.Element},
+      customComponents?: any
+    }) => JSX.Element
+  }
   ###
 export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponents}) ->
   {
@@ -104,22 +41,13 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
   formSchemaBridge
   canSearch = false
   canAdd = false
-  onAdd
   canDelete = false
-  deleteConfirmation = "Soll der Eintrag wirklich gelöscht werden?"
   onDelete
   canExport = false
-  onExportTable
   onRowClick
   autoFormChildren
   formDisabled = false
   formReadOnly = false
-  useSort = true
-  getRowMethodName, getRowCountMethodName
-  rowPublicationName, rowCountPublicationName
-  submitMethodName, deleteMethodName, fetchEditorDataMethodName
-  setValueMethodName
-  exportRowsMethodName,
   viewTableRole, editRole, exportTableRole, #TODO add handling of viewTableRole
   } = dataOptions
 
@@ -130,22 +58,20 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
     throw new Error 'usePubSub is true but rowsCollection or rowCountCollection not given'
 
   if sourceName?
-    getRowMethodName ?= "#{sourceName}.getRows"
-    getRowCountMethodName ?= "#{sourceName}.getCount"
-    rowPublicationName ?= "#{sourceName}.rows"
-    rowCountPublicationName ?= "#{sourceName}.count"
-    submitMethodName ?= "#{sourceName}.submit"
-    setValueMethodName ?= "#{sourceName}.setValue"
-    fetchEditorDataMethodName ?= "#{sourceName}.fetchEditorData"
-    deleteMethodName ?= "#{sourceName}.delete"
-    exportRowsMethodName ?= "#{sourceName}.getExportRows"
+    getRowMethodName = "#{sourceName}.getRows"
+    getRowCountMethodName = "#{sourceName}.getCount"
+    rowPublicationName = "#{sourceName}.rows"
+    rowCountPublicationName = "#{sourceName}.count"
+    submitMethodName = "#{sourceName}.submit"
+    setValueMethodName = "#{sourceName}.setValue"
+    fetchEditorDataMethodName = "#{sourceName}.fetchEditorData"
+    deleteMethodName = "#{sourceName}.delete"
+    exportRowsMethodName = "#{sourceName}.getExportRows"
 
   formSchemaBridge ?= listSchemaBridge
 
   if onRowClick and canEdit
     throw new Error 'both onRowClick and canEdit set to true'
-
-  onRowClick ?= ->
 
   resolveRef = useRef ->
   rejectRef = useRef ->
@@ -286,8 +212,8 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
       data: {_id, changeData}
     .catch console.error
    
-  if canExport
-    onExportTable ?= ->
+  onExportTable = ->
+    if canExport
       meteorApply
         method: exportRowsMethodName
         data: {search, query, sort}
@@ -301,17 +227,17 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
       .catch (error) ->
         console.error error
         toast.error "Fehler (siehe console.log)"
-
+    else throw new Meteor.Error 'onExportTable has been called despite canExport == false'
 
   <ErrorBoundary>
     <DisplayComponent {{
       sourceName,
       listSchemaBridge, formSchemaBridge
       rows, totalRowCount, loadMoreRows, onRowClick,
-      sortColumn, sortDirection, onChangeSort, useSort
+      sortColumn, sortDirection, onChangeSort
       canSearch, search, onChangeSearch
-      canAdd, onAdd
-      canDelete, onDelete, deleteConfirmation
+      canAdd
+      canDelete, onDelete
       canEdit, mayEdit, submit
       autoFormChildren, formDisabled, formReadOnly
       loadEditorData

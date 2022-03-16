@@ -3,8 +3,8 @@ import _ from 'lodash'
 
 export createDefaultPipeline = ({getPreSelectPipeline, getProcessorPipeline, listSchema}) ->
 
-  getPreSelectPipeline ?= -> []
-  getProcessorPipeline ?= -> []
+  getPreSelectPipeline ?= ({pub}) -> []
+  getProcessorPipeline ?= ({pub}) -> []
 
   searchPipeline = ({search}) ->
     if search? and search isnt ''
