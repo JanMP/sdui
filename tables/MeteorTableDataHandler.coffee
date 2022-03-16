@@ -16,10 +16,20 @@ import _ from 'lodash'
 defaultQuery = {} # ensures equality between runs
 
 ###*
-  @param {Object} args
-  @param {createTableDataAPIOutputInterface} args.dataOptions
-  @param {(SDTableDisplayComponentArgumentsType) => JSX.Element} args.DisplayComponent
-  @param {Object} args.customComponents
+  @typedef {import("../interfaces").DataTableOptions} DataTableOptions
+  ###
+###*
+  @typedef {import("../interfaces").DataTableDisplayOptions} DataTableDisplayOptions
+  ###
+
+###*
+  @type {
+    (options: {
+      dataOptions: DataTableOptions,
+      DisplayComponent: {(options: TableDataDisplayOptions) => JSX.Element},
+      customComponents?: any
+    }) => JSX.Element
+  }
   ###
 export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponents}) ->
   {

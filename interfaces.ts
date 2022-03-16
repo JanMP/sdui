@@ -76,7 +76,7 @@ export interface createTableDataAPIReturn {
   exportTableRole?: string
 }
 
-interface additionalDataTableOptionsInterface {
+interface additionalDataTableOptions {
   query?: any
   perLoad?: number
   onDelete?: ({id}: {id: string}) => Promise<any>
@@ -87,9 +87,9 @@ interface additionalDataTableOptionsInterface {
   loadEditorData?: ({id}: {id: string}) => Promise<any>
 }
 
-export type DataTableOptions = createTableDataAPIReturn & additionalDataTableOptionsInterface
+export type DataTableOptions = createTableDataAPIReturn & additionalDataTableOptions
 
-interface TableDataInterface {
+export interface DataTabpeDisplayOptions {
   rows: [any]
   totalRowCount: number
   loadMoreRows: ({startIndex, stopIndex}: {startIndex: number, stopIndex: number}) => Promise<any>
@@ -99,9 +99,5 @@ interface TableDataInterface {
   search: 'string'
   onChangeSearch: (searchString: string) => void
   onDelete: ({id}: {id: string}) => Promise<any>
-
-}
-
-interface SDTabbleDataOptionsInterface {
 
 }
