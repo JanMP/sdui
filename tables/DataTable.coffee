@@ -10,9 +10,9 @@ import {useThrottle} from '@react-hook/throttle'
 import useSize from '@react-hook/size'
 import _ from 'lodash'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faSortUp} from '@fortawesome/free-solid-svg-icons/faSortUp'
-import {faSortDown} from '@fortawesome/free-solid-svg-icons/faSortDown'
-import {faTrash} from '@fortawesome/free-solid-svg-icons/faTrash'
+import {faSortUp} from '@fortAwesome/pro-solid-svg-icons/faSortUp'
+import {faSortDown} from '@fortAwesome/pro-solid-svg-icons/faSortDown'
+import {faTrash} from '@fortAwesome/pro-solid-svg-icons/faTrash'
 import {DefaultHeader} from './DefaultHeader.coffee'
 
 
@@ -69,6 +69,7 @@ cellRenderer = ({listSchemaBridge, onChangeField, cache, mayEdit}) ->
         />}
     </CellMeasurer>
 
+# TODO Think this through 
 actionCellRenderer = ({component}) ->
 ({dataKey, parent, rowIndex, columnIndex, cellData, rowData}) ->
   onClick = (e) ->
@@ -160,7 +161,6 @@ export DataTable = ({
   defaultColumnWidths = columnKeys.map (key, i, arr) ->
     schema._schema[key].sdTable?.columnWidth ? 1 / (if arr.length then arr.length else 20)
 
-  # TODO change handling of columnWidths, so it doesn't break when we change the schema
   getColumnWidthsFromLocalStorage = ->
     if global.localStorage
       try
@@ -171,7 +171,7 @@ export DataTable = ({
 
   saveColumnWidthsToLocalStorage = (newWidths) ->
     if global.localStorage
-      currentEntry = (try JSON.parse global.localStorage.getItem sourceName) ?{}
+      currentEntry = (try JSON.parse global.localStorage.getItem sourceName) ? {}
       global.localStorage.setItem sourceName, JSON.stringify {currentEntry..., columnWidths: newWidths}
 
   [columnWidths, setColumnWidths] = useState getColumnWidthsFromLocalStorage() ? defaultColumnWidths
@@ -286,7 +286,7 @@ export DataTable = ({
                   dataKey="no-data-key"
                   label=""
                   width={deleteColumnWidth}
-                  cellRenderer={deleteButtonCellRenderer {onDelete}}
+                  cellRenderer={actionCell?.render}
                 />
               else if canDelete
                 <Column

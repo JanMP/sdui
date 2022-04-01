@@ -1,7 +1,7 @@
 import React from 'react'
 import {useTw} from '../config.coffee'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faTrash} from '@fortawesome/free-solid-svg-icons/faTrash'
+import {faTrash} from '@fortAwesome/pro-solid-svg-icons/faTrash'
 
 DefaultListItemContent = ({rowData}) ->
   tw = useTw()
@@ -31,15 +31,15 @@ export DefaultListItem = ({
 
   <div className={tw "p-1 shadow flex justify-between#{if isSelected then ' bg-secondary-100' else ''}"} onClick={handleClick}>
     <ListItemContent rowData={rowData}/>
-      {
-        if canDelete
-          <div className={tw"p-2"}>
-            <button
-              className="icon danger"
-              onClick={handleDeleteButtonClick}
-            >
-              <FontAwesomeIcon icon={faTrash}/>
-            </button>
-          </div>
-      }
+    {
+      if canDelete
+        <div className={tw"p-2"}>
+          <button
+            className="icon danger"
+            onClick={handleDeleteButtonClick}
+          >
+            <FontAwesomeIcon icon={faTrash}/>
+          </button>
+        </div>
+    }
   </div>

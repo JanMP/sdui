@@ -1,7 +1,7 @@
 import React from 'react'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faPlus} from '@fortawesome/free-solid-svg-icons/faPlus'
-import {faFileDownload} from '@fortawesome/free-solid-svg-icons/faFileDownload'
+import {faPlus} from '@fortAwesome/pro-solid-svg-icons/faPlus'
+import {faFileDownload} from '@fortAwesome/pro-solid-svg-icons/faFileDownload'
 import {SearchInput} from "./SearchInput.coffee"
 import {useTw} from '../config.coffee'
 

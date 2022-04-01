@@ -1,8 +1,8 @@
 import React from 'react'
 import {DynamicTableField} from './DynamicTableField'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faCheck} from '@fortawesome/free-solid-svg-icons/faCheck'
-import {faTimes} from '@fortawesome/free-solid-svg-icons/faTimes'
+import {faCheck} from '@fortAwesome/pro-solid-svg-icons/faCheck'
+import {faTimes} from '@fortAwesome/pro-solid-svg-icons/faTimes'
 import _ from 'lodash'
 
 export AutoTableAutoField = ({row, columnKey, schemaBridge, onChangeField, measure, mayEdit}) ->

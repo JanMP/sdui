@@ -3,7 +3,7 @@ import {useTw} from '../config.coffee'
 import {meteorApply} from '../common/meteorApply.coffee'
 import {toast} from 'react-toastify'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faSpinner} from '@fortawesome/free-solid-svg-icons/faSpinner'
+import {faSpinner} from '@fortAwesome/pro-solid-svg-icons/faSpinner'
 import {ConfirmationModal} from './ConfirmationModal'
 import _ from 'lodash'
 

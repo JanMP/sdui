@@ -35,6 +35,9 @@ export ContentEditor = (tableOptions) ->
 
   onAdd ?= ->
     openEditor {}
+    
+  # TODO make optional (again) and i18n
+  deleteConfirmation ?= "Soll der Eintrag wirklich gelöscht werden?"
 
   loadEditorData ?= ({id}) -> console.log "loadEditorData id: #{id}"
 
@@ -52,7 +55,7 @@ export ContentEditor = (tableOptions) ->
     .find (key) -> formSchemaBridge.schema._schema[key]?.sdContent?.isContent
   
   setContent = (content) -> setModel (currentModel) -> {currentModel..., [contentKey]: content}
-  
+
   handleOnDelete =
     unless canDelete
       -> console.error 'handleOnDelete has been called despite canDelete false'
