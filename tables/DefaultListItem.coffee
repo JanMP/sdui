@@ -1,7 +1,7 @@
 import React from 'react'
 import {useTw} from '../config.coffee'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faTrash} from '@fortAwesome/pro-solid-svg-icons/faTrash'
+import {faTrash} from '@fortAwesome/free-solid-svg-icons/faTrash'
 
 DefaultListItemContent = ({rowData}) ->
   tw = useTw()

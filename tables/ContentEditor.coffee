@@ -56,6 +56,10 @@ export ContentEditor = (tableOptions) ->
   
   setContent = (content) -> setModel (currentModel) -> {currentModel..., [contentKey]: content}
 
+  deleteAndCloseEditor = ({id}) ->
+    onDelete {id}
+    setEditorOpen false
+
   handleOnDelete =
     unless canDelete
       -> console.error 'handleOnDelete has been called despite canDelete false'
@@ -65,7 +69,7 @@ export ContentEditor = (tableOptions) ->
           setIdForConfirmationModal id
           setConfirmationModalOpen true
         else
-          onDelete {id}
+          deleteAndCloseEditor {id}
 
   openEditor = (formModel) ->
     setModel formModel
@@ -99,7 +103,7 @@ export ContentEditor = (tableOptions) ->
             isOpen={confirmationModalOpen}
             setIsOpen={setConfirmationModalOpen}
             text={deleteConfirmation}
-            onConfirm={-> onDelete id: idForConfirmationModal}
+            onConfirm={-> deleteAndCloseEditor id: idForConfirmationModal}
           />
       }
       <LeftResizable size="25%">

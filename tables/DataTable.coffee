@@ -10,9 +10,9 @@ import {useThrottle} from '@react-hook/throttle'
 import useSize from '@react-hook/size'
 import _ from 'lodash'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faSortUp} from '@fortAwesome/pro-solid-svg-icons/faSortUp'
-import {faSortDown} from '@fortAwesome/pro-solid-svg-icons/faSortDown'
-import {faTrash} from '@fortAwesome/pro-solid-svg-icons/faTrash'
+import {faSortUp} from '@fortAwesome/free-solid-svg-icons/faSortUp'
+import {faSortDown} from '@fortAwesome/free-solid-svg-icons/faSortDown'
+import {faTrash} from '@fortAwesome/free-solid-svg-icons/faTrash'
 import {DefaultHeader} from './DefaultHeader.coffee'
 
 
