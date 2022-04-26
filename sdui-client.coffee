@@ -4,6 +4,7 @@
 # applications. See sdui-tests.js for an example of importing.
 export {userWithIdIsInRole, currentUserIsInRole, useCurrentUserIsInRole, currentUserMustBeInRole} from './common/roleChecks.coffee'
 export {createTableDataAPI} from './api/createTableDataAPI.coffee'
+export {createFilesAPI} from './api/createFilesAPI.coffee'
 export {ActionButton} from './forms/ActionButton.coffee'
 export {SdTable} from './tables/SdTable.coffee'
 export {SdList} from './tables/SdList.coffee'
@@ -18,3 +19,4 @@ export {ColorPicker, ColorPickerField} from './forms/ColorPicker.coffee'
 export {FormModal} from './forms/FormModal.coffee'
 export {createUserTableAPI} from './usertable/createUserTableAPI.coffee'
 export {LoginForm} from './forms/LoginForm.coffee'
+export {FileBar} from './Files/FileBar.coffee'

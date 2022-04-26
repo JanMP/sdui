@@ -38,18 +38,18 @@ export createTableDataAPI = ({
 
   unless viewTableRole?
     viewTableRole = 'any'
-    console.warn "[createAutoDataTableBackend #{sourceName}]:
-      no viewTableRole defined for AutoDataTableBackend #{sourceName}, using '#{viewTableRole}' instead."
+    console.warn "[createTableDataAPI #{sourceName}]:
+      no viewTableRole defined, using '#{viewTableRole}' instead."
 
   if canEdit and not editRole?
     editRole = viewTableRole
-    console.warn "[createAutoDataTableBackend #{sourceName}]:
-      no editRole defined for AutoDataTableBackend #{sourceName}, using '#{editRole}' instead."
+    console.warn "[createTableDataAPI #{sourceName}]:
+      no editRole defined, using '#{editRole}' instead."
 
   if canExport and not exportTableRole?
     exportTableRole = viewTableRole
-    console.warn "[createAutoDataTableBackend #{sourceName}]:
-      no exportTableRole defined for AutoDataTableBackend #{sourceName}, using '#{exportTableRole}' instead."
+    console.warn "[createTableDataAPI #{sourceName}]:
+      no exportTableRole defined, using '#{exportTableRole}' instead."
   
   getPreSelectPipeline ?= -> []
   getProcessorPipeline ?= -> []
