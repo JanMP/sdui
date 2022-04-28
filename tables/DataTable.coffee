@@ -165,7 +165,7 @@ export DataTable = ({
     if global.localStorage
       try
         savedColumnWidths = JSON.parse(global.localStorage.getItem sourceName)?.columnWidths
-        if savedColumnWidths.length is defaultColumnWidths.length then savedColumnWidths
+        if savedColumnWidths?.length is defaultColumnWidths.length then savedColumnWidths
       catch error
         console.error error
 

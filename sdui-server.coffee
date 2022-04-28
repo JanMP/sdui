@@ -5,7 +5,7 @@
 export {userWithIdIsInRole, currentUserIsInRole, currentUserMustBeInRole} from './common/roleChecks.coffee'
 export {createTableDataAPI} from './api/createTableDataAPI.coffee'
 export {createUserTableAPI} from './usertable/createUserTableAPI.coffee'
-export {createFilesAPI} from './api/createFilesAPI.coffee'
+export {createFilesAPI, filesAPISourceSchema} from './api/createFilesAPI.coffee'
 # export {ActionButton} from './forms/ActionButton.coffee'
 # export {SdTable} from './tables/SdTable.coffee'
 # export {SdList} from './tables/SdList.coffee'

@@ -1,14 +1,16 @@
 import React, {useState} from 'react'
 import {meteorApply} from '../common/meteorApply.coffee'
+import {toast} from 'react-toastify'
 
 FileSelector = ->
   <div className="border border-blue-500">
     FileSelector
   </div>
 
-export FileBar = ->
+export FileBar = ({dataOptions}) ->
+  {sourceName, collection} = dataOptions
 
-  [showUpload, setShowUpload] = useState false
+  [showUpload, setShowUpload] = useState true
   toggleShowUpload = -> setShowUpload (x) -> not x
   [showFileSelector, setShowFileSelector] = useState false
   toggleFileSelector = -> setShowFileSelector (x) -> not x
@@ -18,23 +20,34 @@ export FileBar = ->
       {name, size, type} = file
       console.log "filename: #{name}"
       meteorApply
-        method: "spaces.getUploadUrl"
+        method: "#{sourceName}.requestUpload"
         data: {name, size, type}
-      .then (url) ->
-        fetch url,
-          method: 'PUT'
-          headers: 'Content-Type': type
-          body: file
-      .then console.log
-      .catch console.error
+      .then ({uploadUrl, key}) ->
+        response =
+          await fetch uploadUrl,
+            method: 'PUT'
+            headers: 'Content-Type': type
+            body: file
+        {response, key}
+      .then ({response, key}) ->
+        meteorApply
+          method: "#{sourceName}.finishUpload"
+          data:
+            key: key
+            statusText: response.statusText
+      .catch (error) ->
+        console.error error
+        toast.error "#{error}"
 
   onFileInputChange = (e) ->
     if (file = e.target.files?[0])?
       console.log file
     
   getFileList = ->
+    console.log {sourceName}
     meteorApply
-      method: "spaces.getFileList"
+      method: "#{sourceName}.getFileList"
+      data: {}
     .then console.log
 
   <div className="m-1 p-2">

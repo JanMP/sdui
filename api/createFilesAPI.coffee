@@ -5,7 +5,28 @@ import {S3, ListObjectsCommand, PutObjectCommand} from '@aws-sdk/client-s3'
 import {getSignedUrl} from '@aws-sdk/s3-request-presigner'
 import {currentUserMustBeInRole} from '../common/roleChecks.coffee'
 
-export createFilesAPI = ({sourceName, collection, uploadUserRole, uploadPublicRole, getFileListRole}) ->
+export filesAPISourceSchema =
+  new SimpleSchema
+    key:
+      type: String
+    name:
+      type: String
+    owner:
+      type: String
+    size:
+      type: Number
+    type:
+      type: String
+      optional: true
+    status:
+      type: String
+      allowedValues: ['upload-requested', 'upload-done', 'upload-not-ok', 'fetched']
+    fetchDate:
+      type: Date
+      optional: true
+
+export createFilesAPI = ({sourceName, collection, userFilesRole, uploadCommonRole, getCommonFileListRole, getAllFileListRole}) ->
+
 
   unless sourceName?
     throw new Error 'no sourceName given'
@@ -13,20 +34,25 @@ export createFilesAPI = ({sourceName, collection, uploadUserRole, uploadPublicRo
   unless collection?
     throw new Error 'no collection given'
 
-  unless uploadUserRole?
-    uploadUserRole = 'username-is-admin'
+  unless userFilesRole?
+    userFilesRole = 'username-is-admin'
     console.warn "[createFilesAPI #{sourceName}]:
-      no uploadUserRole defined, using username-is-admin"
+      no userfilesRole defined, using username-is-admin"
 
-  unless uploadPublicRole?
-    uploadPublicRole = 'username-is-admin'
+  unless uploadCommonRole?
+    uploadCommonRole = 'username-is-admin'
     console.warn "[createFilesAPI #{sourceName}]:
-      no uploadPublicRole defined, using username-is-admin"
+      no uploadCommonRole defined, using username-is-admin"
 
-  unless getFileListRole?
-    getFileListRole = 'username-is-admin'
+  unless getCommonFileListRole?
+    getCommonFileListRole = 'username-is-admin'
     console.warn "[createFilesAPI #{sourceName}]:
-      no getFileListRole defined, using username-is-admin"
+      no getCommonFileListRole defined, using username-is-admin"
+
+  unless getAllFileListRole?
+    getAllFileListRole = 'username-is-admin'
+    console.warn "[createFilesAPI #{sourceName}]:
+      no getAllFileListRole defined, using username-is-admin"
 
   if Meteor.isServer
     unless (s = Meteor.settings[sourceName])?
@@ -43,56 +69,106 @@ export createFilesAPI = ({sourceName, collection, uploadUserRole, uploadPublicRo
           secretAccessKey: s.secretAccessKey
 
 
-    getFileList = ({prefix}) ->
+    getFileList = (prefix) ->
       s3Client
         .send new ListObjectsCommand
           Bucket: bucket
           Prefix: prefix
         .then (data) ->
+          console.log data
           data.Contents?.map (c) ->
             key: c.Key
             size: c.Size
-            prefix: c.Prefix
+
+    updateFilesCollection = ->
+      getFileList()
+        .then (files) ->
+          fetchDate = new Date()
+          files.forEach (file) ->
+            console.log file
+            unless (owner = file.key.match?(/^(.+?)(?=\/)/g)?[0]) is 'common'
+              unless owner? and Meteor.users.findOne _id: owner
+                owner = 'unknown-owner'
+            
+            name = /^.+?\/(.+)/g.exec(file.key)?[1] ? file.key
+
+            collection.upsert {key: file.key},
+              $set:
+                key: file.key
+                name: name
+                owner: owner
+                size: file.size
+                status: 'fetched'
+                fetchDate: fetchDate
 
 
-    getUploadUrl = ({name, size, type}) ->
+    getUploadUrl = ({key, type}) ->
       getSignedUrl s3Client,
         new PutObjectCommand
           Bucket: bucket
-          Key: name
+          Key: key
           ContentType: type
       ,
         expiresIn: 15 * 60
 
   new ValidatedMethod
     name: "#{sourceName}.getFileList"
-    validate:
-      new SimpleSchema
-        select:
-          type: String
-          allowedValues: ['publicOnly', 'userOnly']
-          optional: true
-      .validator()
-    run: ({select}) ->
-      currentUserMustBeInRole getFileListRole
+    validate: ->
+    run: ->
       if Meteor.isServer
-        privateList = []
-        publicList = []|
-        unless select is 'publicOnly'
-          privateList = await getFileList prefix: "#{Meteor.userId()}/"
+        updateFilesCollection()
+
         
   new ValidatedMethod
-    name: "#{sourceName}.getUploadUrl"
+    name: "#{sourceName}.requestUpload"
     validate:
       new SimpleSchema
         name: String
         size: Number
         type: String
-        public:
+        saveAsCommon:
           type: Boolean
           optional: true
       .validator()
-    run: (params) ->
+    run: ({name, size, type, saveAsCommon}) ->
+      if saveAsCommon
+        currentUserMustBeInRole uploadCommonRole
+      else
+        currentUserMustBeInRole userFilesRole
       if Meteor.isServer
-        await getUploadUrl params
+        prefix = if saveAsCommon then 'common/' else "#{Meteor.userId()}/"
+        key = prefix + name
+        getUploadUrl {key, type}
+          .then (uploadUrl) ->
+            collection.upsert {key},
+              key: key
+              name: name
+              owner: Meteor.userId()
+              size: size
+              type: type
+              status: 'requested'
+            {uploadUrl, key}
+
+        
+
+  new ValidatedMethod
+    name: "#{sourceName}.finishUpload"
+    validate:
+      new SimpleSchema
+        key:
+          type: String
+        statusText:
+          type: String
+      .validator()
+    run: ({key, statusText}) ->
+      if key.startsWith 'common/'
+        currentUserMustBeInRole uploadCommonRole
+      if key.startsWith "#{Meteor.userId()}/"
+        currentUserMustBeInRole userFilesRole
+      console.log {key, statusText}
+      if Meteor.isServer
+        status = if statusText is 'OK' then 'upload-done' else 'upload-not-ok'
+        collection.update {key}, $set: {status}
+
+  {sourceName, collection}
 
