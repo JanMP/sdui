@@ -4,6 +4,9 @@ import {ValidatedMethod} from 'meteor/mdg:validated-method'
 import {S3, ListObjectsCommand, PutObjectCommand} from '@aws-sdk/client-s3'
 import {getSignedUrl} from '@aws-sdk/s3-request-presigner'
 import {currentUserMustBeInRole} from '../common/roleChecks.coffee'
+import {createTableDataAPI} from './createTableDataAPI.coffee'
+
+delay = (ms) -> new Promise (resolve) -> setTimeout resolve, ms
 
 export filesAPISourceSchema =
   new SimpleSchema
@@ -18,15 +21,17 @@ export filesAPISourceSchema =
     type:
       type: String
       optional: true
+    url:
+      type: String
     status:
       type: String
-      allowedValues: ['upload-requested', 'upload-done', 'upload-not-ok', 'fetched']
+      allowedValues: ['requested', 'ok', 'not-ok']
     fetchDate:
       type: Date
       optional: true
 
-export createFilesAPI = ({sourceName, collection, userFilesRole, uploadCommonRole, getCommonFileListRole, getAllFileListRole}) ->
 
+export createFilesAPI = ({sourceName, collection, userFilesRole, uploadCommonRole, getCommonFileListRole, getAllFileListRole}) ->
 
   unless sourceName?
     throw new Error 'no sourceName given'
@@ -54,20 +59,31 @@ export createFilesAPI = ({sourceName, collection, userFilesRole, uploadCommonRol
     console.warn "[createFilesAPI #{sourceName}]:
       no getAllFileListRole defined, using username-is-admin"
 
+  tableDataOptions = createTableDataAPI
+    sourceName: sourceName
+    sourceSchema: filesAPISourceSchema
+    collection: collection
+    viewTableRole: 'admin'
+    editRole: 'admin'
+    canEdit: false
+    canAdd: false
+    canDelete: true
+    canSearch: true
+    canExport: false
+
   if Meteor.isServer
-    unless (s = Meteor.settings[sourceName])?
+    unless (settings = Meteor.settings[sourceName])?
       throw new Error "Meteor.settings: missing key #{sourceName}"
     
-    bucket = s.bucket
+    {endpoint, region, accessKeyId, secretAccessKey, bucket, downloadURLRoot} = settings
 
     s3Client =
       new S3
-        endpoint: s.endpoint
-        region: s.region
+        endpoint: endpoint
+        region: region
         credentials:
-          accessKeyId: s.accessKeyId
-          secretAccessKey: s.secretAccessKey
-
+          accessKeyId: accessKeyId
+          secretAccessKey: secretAccessKey
 
     getFileList = (prefix) ->
       s3Client
@@ -85,20 +101,18 @@ export createFilesAPI = ({sourceName, collection, userFilesRole, uploadCommonRol
         .then (files) ->
           fetchDate = new Date()
           files.forEach (file) ->
-            console.log file
             unless (owner = file.key.match?(/^(.+?)(?=\/)/g)?[0]) is 'common'
               unless owner? and Meteor.users.findOne _id: owner
                 owner = 'unknown-owner'
-            
             name = /^.+?\/(.+)/g.exec(file.key)?[1] ? file.key
-
             collection.upsert {key: file.key},
               $set:
                 key: file.key
                 name: name
                 owner: owner
                 size: file.size
-                status: 'fetched'
+                status: 'ok'
+                url: downloadURLRoot + file.key
                 fetchDate: fetchDate
 
 
@@ -108,17 +122,19 @@ export createFilesAPI = ({sourceName, collection, userFilesRole, uploadCommonRol
           Bucket: bucket
           Key: key
           ContentType: type
+          ACL: 'public-read'
       ,
         expiresIn: 15 * 60
 
+
   new ValidatedMethod
-    name: "#{sourceName}.getFileList"
+    name: "#{sourceName}.updateFilesCollection"
     validate: ->
     run: ->
       if Meteor.isServer
         updateFilesCollection()
 
-        
+
   new ValidatedMethod
     name: "#{sourceName}.requestUpload"
     validate:
@@ -146,10 +162,10 @@ export createFilesAPI = ({sourceName, collection, userFilesRole, uploadCommonRol
               owner: Meteor.userId()
               size: size
               type: type
+              url: downloadURLRoot + key
               status: 'requested'
             {uploadUrl, key}
 
-        
 
   new ValidatedMethod
     name: "#{sourceName}.finishUpload"
@@ -167,8 +183,9 @@ export createFilesAPI = ({sourceName, collection, userFilesRole, uploadCommonRol
         currentUserMustBeInRole userFilesRole
       console.log {key, statusText}
       if Meteor.isServer
-        status = if statusText is 'OK' then 'upload-done' else 'upload-not-ok'
+        status = if statusText is 'OK' then 'ok' else 'not-ok'
         collection.update {key}, $set: {status}
-
-  {sourceName, collection}
+  
+  #return
+  tableDataOptions
 
