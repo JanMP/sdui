@@ -27,6 +27,9 @@ export createTableDataAPI = ({
   makeFormDataFetchMethodRunFkt, makeSubmitMethodRunFkt, makeDeleteMethodRunFkt
   debounceDelay
   observers
+  setupNewItem
+  enableDeleteForRow
+  enableEditForRow
 }) ->
 
   # check required props and setup defaults for optional props
@@ -73,6 +76,10 @@ export createTableDataAPI = ({
   getRowCountPipeline ?= defaultGetRowCountPipeline
   getExportPipeline ?= defaultGetExportPipeline
 
+  setupNewItem ?= ({model}) -> {}
+  enableDeleteForRow ?= ({row}) -> true
+  enableEditForRow ?= ({row}) -> true
+
   if Meteor.isClient # setup local collections for publications
     rowsCollection = new Mongo.Collection "#{sourceName}.rows"
     rowCountCollection = new Mongo.Collection "#{sourceName}.count"
@@ -87,6 +94,7 @@ export createTableDataAPI = ({
     getRowsPipeline, getRowCountPipeline, getExportPipeline
     canEdit, canDelete, canExport, formSchema,
     makeFormDataFetchMethodRunFkt, makeSubmitMethodRunFkt, makeDeleteMethodRunFkt
+    enableDeleteForRow, enableEditForRow
   }
 
 
@@ -102,4 +110,7 @@ export createTableDataAPI = ({
     viewTableRole
     editRole
     exportTableRole
+    setupNewItem
+    enableDeleteForRow
+    enableEditForRow
   }

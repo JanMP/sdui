@@ -13,7 +13,8 @@ sourceName, collection,
 useObjectIds,
 getRowsPipeline, getRowCountPipeline, getExportPipeline
 canEdit, canDelete, canExport
-formSchema, makeFormDataFetchMethodRunFkt, makeSubmitMethodRunFkt, makeDeleteMethodRunFkt}) ->
+formSchema, makeFormDataFetchMethodRunFkt, makeSubmitMethodRunFkt, makeDeleteMethodRunFkt
+enableDeleteForRow, enableEditForRow}) ->
   
   # The Collection might be using ObjectIds instead of String Ids on Mongo
   transformIdToMongo = (id) ->

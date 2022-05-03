@@ -49,6 +49,7 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
   formDisabled = false
   formReadOnly = false
   viewTableRole, editRole, exportTableRole, #TODO add handling of viewTableRole
+  setupNewItem, enableDeleteForRow, enableEditForRow
   } = dataOptions
 
   # we only support usePubSub = true atm
@@ -239,6 +240,9 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
       canAdd
       canDelete, onDelete
       canEdit, mayEdit, submit
+      setupNewItem
+      enableDeleteForRow
+      enableEditForRow
       autoFormChildren, formDisabled, formReadOnly
       loadEditorData
       onChangeField,
