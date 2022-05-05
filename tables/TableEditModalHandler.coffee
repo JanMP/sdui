@@ -21,8 +21,6 @@ export TableEditModalHandler = ({tableOptions, DisplayComponent}) ->
     canExport, onExportTable
     mayExport
     setupNewItem
-    enableDeleteForRow
-    enableEditForRow
     isLoading,
     overscanRowCount
     customComponents
@@ -63,7 +61,7 @@ export TableEditModalHandler = ({tableOptions, DisplayComponent}) ->
   if canEdit
     onRowClick =
       ({rowData, index}) ->
-        return unless enableEditForRow row: rowData
+        return if rowData._disableEditForRow
         if formSchemaBridge is listSchemaBridge
           openModal rows[index]
         else
@@ -111,8 +109,6 @@ export TableEditModalHandler = ({tableOptions, DisplayComponent}) ->
           overscanRowCount
           customComponents
           setupNewItem
-          enableDeleteForRow
-          enableEditForRow
         }...}
       />
     </ErrorBoundary>

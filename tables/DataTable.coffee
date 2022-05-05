@@ -87,7 +87,7 @@ actionCellRenderer = ({component}) ->
     </button>
   </div>
 
-deleteButtonCellRenderer = ({onDelete, enableDeleteForRow}) ->
+deleteButtonCellRenderer = ({onDelete}) ->
   ({dataKey, parent, rowIndex, columnIndex, cellData, rowData}) ->
 
     id = rowData?._id ? rowData?.id
@@ -98,21 +98,20 @@ deleteButtonCellRenderer = ({onDelete, enableDeleteForRow}) ->
       if id?
         onDelete {id}
 
-    disabled = not enableDeleteForRow row: rowData
     <div style={paddingTop: ".5rem"}>
       <button
         onClick={onClick}
         className="danger icon"
-        disabled={disabled}
+        disabled={rowData._disableDeleteForRow}
       >
         <FontAwesomeIcon icon={faTrash}/>
       </button>
     </div>
 
-rowRenderer = ({canEdit, mayEdit, enableEditForRow}) ->
+rowRenderer = ({canEdit, mayEdit}) ->
   (props) ->
     if canEdit
-      if mayEdit and enableEditForRow row: props?.rowData
+      if mayEdit
         props.className += " editable-row"
       else
         props.className += " not-editable-row"
@@ -137,8 +136,6 @@ export DataTable = ({
   onRowClick
   canExport, onExportTable = (args...) -> console.log "onExportTable default stump called with arguments:", args...
   mayExport
-  enableDeleteForRow,
-  enableEditForRow
   overscanRowCount = 10
   customComponents = {}
 }) ->
@@ -287,7 +284,7 @@ export DataTable = ({
             rowCount={rows?.length ? 0}
             rowGetter={getRow}
             rowClassName={({index}) -> if index %% 2 then 'uneven' else 'even'}
-            rowRenderer={rowRenderer {canEdit, mayEdit, enableEditForRow}}
+            rowRenderer={rowRenderer {canEdit, mayEdit}}
             onRowsRendered={onRowsRendered}
             ref={tableRef}
             overscanRowCount={overscanRowCount}
@@ -310,7 +307,7 @@ export DataTable = ({
                   dataKey="no-data-key"
                   label=""
                   width={deleteColumnWidth}
-                  cellRenderer={deleteButtonCellRenderer {onDelete, enableDeleteForRow}}
+                  cellRenderer={deleteButtonCellRenderer {onDelete}}
                 />
             }
           </Table>

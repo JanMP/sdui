@@ -14,7 +14,7 @@ useObjectIds,
 getRowsPipeline, getRowCountPipeline, getExportPipeline
 canEdit, canDelete, canExport
 formSchema, makeFormDataFetchMethodRunFkt, makeSubmitMethodRunFkt, makeDeleteMethodRunFkt
-enableDeleteForRow, enableEditForRow}) ->
+checkDisableDeleteForRow, checkDisableEditForRow}) ->
   
   # The Collection might be using ObjectIds instead of String Ids on Mongo
   transformIdToMongo = (id) ->
@@ -121,12 +121,33 @@ enableDeleteForRow, enableEditForRow}) ->
           .catch (error) ->
             console.error "#{sourceName}.getRows", error
 
+  getRowWithId = ({id}) ->
+    row = await collection.rawCollection().aggregate(getRowsPipeline {query: _id: id}).toArray()
+    if row?.length isnt 1
+      throw new Meteor.Error '[getRowWithId-not-array-length-1]'
+    row[0]
+  
+  editRowMustNotBeDisabled =({id}) ->
+    return unless Meteor.isServer
+    return unless checkDisableEditForRow
+    console.log row = await getRowWithId {id}
+    if row?._disableEditForRow
+      throw new Meteor.Error '[editRowMustNotBeDisabled]', 'Editing for this Row is disabled'
+  
+  deleteRowMustNotBeDisabled = ({id}) ->
+    return unless Meteor.isServer
+    return unless checkDisableDeleteForRow
+    row = await getRowWithId {id}
+    if row?._disableDeleteForRow
+      throw new Meteor.Error '[deleteRowMustNotBeDisabled]', 'Deleting this Row is disabled'
+  
   if canEdit
     submit = new ValidatedMethod
       name: "#{sourceName}.submit"
       validate: (schemaWithId formSchema).validator()
       run: (model) ->
         currentUserMustBeInRole editRole
+        await editRowMustNotBeDisabled id: model._id
         submitMethodRun
           id: model._id
           data: _.omit model, '_id'
@@ -139,6 +160,7 @@ enableDeleteForRow, enableEditForRow}) ->
         .validator()
       run: ({id}) ->
         currentUserMustBeInRole editRole
+        await editRowMustNotBeDisabled: {id}
         if Meteor.isServer
           formDataFetchMethodRun {id}
 
@@ -153,7 +175,9 @@ enableDeleteForRow, enableEditForRow}) ->
             blackbox: true
         .validator()
       run: ({_id, changeData}) ->
+        console.log 'setValue', {_id, changeData}
         currentUserMustBeInRole editRole
+        await editRowMustNotBeDisabled id: _id
         collection.update {_id}, $set: changeData
 
   if canDelete
@@ -165,6 +189,7 @@ enableDeleteForRow, enableEditForRow}) ->
         .validator()
       run: ({id}) ->
         currentUserMustBeInRole editRole
+        await deleteRowMustNotBeDisabled {id}
         if Meteor.isServer
           deleteMethodRun {id}
 

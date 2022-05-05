@@ -59,8 +59,8 @@ export interface createTableDataAPIParams {
   debounceDelay?: number
   observers?: Array<any>
   setupNewItem?: (model: object) => object
-  enableDeleteForRow?: (row: object) => boolean
-  enableEditForRow?: (row: object) => boolean
+  checkDisableEditForRow?: boolean
+  checkDisableDeleteForRow?: boolean 
 }
 export interface createTableDataAPIReturn {
   sourceName: string
@@ -78,8 +78,6 @@ export interface createTableDataAPIReturn {
   editRole?: string
   exportTableRole?: string
   setupNewItem?: (model: object) => object
-  enableDeleteForRow?: (row: object) => boolean
-  enableEditForRow?: (row: object) => boolean
 }
 
 interface additionalDataTableOptions {

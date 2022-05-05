@@ -14,7 +14,7 @@ export AutoTableAutoField = ({row, columnKey, schemaBridge, onChangeField, measu
       catch error
         console.error error
         console.log 'the previous error happened in AutotableAutoField with params', {row, columnKey, schemaBridge, component}
-    else if fieldSchema.sdTable?.editable
+    else if fieldSchema.sdTable?.editable and not row._disableEditForRow
       <DynamicTableField {{row, columnKey, schemaBridge, onChangeField, mayEdit}...}/>
     else if fieldSchema.sdTable?.markup
       <div dangerouslySetInnerHTML={__html: row[columnKey]} />

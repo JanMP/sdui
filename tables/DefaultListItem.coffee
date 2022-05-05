@@ -20,16 +20,19 @@ export DefaultListItem = ({
 
   isSelected = selectedRowId is id
 
+
   handleDeleteButtonClick = (e) ->
     e.stopPropagation()
     e.nativeEvent.stopImmediatePropagation()
-    if id? then onDelete {id}
+    if id? and not rowData._disableDeleteForRow then onDelete {id}
 
   handleClick = ->
     if index? then onClick {rowData, index}
 
+  isSelectedClass = if isSelected then ' bg-secondary-100' else ''
+  editableClass = if true then ' editable-row' else 'not-editable-row'
 
-  <div className={tw "p-1 shadow flex justify-between#{if isSelected then ' bg-secondary-100' else ''}"} onClick={handleClick}>
+  <div className={tw "p-1 shadow flex justify-between#{isSelectedClass} #{editableClass}"} onClick={handleClick}>
     <ListItemContent rowData={rowData}/>
     {
       if canDelete
@@ -37,6 +40,7 @@ export DefaultListItem = ({
           <button
             className="icon danger"
             onClick={handleDeleteButtonClick}
+            disabled={rowData._disableDeleteForRow}
           >
             <FontAwesomeIcon icon={faTrash}/>
           </button>
