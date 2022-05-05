@@ -58,7 +58,7 @@ export interface createTableDataAPIParams {
     }) => (options: {id: string}) => void
   debounceDelay?: number
   observers?: Array<any>
-  setupNewItem?: (model: object) => object
+  setupNewItem?: () => object
   checkDisableEditForRow?: boolean
   checkDisableDeleteForRow?: boolean 
 }
@@ -77,7 +77,7 @@ export interface createTableDataAPIReturn {
   viewTableRole?: string
   editRole?: string
   exportTableRole?: string
-  setupNewItem?: (model: object) => object
+  setupNewItem?: () => object
 }
 
 interface additionalDataTableOptions {

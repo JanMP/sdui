@@ -27,7 +27,10 @@ export TableEditModalHandler = ({tableOptions, DisplayComponent}) ->
   } = tableOptions
 
   onRowClick ?= ({rowData, index}) -> console.log 'onRowClick', {rowData, index}
-  onAdd = -> openModal {}
+  onAdd = ->
+    newItem = await setupNewItem()
+    openModal newItem
+
   loadEditorData ?= ({id}) -> console.log "loadEditorData id: #{id}"
 
   [modalOpen, setModalOpen] = useState false
@@ -52,6 +55,7 @@ export TableEditModalHandler = ({tableOptions, DisplayComponent}) ->
           onDelete {id}
 
   openModal = (formModel) ->
+    console.log {formModel}
     setModel formModel
     setModalOpen true
 

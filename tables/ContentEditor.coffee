@@ -29,13 +29,15 @@ export ContentEditor = (tableOptions) ->
     isLoading,
     overscanRowCount
     customComponents
+    setupNewItem
   } = tableOptions
 
   {Preview, RelatedDataPane} = customComponents ? {}
 
   onAdd ?= ->
-    openEditor {}
-    
+    newItem = await setupNewItem()
+    openEditor newItem
+
   # TODO make optional (again) and i18n
   deleteConfirmation ?= "Soll der Eintrag wirklich gelöscht werden?"
 

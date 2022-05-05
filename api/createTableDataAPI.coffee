@@ -76,7 +76,7 @@ export createTableDataAPI = ({
   getRowCountPipeline ?= defaultGetRowCountPipeline
   getExportPipeline ?= defaultGetExportPipeline
 
-  setupNewItem ?= ({model}) -> {}
+  setupNewItem ?= -> {}
   checkDisableEditForRow ?= false
   checkDisableDeleteForRow ?= false
 
