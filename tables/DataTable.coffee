@@ -110,8 +110,9 @@ deleteButtonCellRenderer = ({onDelete}) ->
 
 rowRenderer = ({canEdit, mayEdit}) ->
   (props) ->
+    console.log {props}
     if canEdit
-      if mayEdit
+      if mayEdit and not props.rowData._disableEditForRow
         props.className += " editable-row"
       else
         props.className += " not-editable-row"

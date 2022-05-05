@@ -30,7 +30,7 @@ export DefaultListItem = ({
     if index? then onClick {rowData, index}
 
   isSelectedClass = if isSelected then ' bg-secondary-100' else ''
-  editableClass = if true then ' editable-row' else 'not-editable-row'
+  editableClass = if rowData._disableEditForRow then ' not-editable-row' else 'editable-row'
 
   <div className={tw "p-1 shadow flex justify-between#{isSelectedClass} #{editableClass}"} onClick={handleClick}>
     <ListItemContent rowData={rowData}/>
