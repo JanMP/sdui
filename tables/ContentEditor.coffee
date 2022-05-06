@@ -20,7 +20,7 @@ export ContentEditor = (tableOptions) ->
     canSearch, search, onChangeSearch
     canAdd, onAdd
     canDelete, onDelete, deleteConfirmation
-    canEdit, mayEdit, submit
+    canEdit, mayEdit, onSubmit
     autoFormChildren, formDisabled, formReadOnly
     loadEditorData
     onChangeField,
@@ -79,7 +79,7 @@ export ContentEditor = (tableOptions) ->
 
   handleSubmit =
     (model) ->
-      submit?(model)
+      onSubmit?(model)
       .then (result) ->
         if (id = result?.insertedId)?
           setSelectedRowId id

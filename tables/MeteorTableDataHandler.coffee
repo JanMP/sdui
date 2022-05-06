@@ -38,9 +38,12 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
   query = defaultQuery
   perLoad = 500
   canEdit = false
+  onSubmit
+  onChangeField
   formSchemaBridge
   canSearch = false
   canAdd = false
+  setupNewItem
   canDelete = false
   onDelete
   canExport = false
@@ -48,8 +51,7 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
   autoFormChildren
   formDisabled = false
   formReadOnly = false
-  viewTableRole, editRole, exportTableRole, #TODO add handling of viewTableRole
-  setupNewItem #TODO check where this is going
+  viewTableRole, editRole, exportTableRole, #TODO add handling of viewTableRole, editRole and exportTableRole
   } = dataOptions
 
   # we only support usePubSub = true atm
@@ -178,7 +180,7 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
     setSortColumn d.sortColumn
     setSortDirection d.sortDirection
 
-  submit = (d) ->
+  onSubmit ?= (d) ->
     meteorApply
       method: submitMethodName
       data: d
@@ -207,7 +209,7 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
     .then ->
       toast.success "Der Eintrag wurde gelöscht"
   
-  onChangeField = ({_id, changeData}) ->
+  onChangeField ?= ({_id, changeData}) ->
     meteorApply
       method: setValueMethodName
       data: {_id, changeData}
@@ -239,7 +241,7 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
       canSearch, search, onChangeSearch
       canAdd
       canDelete, onDelete
-      canEdit, mayEdit, submit
+      canEdit, mayEdit, onSubmit
       setupNewItem
       autoFormChildren, formDisabled, formReadOnly
       loadEditorData

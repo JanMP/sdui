@@ -14,7 +14,7 @@ export TableEditModalHandler = ({tableOptions, DisplayComponent}) ->
     canSearch, search, onChangeSearch
     canAdd
     canDelete, onDelete
-    canEdit, mayEdit, submit
+    canEdit, mayEdit, onSubmit
     autoFormChildren, formDisabled, formReadOnly
     loadEditorData
     onChangeField,
@@ -60,7 +60,7 @@ export TableEditModalHandler = ({tableOptions, DisplayComponent}) ->
     setModalOpen true
 
 
-  submitAndClose = (d) -> submit?(d).then -> setModalOpen false
+  submitAndClose = (d) -> onSubmit?(d).then -> setModalOpen false
 
   if canEdit
     onRowClick =

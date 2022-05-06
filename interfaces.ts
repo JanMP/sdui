@@ -21,7 +21,7 @@ export interface createTableDataAPIParams {
   getPreSelectPipeline?: ({pub}?: {pub: object}) => Array<Object>
   getProcessorPipeline?: ({pub}?: {pub: object}) => Array<Object>
   getRowsPipeline?:
-    (options: {
+    (_: {
         pub: object,
         search: string,
         query?: Mongo.Query,
@@ -43,19 +43,19 @@ export interface createTableDataAPIParams {
       collection: Mongo.Collection
       transFormIdToMongo: (id: any) => any
       transFormIdToMiniMongo: (id: any) => any
-    }) => (options: {id: string}) => Mongo.Cursor
+    }) => ({id: string}) => Mongo.Cursor
   makeSubmitMethodRunFkt?:
     (options: {
       collection: Mongo.Collection
       transFormIdToMongo: (id: any) => any
       transFormIdToMiniMongo: (id: any) => any
-    }) => (options: {data: object, id: string}) => void
+    }) => ({data: object, id: string}) => void
   makeDeleteMethodRunFkt?:
     (options: {
       collection: Mongo.Collection
       transFormIdToMongo: (id: any) => any
       transFormIdToMiniMongo: (id: any) => any
-    }) => (options: {id: string}) => void
+    }) => ({id: string}) => void
   debounceDelay?: number
   observers?: Array<any>
   setupNewItem?: () => object
@@ -78,17 +78,19 @@ export interface createTableDataAPIReturn {
   editRole?: string
   exportTableRole?: string
   setupNewItem?: () => object
+  onSubmit?: (object) => any
+  onChangeField?: ({_id: string, changeData: object}) => any
 }
 
 interface additionalDataTableOptions {
   query?: any
   perLoad?: number
-  onDelete?: ({id}: {id: string}) => Promise<any>
+  onDelete?: ({id: string}) => Promise<any>
   onRowClick?: ({rowData, index}: {rowData: any, index: number}) => void
   autoFormChildren?: [any]
   formDisabled?: boolean
   formReadOnly?: boolean
-  loadEditorData?: ({id}: {id: string}) => Promise<any>
+  loadEditorData?: ({id: string}) => Promise<any>
 }
 
 export type DataTableOptions = createTableDataAPIReturn & additionalDataTableOptions
