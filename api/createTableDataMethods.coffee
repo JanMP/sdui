@@ -130,7 +130,7 @@ checkDisableDeleteForRow, checkDisableEditForRow}) ->
   editRowMustNotBeDisabled =({id}) ->
     return unless Meteor.isServer
     return unless checkDisableEditForRow
-    console.log row = await getRowWithId {id}
+    row = await getRowWithId {id}
     if row?._disableEditForRow
       throw new Meteor.Error '[editRowMustNotBeDisabled]', 'Editing for this Row is disabled'
   
@@ -175,7 +175,6 @@ checkDisableDeleteForRow, checkDisableEditForRow}) ->
             blackbox: true
         .validator()
       run: ({_id, changeData}) ->
-        console.log 'setValue', {_id, changeData}
         currentUserMustBeInRole editRole
         await editRowMustNotBeDisabled id: _id
         collection.update {_id}, $set: changeData
