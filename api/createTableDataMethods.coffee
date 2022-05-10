@@ -12,7 +12,7 @@ viewTableRole, editRole, exportTableRole,
 sourceName, collection,
 useObjectIds,
 getRowsPipeline, getRowCountPipeline, getExportPipeline
-canEdit, canDelete, canExport
+canEdit, canAdd, canDelete, canExport
 formSchema, makeFormDataFetchMethodRunFkt, makeSubmitMethodRunFkt, makeDeleteMethodRunFkt
 checkDisableDeleteForRow, checkDisableEditForRow}) ->
   
@@ -141,7 +141,7 @@ checkDisableDeleteForRow, checkDisableEditForRow}) ->
     if row?._disableDeleteForRow
       throw new Meteor.Error '[deleteRowMustNotBeDisabled]', 'Deleting this Row is disabled'
   
-  if canEdit
+  if canEdit or canAdd
     submit = new ValidatedMethod
       name: "#{sourceName}.submit"
       validate: (schemaWithId formSchema).validator()

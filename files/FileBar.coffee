@@ -4,18 +4,7 @@ import {toast} from 'react-toastify'
 import {SdList} from '../tables/SdList.coffee'
 
 
-ListItemContent  = ({rowData}) ->
-  <div className="flex p-2 gap-2">
-    <div className="h-[60px]">
-     { <img className="max-h-full max-w-[80px]" src={rowData.url} alt="image" /> if rowData.status is 'ok'}
-    </div>
 
-    <div>
-      <div className="text-lg">{rowData.name}</div>
-      <div className="text-sm">{rowData.size}</div>
-    </div>
-    
-  </div>
 
 export FileBar = ({dataOptions}) ->
   {sourceName, collection} = dataOptions
@@ -62,7 +51,7 @@ export FileBar = ({dataOptions}) ->
 
   <div className="m-1 p-2">
     {<div className="border border-blue-500 h-[500px]">
-      <SdList dataOptions={dataOptions} customComponents={{ListItemContent}}/>
+      <SdList dataOptions={{dataOptions..., onSubmit :console.table}} customComponents={{ListItemContent}}/>
     </div> if true}
     {<div className="border border-red-500">
       <input id="file-input" type="file" onChange={onFileInputChange}/>

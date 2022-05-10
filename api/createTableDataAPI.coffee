@@ -19,7 +19,7 @@ export createTableDataAPI = ({
   useObjectIds
   listSchema, formSchema
   canEdit, canSearch, canAdd, canDelete, canExport
-  viewTableRole, editRole, exportTableRole
+  viewTableRole, editRole, addRole, exportTableRole
   getPreSelectPipeline
   getProcessorPipeline,
   # CHECK if they work or if we should get rid of the following:
@@ -48,6 +48,11 @@ export createTableDataAPI = ({
     editRole = viewTableRole
     console.warn "[createTableDataAPI #{sourceName}]:
       no editRole defined, using '#{editRole}' instead."
+
+  if canAdd and not addRole?
+    addRole = editRole
+    console.warn "[createTableDataAPI #{sourceName}]:
+      no addRole defined, using '#{addRole}' instead."
 
   if canExport and not exportTableRole?
     exportTableRole = viewTableRole
@@ -92,7 +97,7 @@ export createTableDataAPI = ({
   createTableDataMethods {
     viewTableRole, editRole, exportTableRole, sourceName, collection, useObjectIds,
     getRowsPipeline, getRowCountPipeline, getExportPipeline
-    canEdit, canDelete, canExport, formSchema,
+    canEdit, canAdd, canDelete, canExport, formSchema,
     makeFormDataFetchMethodRunFkt, makeSubmitMethodRunFkt, makeDeleteMethodRunFkt
     checkDisableDeleteForRow, checkDisableEditForRow
   }

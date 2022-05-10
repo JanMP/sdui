@@ -3,12 +3,15 @@ import SimpleSchema from 'simpl-schema'
 import {ValidatedMethod} from 'meteor/mdg:validated-method'
 import {S3, ListObjectsCommand, PutObjectCommand} from '@aws-sdk/client-s3'
 import {getSignedUrl} from '@aws-sdk/s3-request-presigner'
-import {currentUserMustBeInRole} from '../common/roleChecks.coffee'
+import {currentUserMustBeInRole, currentUserIsInRole} from '../common/roleChecks.coffee'
 import {createTableDataAPI} from './createTableDataAPI.coffee'
+import {FileInput} from '../files/FileInput.coffee'
 
 delay = (ms) -> new Promise (resolve) -> setTimeout resolve, ms
 
-export filesAPISourceSchema =
+SimpleSchema.extendOptions ['sdTable', 'uniforms']
+
+export sourceSchema =
   new SimpleSchema
     key:
       type: String
@@ -30,8 +33,14 @@ export filesAPISourceSchema =
       type: Date
       optional: true
 
+setupNewItem = ->
+  files: []
+  uploadAs: ''
 
-export createFilesAPI = ({sourceName, collection, userFilesRole, uploadCommonRole, getCommonFileListRole, getAllFileListRole}) ->
+export createFilesAPI = ({
+sourceName, collection
+getUserFileListRole, uploadUserFilesRole
+getCommonFileListRole, uploadCommonFilesRole}) ->
 
   unless sourceName?
     throw new Error 'no sourceName given'
@@ -39,37 +48,40 @@ export createFilesAPI = ({sourceName, collection, userFilesRole, uploadCommonRol
   unless collection?
     throw new Error 'no collection given'
 
-  unless userFilesRole?
-    userFilesRole = 'username-is-admin'
+  unless getUserFileListRole?
+    getUserFileListRole = 'username-is-admin'
     console.warn "[createFilesAPI #{sourceName}]:
-      no userfilesRole defined, using username-is-admin"
+      no uploadCommonFilesRole defined, using username-is-admin"
 
-  unless uploadCommonRole?
-    uploadCommonRole = 'username-is-admin'
+  unless uploadUserFilesRole?
+    uploadUserFilesRole = 'username-is-admin'
     console.warn "[createFilesAPI #{sourceName}]:
-      no uploadCommonRole defined, using username-is-admin"
+      no uploadUserFilesRole defined, using username-is-admin"
 
   unless getCommonFileListRole?
     getCommonFileListRole = 'username-is-admin'
     console.warn "[createFilesAPI #{sourceName}]:
       no getCommonFileListRole defined, using username-is-admin"
 
-  unless getAllFileListRole?
-    getAllFileListRole = 'username-is-admin'
+  unless uploadCommonFilesRole?
+    uploadCommonFilesRole = 'username-is-admin'
     console.warn "[createFilesAPI #{sourceName}]:
-      no getAllFileListRole defined, using username-is-admin"
+      no uploadCommonFilesRole defined, using username-is-admin"
+
+
 
   tableDataOptions = createTableDataAPI
     sourceName: sourceName
-    sourceSchema: filesAPISourceSchema
+    sourceSchema: sourceSchema
     collection: collection
-    viewTableRole: 'admin'
-    editRole: 'admin'
+    viewTableRole: 'any'
+    editRole: 'any'
     canEdit: false
-    canAdd: false
+    canAdd: true
     canDelete: true
     canSearch: true
     canExport: false
+    setupNewItem: setupNewItem
 
   if Meteor.isServer
     unless (settings = Meteor.settings[sourceName])?
@@ -148,9 +160,9 @@ export createFilesAPI = ({sourceName, collection, userFilesRole, uploadCommonRol
       .validator()
     run: ({name, size, type, saveAsCommon}) ->
       if saveAsCommon
-        currentUserMustBeInRole uploadCommonRole
+        currentUserMustBeInRole uploadCommonFilesRole
       else
-        currentUserMustBeInRole userFilesRole
+        currentUserMustBeInRole uploadUserFilesRole
       if Meteor.isServer
         prefix = if saveAsCommon then 'common/' else "#{Meteor.userId()}/"
         key = prefix + name
@@ -177,15 +189,20 @@ export createFilesAPI = ({sourceName, collection, userFilesRole, uploadCommonRol
           type: String
       .validator()
     run: ({key, statusText}) ->
-      if key.startsWith 'common/'
-        currentUserMustBeInRole uploadCommonRole
-      if key.startsWith "#{Meteor.userId()}/"
-        currentUserMustBeInRole userFilesRole
+      switch
+        when key.startsWith 'common/'
+          currentUserMustBeInRole uploadCommonFilesRole
+        when key.startsWith "#{Meteor.userId()}/"
+          currentUserMustBeInRole uploadUserFilesRole
+        else
+          throw new Meteor.Error "[#{sourceName}.finishUPload key not allowed]"
       console.log {key, statusText}
       if Meteor.isServer
         status = if statusText is 'OK' then 'ok' else 'not-ok'
         collection.update {key}, $set: {status}
   
+  roles = {getUserFileListRole, uploadUserFilesRole, getCommonFileListRole, uploadCommonFilesRole}
   #return
-  tableDataOptions
+  {tableDataOptions, roles}
+  
 

@@ -17,7 +17,7 @@ export interface createTableDataAPIParams {
   canExport?: boolean
   viewTableRole?: string
   editRole?: string
-  exportTableRole: string
+  exportTableRole?: string
   getPreSelectPipeline?: ({pub}?: {pub: object}) => Array<Object>
   getProcessorPipeline?: ({pub}?: {pub: object}) => Array<Object>
   getRowsPipeline?:
