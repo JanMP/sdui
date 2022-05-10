@@ -11,51 +11,55 @@ import {FileInputField} from './FileInput.coffee'
 SimpleSchema.extendOptions ['sdTable', 'uniforms']
 
 send = ({model, sourceName}) ->
-  console.log {original, thumbnail} = model.file
-  file = thumbnail
-  {name, size, type} = file
-  console.log "filename: #{name}"
-  meteorApply
-    method: "#{sourceName}.requestUpload"
-    data: {name, size, type}
-  .then ({uploadUrl, key}) ->
-    response =
-      await fetch uploadUrl,
-        method: 'PUT'
-        headers:
-          'Content-Type': type
-          'x-amz-acl': 'public-read'
-        body: file
-    {response, key}
-  .then ({response, key}) ->
+  {original, thumbnail} = model.file
+  Promise.allSettled compact([original, thumbnail]).map (file) ->
+    {name, size, type} = file
+    saveAsCommon = model.uploadAs is 'public'
     meteorApply
-      method: "#{sourceName}.finishUpload"
-      data:
-        key: key
-        statusText: response.statusText
-  .catch (error) ->
-    console.error error
-    toast.error "#{error}"
+      method: "#{sourceName}.requestUpload"
+      data: {name, size, type, saveAsCommon}
+    .then ({uploadUrl, key}) ->
+      response =
+        await fetch uploadUrl,
+          method: 'PUT'
+          headers:
+            'Content-Type': type
+            'x-amz-acl': 'public-read'
+          body: file
+      {response, key}
+    .then ({response, key}) ->
+      meteorApply
+        method: "#{sourceName}.finishUpload"
+        data:
+          key: key
+          statusText: response.statusText
+    .catch (error) ->
+      console.error error
+      toast.error "#{error}"
 
 
 ListItemContent  = ({rowData}) ->
-  <div className="flex p-2 gap-2">
-    <div className="h-[160px]">
+  <div className="flex p-2 gap-4">
+    <div>
       {
-        if rowData.status is 'ok' and rowData.type?.startsWith?('image/') and rowData.size <= 100000
-          <img className="max-h-full max-w-[100px]" src={rowData.url} alt={rowData.name} />
+        if rowData.thumbnailUrl? and rowData.thumbnailStatus is 'ok'
+          <div className="h-[100px] w-[150px] flex justify-center">
+            <img className="shadow-xl" src={rowData.thumbnailUrl} alt={rowData.name} />
+          </div>
         else
-          <div className="h-[100px] w-[100px] bg-gray-200 flex flex-row align-center content-center">
-            <span>{rowData.type or '?'}</span>
+          <div className="h-[100px] w-[150px] bg-gray-200 flex flex-row align-center content-center shadow">
+            <div>{rowData.type or '?'}</div>
           </div>
       }
     </div>
 
     <div>
       <div className="text-lg">{rowData.name}</div>
-      <div className="text-sm">{rowData.size}</div>
-      <div className="text-sm">{rowData.type}</div>
-
+      <div className="text-sm">Size: {rowData.size}</div>
+      <div className="text-sm">Type: {rowData.type}</div>
+      <div className="text-sm">
+        {if rowData.isCommon then 'public' else 'private'}
+      </div>
     </div>
     
   </div>
@@ -79,6 +83,7 @@ export FileList = ({dataOptions}) ->
       blackbox: true
     'file.thumbnail':
       type: Object
+      optional: true
       blackbox: true
     uploadAs:
       type: String

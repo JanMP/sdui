@@ -1,7 +1,7 @@
 import {Meteor} from 'meteor/meteor'
 import SimpleSchema from 'simpl-schema'
 import {ValidatedMethod} from 'meteor/mdg:validated-method'
-import {S3, ListObjectsCommand, PutObjectCommand} from '@aws-sdk/client-s3'
+import {S3, ListObjectsCommand, PutObjectCommand, DeleteObjectCommand} from '@aws-sdk/client-s3'
 import {getSignedUrl} from '@aws-sdk/s3-request-presigner'
 import {currentUserMustBeInRole, currentUserIsInRole} from '../common/roleChecks.coffee'
 import {createTableDataAPI} from './createTableDataAPI.coffee'
@@ -17,7 +17,9 @@ export sourceSchema =
       type: String
     name:
       type: String
-    owner:
+    isCommon:
+      type: Boolean
+    uploader:
       type: String
     size:
       type: Number
@@ -26,8 +28,15 @@ export sourceSchema =
       optional: true
     url:
       type: String
+    thumbnailUrl:
+      type: String
+      optional: true
     status:
       type: String
+      allowedValues: ['requested', 'ok', 'not-ok']
+    thumbnailStatus:
+      type: String
+      optional: true
       allowedValues: ['requested', 'ok', 'not-ok']
     fetchDate:
       type: Date
@@ -68,7 +77,30 @@ getCommonFileListRole, uploadCommonFilesRole}) ->
     console.warn "[createFilesAPI #{sourceName}]:
       no uploadCommonFilesRole defined, using username-is-admin"
 
-
+  makeDeleteMethodRunFkt = ({collection, transformIdToMongo, transformIdToMiniMongo}) ->
+    ({id}) ->
+      if Meteor.isServer
+        entry = collection.findOne _id: id
+        unless entry?
+          throw new Meteor.Error "[#{sourceName}.delete] no entry #{id}"
+        unless (key = entry.key)? and typeof key is 'string'
+          throw new Meteor.Error "[#{sourceName}.delete] no key in entry #{id}"
+        switch
+          when key.startsWith 'common/'
+            currentUserMustBeInRole 'uploadCommonFiles'
+          when key.startsWith "#{Meteor.userId}/"
+            currentUserMustBeInRole uploadUserFilesRole
+          else
+            currentUserMustBeInRole 'admin'
+        keysToDelete = []
+        if entry.status is 'ok'
+          keysToDelete.push key
+        if entry.thumbnailStatus is 'ok'
+          keysToDelete.push key + '.thumbnail.png'
+        Promise.allSettled keysToDelete.map (k) -> deleteObject key:k
+        .then ->
+          collection.remove _id: transformIdToMongo id
+        .catch (error) -> throw new Meteor.Error error
 
   tableDataOptions = createTableDataAPI
     sourceName: sourceName
@@ -82,6 +114,7 @@ getCommonFileListRole, uploadCommonFilesRole}) ->
     canSearch: true
     canExport: false
     setupNewItem: setupNewItem
+    makeDeleteMethodRunFkt: makeDeleteMethodRunFkt
 
   if Meteor.isServer
     unless (settings = Meteor.settings[sourceName])?
@@ -108,6 +141,7 @@ getCommonFileListRole, uploadCommonFilesRole}) ->
             key: c.Key
             size: c.Size
 
+    #TODO update this
     updateFilesCollection = ->
       getFileList()
         .then (files) ->
@@ -121,7 +155,7 @@ getCommonFileListRole, uploadCommonFilesRole}) ->
               $set:
                 key: file.key
                 name: name
-                owner: owner
+                uploader: owner
                 size: file.size
                 status: 'ok'
                 url: downloadURLRoot + file.key
@@ -137,6 +171,16 @@ getCommonFileListRole, uploadCommonFilesRole}) ->
           ACL: 'public-read'
       ,
         expiresIn: 15 * 60
+
+
+    deleteObject = ({key}) ->
+      s3Client
+        .send new DeleteObjectCommand
+          Bucket: bucket
+          Key: key
+        .then (result) ->
+          unless result.DeleteMarker
+            throw new Error "[could-not-delete #{key}]"
 
 
   new ValidatedMethod
@@ -168,15 +212,22 @@ getCommonFileListRole, uploadCommonFilesRole}) ->
         key = prefix + name
         getUploadUrl {key, type}
           .then (uploadUrl) ->
-            collection.upsert {key},
-              key: key
-              name: name
-              owner: Meteor.userId()
-              size: size
-              type: type
-              url: downloadURLRoot + key
-              status: 'requested'
+            originalKey = key.replace /\.thumbnail\.png$/, ''
+            thumbnailKey = if key.endsWith '.thumbnail.png' then key
+            collection.upsert {key: originalKey},
+              $set:
+                key: originalKey
+                name: name unless thumbnailKey?
+                isCommon: saveAsCommon
+                uploader: Meteor.userId()
+                size: size unless thumbnailKey?
+                type: type unless thumbnailKey?
+                url: downloadURLRoot + originalKey
+                thumbnailUrl: if thumbnailKey? then downloadURLRoot + thumbnailKey
+                status: 'requested' unless thumbnailKey?
+                thumbnailStatus: 'requested' if thumbnailKey?
             {uploadUrl, key}
+          .catch (error) -> throw error
 
 
   new ValidatedMethod
@@ -199,8 +250,43 @@ getCommonFileListRole, uploadCommonFilesRole}) ->
       console.log {key, statusText}
       if Meteor.isServer
         status = if statusText is 'OK' then 'ok' else 'not-ok'
-        collection.update {key}, $set: {status}
+        originalKey = key.replace /\.thumbnail\.png$/, ''
+        thumbnailKey = if key.endsWith '.thumbnail.png' then key
+        collection.update {key: originalKey},
+          $set:
+            if thumbnailKey?
+              thumbnailStatus: status
+            else
+              status: status
   
+  new ValidatedMethod
+    name: "#{sourceName}.deleteObject"
+    validate:
+      new SimpleSchema
+        key: String
+      .validator()
+    run: ({key}) ->
+      switch
+        when key.startsWith 'common/'
+          currentUserMustBeInRole 'uploadCommonFiles'
+        when key.startsWith "#{Meteor.userId}/"
+          currentUserMustBeInRole uploadUserFilesRole
+        else
+          currentUserMustBeInRole 'admin'
+      if Meteor.isServer
+        entry = collection.findOne {key}
+        unless entry?
+          throw new Meteor.Error "[#{sourceName}.deleteObject] no entry for key: #{key}"
+        keysToDelete = []
+        if entry.status is 'ok'
+          keysToDelete.push key
+        if entry.thumbnailStatus is 'ok'
+          keysToDelete.push key + '.thumbnail.png'
+        Promise.allSettled keysToDelete.map (k) -> deleteObject key:k
+        .then ->
+          collection.remove _id: entry._id
+        .catch (error) -> throw new Meteor.Error error
+
   roles = {getUserFileListRole, uploadUserFilesRole, getCommonFileListRole, uploadCommonFilesRole}
   #return
   {tableDataOptions, roles}
