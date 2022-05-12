@@ -3,15 +3,19 @@ import {DataList} from './DataList.coffee'
 import {ErrorBoundary} from '../common/ErrorBoundary.coffee'
 import {ConfirmationModal} from '../forms/ConfirmationModal.coffee'
 import {useTw} from '../config.coffee'
-import {Fill, LeftResizable, BottomResizable, TopResizable, Top} from 'react-spaces'
+import {Fill, LeftResizable, BottomResizable, TopResizable, Top, Bottom} from 'react-spaces'
 import {AutoForm} from '../forms/uniforms-custom/select-implementation'
 import {MarkdownEditor} from '../markdown/MarkdownEditor.coffee'
 import {MarkdownDisplay} from '../markdown/MarkdownDisplay.coffee'
+import {ActionButton} from '../forms/ActionButton.coffee'
+import {faVial} from '@fortawesome/free-solid-svg-icons/faVial'
+import {faFolderOpen} from '@fortawesome/free-solid-svg-icons/faFolderOpen'
+import {faFolderClosed} from '@fortawesome/free-solid-svg-icons/faFolderClosed'
 import _ from 'lodash'
 
 
 export ContentEditor = (tableOptions) ->
-  
+
   {
     sourceName
     listSchemaBridge, formSchemaBridge
@@ -32,7 +36,7 @@ export ContentEditor = (tableOptions) ->
     setupNewItem
   } = tableOptions
 
-  {Preview, RelatedDataPane} = customComponents ? {}
+  {Preview, RelatedDataPane, FilePane} = customComponents ? {}
 
   onAdd ?= ->
     newItem = await setupNewItem()
@@ -49,6 +53,9 @@ export ContentEditor = (tableOptions) ->
 
   [confirmationModalOpen, setConfirmationModalOpen] = useState false
   [idForConfirmationModal, setIdForConfirmationModal] = useState ''
+
+  [filePaneOpen, setFilePaneOpen] = useState false
+  toggleFilePaneOpen = -> setFilePaneOpen (x) -> not x
 
   editorInstance = useRef()
 
@@ -136,11 +143,32 @@ export ContentEditor = (tableOptions) ->
             <Top size="2rem" className="text-sm bg-secondary-200 p-2">Content</Top>
               <Fill>
                 <ErrorBoundary>
-                  <MarkdownEditor
-                    instance={editorInstance}
-                    value={model?[contentKey]}
-                    onChange={setContent}
-                  />
+                  <Fill>
+                    <Fill onResizeEnd={-> editorInstance?.current?.editor?.resize()}>
+                    {
+                      if FilePane? and filePaneOpen
+                        <FilePane/>
+                      else
+                        <MarkdownEditor
+                          instance={editorInstance}
+                          value={model?[contentKey]}
+                          onChange={setContent}
+                        />
+                    }
+                    </Fill>
+                    {
+                      if FilePane?
+                        <Bottom size="2rem" className="border-t-1 border-gray-200">
+                          <div className="border border-t-1 text-xl">
+                            <ActionButton
+                              onAction={toggleFilePaneOpen}
+                              icon={if filePaneOpen then faFolderOpen else faFolderClosed}
+                              className="icon"
+                            />
+                          </div>
+                        </Bottom>
+                    }
+                  </Fill>
                 </ErrorBoundary>
               </Fill>
             </TopResizable>
