@@ -96,15 +96,14 @@ checkDisableDeleteForRow, checkDisableEditForRow}) ->
           console.error "#{sourceName}.getRows", error
 
   if canExport
-    getExportRows = new ValidatedMethod
+    new ValidatedMethod
       name: "#{sourceName}.getExportRows"
       validate:
         new SimpleSchema
           search:
             type: String
             optional: true
-          query:
-            type: Object
+          query:            type: Object
             blackbox: true
           sort:
             type: Object
@@ -127,7 +126,7 @@ checkDisableDeleteForRow, checkDisableEditForRow}) ->
       throw new Meteor.Error '[getRowWithId-not-array-length-1]'
     row[0]
   
-  editRowMustNotBeDisabled =({id}) ->
+  editRowMustNotBeDisabled = ({id}) ->
     return unless Meteor.isServer
     return unless checkDisableEditForRow
     row = await getRowWithId {id}
@@ -159,8 +158,7 @@ checkDisableDeleteForRow, checkDisableEditForRow}) ->
           id: String
         .validator()
       run: ({id}) ->
-        currentUserMustBeInRole editRole
-        await editRowMustNotBeDisabled: {id}
+        currentUserMustBeInRole editRole        await editRowMustNotBeDisabled: {id}
         if Meteor.isServer
           formDataFetchMethodRun {id}
 

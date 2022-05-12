@@ -7,8 +7,6 @@ import {currentUserMustBeInRole, currentUserIsInRole} from '../common/roleChecks
 import {createTableDataAPI} from './createTableDataAPI.coffee'
 import {FileInput} from '../files/FileInput.coffee'
 
-delay = (ms) -> new Promise (resolve) -> setTimeout resolve, ms
-
 SimpleSchema.extendOptions ['sdTable', 'uniforms']
 
 export sourceSchema =
