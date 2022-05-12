@@ -39,12 +39,12 @@ send = ({model, sourceName}) ->
 
 
 ListItemContent  = ({rowData}) ->
-  <div className="flex p-2 gap-4">
+  <div className="flex p-2 gap-4 overflow-hidden">
     <div>
       {
         if rowData.thumbnailUrl? and rowData.thumbnailStatus is 'ok'
           <div className="h-[100px] w-[150px] flex justify-center">
-            <img className="shadow-xl" src={rowData.thumbnailUrl} alt={rowData.name} />
+            <img className="shadow" src={rowData.thumbnailUrl} alt={rowData.name} />
           </div>
         else
           <div className="h-[100px] w-[150px] bg-gray-200 flex flex-row align-center content-center shadow">
@@ -54,7 +54,9 @@ ListItemContent  = ({rowData}) ->
     </div>
 
     <div>
-      <div className="text-lg">{rowData.name}</div>
+      <a href={rowData.url}>
+        <span>{rowData.name}</span>
+      </a>
       <div className="text-sm">Size: {rowData.size}</div>
       <div className="text-sm">Type: {rowData.type}</div>
       <div className="text-sm">
