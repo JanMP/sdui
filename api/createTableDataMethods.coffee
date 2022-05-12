@@ -8,7 +8,7 @@ import {currentUserMustBeInRole} from '../common/roleChecks.coffee'
 import _ from 'lodash'
 
 export createTableDataMethods = ({
-viewTableRole, editRole, exportTableRole,
+viewTableRole, editRole, addRole, deleteRole, exportTableRole,
 sourceName, collection,
 useObjectIds,
 getRowsPipeline, getRowCountPipeline, getExportPipeline
@@ -103,7 +103,8 @@ checkDisableDeleteForRow, checkDisableEditForRow}) ->
           search:
             type: String
             optional: true
-          query:            type: Object
+          query:
+            type: Object
             blackbox: true
           sort:
             type: Object
@@ -141,24 +142,28 @@ checkDisableDeleteForRow, checkDisableEditForRow}) ->
       throw new Meteor.Error '[deleteRowMustNotBeDisabled]', 'Deleting this Row is disabled'
   
   if canEdit or canAdd
-    submit = new ValidatedMethod
+    new ValidatedMethod
       name: "#{sourceName}.submit"
       validate: (schemaWithId formSchema).validator()
       run: (model) ->
-        currentUserMustBeInRole editRole
+        if model._id?
+          currentUserMustBeInRole editRole
+        else
+          currentUserMustBeInRole addRole
         await editRowMustNotBeDisabled id: model._id
         submitMethodRun
           id: model._id
           data: _.omit model, '_id'
 
-    fetchEditorData = new ValidatedMethod
+    new ValidatedMethod
       name: "#{sourceName}.fetchEditorData"
       validate:
         new SimpleSchema
           id: String
         .validator()
       run: ({id}) ->
-        currentUserMustBeInRole editRole        await editRowMustNotBeDisabled: {id}
+        currentUserMustBeInRole editRole
+        await editRowMustNotBeDisabled: {id}
         if Meteor.isServer
           formDataFetchMethodRun {id}
 
@@ -185,7 +190,7 @@ checkDisableDeleteForRow, checkDisableEditForRow}) ->
           id: String
         .validator()
       run: ({id}) ->
-        currentUserMustBeInRole editRole
+        currentUserMustBeInRole deleteRole
         await deleteRowMustNotBeDisabled {id}
         if Meteor.isServer
           deleteMethodRun {id}

@@ -8,7 +8,7 @@ import {Roles} from 'meteor/alanning:roles'
 import {RoleSelect} from './RoleSelect'
 
 
-export createUserTableAPI = ({userProfileSchema, allowedRoles}) ->
+export createUserTableAPI = ({userProfileSchema, allowedRoles, viewUserTableRole, editUserRole}) ->
 
   allowedRoles ?= ['admin', 'editor']
   
@@ -162,8 +162,8 @@ export createUserTableAPI = ({userProfileSchema, allowedRoles}) ->
 
   #returning the dataOptions
   createTableDataAPI
-    viewTableRole: 'logged-in'
-    editRole: 'logged-in'
+    viewTableRole: viewUserTableRole ? 'username-is-admin'
+    editRole: editUserRole ? 'username-is-admin'
     sourceName: 'users'
     sourceSchema: userSchema
     listSchema: userListSchema

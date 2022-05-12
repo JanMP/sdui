@@ -51,7 +51,7 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
   autoFormChildren
   formDisabled = false
   formReadOnly = false
-  viewTableRole, editRole, exportTableRole, #TODO add handling of viewTableRole, editRole and exportTableRole
+  viewTableRole, editRole, addRole, deleteRole, exportTableRole,
   } = dataOptions
 
   # we only support usePubSub = true atm
@@ -92,6 +92,8 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
   # [debouncedSearch, setDebouncedSearch] = useDebounce '', 1000
 
   mayEdit = useCurrentUserIsInRole editRole
+  mayAdd = useCurrentUserIsInRole addRole
+  mayDelete = useCurrentUserIsInRole deleteRole
   mayExport = (useCurrentUserIsInRole exportTableRole) and rows?.length
 
   if sortColumn? and sortDirection?
@@ -239,8 +241,8 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
       rows, totalRowCount, loadMoreRows, onRowClick,
       sortColumn, sortDirection, onChangeSort
       canSearch, search, onChangeSearch
-      canAdd
-      canDelete, onDelete
+      canAdd, mayAdd
+      canDelete, mayDelete, onDelete
       canEdit, mayEdit, onSubmit
       setupNewItem
       autoFormChildren, formDisabled, formReadOnly

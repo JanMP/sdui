@@ -9,7 +9,7 @@ export DefaultHeader = ({
   loadedRowCount, totalRowCount
   canSearch, search, onChangeSearch
   canExport, onExportTable, mayExport,
-  canAdd, onAdd, mayEdit
+  canAdd, onAdd, mayAdd
 }) ->
 
   tw = useTw()
@@ -40,7 +40,7 @@ export DefaultHeader = ({
           if canAdd
             <button
               className="primary icon"
-              onClick={onAdd} disabled={not mayEdit}
+              onClick={onAdd} disabled={not mayAdd}
             >
               <FontAwesomeIcon icon={faPlus}/>
             </button>

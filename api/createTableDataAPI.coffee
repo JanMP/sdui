@@ -19,7 +19,7 @@ export createTableDataAPI = ({
   useObjectIds
   listSchema, formSchema
   canEdit, canSearch, canAdd, canDelete, canExport
-  viewTableRole, editRole, addRole, exportTableRole
+  viewTableRole, editRole, addRole, deleteRole, exportTableRole
   getPreSelectPipeline
   getProcessorPipeline,
   # CHECK if they work or if we should get rid of the following:
@@ -40,24 +40,29 @@ export createTableDataAPI = ({
     throw new Error 'no sourceSchema given'
 
   unless viewTableRole?
-    viewTableRole = 'any'
     console.warn "[createTableDataAPI #{sourceName}]:
       no viewTableRole defined, using '#{viewTableRole}' instead."
+  viewTableRole ?= 'any'
 
   if canEdit and not editRole?
-    editRole = viewTableRole
     console.warn "[createTableDataAPI #{sourceName}]:
       no editRole defined, using '#{editRole}' instead."
+  editRole ?= viewTableRole
 
   if canAdd and not addRole?
-    addRole = editRole
     console.warn "[createTableDataAPI #{sourceName}]:
       no addRole defined, using '#{addRole}' instead."
+  addRole ?= editRole
+
+  if canDelete and not deleteRole?
+    console.warn "[createTableDataAPI #{sourceName}]:
+      no deleteRole defined, using '#{editRole}' instead."
+  deleteRole ?= editRole
 
   if canExport and not exportTableRole?
-    exportTableRole = viewTableRole
     console.warn "[createTableDataAPI #{sourceName}]:
       no exportTableRole defined, using '#{exportTableRole}' instead."
+  exportTableRole ?= viewTableRole
   
   getPreSelectPipeline ?= -> []
   getProcessorPipeline ?= -> []
@@ -95,7 +100,7 @@ export createTableDataAPI = ({
     }
 
   createTableDataMethods {
-    viewTableRole, editRole, exportTableRole, sourceName, collection, useObjectIds,
+    viewTableRole, editRole, addRole, deleteRole, exportTableRole, sourceName, collection, useObjectIds,
     getRowsPipeline, getRowCountPipeline, getExportPipeline
     canEdit, canAdd, canDelete, canExport, formSchema,
     makeFormDataFetchMethodRunFkt, makeSubmitMethodRunFkt, makeDeleteMethodRunFkt
@@ -114,6 +119,8 @@ export createTableDataAPI = ({
     canExport
     viewTableRole
     editRole
+    addRole
+    deleteRole
     exportTableRole
     setupNewItem
   }

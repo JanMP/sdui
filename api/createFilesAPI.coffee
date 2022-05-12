@@ -6,6 +6,7 @@ import {getSignedUrl} from '@aws-sdk/s3-request-presigner'
 import {currentUserMustBeInRole, currentUserIsInRole} from '../common/roleChecks.coffee'
 import {createTableDataAPI} from './createTableDataAPI.coffee'
 import {FileInput} from '../files/FileInput.coffee'
+import compact from 'lodash/compact'
 
 SimpleSchema.extendOptions ['sdTable', 'uniforms']
 
@@ -85,7 +86,7 @@ getCommonFileListRole, uploadCommonFilesRole}) ->
           throw new Meteor.Error "[#{sourceName}.delete] no key in entry #{id}"
         switch
           when key.startsWith 'common/'
-            currentUserMustBeInRole 'uploadCommonFiles'
+            currentUserMustBeInRole uploadCommonFilesRole
           when key.startsWith "#{Meteor.userId}/"
             currentUserMustBeInRole uploadUserFilesRole
           else
@@ -100,19 +101,38 @@ getCommonFileListRole, uploadCommonFilesRole}) ->
           collection.remove _id: transformIdToMongo id
         .catch (error) -> throw new Meteor.Error error
 
+  getPreSelectPipeline = ({pub}) -> [
+    if currentUserIsInRole [getCommonFileListRole, getUserFileListRole]
+      $match:
+        $or:
+          compact [
+            if currentUserIsInRole getCommonFileListRole
+              isCommon: true
+            if currentUserIsInRole getUserFileListRole
+              $and: [
+                isCommon: false
+                uploader:
+                  Meteor.userId() ? pub?.userId ? 'this is not a valid userId'
+              ]
+            false #make sure array isn't empty
+          ]
+  ]
+
   tableDataOptions = createTableDataAPI
     sourceName: sourceName
     sourceSchema: sourceSchema
     collection: collection
-    viewTableRole: 'any'
-    editRole: 'any'
+    viewTableRole: [getCommonFileListRole, getUserFileListRole]
     canEdit: false
     canAdd: true
+    addRole: [uploadCommonFilesRole, uploadUserFilesRole]
     canDelete: true
+    deleteRole: [uploadCommonFilesRole, uploadUserFilesRole]
     canSearch: true
     canExport: false
     setupNewItem: setupNewItem
     makeDeleteMethodRunFkt: makeDeleteMethodRunFkt
+    getPreSelectPipeline: getPreSelectPipeline
 
   if Meteor.isServer
     unless (settings = Meteor.settings[sourceName])?

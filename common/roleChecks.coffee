@@ -8,9 +8,9 @@ import {useTracker} from 'meteor/react-meteor-data'
   Think about the trustworthiness of the UserId before using this!
   
   In addition to roles defined via alanning:roles you can specify
-  'any', 'logged-in' and 'username-is-admin'
+  'any' and 'logged-in'
 
-  @param {{role: string, id: string}}
+  @param {{role: string | Array<string>, id: string}} params
   @return {boolean}
   ###
 export userWithIdIsInRole = ({role, id}) ->
@@ -19,15 +19,13 @@ export userWithIdIsInRole = ({role, id}) ->
       true
     when 'logged-in'
       id?
-    when 'username-is-admin'
-      Meteor.user()?.username is 'admin'
     else
       Roles.userIsInRole id, role
 
 ###*
   In addition to roles defined via alanning:roles you can specify
-  'any', 'logged-in' and 'username-is-admin'
-  @param {string} role
+  'any' and 'logged-in'
+  @param {string | Array<string>} role
   @return {boolean}
   ###
 export currentUserIsInRole = (role) -> userWithIdIsInRole id: Meteor.userId(), role: role
@@ -35,7 +33,7 @@ export currentUserIsInRole = (role) -> userWithIdIsInRole id: Meteor.userId(), r
 ###*
   React hook, using useTracer.
   In addition to roles defined via alanning:roles you can specify
-  'any', 'logged-in' and 'username-is-admin'
+  'any' and 'logged-in'
   @param {string} role
   @return {boolean}
   ###
@@ -46,7 +44,7 @@ export useCurrentUserIsInRole = (role) -> useTracker -> currentUserIsInRole role
 
   In addition to roles defined via alanning:roles you can specify
   'any', 'logged-in' and 'username-is-admin'
-  @param {string} role - the alanning:role 
+  @param {string | Array<string>} role - the alanning:role 
   @throws {Meteor.Error} throws an error when user is not in role
   ###
 export currentUserMustBeInRole = (role) ->

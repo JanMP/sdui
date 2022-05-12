@@ -10,7 +10,7 @@ DefaultListItemContent = ({rowData}) ->
 
 
 export DefaultListItem = ({
-  rowData, index, canDelete, onDelete, onClick,
+  rowData, index, canDelete, mayDelete, onDelete, onClick,
   ListItemContent = DefaultListItemContent, selectedRowId
 }) ->
   
@@ -40,7 +40,7 @@ export DefaultListItem = ({
           <button
             className="icon danger"
             onClick={handleDeleteButtonClick}
-            disabled={rowData._disableDeleteForRow}
+            disabled={rowData._disableDeleteForRow or not mayDelete}
           >
             <FontAwesomeIcon icon={faTrash}/>
           </button>

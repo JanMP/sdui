@@ -15,9 +15,11 @@ export interface createTableDataAPIParams {
   canAdd?: boolean
   canDelete?: boolean
   canExport?: boolean
-  viewTableRole?: string
-  editRole?: string
-  exportTableRole?: string
+  viewTableRole?: string | Array<string>
+  editRole?: string  | Array<string>
+  addRole?: string  | Array<string>
+  deleteRole?: string  | Array<string>
+  exportTableRole?: string | Array<string>
   getPreSelectPipeline?: ({pub}?: {pub: object}) => Array<Object>
   getProcessorPipeline?: ({pub}?: {pub: object}) => Array<Object>
   getRowsPipeline?:
@@ -74,9 +76,11 @@ export interface createTableDataAPIReturn {
   canDelete?: boolean
   deleteConfirmation?: string
   canExport?: boolean
-  viewTableRole?: string
-  editRole?: string
-  exportTableRole?: string
+  viewTableRole?: string | Array<string>
+  editRole?: string | Array<string>
+  addRole?: string | Array<string>
+  deleteRole?: string | Array<string>
+  exportTableRole?: string | Array<string>
   setupNewItem?: () => object
   onSubmit?: (object) => any
   onChangeField?: ({_id: string, changeData: object}) => any
@@ -105,5 +109,4 @@ export interface DataTabpeDisplayOptions {
   search: 'string'
   onChangeSearch: (searchString: string) => void
   onDelete: ({id}: {id: string}) => Promise<any>
-
 }

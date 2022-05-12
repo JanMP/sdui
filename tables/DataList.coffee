@@ -33,8 +33,8 @@ export DataList = ({
   canSearch, search,
   onChangeSearch = (args...) -> console.log "onChangeSearch default stump called with arguments:", args...
   isLoading
-  canAdd, onAdd = (args...) -> console.log "onAdd default stump called with arguments:", args...
-  canDelete, onDelete = (args...) -> console.log "onDelete default stump called with arguments:", args...
+  canAdd, mayAdd, onAdd = (args...) -> console.log "onAdd default stump called with arguments:", args...
+  canDelete, mayDelete, onDelete = (args...) -> console.log "onDelete default stump called with arguments:", args...
   canEdit, mayEdit,
   onChangeField = (args...) -> console.log "onChangeField default stump called with arguments:", args...
   onRowClick
@@ -101,6 +101,7 @@ export DataList = ({
           onDelete={onDelete}
           onClick={onRowClick}
           canDelete={canDelete}
+          mayDelete={mayDelete}
           ListItemContent={ListItemContent}
           selectedRowId={selectedRowId}
         />
@@ -122,7 +123,7 @@ export DataList = ({
         mayExport={mayExport}
         canAdd={canAdd}
         onAdd={onAdd}
-        mayEdit={mayEdit}
+        mayAdd={mayAdd}
       />
     </div>
    

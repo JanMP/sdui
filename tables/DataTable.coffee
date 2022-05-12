@@ -87,7 +87,8 @@ actionCellRenderer = ({component}) ->
     </button>
   </div>
 
-deleteButtonCellRenderer = ({onDelete}) ->
+deleteButtonCellRenderer = ({mayDelete, onDelete}) ->
+  console.log mayDelete
   ({dataKey, parent, rowIndex, columnIndex, cellData, rowData}) ->
 
     id = rowData?._id ? rowData?.id
@@ -102,7 +103,7 @@ deleteButtonCellRenderer = ({onDelete}) ->
       <button
         onClick={onClick}
         className="danger icon"
-        disabled={rowData._disableDeleteForRow}
+        disabled={rowData._disableDeleteForRow or not mayDelete}
       >
         <FontAwesomeIcon icon={faTrash}/>
       </button>
@@ -129,8 +130,8 @@ export DataTable = ({
   canSearch, search,
   onChangeSearch = (args...) -> console.log "onChangeSearch default stump called with arguments:", args...
   isLoading
-  canAdd, onAdd = (args...) -> console.log "onAdd default stump called with arguments:", args...
-  canDelete, onDelete = (args...) -> console.log "onDelete default stump called with arguments:", args...
+  canAdd, mayAdd, onAdd = (args...) -> console.log "onAdd default stump called with arguments:", args...
+  canDelete, mayDelete, onDelete = (args...) -> console.log "onDelete default stump called with arguments:", args...
   canEdit, mayEdit,
   onChangeField = (args...) -> console.log "onChangeField default stump called with arguments:", args...
   onRowClick
@@ -140,6 +141,7 @@ export DataTable = ({
   customComponents = {}
 }) ->
 
+  console.log mayDelete
   {Header, actionCell} = customComponents
   Header ?= DefaultHeader
   {renderer, width} = actionCell ? {}
@@ -265,7 +267,7 @@ export DataTable = ({
         mayExport={mayExport}
         canAdd={canAdd}
         onAdd={onAdd}
-        mayEdit={mayEdit}
+        mayAdd={mayAdd}
       />
     </div>
    
@@ -307,7 +309,7 @@ export DataTable = ({
                   dataKey="no-data-key"
                   label=""
                   width={deleteColumnWidth}
-                  cellRenderer={deleteButtonCellRenderer {onDelete}}
+                  cellRenderer={deleteButtonCellRenderer {mayDelete, onDelete}}
                 />
             }
           </Table>
