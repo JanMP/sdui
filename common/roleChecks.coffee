@@ -43,7 +43,7 @@ export useCurrentUserIsInRole = (role) -> useTracker -> currentUserIsInRole role
   Use this in Meteor Methods.
 
   In addition to roles defined via alanning:roles you can specify
-  'any', 'logged-in' and 'username-is-admin'
+  'any' and 'logged-in'
   @param {string | Array<string>} role - the alanning:role 
   @throws {Meteor.Error} throws an error when user is not in role
   ###

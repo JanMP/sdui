@@ -3,7 +3,7 @@ import SimpleSchema from 'simpl-schema'
 import {ValidatedMethod} from 'meteor/mdg:validated-method'
 import {S3, ListObjectsCommand, PutObjectCommand, DeleteObjectCommand} from '@aws-sdk/client-s3'
 import {getSignedUrl} from '@aws-sdk/s3-request-presigner'
-import {currentUserMustBeInRole, currentUserIsInRole} from '../common/roleChecks.coffee'
+import {currentUserMustBeInRole, currentUserIsInRole, userWithIdIsInRole} from '../common/roleChecks.coffee'
 import {createTableDataAPI} from './createTableDataAPI.coffee'
 import {FileInput} from '../files/FileInput.coffee'
 import compact from 'lodash/compact'
@@ -57,24 +57,24 @@ getCommonFileListRole, uploadCommonFilesRole}) ->
     throw new Error 'no collection given'
 
   unless getUserFileListRole?
-    getUserFileListRole = 'username-is-admin'
+    getUserFileListRole = 'admin'
     console.warn "[createFilesAPI #{sourceName}]:
-      no uploadCommonFilesRole defined, using username-is-admin"
+      no uploadCommonFilesRole defined, using admin"
 
   unless uploadUserFilesRole?
-    uploadUserFilesRole = 'username-is-admin'
+    uploadUserFilesRole = 'admin'
     console.warn "[createFilesAPI #{sourceName}]:
-      no uploadUserFilesRole defined, using username-is-admin"
+      no uploadUserFilesRole defined, using admin"
 
   unless getCommonFileListRole?
-    getCommonFileListRole = 'username-is-admin'
+    getCommonFileListRole = 'admin'
     console.warn "[createFilesAPI #{sourceName}]:
-      no getCommonFileListRole defined, using username-is-admin"
+      no getCommonFileListRole defined, using admin"
 
   unless uploadCommonFilesRole?
-    uploadCommonFilesRole = 'username-is-admin'
+    uploadCommonFilesRole = 'admin'
     console.warn "[createFilesAPI #{sourceName}]:
-      no uploadCommonFilesRole defined, using username-is-admin"
+      no uploadCommonFilesRole defined, using admin"
 
   makeDeleteMethodRunFkt = ({collection, transformIdToMongo, transformIdToMiniMongo}) ->
     ({id}) ->
@@ -101,22 +101,32 @@ getCommonFileListRole, uploadCommonFilesRole}) ->
           collection.remove _id: transformIdToMongo id
         .catch (error) -> throw new Meteor.Error error
 
-  getPreSelectPipeline = ({pub}) -> [
-    if currentUserIsInRole [getCommonFileListRole, getUserFileListRole]
+  getPreSelectPipeline = ({pub}) ->
+    userId = pub?.userId ? Meteor.userId()
+    [
       $match:
-        $or:
-          compact [
-            if currentUserIsInRole getCommonFileListRole
-              isCommon: true
-            if currentUserIsInRole getUserFileListRole
-              $and: [
-                isCommon: false
-                uploader:
-                  Meteor.userId() ? pub?.userId ? 'this is not a valid userId'
-              ]
-            false #make sure array isn't empty
+        $or: compact [
+          if userWithIdIsInRole id: userId, role: getCommonFileListRole
+            isCommon: true
+          if userWithIdIsInRole id: userId, role: getUserFileListRole
+            $and: [
+              isCommon: false
+              uploader:
+                userId ? Meteor.userId() 'this is not a valid userId'
+            ]
+          false #make sure array isn't empty
+        ]
+    ,
+      $addFields:
+        _disableDeleteForRow:
+          $or: compact [
+            unless userWithIdIsInRole id: userId, role: uploadCommonFilesRole
+              $eq: ['$isCommon', true]
+            unless userWithIdIsInRole id: userId, role: uploadUserFilesRole
+              $eq: ['$isCommon', false]
+            false
           ]
-  ]
+    ]
 
   tableDataOptions = createTableDataAPI
     sourceName: sourceName
