@@ -88,7 +88,6 @@ actionCellRenderer = ({component}) ->
   </div>
 
 deleteButtonCellRenderer = ({mayDelete, onDelete}) ->
-  console.log mayDelete
   ({dataKey, parent, rowIndex, columnIndex, cellData, rowData}) ->
 
     id = rowData?._id ? rowData?.id
@@ -141,7 +140,6 @@ export DataTable = ({
   customComponents = {}
 }) ->
 
-  console.log mayDelete
   {Header, actionCell} = customComponents
   Header ?= DefaultHeader
   {renderer, width} = actionCell ? {}
