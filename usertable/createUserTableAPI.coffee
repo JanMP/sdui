@@ -162,8 +162,8 @@ export createUserTableAPI = ({userProfileSchema, allowedRoles}) ->
 
   #returning the dataOptions
   createTableDataAPI
-    viewTableRole: 'logged-in'
-    editRole: 'logged-in'
+    viewTableRole: 'admin'
+    editRole: 'admin'
     sourceName: 'users'
     sourceSchema: userSchema
     listSchema: userListSchema
