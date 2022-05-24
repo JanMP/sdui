@@ -28,11 +28,12 @@ function Date({
   placeholder,
   readOnly,
   value,
+  hasFloatingLabel,
   ...props
 }: DateFieldProps) {
   return (
     <div className={setClassNamesForProps(props)} {...filterDOMProps(props)}>
-      {label && !props.hasFloatingLabel &&<label htmlFor={id}>{label}</label>}
+      {label && !hasFloatingLabel &&<label htmlFor={id}>{label}</label>}
       <input
         disabled={disabled}
         id={id}
@@ -42,7 +43,6 @@ function Date({
         onChange={event => {
           const date = new DateConstructor(event.target.value);
           if (date.getFullYear() < 10000) {
-            console.log(date)
             onChange(date);
           } else if (isNaN(event.target.valueAsNumber)) {
             onChange(undefined);
@@ -54,7 +54,7 @@ function Date({
         type="datetime-local"
         value={dateFormat(value) ?? ''}
       />
-      {label && props.hasFloatingLabel &&<label htmlFor={id}>{label}</label>}
+      {label && hasFloatingLabel &&<label htmlFor={id}>{label}</label>}
     </div>
   );
 }
