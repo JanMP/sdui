@@ -1,6 +1,7 @@
 import React, { Ref } from 'react';
 import { HTMLFieldProps, connectField, filterDOMProps } from 'uniforms';
 import setClassNamesForProps from './setClassNamesForProps';
+import {DateTime} from 'luxon'
 
 /* istanbul ignore next */
 const DateConstructor = (typeof global === 'object' ? global : window).Date;
@@ -36,8 +37,9 @@ function Date({
         min={dateFormat(min)}
         name={name}
         onChange={event => {
-          const date = new DateConstructor(event.target.valueAsNumber);
+          const date = new DateConstructor(event.target.value);
           if (date.getFullYear() < 10000) {
+            console.log(date)
             onChange(date);
           } else if (isNaN(event.target.valueAsNumber)) {
             onChange(undefined);
