@@ -5,7 +5,10 @@ import {DateTime} from 'luxon'
 
 /* istanbul ignore next */
 const DateConstructor = (typeof global === 'object' ? global : window).Date;
-const dateFormat = (value?: Date) => value?.toISOString().slice(0, -8);
+const dateFormat = (value?: Date) => {
+  const dt = value ? DateTime.fromJSDate(value) : undefined
+  return dt?.toISO().slice(0,-13)
+}
 
 export type DateFieldProps = HTMLFieldProps<
   Date,
