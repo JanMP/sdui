@@ -1,10 +1,14 @@
 import React, { Ref } from 'react';
 import { HTMLFieldProps, connectField, filterDOMProps } from 'uniforms';
 import setClassNamesForProps from './setClassNamesForProps';
+import {DateTime} from 'luxon'
 
 /* istanbul ignore next */
 const DateConstructor = (typeof global === 'object' ? global : window).Date;
-const dateFormat = (value?: Date) => value?.toISOString().slice(0, -8);
+const dateFormat = (value?: Date) => {
+  const dt = value ? DateTime.fromJSDate(value) : undefined
+  return dt?.toISO().slice(0,-13)
+}
 
 export type DateFieldProps = HTMLFieldProps<
   Date,
@@ -24,11 +28,12 @@ function Date({
   placeholder,
   readOnly,
   value,
+  hasFloatingLabel,
   ...props
 }: DateFieldProps) {
   return (
     <div className={setClassNamesForProps(props)} {...filterDOMProps(props)}>
-      {label && !props.hasFloatingLabel &&<label htmlFor={id}>{label}</label>}
+      {label && !hasFloatingLabel &&<label htmlFor={id}>{label}</label>}
       <input
         disabled={disabled}
         id={id}
@@ -36,7 +41,7 @@ function Date({
         min={dateFormat(min)}
         name={name}
         onChange={event => {
-          const date = new DateConstructor(event.target.valueAsNumber);
+          const date = new DateConstructor(event.target.value);
           if (date.getFullYear() < 10000) {
             onChange(date);
           } else if (isNaN(event.target.valueAsNumber)) {
@@ -49,7 +54,7 @@ function Date({
         type="datetime-local"
         value={dateFormat(value) ?? ''}
       />
-      {label && props.hasFloatingLabel &&<label htmlFor={id}>{label}</label>}
+      {label && hasFloatingLabel &&<label htmlFor={id}>{label}</label>}
     </div>
   );
 }
