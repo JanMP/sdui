@@ -36,6 +36,8 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
   sourceName, listSchemaBridge,
   rowsCollection, rowCountCollection
   query = defaultQuery
+  initialSortColumn
+  initialSortDirection
   perLoad = 500
   canEdit = false
   formSchemaBridge
@@ -82,8 +84,8 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
 
   [isLoading, setIsLoading] = useState false
 
-  [sortColumn, setSortColumn] = useState undefined
-  [sortDirection, setSortDirection] = useState undefined
+  [sortColumn, setSortColumn] = useState initialSortColumn
+  [sortDirection, setSortDirection] = useState initialSortDirection
   
   [search, setSearch] = useState ''
   # [debouncedSearch, setDebouncedSearch] = useDebounce '', 1000

@@ -18,6 +18,9 @@ export interface createTableDataAPIParams {
   viewTableRole?: string
   editRole?: string
   exportTableRole: string
+  query?: object
+  initialSortColumn?: string
+  initialSortDirection?: 'ASC' | 'DESC'
   getPreSelectPipeline?: ({pub}?: {pub: object}) => Array<Object>
   getProcessorPipeline?: ({pub}?: {pub: object}) => Array<Object>
   getRowsPipeline?:
@@ -74,10 +77,12 @@ export interface createTableDataAPIReturn {
   viewTableRole?: string
   editRole?: string
   exportTableRole?: string
+  query?: object
+  initialSortColumn?: string
+  initialSortDirection?: 'ASC' | 'DESC'
 }
 
 interface additionalDataTableOptions {
-  query?: any
   perLoad?: number
   onDelete?: ({id}: {id: string}) => Promise<any>
   onRowClick?: ({rowData, index}: {rowData: any, index: number}) => void
@@ -89,7 +94,7 @@ interface additionalDataTableOptions {
 
 export type DataTableOptions = createTableDataAPIReturn & additionalDataTableOptions
 
-export interface DataTabpeDisplayOptions {
+export interface DataTableDisplayOptions {
   rows: [any]
   totalRowCount: number
   loadMoreRows: ({startIndex, stopIndex}: {startIndex: number, stopIndex: number}) => Promise<any>

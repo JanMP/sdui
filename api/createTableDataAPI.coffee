@@ -27,6 +27,7 @@ export createTableDataAPI = ({
   makeFormDataFetchMethodRunFkt, makeSubmitMethodRunFkt, makeDeleteMethodRunFkt
   debounceDelay
   observers
+  query, initialSortColumn, initialSortDirection
 }) ->
 
   # check required props and setup defaults for optional props
@@ -102,4 +103,5 @@ export createTableDataAPI = ({
     viewTableRole
     editRole
     exportTableRole
+    query, initialSortColumn, initialSortDirection
   }
