@@ -95,16 +95,16 @@ export DataList = ({
         parent={parent}
         rowIndex={index}
       >
-        <ListItem
-          rowData={getRow {index}}
-          index={index}
-          onDelete={onDelete}
-          onClick={onRowClick}
-          canDelete={canDelete}
-          mayDelete={mayDelete}
-          ListItemContent={ListItemContent}
-          selectedRowId={selectedRowId}
-        />
+        {({measure}) ->
+          <ListItem
+            rowData={getRow {index}}
+            index={index}
+            onDelete={onDelete}
+            onClick={onRowClick}
+            canDelete={canDelete}
+            ListItemContent={ListItemContent}
+            selectedRowId={selectedRowId}
+          />}
       </CellMeasurer>
     </div>
 

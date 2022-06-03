@@ -27,6 +27,7 @@ export createTableDataAPI = ({
   makeFormDataFetchMethodRunFkt, makeSubmitMethodRunFkt, makeDeleteMethodRunFkt
   debounceDelay
   observers
+  query, initialSortColumn, initialSortDirection
   setupNewItem
   checkDisableEditForRow
   checkDisableDeleteForRow
@@ -122,5 +123,6 @@ export createTableDataAPI = ({
     addRole
     deleteRole
     exportTableRole
+    query, initialSortColumn, initialSortDirection
     setupNewItem
   }

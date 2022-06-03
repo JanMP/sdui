@@ -20,6 +20,9 @@ export interface createTableDataAPIParams {
   addRole?: string  | Array<string>
   deleteRole?: string  | Array<string>
   exportTableRole?: string | Array<string>
+  query?: object
+  initialSortColumn?: string
+  initialSortDirection?: 'ASC' | 'DESC'
   getPreSelectPipeline?: ({pub}?: {pub: object}) => Array<Object>
   getProcessorPipeline?: ({pub}?: {pub: object}) => Array<Object>
   getRowsPipeline?:
@@ -45,19 +48,19 @@ export interface createTableDataAPIParams {
       collection: Mongo.Collection
       transFormIdToMongo: (id: any) => any
       transFormIdToMiniMongo: (id: any) => any
-    }) => ({id: string}) => Mongo.Cursor
+    }) => (options: {id: string}) => Mongo.Cursor
   makeSubmitMethodRunFkt?:
     (options: {
       collection: Mongo.Collection
       transFormIdToMongo: (id: any) => any
       transFormIdToMiniMongo: (id: any) => any
-    }) => ({data: object, id: string}) => void
+    }) => (options: {data: object, id: string}) => void
   makeDeleteMethodRunFkt?:
     (options: {
       collection: Mongo.Collection
       transFormIdToMongo: (id: any) => any
       transFormIdToMiniMongo: (id: any) => any
-    }) => ({id: string}) => void
+    }) => (options: {id: string}) => void
   debounceDelay?: number
   observers?: Array<any>
   setupNewItem?: () => object
@@ -84,10 +87,12 @@ export interface createTableDataAPIReturn {
   setupNewItem?: () => object
   onSubmit?: (object) => any
   onChangeField?: ({_id: string, changeData: object}) => any
+  query?: object
+  initialSortColumn?: string
+  initialSortDirection?: 'ASC' | 'DESC'
 }
 
 interface additionalDataTableOptions {
-  query?: any
   perLoad?: number
   onDelete?: ({id: string}) => Promise<any>
   onRowClick?: ({rowData, index}: {rowData: any, index: number}) => void
@@ -99,7 +104,7 @@ interface additionalDataTableOptions {
 
 export type DataTableOptions = createTableDataAPIReturn & additionalDataTableOptions
 
-export interface DataTabpeDisplayOptions {
+export interface DataTableDisplayOptions {
   rows: [any]
   totalRowCount: number
   loadMoreRows: ({startIndex, stopIndex}: {startIndex: number, stopIndex: number}) => Promise<any>
