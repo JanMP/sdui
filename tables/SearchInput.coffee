@@ -27,6 +27,7 @@ export SearchInput = ({value, onChange, className}) ->
       setDisplayValue newValue
 
   <input
+    placeholder="Suchen..."
     className={className}
     type="text"
     value={displayValue}
