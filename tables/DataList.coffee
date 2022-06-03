@@ -65,17 +65,6 @@ export DataList = ({
 
   [debouncedResetTrigger, setDebouncedResetTrigger] = useThrottle 0, 30
 
-  onResizeRows = ({dataKey, deltaX}) ->
-    prevWidths = columnWidths
-    ratioDeltaX = deltaX / totalColumnsWidth
-    i = _.findIndex columnKeys, (key) -> key is dataKey
-    prevWidths[i] += ratioDeltaX
-    prevWidths[i + 1] -= ratioDeltaX
-    setColumnWidths prevWidths
-    saveColumnWidthsToLocalStorage prevWidths
-    setDebouncedResetTrigger debouncedResetTrigger + 1
-
-
   useEffect ->
     cacheRef.current.clearAll()
   , [contentContainerWidth, contentContainerHeight, debouncedResetTrigger]
@@ -106,15 +95,16 @@ export DataList = ({
         parent={parent}
         rowIndex={index}
       >
-        <ListItem
-          rowData={getRow {index}}
-          index={index}
-          onDelete={onDelete}
-          onClick={onRowClick}
-          canDelete={canDelete}
-          ListItemContent={ListItemContent}
-          selectedRowId={selectedRowId}
-        />
+        {({measure}) ->
+          <ListItem
+            rowData={getRow {index}}
+            index={index}
+            onDelete={onDelete}
+            onClick={onRowClick}
+            canDelete={canDelete}
+            ListItemContent={ListItemContent}
+            selectedRowId={selectedRowId}
+          />}
       </CellMeasurer>
     </div>
 

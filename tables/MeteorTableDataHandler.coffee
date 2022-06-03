@@ -96,6 +96,10 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
   if sortColumn? and sortDirection?
     sort = "#{sortColumn}": if sortDirection is 'ASC' then 1 else -1
 
+  useEffect ->
+    setSortColumn initialSortColumn
+    setSortDirection initialSortDirection
+  [initialSortColumn, initialSortDirection]
 
   getRows = ->
     return if usePubSub
