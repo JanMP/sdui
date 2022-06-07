@@ -1,12 +1,24 @@
 import {Meteor} from 'meteor/meteor'
 import SimpleSchema from 'simpl-schema'
 import {ValidatedMethod} from 'meteor/mdg:validated-method'
-import {S3, ListObjectsCommand, PutObjectCommand, DeleteObjectCommand} from '@aws-sdk/client-s3'
-import {getSignedUrl} from '@aws-sdk/s3-request-presigner'
 import {currentUserMustBeInRole, currentUserIsInRole, userWithIdIsInRole} from '../common/roleChecks.coffee'
 import {createTableDataAPI} from './createTableDataAPI.coffee'
 import {FileInput} from '../files/FileInput.coffee'
 import compact from 'lodash/compact'
+
+getSignedUrl = null
+S3 = null
+ListObjectsCommand = null
+PutObjectCommand = null
+DeleteObjectCommand = null
+
+if Meteor.isServer
+  console.log('import stuff')
+  `import presigner from '@aws-sdk/s3-request-presigner'
+  import clientS3 from '@aws-sdk/client-s3'`
+  {getSignedUrl} = presigner
+  {S3, ListObjectsCommand, PutObjectCommand, DeleteObjectCommand} = clientS3
+
 
 SimpleSchema.extendOptions ['sdTable', 'uniforms']
 
@@ -44,6 +56,7 @@ export sourceSchema =
 setupNewItem = ->
   files: []
   uploadAs: ''
+
 
 export createFilesAPI = ({
 sourceName, collection
