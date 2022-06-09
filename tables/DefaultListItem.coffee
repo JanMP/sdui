@@ -3,7 +3,7 @@ import {useTw} from '../config.coffee'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faTrash} from '@fortAwesome/free-solid-svg-icons/faTrash'
 
-DefaultListItemContent = ({rowData}) ->
+DefaultListItemContent = ({rowData, measure}) ->
   tw = useTw()
 
   <div className={tw"bg-red-100"}>{JSON.stringify rowData, null, 2}</div>
@@ -12,6 +12,7 @@ DefaultListItemContent = ({rowData}) ->
 export DefaultListItem = ({
   rowData, index, canDelete, mayDelete, onDelete, onClick,
   ListItemContent = DefaultListItemContent, selectedRowId
+  measure
 }) ->
   
   tw = useTw()
@@ -33,7 +34,7 @@ export DefaultListItem = ({
   editableClass = if rowData._disableEditForRow then ' not-editable-row' else 'editable-row'
 
   <div className={tw "p-1 shadow flex justify-between#{isSelectedClass} #{editableClass}"} onClick={handleClick}>
-    <ListItemContent rowData={rowData}/>
+    <ListItemContent rowData={rowData} measure={measure}/>
     {
       if canDelete
         <div className={tw"p-2"}>

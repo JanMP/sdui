@@ -104,6 +104,7 @@ export DataList = ({
             canDelete={canDelete}
             ListItemContent={ListItemContent}
             selectedRowId={selectedRowId}
+            measure={measure}
           />}
       </CellMeasurer>
     </div>
