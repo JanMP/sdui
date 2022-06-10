@@ -102,6 +102,7 @@ export DataList = ({
             onDelete={onDelete}
             onClick={onRowClick}
             canDelete={canDelete}
+            mayDelete={mayDelete}
             ListItemContent={ListItemContent}
             selectedRowId={selectedRowId}
             measure={measure}
