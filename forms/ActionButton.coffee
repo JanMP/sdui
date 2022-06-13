@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react'
-import {useTw} from '../config.coffee'
+
 import {meteorApply} from '../common/meteorApply.coffee'
 import {toast} from 'react-toastify'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
@@ -33,8 +33,6 @@ onSuccess, successMsg, onError, errorMsg, confirmation, className, disabled}) ->
 
   onSuccess ?= (result) -> if successMsg? then toast.success successMsg
   onError ?= (error) -> toast.error "#{errorMsg ? error}"
-
-  tw = useTw()
 
   [isBusy, setIsBusy] = useState false
   [modalIsOpen, setModalIsOpen] = useState false
@@ -78,14 +76,14 @@ onSuccess, successMsg, onError, errorMsg, confirmation, className, disabled}) ->
       disabled={disabled}
       onClick={handleClick}
     >
-      <div className={tw"relative"}>
-        <div className={tw if isBusy then"invisible"}>
+      <div className="relative">
+        <div className={if isBusy then "invisible"}>
           {<FontAwesomeIcon icon={icon} fixedWidth /> if icon?}
           {<span> {label}</span> if label?}
         </div>
         {
           if isBusy
-            <div className={tw "absolute inset-0 grid place-items-center"}>
+            <div className="absolute inset-0 grid place-items-center">
               <FontAwesomeIcon icon={faSpinner} fixedWidth spin/>
             </div>
         }

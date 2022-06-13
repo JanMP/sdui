@@ -3,7 +3,6 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faPlus} from '@fortAwesome/free-solid-svg-icons/faPlus'
 import {faFileDownload} from '@fortAwesome/free-solid-svg-icons/faFileDownload'
 import {SearchInput} from "./SearchInput.coffee"
-import {useTw} from '../config.coffee'
 
 export DefaultHeader = ({
   loadedRowCount, totalRowCount
@@ -12,11 +11,9 @@ export DefaultHeader = ({
   canAdd, onAdd, mayAdd
 }) ->
 
-  tw = useTw()
-
-  <div className={tw"flex justify-between p-4 border-b-4 border-secondary-200 flex-wrap gap-2"}>
-    <div className={tw"flex-grow"}>{loadedRowCount}/{totalRowCount}</div>
-    <div className={tw"flex-grow"}>
+  <div className="flex justify-between p-4 border-b-4 border-secondary-200 flex-wrap gap-2">
+    <div className="flex-grow">{loadedRowCount}/{totalRowCount}</div>
+    <div className="flex-grow">
         {
           if canSearch
             <SearchInput
@@ -25,8 +22,8 @@ export DefaultHeader = ({
             />
         }
     </div>
-    <div className={tw"flex-shrink flex-grow-0 text-right"}>
-      <div className={tw"children:m-1"}>
+    <div className="flex-shrink flex-grow-0 text-right">
+      <div className="children:m-1">
         {
           if canExport
             <button

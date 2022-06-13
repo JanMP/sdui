@@ -1,12 +1,9 @@
 import React, {useState, useEffect} from 'react'
 import {useDebounce} from '@react-hook/debounce'
-import {useTw} from '../config.coffee'
 
 export SearchInput = ({value, onChange, className}) ->
 
-  tw = useTw()
-
-  className ?= tw"max-w-[10rem] min-w-[5rem]"
+  className ?= "max-w-[10rem] min-w-[5rem]"
 
   [isValid, setIsValid] = useState true
   [displayValue, setDisplayValue] = useState value

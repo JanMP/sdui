@@ -1,12 +1,9 @@
 import React from 'react'
-import {useTw} from '../config.coffee'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faTrash} from '@fortAwesome/free-solid-svg-icons/faTrash'
 
 DefaultListItemContent = ({rowData, measure}) ->
-  tw = useTw()
-
-  <div className={tw"bg-red-100"}>{JSON.stringify rowData, null, 2}</div>
+  <div className="bg-red-100">{JSON.stringify rowData, null, 2}</div>
 
 
 export DefaultListItem = ({
@@ -15,7 +12,6 @@ export DefaultListItem = ({
   measure
 }) ->
   
-  tw = useTw()
   rowData ?= {}
   id = rowData._id ? rowData.id
 
@@ -33,11 +29,11 @@ export DefaultListItem = ({
   isSelectedClass = if isSelected then ' bg-secondary-100' else ''
   editableClass = if rowData._disableEditForRow then ' not-editable-row' else 'editable-row'
 
-  <div className={tw "p-1 shadow flex justify-between#{isSelectedClass} #{editableClass}"} onClick={handleClick}>
+  <div className="p-1 shadow flex justify-between #{isSelectedClass} #{editableClass}" onClick={handleClick}>
     <ListItemContent rowData={rowData} measure={measure}/>
     {
       if canDelete
-        <div className={tw"p-2"}>
+        <div className="p-2">
           <button
             className="icon danger"
             onClick={handleDeleteButtonClick}
