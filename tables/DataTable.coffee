@@ -254,19 +254,14 @@ export DataTable = ({
   <div ref={contentContainerRef} style={height: '100%'} className="bg-white">
   
     <div ref={headerContainerRef}>
-      <Header
-        loadedRowCount={rows?.length}
-        totalRowCount={totalRowCount}
-        canSearch={canSearch}
-        search={search}
-        onChangeSearch={onChangeSearch}
-        canExport={canExport}
-        onExportTable={onExportTable}
-        mayExport={mayExport}
-        canAdd={canAdd}
-        onAdd={onAdd}
-        mayAdd={mayAdd}
-      />
+      <Header {{
+        listSchemaBridge
+        loadedRowCount: rows?.length, totalRowCount
+        canSearch, search, onChangeSearch
+        canExport, mayExport, onExportTable,
+        canAdd, mayAdd, onAdd
+        sortColumn, sortDirection, onChangeSort
+      }...}/>
     </div>
    
       <InfiniteLoader

@@ -110,8 +110,28 @@ export interface DataTableDisplayOptions {
   loadMoreRows: ({startIndex, stopIndex}: {startIndex: number, stopIndex: number}) => Promise<any>
   sortColumn: string
   sortDirection: 'ASC' | 'DESC'
-  onCangeSort: ({sortColumn, sortDirection}: {sortColumn: string, sortDirection: 'ASC' | 'DESC'}) => void
+  onChangeSort: ({sortColumn, sortDirection}: {sortColumn: string, sortDirection: 'ASC' | 'DESC'}) => void
   search: 'string'
   onChangeSearch: (searchString: string) => void
   onDelete: ({id}: {id: string}) => Promise<any>
+}
+
+export interface DataTableHeaderOptions {
+  ListSchemaBridge: object
+  loadedRowCount: number
+  totalRowCount: number
+  canSearch?: boolean
+  search?: string
+  onChangeSearch?: (searchString: string) => void
+  canExport?: boolean
+  mayExport?: boolean
+  onExportTable?: () => void
+  canAdd?: boolean
+  mayAdd?: boolean
+  onAdd?: () => void
+  sortColumn?: string
+  sortDirection?: 'ASC' | 'DESC'
+  onChangeSort:  ({sortColumn, sortDirection}: {sortColumn: string, sortDirection: 'ASC' | 'DESC'}) => void
+  // query?: object
+  // onChangeQuery?: (query: object) => void
 }

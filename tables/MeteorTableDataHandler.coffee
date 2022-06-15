@@ -26,7 +26,7 @@ defaultQuery = {} # ensures equality between runs
   @type {
     (options: {
       dataOptions: DataTableOptions,
-      DisplayComponent: {(options: TableDataDisplayOptions) => JSX.Element},
+      DisplayComponent: {(options: DataTableDisplayOptions) => JSX.Element},
       customComponents?: any
     }) => JSX.Element
   }
