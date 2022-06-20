@@ -124,7 +124,7 @@ export DataTable = ({
   listSchemaBridge,
   rows, limit, totalRowCount,
   loadMoreRows = (args...) -> console.log "loadMoreRows default stump called with arguments:", args...
-  sortColumn, sortDirection,
+  canSort, sortColumn, sortDirection,
   onChangeSort = (args...) -> console.log "onChangeSort default stump called with arguments:", args...
   canSearch, search,
   onChangeSearch = (args...) -> console.log "onChangeSearch default stump called with arguments:", args...
@@ -260,7 +260,7 @@ export DataTable = ({
         canSearch, search, onChangeSearch
         canExport, mayExport, onExportTable,
         canAdd, mayAdd, onAdd
-        sortColumn, sortDirection, onChangeSort
+        canSort, sortColumn, sortDirection, onChangeSort
       }...}/>
     </div>
    

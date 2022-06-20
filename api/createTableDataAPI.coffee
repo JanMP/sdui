@@ -18,7 +18,7 @@ export createTableDataAPI = ({
   sourceName, sourceSchema, collection
   useObjectIds
   listSchema, formSchema
-  canEdit, canSearch, canAdd, canDelete, canExport
+  canEdit, canSearch, canSort, canAdd, canDelete, canExport
   viewTableRole, editRole, addRole, deleteRole, exportTableRole
   getPreSelectPipeline
   getProcessorPipeline,
@@ -29,6 +29,7 @@ export createTableDataAPI = ({
   observers
   query, initialSortColumn, initialSortDirection
   setupNewItem
+  showRowCount
   checkDisableEditForRow
   checkDisableDeleteForRow
 }) ->
@@ -39,6 +40,9 @@ export createTableDataAPI = ({
 
   unless sourceSchema?
     throw new Error 'no sourceSchema given'
+
+  canSearch ?= true
+  canSort ?= true
 
   if not viewTableRole? and Meteor.isServer
     console.warn "[createTableDataAPI #{sourceName}]:
@@ -115,6 +119,7 @@ export createTableDataAPI = ({
     rowsCollection, rowCountCollection
     canEdit
     canSearch
+    canSort
     canAdd
     canDelete
     canExport
@@ -125,4 +130,5 @@ export createTableDataAPI = ({
     exportTableRole
     query, initialSortColumn, initialSortDirection
     setupNewItem
+    showRowCount
   }

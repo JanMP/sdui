@@ -12,6 +12,7 @@ export interface createTableDataAPIParams {
   formSchema?: SimpleSchema
   canEdit?: boolean
   canSearch?: boolean
+  canSort?: boolean
   canAdd?: boolean
   canDelete?: boolean
   canExport?: boolean
@@ -64,6 +65,7 @@ export interface createTableDataAPIParams {
   debounceDelay?: number
   observers?: Array<any>
   setupNewItem?: () => object
+  showRowCount?: boolean
   checkDisableEditForRow?: boolean
   checkDisableDeleteForRow?: boolean 
 }
@@ -75,6 +77,7 @@ export interface createTableDataAPIReturn {
   rowCountCollection: Mongo.Collection
   canEdit?: boolean
   canSearch?: boolean
+  canSort?: boolean
   canAdd?: boolean
   canDelete?: boolean
   deleteConfirmation?: string
@@ -90,6 +93,7 @@ export interface createTableDataAPIReturn {
   query?: object
   initialSortColumn?: string
   initialSortDirection?: 'ASC' | 'DESC'
+  showRowCount?: boolean
 }
 
 interface additionalDataTableOptions {
@@ -117,7 +121,7 @@ export interface DataTableDisplayOptions {
 }
 
 export interface DataTableHeaderOptions {
-  ListSchemaBridge: object
+  listSchemaBridge: object
   loadedRowCount: number
   totalRowCount: number
   canSearch?: boolean

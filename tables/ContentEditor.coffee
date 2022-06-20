@@ -19,7 +19,7 @@ export ContentEditor = (tableOptions) ->
     sourceName
     listSchemaBridge, formSchemaBridge
     rows, totalRowCount, loadMoreRows, onRowClick,
-    sortColumn, sortDirection, onChangeSort, useSort
+    canSort, sortColumn, sortDirection, onChangeSort
     canSearch, search, onChangeSearch
     canAdd, mayAdd, onAdd
     canDelete, mayDelete, onDelete, deleteConfirmation
@@ -120,7 +120,7 @@ export ContentEditor = (tableOptions) ->
             sourceName
             listSchemaBridge,
             rows, totalRowCount, loadMoreRows, onRowClick,
-            sortColumn, sortDirection, onChangeSort, useSort
+            canSort, sortColumn, sortDirection, onChangeSort
             canSearch, search, onChangeSearch
             canAdd, mayAdd, onAdd
             canDelete, mayDelete, onDelete: handleOnDelete

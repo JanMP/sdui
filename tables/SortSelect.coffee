@@ -43,13 +43,11 @@ export SortSelect = ({listSchemaBridge, sortColumn, sortDirection, onChangeSort}
     </div>
     
   
-  <div className="flex">
-    <Select
-      className="sort-select-container w-full"
-      classNamePrefix="sort-select"
-      components={{IndicatorsContainer}}
-      value={valueOption}
-      options={options}
-      onChange={changeValue}
-    />
-  </div>
+  <Select
+    className="sort-select-container w-full"
+    classNamePrefix="sort-select"
+    components={{IndicatorsContainer}}
+    value={valueOption}
+    options={options}
+    onChange={changeValue}
+  />

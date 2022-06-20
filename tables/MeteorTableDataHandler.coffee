@@ -38,22 +38,24 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
   query = defaultQuery
   initialSortColumn
   initialSortDirection
-  perLoad = 500
-  canEdit = false
+  perLoad
+  canEdit
   onSubmit
   onChangeField
   formSchemaBridge
-  canSearch = false
-  canAdd = false
+  canSearch
+  canSort
+  canAdd
   setupNewItem
-  canDelete = false
+  canDelete
   onDelete
-  canExport = false
+  canExport
   onRowClick
   autoFormChildren
-  formDisabled = false
-  formReadOnly = false
-  viewTableRole, editRole, addRole, deleteRole, exportTableRole,
+  formDisabled
+  formReadOnly
+  viewTableRole, editRole, addRole, deleteRole, exportTableRole
+  showRowCount
   } = dataOptions
 
   # we only support usePubSub = true atm
@@ -115,6 +117,7 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
       setIsLoading false
 
   getTotalRowCount = ->
+    return unless showRowCount
     return if usePubSub
     meteorApply
       method: getRowCountMethodName
@@ -146,11 +149,13 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
   , [subLoading]
   
   countSubLoading = useTracker ->
+    return unless showRowCount
     return unless usePubSub
     handle = Meteor.subscribe rowCountPublicationName, {query, search}
     not handle.ready()
 
   subRowCount = useTracker ->
+    return unless showRowCount
     return unless usePubSub
     rowCountCollection.findOne({})?.count or 0
   
@@ -180,6 +185,7 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
       rejectRef.current = rej
 
   onChangeSort = (d) ->
+    return unless canSort
     setSortColumn d.sortColumn
     setSortDirection d.sortDirection
 
@@ -240,7 +246,7 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
       sourceName,
       listSchemaBridge, formSchemaBridge
       rows, totalRowCount, loadMoreRows, onRowClick,
-      sortColumn, sortDirection, onChangeSort
+      canSort, sortColumn, sortDirection, onChangeSort
       canSearch, search, onChangeSearch
       canAdd, mayAdd
       canDelete, mayDelete, onDelete
