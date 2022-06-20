@@ -40,29 +40,29 @@ export createTableDataAPI = ({
   unless sourceSchema?
     throw new Error 'no sourceSchema given'
 
-  unless viewTableRole?
+  if not viewTableRole? and Meteor.isServer
     console.warn "[createTableDataAPI #{sourceName}]:
-      no viewTableRole defined, using '#{viewTableRole}' instead."
+      no viewTableRole defined, using 'any' instead."
   viewTableRole ?= 'any'
 
-  if canEdit and not editRole?
+  if canEdit and not editRole? and Meteor.isServer
     console.warn "[createTableDataAPI #{sourceName}]:
-      no editRole defined, using '#{editRole}' instead."
+      no editRole defined, using '#{viewTableRole}' instead."
   editRole ?= viewTableRole
 
-  if canAdd and not addRole?
+  if canAdd and not addRole? and Meteor.isServer
     console.warn "[createTableDataAPI #{sourceName}]:
-      no addRole defined, using '#{addRole}' instead."
+      no addRole defined, using '#{editRole}' instead."
   addRole ?= editRole
 
-  if canDelete and not deleteRole?
+  if canDelete and not deleteRole? and Meteor.isServer
     console.warn "[createTableDataAPI #{sourceName}]:
       no deleteRole defined, using '#{editRole}' instead."
   deleteRole ?= editRole
 
-  if canExport and not exportTableRole?
+  if canExport and not exportTableRole? and Meteor.isServer
     console.warn "[createTableDataAPI #{sourceName}]:
-      no exportTableRole defined, using '#{exportTableRole}' instead."
+      no exportTableRole defined, using '#{viewTableRole}' instead."
   exportTableRole ?= viewTableRole
   
   getPreSelectPipeline ?= -> []
