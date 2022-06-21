@@ -13,6 +13,7 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faSortUp} from '@fortAwesome/free-solid-svg-icons/faSortUp'
 import {faSortDown} from '@fortAwesome/free-solid-svg-icons/faSortDown'
 import {faTrash} from '@fortAwesome/free-solid-svg-icons/faTrash'
+import {faGripVertical} from '@fortAwesome/free-solid-svg-icons/faGripVertical'
 import {DefaultHeader} from './DefaultHeader.coffee'
 
 
@@ -27,24 +28,32 @@ resizableHeaderRenderer = ({onResizeRows, isLastOne}) ->
     onDrag = (e, {deltaX}) ->
       onResizeRows {dataKey, deltaX}
     
-    <React.Fragment key={dataKey}>
-      <div className="ReactVirtualized__Table__headerTruncatedText sort-click-target">
-        {label}{
-          if sortBy is dataKey
-            if sortDirection is 'ASC' then <FontAwesomeIcon icon={faSortUp}/> else <FontAwesomeIcon icon={faSortDown} />
-        }
+    <div className="w-full overflow-hidden flex justify-end items-center h-[34pt] #{if isLastOne then '' else 'border-r-2 border-secondary-300'}" key={dataKey}>
+      <div className="flex-auto flex justify-between sort-click-target">
+        <div className="flex-auto overflow-hidden whitespace-nowrap text-ellipsis sort-click-target">{label}</div>
+        <div className="flex-none text-secondary-400 mr-2 sort-click-target">
+          {
+            if sortBy is dataKey
+              if sortDirection is 'ASC'
+                <FontAwesomeIcon className="sort-click-target" icon={faSortDown}/>
+              else
+                <FontAwesomeIcon className="sort-click-target" icon={faSortUp} />
+          }
+        </div>
       </div>
       {<Draggable
         axis="x"
-        defaultClassName="DragHandle"
-        defaultClassNameDragging="DragHandleActive"
+        defaultClassName="flex-none cursor-col-resize text-secondary-500"
+        defaultClassNameDragging="flex-none cursor-col-resize !text-secondary-200 "
         onDrag={onDrag}
         position={x: 0}
-        zIndex={999}
       >
-        <span/>
+        <FontAwesomeIcon
+          className="mr-2"
+          icon={faGripVertical}
+        />
       </Draggable> unless isLastOne}
-    </React.Fragment>
+    </div>
 
 
 cellRenderer = ({listSchemaBridge, onChangeField, cache, mayEdit}) ->
@@ -193,13 +202,18 @@ export DataTable = ({
   [debouncedResetTrigger, setDebouncedResetTrigger] = useThrottle 0, 30
 
   onResizeRows = ({dataKey, deltaX}) ->
-    prevWidths = columnWidths
-    ratioDeltaX = deltaX / totalColumnsWidth
-    i = _.findIndex columnKeys, (key) -> key is dataKey
-    prevWidths[i] += ratioDeltaX
-    prevWidths[i + 1] -= ratioDeltaX
-    setColumnWidths prevWidths
-    saveColumnWidthsToLocalStorage prevWidths
+    newWidths = [columnWidths...]
+    if dataKey? and deltaX?
+      ratioDeltaX = deltaX / totalColumnsWidth
+      i = _.findIndex columnKeys, (key) -> key is dataKey
+      newWidths[i] += ratioDeltaX
+      newWidths[i + 1] -= ratioDeltaX
+    if _.some newWidths, (w) -> w * totalColumnsWidth < 25
+      newWidths = columnWidths.map (w) -> Math.max w, 25 / totalColumnsWidth
+      sumOfNewWidths = _.sum newWidths
+      newWidths = newWidths.map (w) -> w / sumOfNewWidths
+    setColumnWidths newWidths
+    saveColumnWidthsToLocalStorage newWidths
     setDebouncedResetTrigger debouncedResetTrigger + 1
 
   sort = ({event, defaultSortDirection, sortBy, sortDirection}) ->
@@ -274,7 +288,7 @@ export DataTable = ({
           <Table
             width={contentContainerWidth}
             height={contentContainerHeight - headerContainerHeight - 10}
-            headerHeight={30}
+            headerHeight={34}
             rowHeight={cacheRef.current.rowHeight}
             rowCount={rows?.length ? 0}
             rowGetter={getRow}
