@@ -3,8 +3,6 @@ import {useDebounce} from '@react-hook/debounce'
 
 export SearchInput = ({value, onChange, className}) ->
 
-  className ?= "max-w-[10rem] min-w-[5rem]"
-
   [isValid, setIsValid] = useState true
   [displayValue, setDisplayValue] = useState value
   [debouncedValue, setDebouncedValue] = useDebounce value, 500

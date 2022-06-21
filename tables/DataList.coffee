@@ -28,7 +28,7 @@ export DataList = ({
   listSchemaBridge,
   rows, limit, totalRowCount,
   loadMoreRows = (args...) -> console.log "loadMoreRows default stump called with arguments:", args...
-  useSort, sortColumn, sortDirection,
+  canSort, sortColumn, sortDirection,
   onChangeSort = (args...) -> console.log "onChangeSort default stump called with arguments:", args...
   canSearch, search,
   onChangeSearch = (args...) -> console.log "onChangeSearch default stump called with arguments:", args...
@@ -38,8 +38,7 @@ export DataList = ({
   canEdit, mayEdit,
   onChangeField = (args...) -> console.log "onChangeField default stump called with arguments:", args...
   onRowClick
-  canExport, onExportTable = (args...) -> console.log "onExportTable default stump called with arguments:", args...
-  mayExport
+  canExport, mayExport, onExportTable = (args...) -> console.log "onExportTable default stump called with arguments:", args...
   overscanRowCount = 10
   customComponents = {}
   selectedRowId = null
@@ -114,19 +113,14 @@ export DataList = ({
   <div ref={contentContainerRef} style={height: '100%'} className="bg-white">
   
     <div ref={headerContainerRef}>
-      <Header
-        loadedRowCount={rows?.length}
-        totalRowCount={totalRowCount}
-        canSearch={canSearch}
-        search={search}
-        onChangeSearch={onChangeSearch}
-        canExport={canExport}
-        onExportTable={onExportTable}
-        mayExport={mayExport}
-        canAdd={canAdd}
-        onAdd={onAdd}
-        mayAdd={mayAdd}
-      />
+      <Header {{
+        listSchemaBridge
+        loadedRowCount: rows?.length, totalRowCount
+        canSearch, search, onChangeSearch
+        canExport, mayExport, onExportTable
+        canAdd, mayAdd, onAdd
+        canSort, sortColumn, sortDirection, onChangeSort
+        }...}/>
     </div>
    
       <InfiniteLoader

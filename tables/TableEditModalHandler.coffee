@@ -10,7 +10,7 @@ export TableEditModalHandler = ({tableOptions, DisplayComponent}) ->
     sourceName
     listSchemaBridge, formSchemaBridge
     rows, totalRowCount, loadMoreRows, onRowClick,
-    sortColumn, sortDirection, onChangeSort, useSort
+    canSort, sortColumn, sortDirection, onChangeSort
     canSearch, search, onChangeSearch
     canAdd, mayAdd
     canDelete, mayDelete, onDelete
@@ -101,7 +101,7 @@ export TableEditModalHandler = ({tableOptions, DisplayComponent}) ->
           sourceName
           listSchemaBridge,
           rows, totalRowCount, loadMoreRows, onRowClick,
-          sortColumn, sortDirection, onChangeSort, useSort
+          canSort, sortColumn, sortDirection, onChangeSort
           canSearch, search, onChangeSearch
           canAdd, mayAdd, onAdd
           canDelete, mayDelete, onDelete: handleOnDelete

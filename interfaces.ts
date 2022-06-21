@@ -12,6 +12,7 @@ export interface createTableDataAPIParams {
   formSchema?: SimpleSchema
   canEdit?: boolean
   canSearch?: boolean
+  canSort?: boolean
   canAdd?: boolean
   canDelete?: boolean
   canExport?: boolean
@@ -64,6 +65,7 @@ export interface createTableDataAPIParams {
   debounceDelay?: number
   observers?: Array<any>
   setupNewItem?: () => object
+  showRowCount?: boolean
   checkDisableEditForRow?: boolean
   checkDisableDeleteForRow?: boolean 
 }
@@ -75,6 +77,7 @@ export interface createTableDataAPIReturn {
   rowCountCollection: Mongo.Collection
   canEdit?: boolean
   canSearch?: boolean
+  canSort?: boolean
   canAdd?: boolean
   canDelete?: boolean
   deleteConfirmation?: string
@@ -90,6 +93,7 @@ export interface createTableDataAPIReturn {
   query?: object
   initialSortColumn?: string
   initialSortDirection?: 'ASC' | 'DESC'
+  showRowCount?: boolean
 }
 
 interface additionalDataTableOptions {
@@ -110,8 +114,28 @@ export interface DataTableDisplayOptions {
   loadMoreRows: ({startIndex, stopIndex}: {startIndex: number, stopIndex: number}) => Promise<any>
   sortColumn: string
   sortDirection: 'ASC' | 'DESC'
-  onCangeSort: ({sortColumn, sortDirection}: {sortColumn: string, sortDirection: 'ASC' | 'DESC'}) => void
+  onChangeSort: ({sortColumn, sortDirection}: {sortColumn: string, sortDirection: 'ASC' | 'DESC'}) => void
   search: 'string'
   onChangeSearch: (searchString: string) => void
   onDelete: ({id}: {id: string}) => Promise<any>
+}
+
+export interface DataTableHeaderOptions {
+  listSchemaBridge: object
+  loadedRowCount: number
+  totalRowCount: number
+  canSearch?: boolean
+  search?: string
+  onChangeSearch?: (searchString: string) => void
+  canExport?: boolean
+  mayExport?: boolean
+  onExportTable?: () => void
+  canAdd?: boolean
+  mayAdd?: boolean
+  onAdd?: () => void
+  sortColumn?: string
+  sortDirection?: 'ASC' | 'DESC'
+  onChangeSort:  ({sortColumn, sortDirection}: {sortColumn: string, sortDirection: 'ASC' | 'DESC'}) => void
+  // query?: object
+  // onChangeQuery?: (query: object) => void
 }
