@@ -26,12 +26,13 @@ defaultQuery = {} # ensures equality between runs
   @type {
     (options: {
       dataOptions: DataTableOptions,
+      fileListDataOptions?: DataTableOptions
       DisplayComponent: {(options: DataTableDisplayOptions) => JSX.Element},
       customComponents?: any
     }) => JSX.Element
   }
   ###
-export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponents}) ->
+export MeteorTableDataHandler = ({dataOptions, fileListDataOptions, DisplayComponent, customComponents}) ->
   {
   sourceName, listSchemaBridge,
   rowsCollection, rowCountCollection
@@ -259,5 +260,6 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
       mayExport
       isLoading,
       customComponents
+      fileListDataOptions
     }...} />
   </ErrorBoundary>

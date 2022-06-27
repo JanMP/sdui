@@ -28,6 +28,9 @@ export sourceSchema =
       type: String
     name:
       type: String
+    altName:
+      type: String
+      optional: true
     isCommon:
       type: Boolean
     uploader:

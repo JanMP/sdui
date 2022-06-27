@@ -10,6 +10,7 @@ import {ActionButton} from '../forms/ActionButton.coffee'
 import {faVial} from '@fortawesome/free-solid-svg-icons/faVial'
 import {faFolderOpen} from '@fortawesome/free-solid-svg-icons/faFolderOpen'
 import {faFolderClosed} from '@fortawesome/free-solid-svg-icons/faFolderClosed'
+import {FileSelect} from '../files/FileSelect.coffee'
 import _ from 'lodash'
 
 
@@ -33,6 +34,7 @@ export ContentEditor = (tableOptions) ->
     overscanRowCount
     customComponents
     setupNewItem
+    fileListDataOptions
   } = tableOptions
 
   {Preview, RelatedDataPane, FilePane} = customComponents ? {}
@@ -138,33 +140,22 @@ export ContentEditor = (tableOptions) ->
       {
         if mayEdit and editorOpen
           <LeftResizable size="50%" onResizeEnd={-> editorInstance?.current?.editor?.resize()}>
-            <TopResizable size="20%" onResizeEnd={-> editorInstance?.current?.editor?.resize()}>
-            <Top size="2rem" className="text-sm bg-secondary-200 p-2">Content</Top>
-              <Fill>
+            <TopResizable size="20%" onResizeEnd={-> editorInstance?.current?.editor?.resize()} allowOverflow>
+              <Top size="2rem" className="text-sm bg-secondary-200 p-2" allowOverflow>Content</Top>
+              <Fill allowOverflow>
                 <ErrorBoundary>
-                  <Fill>
+                  <Fill allowOverflow>
                     <Fill onResizeEnd={-> editorInstance?.current?.editor?.resize()}>
-                    {
-                      if FilePane? and filePaneOpen
-                        <FilePane/>
-                      else
-                        <MarkdownEditor
-                          instance={editorInstance}
-                          value={model?[contentKey]}
-                          onChange={setContent}
-                        />
-                    }
+                      <MarkdownEditor
+                        instance={editorInstance}
+                        value={model?[contentKey]}
+                        onChange={setContent}
+                      />
                     </Fill>
                     {
-                      if FilePane?
-                        <Bottom size="2rem" className="border-t-1 border-gray-200">
-                          <div className="border border-t-1 text-xl">
-                            <ActionButton
-                              onAction={toggleFilePaneOpen}
-                              icon={if filePaneOpen then faFolderOpen else faFolderClosed}
-                              className="icon"
-                            />
-                          </div>
+                      if fileListDataOptions?
+                        <Bottom size={55} className="p-1 border border-t-2 border-secondary-300" allowOverflow>
+                          <FileSelect dataOptions={fileListDataOptions} menuPlacement="top"/>
                         </Bottom>
                     }
                   </Fill>
