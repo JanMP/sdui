@@ -263,8 +263,8 @@ getCommonFileListRole, uploadCommonFilesRole}) ->
                 uploader: Meteor.userId()
                 size: size unless thumbnailKey?
                 type: type unless thumbnailKey?
-                url: downloadURLRoot + originalKey
-                thumbnailUrl: if thumbnailKey? then downloadURLRoot + thumbnailKey
+                url: encodeURI downloadURLRoot + originalKey
+                thumbnailUrl: if thumbnailKey? then encodeURI downloadURLRoot + thumbnailKey
                 status: 'requested' unless thumbnailKey?
                 thumbnailStatus: 'requested' if thumbnailKey?
             {uploadUrl, key}
