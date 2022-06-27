@@ -277,10 +277,10 @@ getCommonFileListRole, uploadCommonFilesRole}) ->
       new SimpleSchema
         key:
           type: String
-        statusText:
-          type: String
+        isOk:
+          type: Boolean
       .validator()
-    run: ({key, statusText}) ->
+    run: ({key, isOk}) ->
       switch
         when key.startsWith 'common/'
           currentUserMustBeInRole uploadCommonFilesRole
@@ -288,9 +288,9 @@ getCommonFileListRole, uploadCommonFilesRole}) ->
           currentUserMustBeInRole uploadUserFilesRole
         else
           throw new Meteor.Error "[#{sourceName}.finishUPload key not allowed]"
-      console.log {key, statusText}
+      console.log {key, isOk}
       if Meteor.isServer
-        status = if statusText is 'OK' then 'ok' else 'not-ok'
+        status = if isOk then 'ok' else 'not-ok'
         originalKey = key.replace /\.thumbnail\.png$/, ''
         thumbnailKey = if key.endsWith '.thumbnail.png' then key
         collection.update {key: originalKey},

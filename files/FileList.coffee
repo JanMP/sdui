@@ -32,7 +32,7 @@ send = ({model, sourceName}) ->
         method: "#{sourceName}.finishUpload"
         data:
           key: key
-          statusText: response.statusText
+          isOk: response.ok
     .catch (error) ->
       console.error error
       toast.error "#{error}"
