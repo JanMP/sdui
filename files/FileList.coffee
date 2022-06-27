@@ -7,6 +7,9 @@ import SimpleSchema2Bridge from 'uniforms-bridge-simple-schema-2'
 import {useCurrentUserIsInRole} from '../common/roleChecks.coffee'
 import compact from 'lodash/compact'
 import {FileInputField} from './FileInput.coffee'
+import toStringWithUnitPrefix from '../common/toStringWithUnitPrefix.coffee'
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
+import {faUser} from '@fortAwesome/free-solid-svg-icons/faUser'
 
 SimpleSchema.extendOptions ['sdTable', 'uniforms']
 
@@ -28,6 +31,7 @@ send = ({model, sourceName}) ->
           body: file
       {response, key}
     .then ({response, key}) ->
+      console.log {key, response}
       meteorApply
         method: "#{sourceName}.finishUpload"
         data:
@@ -47,23 +51,18 @@ ListItemContent  = ({rowData}) ->
             <img className="shadow" src={rowData.thumbnailUrl} alt={rowData.name} />
           </div>
         else
-          <div className="h-[100px] w-[150px] bg-gray-200 flex flex-row align-center content-center shadow">
-            <div>{rowData.type or '?'}</div>
+          <div className="h-[100px] w-[150px] bg-secondary-300 flex justify-center items-center">
+            <div className="text-white text-3xl">?</div>
           </div>
       }
     </div>
 
     <div>
       <a href={rowData.url}>
-        <span>{rowData.name}</span>
+        <span className="whitespace-nowrap text-ellipsis" title={rowData.name}>{rowData.name}</span>
       </a>
-      <div className="text-sm">Size: {rowData.size}</div>
-      <div className="text-sm">Type: {rowData.type}</div>
-      <div className="text-sm">
-        {if rowData.isCommon then 'public' else 'private'}
-      </div>
+      <div className="text-sm">{<FontAwesomeIcon icon={faUser}/> unless rowData.isCommon} {rowData.type} {toStringWithUnitPrefix rowData.size, onlyFromE3: true}B</div>
     </div>
-    
   </div>
 
 export FileList = ({dataOptions}) ->
