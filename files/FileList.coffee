@@ -1,45 +1,8 @@
-import React, {useEffect, useState} from 'react'
-import {meteorApply} from '../common/meteorApply.coffee'
-import {toast} from 'react-toastify'
+import React from 'react'
 import {SdList} from '../tables/SdList.coffee'
-import SimpleSchema from 'simpl-schema'
-import SimpleSchema2Bridge from 'uniforms-bridge-simple-schema-2'
-import {useCurrentUserIsInRole} from '../common/roleChecks.coffee'
-import compact from 'lodash/compact'
-import {FileInputField} from './FileInput.coffee'
+import {DefaultHeader} from '../tables/DefaultHeader.coffee'
 import toStringWithUnitPrefix from '../common/toStringWithUnitPrefix.coffee'
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faUser} from '@fortAwesome/free-solid-svg-icons/faUser'
-
-SimpleSchema.extendOptions ['sdTable', 'uniforms']
-
-send = ({model, sourceName}) ->
-  {original, thumbnail} = model.file
-  Promise.allSettled compact([original, thumbnail]).map (file) ->
-    {name, size, type} = file
-    saveAsCommon = model.uploadAs is 'public'
-    meteorApply
-      method: "#{sourceName}.requestUpload"
-      data: {name, size, type, saveAsCommon}
-    .then ({uploadUrl, key}) ->
-      response =
-        await fetch uploadUrl,
-          method: 'PUT'
-          headers:
-            'Content-Type': type
-            'x-amz-acl': 'public-read'
-          body: file
-      {response, key}
-    .then ({response, key}) ->
-      console.log {key, response}
-      meteorApply
-        method: "#{sourceName}.finishUpload"
-        data:
-          key: key
-          isOk: response.ok
-    .catch (error) ->
-      console.error error
-      toast.error "#{error}"
+import {FileUploadButton} from './FileUploadButton.coffee'
 
 
 ListItemContent  = ({rowData}) ->
@@ -66,38 +29,17 @@ ListItemContent  = ({rowData}) ->
   </div>
 
 export FileList = ({dataOptions}) ->
-  {tableDataOptions, roles} = dataOptions
-  {getUserFileListRole, uploadUserFilesRole, getCommonFileListRole, uploadCommonFilesRole} = roles
-  
-  mayUploadCommonFiles = useCurrentUserIsInRole uploadCommonFilesRole
-  mayUploadUserFiles = useCurrentUserIsInRole uploadUserFilesRole
+  {tableDataOptions} = dataOptions
 
-  [files, setFiles] = useState []
-  
-  formSchema = new SimpleSchema
-    file:
-      type: Object
-      uniforms:
-        component: FileInputField
-    'file.original':
-      type: Object
-      blackbox: true
-    'file.thumbnail':
-      type: Object
-      optional: true
-      blackbox: true
-    uploadAs:
-      type: String
-      allowedValues: compact [
-        if mayUploadCommonFiles then 'public'
-        if mayUploadUserFiles then 'private'
-      ]
-  formSchemaBridge = new SimpleSchema2Bridge formSchema
+  Header = (props) ->
+    DefaultHeader {{
+      props...
+      AdditionalButtonsRight: -> <FileUploadButton dataOptions={dataOptions}/>
+    }...}
 
-  onSubmit = (model) ->
-    send {model, sourceName: tableDataOptions.sourceName}
-
-  <SdList
-    dataOptions={{tableDataOptions..., formSchemaBridge, onSubmit}}
-    customComponents={{ListItemContent}}
-  />
+  <>
+    <SdList
+      dataOptions={tableDataOptions}
+      customComponents={{ListItemContent, Header}}
+    />
+  </>

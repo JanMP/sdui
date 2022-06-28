@@ -1,6 +1,7 @@
 import SimpleSchema2Bridge from 'uniforms-bridge-simple-schema-2'
 import {Mongo} from 'meteor/mongo'
 import SimpleSchema from 'simpl-schema'
+import {FC} from React
 
 
 export interface createTableDataAPIParams {
@@ -133,9 +134,12 @@ export interface DataTableHeaderOptions {
   canAdd?: boolean
   mayAdd?: boolean
   onAdd?: () => void
+  canSort?: boolean
   sortColumn?: string
   sortDirection?: 'ASC' | 'DESC'
   onChangeSort:  ({sortColumn, sortDirection}: {sortColumn: string, sortDirection: 'ASC' | 'DESC'}) => void
+  AdditionalButtonsLeft?: FC
+  AdditionalButtonsRight?: FC
   // query?: object
   // onChangeQuery?: (query: object) => void
 }

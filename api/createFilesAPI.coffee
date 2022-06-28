@@ -56,10 +56,6 @@ export sourceSchema =
       type: Date
       optional: true
 
-setupNewItem = ->
-  files: []
-  uploadAs: ''
-
 
 export createFilesAPI = ({
 sourceName, collection
@@ -150,16 +146,15 @@ getCommonFileListRole, uploadCommonFilesRole}) ->
     collection: collection
     viewTableRole: [getCommonFileListRole, getUserFileListRole]
     canEdit: false
-    canAdd: true
-    addRole: [uploadCommonFilesRole, uploadUserFilesRole]
+    canAdd: false # we completely bypass this and build our own
     canDelete: true
     deleteRole: [uploadCommonFilesRole, uploadUserFilesRole]
     canSearch: true
     canExport: false
-    setupNewItem: setupNewItem
     makeDeleteMethodRunFkt: makeDeleteMethodRunFkt
     getPreSelectPipeline: getPreSelectPipeline
 
+  
   if Meteor.isServer
     unless (settings = Meteor.settings[sourceName])?
       throw new Error "Meteor.settings: missing key #{sourceName}"

@@ -19,14 +19,15 @@ export DefaultHeader = ({
   canExport, mayExport, onExportTable,
   canAdd, mayAdd, onAdd
   canSort, sortColumn, sortDirection, onChangeSort
+  AdditionalButtonsLeft = -> null
+  AdditionalButtonsRight = -> null
 }) ->
 
   <div className="flex justify-between p-2 border-b-2 border-secondary-200 flex-wrap gap-2">
     {
       if totalRowCount
         <div className="flex-grow">{loadedRowCount}/{totalRowCount}</div>
-      else
-        <div className="h-0 basis-0 flex-grow"/>
+      else        <div className="h-0 basis-0 flex-grow"/>
     }
     <div className="grow-[20] flex-shrink max-w-[40rem] flex-wrap flex justify-between gap-2">
       {
@@ -50,6 +51,7 @@ export DefaultHeader = ({
     </div>
     <div className="flex-shrink flex-grow text-right">
       <div className="children:m-1">
+        <AdditionalButtonsLeft/>
         {
           if canExport
             <button
@@ -68,6 +70,7 @@ export DefaultHeader = ({
               <FontAwesomeIcon icon={faPlus}/>
             </button>
         }
+        <AdditionalButtonsRight/>
       </div>
     </div>
   </div>

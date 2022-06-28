@@ -13,7 +13,7 @@ DisplayComponent = (tableOptions) ->
   />
 
 ###*
-  @type {({dataOptions, customComponents}: {dataOptions: DataTableOptions, customComponents: any}) => JSX.Element }
+  @type {({dataOptions, customComponents}: {dataOptions: DataTableOptions, customComponents: any}) => React.FC }
   ###
 export SdTable = ({dataOptions, customComponents}) ->
   <MeteorTableDataHandler
