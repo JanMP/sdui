@@ -47,6 +47,7 @@ export MeteorTableDataHandler = ({dataOptions, fileListDataOptions, DisplayCompo
   canSearch
   canSort
   canAdd
+  onAdd
   setupNewItem
   canDelete
   onDelete

@@ -12,7 +12,7 @@ export TableEditModalHandler = ({tableOptions, DisplayComponent}) ->
     rows, totalRowCount, loadMoreRows, onRowClick,
     canSort, sortColumn, sortDirection, onChangeSort
     canSearch, search, onChangeSearch
-    canAdd, mayAdd
+    canAdd, mayAdd, onAdd
     canDelete, mayDelete, onDelete
     canEdit, mayEdit, onSubmit
     autoFormChildren, formDisabled, formReadOnly
@@ -27,7 +27,7 @@ export TableEditModalHandler = ({tableOptions, DisplayComponent}) ->
   } = tableOptions
 
   onRowClick ?= ({rowData, index}) -> console.log 'onRowClick', {rowData, index}
-  onAdd = ->
+  onAdd ?= ->
     newItem = await setupNewItem()
     openModal newItem
 
