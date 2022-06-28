@@ -27,7 +27,8 @@ export DefaultHeader = ({
     {
       if totalRowCount
         <div className="flex-grow">{loadedRowCount}/{totalRowCount}</div>
-      else        <div className="h-0 basis-0 flex-grow"/>
+      else
+        <div className="h-0 basis-0 flex-grow"/>
     }
     <div className="grow-[20] flex-shrink max-w-[40rem] flex-wrap flex justify-between gap-2">
       {

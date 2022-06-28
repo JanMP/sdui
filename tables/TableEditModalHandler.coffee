@@ -55,7 +55,6 @@ export TableEditModalHandler = ({tableOptions, DisplayComponent}) ->
           onDelete {id}
 
   openModal = (formModel) ->
-    console.log {formModel}
     setModel formModel
     setModalOpen true
 

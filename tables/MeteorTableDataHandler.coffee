@@ -250,7 +250,7 @@ export MeteorTableDataHandler = ({dataOptions, fileListDataOptions, DisplayCompo
       rows, totalRowCount, loadMoreRows, onRowClick,
       canSort, sortColumn, sortDirection, onChangeSort
       canSearch, search, onChangeSearch
-      canAdd, mayAdd
+      canAdd, mayAdd, onAdd
       canDelete, mayDelete, onDelete
       canEdit, mayEdit, onSubmit
       setupNewItem
