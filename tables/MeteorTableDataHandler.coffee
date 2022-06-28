@@ -27,9 +27,9 @@ defaultQuery = {} # ensures equality between runs
     (options: {
       dataOptions: DataTableOptions,
       fileListDataOptions?: DataTableOptions
-      DisplayComponent: {(options: DataTableDisplayOptions) => JSX.Element},
+      DisplayComponent: {(options: DataTableDisplayOptions) => React.FileCallback},
       customComponents?: any
-    }) => JSX.Element
+    }) => React.FC
   }
   ###
 export MeteorTableDataHandler = ({dataOptions, fileListDataOptions, DisplayComponent, customComponents}) ->

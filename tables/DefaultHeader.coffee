@@ -10,7 +10,7 @@ import {SortSelect} from './SortSelect.coffee'
   @typedef {import("../interfaces").DataTableHeaderOptions} DataTableHeaderOptions
   ###
 ###*
-  @type {(options: DataTableHeaderOptions) => JSX.Element}
+  @type {(options: DataTableHeaderOptions) => React.FC}
   ###
 export DefaultHeader = ({
   listSchemaBridge
