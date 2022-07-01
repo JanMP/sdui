@@ -4,6 +4,7 @@ import {components} from 'react-select'
 import {meteorApply, currentUserIsInRole} from 'meteor/janmp:sdui'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faUser} from '@fortAwesome/free-solid-svg-icons/faUser'
+import {faTriangleExclamation} from '@fortAwesome/free-solid-svg-icons/faTriangleExclamation'
 import {faClipboardQuestion} from '@fortAwesome/free-solid-svg-icons/faClipboardQuestion'
 import {faImage} from '@fortAwesome/free-solid-svg-icons/faImage'
 import {faLink} from '@fortAwesome/free-solid-svg-icons/faLink'
@@ -16,7 +17,6 @@ export FileSelect = ({dataOptions, menuPlacement}) ->
   [option, setOption] = useState null
   isImage = option?.value?.type?.startsWith?('image')
 
-  console.log currentUserIsInRole 'getCommonFileList'
   promiseOptions = (search) ->
     meteorApply
       method: "#{sourceName}.getRows"
@@ -31,12 +31,13 @@ export FileSelect = ({dataOptions, menuPlacement}) ->
       result.map (file) ->
         key: file._id
         value: file
-        label: file.name
+        label: file.label
+        isCommon: file.isCommon
+        status: file.status
 
   copy = ->
     return unless (value = option?.value)?
-    text = "#{if isImage then '!' else ''}[#{value.alt ? ''}](#{value.url})"
-    console.log text
+    text = "#{if isImage then '!' else ''}[#{value.label ? ''}](#{value.url})"
     navigator.clipboard.writeText text
 
   Option = (props) ->
@@ -44,18 +45,23 @@ export FileSelect = ({dataOptions, menuPlacement}) ->
     <components.Option {props...}>
       <div className="flex gap-4">
         {
-          if value.thumbnailUrl? and value.thumbnailStatus is 'ok'
-            <div className="h-[50px] w-[75px] flex justify-center">
+          if value.thumbnailUrl? and value.status is 'ok'
+            <div className="flex-none w-[100px] h-[65px] flex justify-center">
               <img className="shadow" src={value.thumbnailUrl} alt={value.name} />
             </div>
           else
-            <div className="h-[50] w-[75px] bg-secondary-300 flex justify-center items-center">
+            <div className="flex-none w-[100px] h-[65px] bg-secondary-300 flex justify-center items-center">
               <div className="text-white text-3xl">?</div>
             </div>
         }
-        <div className="">
+        <div>
           <div className="overflow-hidden whitespace-nowrap text-ellipsis" title={value.name}>{value.name}</div>
-          <div className="text-sm">{<FontAwesomeIcon icon={faUser}/> unless value.isCommon} {value.type} {toStringWithUnitPrefix value.size, onlyFromE3: true}B</div>
+          {<div className="text-sm italic text-secondary-600">{value.label}</div> if value.label?}
+          <div className="text-sm">
+            {<FontAwesomeIcon className="text-danger-500 mr-2" icon={faTriangleExclamation}/> unless value.status is 'ok'}
+            {<FontAwesomeIcon className="mr-2" icon={faUser}/> unless value.isCommon}
+            <span>{value.type} {toStringWithUnitPrefix value.size, onlyFromE3: true}B</span>
+          </div>
         </div>
       </div>
     </components.Option>

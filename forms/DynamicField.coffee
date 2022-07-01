@@ -10,7 +10,7 @@ export DynamicField = ({schemaBridge, fieldName, label, value, onChange, validat
   return null unless schemaBridge?.schema? and fieldName?
 
   value ?= null
-  onChange ?= (value) -> console.log 'onChange:', value
+  onChange ?= (value) -> console.log 'stub for onChange:', value
 
   schemaBridgeForFieldName = new SimpleSchema2Bridge schemaBridge.schema?.pick fieldName
 
