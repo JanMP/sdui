@@ -16,6 +16,10 @@ import {faTrash} from '@fortAwesome/free-solid-svg-icons/faTrash'
 import {DefaultListItem} from './DefaultListItem.coffee'
 import {DefaultHeader} from './DefaultHeader.coffee'
 
+peek = (label, fkt) ->
+  (props...) ->
+    console.log label, props...
+    fkt props...
 
 newCache = -> new CellMeasurerCache
   fixedWidth: true

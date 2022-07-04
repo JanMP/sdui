@@ -25,6 +25,7 @@ export interface createTableDataAPIParams {
   query?: object
   initialSortColumn?: string
   initialSortDirection?: 'ASC' | 'DESC'
+  perLoad?: number
   getPreSelectPipeline?: ({pub}?: {pub: object}) => Array<Object>
   getProcessorPipeline?: ({pub}?: {pub: object}) => Array<Object>
   getRowsPipeline?:
@@ -95,10 +96,10 @@ export interface createTableDataAPIReturn {
   initialSortColumn?: string
   initialSortDirection?: 'ASC' | 'DESC'
   showRowCount?: boolean
+  perLoad: number
 }
 
 interface additionalDataTableOptions {
-  perLoad?: number
   onDelete?: ({id: string}) => Promise<any>
   onRowClick?: ({rowData, index}: {rowData: any, index: number}) => void
   autoFormChildren?: [any]

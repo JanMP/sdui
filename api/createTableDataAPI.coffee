@@ -28,6 +28,7 @@ export createTableDataAPI = ({
   debounceDelay
   observers
   query, initialSortColumn, initialSortDirection
+  perLoad,
   setupNewItem
   showRowCount
   checkDisableEditForRow
@@ -43,6 +44,8 @@ export createTableDataAPI = ({
 
   canSearch ?= true
   canSort ?= true
+
+  perLoad ?= 500
 
   if not viewTableRole? and Meteor.isServer
     console.warn "[createTableDataAPI #{sourceName}]:
@@ -129,6 +132,7 @@ export createTableDataAPI = ({
     deleteRole
     exportTableRole
     query, initialSortColumn, initialSortDirection
+    perLoad
     setupNewItem
     showRowCount
   }

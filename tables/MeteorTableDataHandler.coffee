@@ -180,6 +180,7 @@ export MeteorTableDataHandler = ({dataOptions, fileListDataOptions, DisplayCompo
   , [subLoading]
 
   loadMoreRows = ({startIndex, stopIndex}) ->
+    console.log {startIndex, stopIndex, limit}
     if stopIndex >= limit
       setLimit limit + perLoad
     new Promise (res, rej) ->
