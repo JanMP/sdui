@@ -5,13 +5,13 @@ import {meteorApply, currentUserIsInRole} from 'meteor/janmp:sdui'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faUser} from '@fortAwesome/free-solid-svg-icons/faUser'
 import {faTriangleExclamation} from '@fortAwesome/free-solid-svg-icons/faTriangleExclamation'
-import {faClipboardQuestion} from '@fortAwesome/free-solid-svg-icons/faClipboardQuestion'
+import {faFileCircleQuestion} from '@fortAwesome/free-solid-svg-icons/faFileCircleQuestion'
 import {faImage} from '@fortAwesome/free-solid-svg-icons/faImage'
 import {faLink} from '@fortAwesome/free-solid-svg-icons/faLink'
 import toStringWithUnitPrefix from '../common/toStringWithUnitPrefix.coffee'
 
 
-export FileSelect = ({dataOptions, menuPlacement}) ->
+export FileSelect = ({dataOptions, editor, menuPlacement}) ->
   {sourceName} = dataOptions.tableDataOptions
 
   [option, setOption] = useState null
@@ -27,7 +27,6 @@ export FileSelect = ({dataOptions, menuPlacement}) ->
         skip: 0
         sort: key: 1
     .then (result) ->
-      console.log result
       result.map (file) ->
         key: file._id
         value: file
@@ -35,10 +34,12 @@ export FileSelect = ({dataOptions, menuPlacement}) ->
         isCommon: file.isCommon
         status: file.status
 
-  copy = ->
+  insert = ->
+    console.log 'insert'
     return unless (value = option?.value)?
+    console.log value
     text = "#{if isImage then '!' else ''}[#{value.label ? ''}](#{value.url})"
-    navigator.clipboard.writeText text
+    editor?.session?.insert editor?.getCursorPosition(), text
 
   Option = (props) ->
     {value} = props
@@ -69,17 +70,17 @@ export FileSelect = ({dataOptions, menuPlacement}) ->
   IndicatorsContainer = ->
     
     unless option?.value?
-      return <FontAwesomeIcon className="mr-2 text-secondary-300" icon={faClipboardQuestion}/>
+      return <FontAwesomeIcon className="mr-2 text-secondary-300" icon={faFileCircleQuestion}/>
 
     icon = if isImage then faImage else faLink
     
     <button
       className="button primary"
-      onClick={copy}
+      onClick={insert}
       onMouseDown={(e) -> e.stopPropagation()}
     >
       <FontAwesomeIcon icon={icon}/>
-      <span className="ml-2">copy</span>
+      <span className="ml-2">insert</span>
     </button>
 
 

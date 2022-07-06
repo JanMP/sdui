@@ -4,7 +4,7 @@ import {ErrorBoundary} from '../common/ErrorBoundary.coffee'
 import {ConfirmationModal} from '../forms/ConfirmationModal.coffee'
 import {Fill, LeftResizable, BottomResizable, TopResizable, Top, Bottom} from 'react-spaces'
 import {AutoForm} from '../forms/uniforms-custom/select-implementation'
-import {MarkdownEditor} from '../markdown/MarkdownEditor.coffee'
+import {SdEditor} from '../editor/SdEditor.coffee'
 import {MarkdownDisplay} from '../markdown/MarkdownDisplay.coffee'
 import {ActionButton} from '../forms/ActionButton.coffee'
 import {faVial} from '@fortawesome/free-solid-svg-icons/faVial'
@@ -34,7 +34,6 @@ export ContentEditor = (tableOptions) ->
     overscanRowCount
     customComponents
     setupNewItem
-    fileListDataOptions
   } = tableOptions
 
   {Preview, RelatedDataPane, FilePane} = customComponents ? {}
@@ -139,26 +138,15 @@ export ContentEditor = (tableOptions) ->
       </LeftResizable>
       {
         if mayEdit and editorOpen
-          <LeftResizable size="50%" onResizeEnd={-> editorInstance?.current?.editor?.resize()}>
-            <TopResizable size="20%" onResizeEnd={-> editorInstance?.current?.editor?.resize()} allowOverflow>
+          <LeftResizable size="50%">
+            <TopResizable size="20%">
               <Top size="2rem" className="text-sm bg-secondary-200 p-2" allowOverflow>Content</Top>
               <Fill allowOverflow>
                 <ErrorBoundary>
-                  <Fill allowOverflow>
-                    <Fill onResizeEnd={-> editorInstance?.current?.editor?.resize()}>
-                      <MarkdownEditor
-                        instance={editorInstance}
-                        value={model?[contentKey]}
-                        onChange={setContent}
-                      />
-                    </Fill>
-                    {
-                      if fileListDataOptions?
-                        <Bottom size={55} className="p-1 border border-t-2 border-secondary-300" allowOverflow>
-                          <FileSelect dataOptions={fileListDataOptions} menuPlacement="top"/>
-                        </Bottom>
-                    }
-                  </Fill>
+                  <SdEditor
+                    value={model?[contentKey]}
+                    onChange={setContent}
+                  />
                 </ErrorBoundary>
               </Fill>
             </TopResizable>
