@@ -26,12 +26,13 @@ defaultQuery = {} # ensures equality between runs
   @type {
     (options: {
       dataOptions: DataTableOptions,
-      DisplayComponent: {(options: DataTableDisplayOptions) => JSX.Element},
+      fileListDataOptions?: DataTableOptions
+      DisplayComponent: {(options: DataTableDisplayOptions) => React.FileCallback},
       customComponents?: any
-    }) => JSX.Element
+    }) => React.FC
   }
   ###
-export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponents}) ->
+export MeteorTableDataHandler = ({dataOptions, fileListDataOptions, DisplayComponent, customComponents}) ->
   {
   sourceName, listSchemaBridge,
   rowsCollection, rowCountCollection
@@ -46,6 +47,7 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
   canSearch
   canSort
   canAdd
+  onAdd
   setupNewItem
   canDelete
   onDelete
@@ -178,6 +180,7 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
   , [subLoading]
 
   loadMoreRows = ({startIndex, stopIndex}) ->
+    console.log {startIndex, stopIndex, limit}
     if stopIndex >= limit
       setLimit limit + perLoad
     new Promise (res, rej) ->
@@ -248,7 +251,7 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
       rows, totalRowCount, loadMoreRows, onRowClick,
       canSort, sortColumn, sortDirection, onChangeSort
       canSearch, search, onChangeSearch
-      canAdd, mayAdd
+      canAdd, mayAdd, onAdd
       canDelete, mayDelete, onDelete
       canEdit, mayEdit, onSubmit
       setupNewItem
@@ -259,5 +262,6 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
       mayExport
       isLoading,
       customComponents
+      fileListDataOptions
     }...} />
   </ErrorBoundary>

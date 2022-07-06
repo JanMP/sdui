@@ -5,7 +5,7 @@ import 'ace-builds/src-noconflict/mode-markdown'
 import 'ace-builds/src-noconflict/theme-chrome'
 
 ###*
-  @type {({value, onChange, editorWidth, editorHeight, instance} : {value: string, onChange: (newValue: string) => void, editorWidth?: string, editorHeight?: string, instance: any})  => JSX.Element}
+  @type {({value, onChange, editorWidth, editorHeight, instance} : {value: string, onChange: (newValue: string) => void, editorWidth?: string, editorHeight?: string, instance: any})  => React.FC}
   ###
 export MarkdownEditor = ({value = '', onChange, editorWidth = "100%", editorHeight = "100%", instance}) ->
 

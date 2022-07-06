@@ -3,7 +3,7 @@ import SimpleSchema from 'simpl-schema'
 import {ValidatedMethod} from 'meteor/mdg:validated-method'
 import {currentUserMustBeInRole, currentUserIsInRole, userWithIdIsInRole} from '../common/roleChecks.coffee'
 import {createTableDataAPI} from './createTableDataAPI.coffee'
-import {FileInput} from '../files/FileInput.coffee'
+import {FileInputField} from '../files/FileInput.coffee'
 import compact from 'lodash/compact'
 
 getSignedUrl = null
@@ -13,7 +13,6 @@ PutObjectCommand = null
 DeleteObjectCommand = null
 
 if Meteor.isServer
-  console.log('import stuff')
   `import presigner from '@aws-sdk/s3-request-presigner'
   import clientS3 from '@aws-sdk/client-s3'`
   {getSignedUrl} = presigner
@@ -28,6 +27,9 @@ export sourceSchema =
       type: String
     name:
       type: String
+    label:
+      type: String
+      optional: true
     isCommon:
       type: Boolean
     uploader:
@@ -44,18 +46,13 @@ export sourceSchema =
       optional: true
     status:
       type: String
-      allowedValues: ['requested', 'ok', 'not-ok']
-    thumbnailStatus:
-      type: String
-      optional: true
-      allowedValues: ['requested', 'ok', 'not-ok']
-    fetchDate:
-      type: Date
-      optional: true
+      allowedValues: ['upload-requested', 'ok', 'not-ok']
 
-setupNewItem = ->
-  files: []
-  uploadAs: ''
+
+fileInfo = new SimpleSchema
+  name: String
+  size: Number
+  type: String
 
 
 export createFilesAPI = ({
@@ -125,7 +122,7 @@ getCommonFileListRole, uploadCommonFilesRole}) ->
             $and: [
               isCommon: false
               uploader:
-                userId ? Meteor.userId() 'this is not a valid userId'
+                userId ? 'this is not a valid userId'
             ]
           false #make sure array isn't empty
         ]
@@ -147,16 +144,15 @@ getCommonFileListRole, uploadCommonFilesRole}) ->
     collection: collection
     viewTableRole: [getCommonFileListRole, getUserFileListRole]
     canEdit: false
-    canAdd: true
-    addRole: [uploadCommonFilesRole, uploadUserFilesRole]
+    canAdd: false # we completely bypass this and build our own
     canDelete: true
     deleteRole: [uploadCommonFilesRole, uploadUserFilesRole]
     canSearch: true
     canExport: false
-    setupNewItem: setupNewItem
     makeDeleteMethodRunFkt: makeDeleteMethodRunFkt
     getPreSelectPipeline: getPreSelectPipeline
 
+  
   if Meteor.isServer
     unless (settings = Meteor.settings[sourceName])?
       throw new Error "Meteor.settings: missing key #{sourceName}"
@@ -236,69 +232,75 @@ getCommonFileListRole, uploadCommonFilesRole}) ->
     name: "#{sourceName}.requestUpload"
     validate:
       new SimpleSchema
-        name: String
-        size: Number
-        type: String
-        saveAsCommon:
-          type: Boolean
+        file: Object
+        'file.file':
+          type: fileInfo
+        'file.thumbnail':
+          type: Object
+          blackbox: true
+        label:
+          type: String
           optional: true
+        listingScope:
+          type: String
+          allowedValues: ['public', 'private']
       .validator()
-    run: ({name, size, type, saveAsCommon}) ->
-      if saveAsCommon
+    run: ({file, label, listingScope}) ->
+      if (isCommon = listingScope is 'public')
         currentUserMustBeInRole uploadCommonFilesRole
-      else
+      if listingScope is 'private'
         currentUserMustBeInRole uploadUserFilesRole
-      if Meteor.isServer
-        prefix = if saveAsCommon then 'common/' else "#{Meteor.userId()}/"
-        key = prefix + name
-        getUploadUrl {key, type}
-          .then (uploadUrl) ->
-            originalKey = key.replace /\.thumbnail\.png$/, ''
-            thumbnailKey = if key.endsWith '.thumbnail.png' then key
-            collection.upsert {key: originalKey},
-              $set:
-                key: originalKey
-                name: name unless thumbnailKey?
-                isCommon: saveAsCommon
-                uploader: Meteor.userId()
-                size: size unless thumbnailKey?
-                type: type unless thumbnailKey?
-                url: downloadURLRoot + originalKey
-                thumbnailUrl: if thumbnailKey? then downloadURLRoot + thumbnailKey
-                status: 'requested' unless thumbnailKey?
-                thumbnailStatus: 'requested' if thumbnailKey?
-            {uploadUrl, key}
-          .catch (error) -> throw error
+      return unless Meteor.isServer
+
+      hasThumbnail = file.thumbnail.name?
+      
+      prefix = if listingScope is 'public' then 'common/' else "#{Meteor.userId()}/"
+      fileKey = prefix + file.file.name
+      thumbnailKey = if hasThumbnail then prefix + file.thumbnail.name else null
+
+      {name, size, type} = file.file
+
+      fileUploadUrl =
+        await getUploadUrl
+          key: fileKey
+          type: type
+      thumbnailUploadUrl =
+        await if hasThumbnail
+          getUploadUrl
+            key: thumbnailKey
+            type: file.thumbnail.type
+
+      console.log 'requesting upload', fileKey
+
+      collection.upsert {key: fileKey},
+        $set:
+          key: fileKey
+          thumbnailKey: thumbnailKey
+          name: name
+          label: label ? ''
+          isCommon: isCommon
+          uploader: Meteor.userId()
+          size: size
+          type: type
+          url: encodeURI downloadURLRoot + fileKey
+          thumbnailUrl: if thumbnailKey? then encodeURI downloadURLRoot + thumbnailKey else null
+          status: 'upload-requested'
+
+      {fileKey, fileUploadUrl, thumbnailUploadUrl}
 
 
   new ValidatedMethod
     name: "#{sourceName}.finishUpload"
     validate:
       new SimpleSchema
-        key:
-          type: String
-        statusText:
-          type: String
+        key: String
+        isOK: Boolean
       .validator()
-    run: ({key, statusText}) ->
-      switch
-        when key.startsWith 'common/'
-          currentUserMustBeInRole uploadCommonFilesRole
-        when key.startsWith "#{Meteor.userId()}/"
-          currentUserMustBeInRole uploadUserFilesRole
-        else
-          throw new Meteor.Error "[#{sourceName}.finishUPload key not allowed]"
-      console.log {key, statusText}
+    run: ({key, isOK}) ->
       if Meteor.isServer
-        status = if statusText is 'OK' then 'ok' else 'not-ok'
-        originalKey = key.replace /\.thumbnail\.png$/, ''
-        thumbnailKey = if key.endsWith '.thumbnail.png' then key
-        collection.update {key: originalKey},
+        collection.update {key, uploader: Meteor.userId()},
           $set:
-            if thumbnailKey?
-              thumbnailStatus: status
-            else
-              status: status
+            status: if isOK then 'ok' else 'not-ok'
   
   new ValidatedMethod
     name: "#{sourceName}.deleteObject"
@@ -321,7 +323,7 @@ getCommonFileListRole, uploadCommonFilesRole}) ->
         keysToDelete = []
         if entry.status is 'ok'
           keysToDelete.push key
-        if entry.thumbnailStatus is 'ok'
+        if entry.thumbnailUrl?
           keysToDelete.push key + '.thumbnail.png'
         Promise.allSettled keysToDelete.map (k) -> deleteObject key:k
         .then ->

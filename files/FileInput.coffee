@@ -18,17 +18,14 @@ generateThumbnail = ({file, maxW, maxH}) ->
 
   new Promise (resolve, reject) ->
     reader.onload = (e) ->
-      console.log 'one'
       img = new Image()
       img.onload = ->
-        console.log 'two'
         scaleRatio = (Math.min maxW, maxH) / (Math.max img.width, img.height)
         canvas.width = w = img.width * scaleRatio
         canvas.height = h = img.height * scaleRatio
         ctx.clearRect 0, 0, w, h
         ctx.drawImage img, 0, 0, w, h
         canvas.toBlob (blob) ->
-          console.log 'three'
           unless blob?
             reject 'could not create blob'
           resolve new File [blob], file.name + '.thumbnail.png', type: 'image/png'
@@ -61,9 +58,9 @@ props...}) ->
       .catch console.error
     generateThumbnail {file, maxW: 150, maxH: 100}
       .then (thumbnail) ->
-        onChange {original: file, thumbnail}
+        onChange {file, thumbnail}
       .catch ->
-        onChange {original: file, thumbnail: null}
+        onChange {file, thumbnail: null}
 
   onError = (e) -> setPreview null
 

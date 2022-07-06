@@ -12,7 +12,7 @@ export TableEditModalHandler = ({tableOptions, DisplayComponent}) ->
     rows, totalRowCount, loadMoreRows, onRowClick,
     canSort, sortColumn, sortDirection, onChangeSort
     canSearch, search, onChangeSearch
-    canAdd, mayAdd
+    canAdd, mayAdd, onAdd
     canDelete, mayDelete, onDelete
     canEdit, mayEdit, onSubmit
     autoFormChildren, formDisabled, formReadOnly
@@ -26,12 +26,12 @@ export TableEditModalHandler = ({tableOptions, DisplayComponent}) ->
     customComponents
   } = tableOptions
 
-  onRowClick ?= ({rowData, index}) -> console.log 'onRowClick', {rowData, index}
-  onAdd = ->
+  onRowClick ?= ({rowData, index}) -> console.log 'stub for onRowClick', {rowData, index}
+  onAdd ?= ->
     newItem = await setupNewItem()
     openModal newItem
 
-  loadEditorData ?= ({id}) -> console.log "loadEditorData id: #{id}"
+  loadEditorData ?= ({id}) -> console.log "stub for loadEditorData id: #{id}"
 
   [modalOpen, setModalOpen] = useState false
   [model, setModel] = useState {}
@@ -47,7 +47,6 @@ export TableEditModalHandler = ({tableOptions, DisplayComponent}) ->
       -> console.error 'handleOnDelete has been called despite canDelete false'
     else
       ({id}) ->
-        console.log 'handleOnDelete'
         if deleteConfirmation?
           setIdForConfirmationModal id
           setConfirmationModalOpen true
@@ -55,7 +54,6 @@ export TableEditModalHandler = ({tableOptions, DisplayComponent}) ->
           onDelete {id}
 
   openModal = (formModel) ->
-    console.log {formModel}
     setModel formModel
     setModalOpen true
 

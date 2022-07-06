@@ -1,6 +1,7 @@
 import SimpleSchema2Bridge from 'uniforms-bridge-simple-schema-2'
 import {Mongo} from 'meteor/mongo'
 import SimpleSchema from 'simpl-schema'
+import {FC} from React
 
 
 export interface createTableDataAPIParams {
@@ -24,6 +25,7 @@ export interface createTableDataAPIParams {
   query?: object
   initialSortColumn?: string
   initialSortDirection?: 'ASC' | 'DESC'
+  perLoad?: number
   getPreSelectPipeline?: ({pub}?: {pub: object}) => Array<Object>
   getProcessorPipeline?: ({pub}?: {pub: object}) => Array<Object>
   getRowsPipeline?:
@@ -94,10 +96,10 @@ export interface createTableDataAPIReturn {
   initialSortColumn?: string
   initialSortDirection?: 'ASC' | 'DESC'
   showRowCount?: boolean
+  perLoad: number
 }
 
 interface additionalDataTableOptions {
-  perLoad?: number
   onDelete?: ({id: string}) => Promise<any>
   onRowClick?: ({rowData, index}: {rowData: any, index: number}) => void
   autoFormChildren?: [any]
@@ -133,9 +135,12 @@ export interface DataTableHeaderOptions {
   canAdd?: boolean
   mayAdd?: boolean
   onAdd?: () => void
+  canSort?: boolean
   sortColumn?: string
   sortDirection?: 'ASC' | 'DESC'
   onChangeSort:  ({sortColumn, sortDirection}: {sortColumn: string, sortDirection: 'ASC' | 'DESC'}) => void
+  AdditionalButtonsLeft?: FC
+  AdditionalButtonsRight?: FC
   // query?: object
   // onChangeQuery?: (query: object) => void
 }

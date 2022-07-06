@@ -4,12 +4,13 @@ import {ErrorBoundary} from '../common/ErrorBoundary.coffee'
 import {ConfirmationModal} from '../forms/ConfirmationModal.coffee'
 import {Fill, LeftResizable, BottomResizable, TopResizable, Top, Bottom} from 'react-spaces'
 import {AutoForm} from '../forms/uniforms-custom/select-implementation'
-import {MarkdownEditor} from '../markdown/MarkdownEditor.coffee'
+import {SdEditor} from '../editor/SdEditor.coffee'
 import {MarkdownDisplay} from '../markdown/MarkdownDisplay.coffee'
 import {ActionButton} from '../forms/ActionButton.coffee'
 import {faVial} from '@fortawesome/free-solid-svg-icons/faVial'
 import {faFolderOpen} from '@fortawesome/free-solid-svg-icons/faFolderOpen'
 import {faFolderClosed} from '@fortawesome/free-solid-svg-icons/faFolderClosed'
+import {FileSelect} from '../files/FileSelect.coffee'
 import _ from 'lodash'
 
 
@@ -137,37 +138,15 @@ export ContentEditor = (tableOptions) ->
       </LeftResizable>
       {
         if mayEdit and editorOpen
-          <LeftResizable size="50%" onResizeEnd={-> editorInstance?.current?.editor?.resize()}>
-            <TopResizable size="20%" onResizeEnd={-> editorInstance?.current?.editor?.resize()}>
-            <Top size="2rem" className="text-sm bg-secondary-200 p-2">Content</Top>
-              <Fill>
+          <LeftResizable size="50%">
+            <TopResizable size="20%">
+              <Top size="2rem" className="text-sm bg-secondary-200 p-2" allowOverflow>Content</Top>
+              <Fill allowOverflow>
                 <ErrorBoundary>
-                  <Fill>
-                    <Fill onResizeEnd={-> editorInstance?.current?.editor?.resize()}>
-                    {
-                      if FilePane? and filePaneOpen
-                        <FilePane/>
-                      else
-                        <MarkdownEditor
-                          instance={editorInstance}
-                          value={model?[contentKey]}
-                          onChange={setContent}
-                        />
-                    }
-                    </Fill>
-                    {
-                      if FilePane?
-                        <Bottom size="2rem" className="border-t-1 border-gray-200">
-                          <div className="border border-t-1 text-xl">
-                            <ActionButton
-                              onAction={toggleFilePaneOpen}
-                              icon={if filePaneOpen then faFolderOpen else faFolderClosed}
-                              className="icon"
-                            />
-                          </div>
-                        </Bottom>
-                    }
-                  </Fill>
+                  <SdEditor
+                    value={model?[contentKey]}
+                    onChange={setContent}
+                  />
                 </ErrorBoundary>
               </Fill>
             </TopResizable>

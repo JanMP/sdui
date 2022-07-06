@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react'
 import {useDebounce} from '@react-hook/debounce'
 
-export SearchInput = ({value, onChange, className}) ->
+export SearchInput = ({value, onChange, className = 'search-input'}) ->
 
   [isValid, setIsValid] = useState true
   [displayValue, setDisplayValue] = useState value
