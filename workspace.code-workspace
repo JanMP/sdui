@@ -5,6 +5,9 @@
 		},
 		{
 			"path": "../../sdui-dev"
+		},
+		{
+			"path": "../sdui-queryeditor"
 		}
 	],
 	"settings": {
