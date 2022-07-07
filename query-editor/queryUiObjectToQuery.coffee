@@ -2,7 +2,7 @@ import {Meteor} from 'meteor/meteor'
 import {Mongo} from 'meteor/mongo'
 # import {CodeListen} from '/imports/api/CodeListen'
 
-export default queryUiObjectToQuery = ({queryUiObject, getList}) ->
+export default ({queryUiObject, getList}) ->
 
   getList ?= ({subject, predicate, object}) -> []
 
@@ -34,7 +34,9 @@ export default queryUiObjectToQuery = ({queryUiObject, getList}) ->
         result =
           "#{subject}":
             "#{predicate}": object.value
-        if predicate is '$regex' then object ?= ''
+        if predicate is '$regex'
+          unless object.value? and (try (new RegExp object.value)?)
+           result = {}
         if predicate is '$regex' and obj.content.ignoreCase then result[subject]['$options'] = 'i'
         result
       else

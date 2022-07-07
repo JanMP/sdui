@@ -10,6 +10,7 @@ import {useCurrentUserIsInRole} from '../common/roleChecks.coffee'
 import {getColumnsToExport} from '../common/getColumnsToExport.coffee'
 import Papa from 'papaparse'
 import {downloadAsFile} from '../common/downloadAsFile.coffee'
+import queryUiObjectToQuery from '../query-editor/queryUiObjectToQuery.coffee'
 import _ from 'lodash'
 
 
@@ -36,7 +37,6 @@ export MeteorTableDataHandler = ({dataOptions, fileListDataOptions, DisplayCompo
   {
   sourceName, listSchemaBridge,
   rowsCollection, rowCountCollection
-  query = defaultQuery
   initialSortColumn
   initialSortDirection
   perLoad
@@ -46,6 +46,7 @@ export MeteorTableDataHandler = ({dataOptions, fileListDataOptions, DisplayCompo
   formSchemaBridge
   canSearch
   canSort
+  canQuery
   canAdd
   onAdd
   setupNewItem
@@ -95,7 +96,23 @@ export MeteorTableDataHandler = ({dataOptions, fileListDataOptions, DisplayCompo
   [sortDirection, setSortDirection] = useState initialSortDirection
   
   [search, setSearch] = useState ''
-  # [debouncedSearch, setDebouncedSearch] = useDebounce '', 1000
+  
+  [query, setQuery] = useState defaultQuery
+
+  onChangeQueryUiObject = (queryUiObject) ->
+    newQuery =
+      try
+        queryUiObjectToQuery {queryUiObject}
+      catch error
+        console.error error
+        {}
+    console.log JSON.stringify newQuery, null, 2
+    setQuery newQuery
+
+
+  useEffect ->
+    console.log JSON.stringify query, null, 2
+  , [query]
 
   mayEdit = useCurrentUserIsInRole editRole
   mayAdd = useCurrentUserIsInRole addRole
@@ -129,7 +146,7 @@ export MeteorTableDataHandler = ({dataOptions, fileListDataOptions, DisplayCompo
     .catch console.error
 
   useEffect ->
-    if query?
+    if query? # handle this
       getTotalRowCount()
     return
   , [search, query, sourceName]
@@ -251,6 +268,7 @@ export MeteorTableDataHandler = ({dataOptions, fileListDataOptions, DisplayCompo
       rows, totalRowCount, loadMoreRows, onRowClick,
       canSort, sortColumn, sortDirection, onChangeSort
       canSearch, search, onChangeSearch
+      canQuery, onChangeQueryUiObject
       canAdd, mayAdd, onAdd
       canDelete, mayDelete, onDelete
       canEdit, mayEdit, onSubmit

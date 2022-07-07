@@ -1,7 +1,8 @@
 import React, {useEffect} from 'react'
-import {DynamicField} from 'meteor/janmp:sdui'
+import {DynamicField} from '../forms/DynamicField.coffee'
 import {SimpleSchema2Bridge as Bridge} from 'uniforms-bridge-simple-schema-2'
 # import CodeListenSelect from '../parts/SearchQueryField'
+import {ErrorBoundary} from '../common/ErrorBoundary.coffee'
 
 import SimpleSchema from 'simpl-schema'
 import Select from 'react-select'
@@ -11,7 +12,7 @@ import PartIndex from './PartIndex'
 import _ from 'lodash'
 
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faTrash} from '@fortawesome/free-solid-svg-icons'
+import {faTimes} from '@fortawesome/free-solid-svg-icons'
 
 
 regexSchema =
@@ -119,45 +120,56 @@ export QuerySentenceEditor = React.memo ({rule, partIndex, bridge, path, onChang
   , [subjectFitsContext]
 
   SentenceForm =
-    <div style={display: 'flex'}>
-      <div>
-        <div className="inline" style={display: 'flex'}>
-          <div className="flex-grow">
-            <Select
-              value={subject}
-              options={subjectSelectOptions}
-              onChange={changeSubject}
-              name="subject"
-            />
-          </div>
-          <div className="flex-grow">
-            <Select
-              value={rule.content.predicate?.value}
-              options={predicateSelectOptions}
-              onChange={changePredicate}
-              name="predicate"
-            />
+    <ErrorBoundary>
+      <div className="flex">
+        <div>
+          <div className="flex inline">
+            <div className="flex-grow">
+              <ErrorBoundary>
+                <Select
+                  className="p-2"
+                  value={_.find subjectSelectOptions, value: subject}
+                  options={subjectSelectOptions}
+                  onChange={changeSubject}
+                  name="subject"
+                />
+              </ErrorBoundary>
+            </div>
+            <div className="flex-grow">
+              <ErrorBoundary>
+                <Select
+                  className="p-2"
+                  value={_.find predicateSelectOptions, value: rule.content.predicate?.value}
+                  options={predicateSelectOptions}
+                  onChange={changePredicate}
+                  name="predicate"
+                />
+              </ErrorBoundary>
+            </div>
           </div>
         </div>
+        <div>
+          <ErrorBoundary>
+            <DynamicField
+              className="-m-1"
+              schemaBridge={autoFormSchemaBridge}
+              fieldName={objectPath}
+              label={false}
+              value={object}
+              onChange={changeObject}
+              mayEdit={true}
+            />
+          </ErrorBoundary>
+        </div>
       </div>
-      <div>
-        <DynamicField
-          schemaBridge={autoFormSchemaBridge}
-          fieldName={objectPath}
-          label={false}
-          value={object}
-          onChange={changeObject}
-          mayEdit={true}
-        />
-      </div>
-    </div>
+    </ErrorBoundary>
 
 
-  <div className="query-sentence" style={display: 'flex', justifyContent: 'space-between'}>
+  <div className="overflow-visible flex justify-between bg-white rounded mb-2 | query-sentence">
     {if canDisplay then SentenceForm}
-    <div style={flexGrow: 0, flexShrink: 1, marginLeft: '1rem'}>
-      <button onClick={onRemove}>
-        <FontAwesomeIcon icon={faTrash}/>
+    <div className="p-2">
+      <button className="icon secondary" onClick={onRemove}>
+        <FontAwesomeIcon icon={faTimes}/>
       </button>
     </div>
   </div>

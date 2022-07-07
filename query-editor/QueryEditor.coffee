@@ -7,9 +7,7 @@ import PartIndex from './PartIndex'
 import _ from 'lodash'
 
 
-export QueryEditor = React.memo ({schema, rule, path, onChange}) ->
-
-  bridge = new Bridge schema, ->
+export QueryEditor = React.memo ({bridge, rule, path, onChange}) ->
 
   path ?= ''
   rule ?= getNewBlock {bridge, path, type: 'logicBlock'}
@@ -37,7 +35,7 @@ export QueryEditor = React.memo ({schema, rule, path, onChange}) ->
     onChange theRule
 
 
-  <div className="query-editor">
+  <div className="overflow-visible query-editor">
     <QueryBlockEditor
       rule={rule}
       partIndex={new PartIndex()}

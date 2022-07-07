@@ -22,6 +22,7 @@ export ContentEditor = (tableOptions) ->
     rows, totalRowCount, loadMoreRows, onRowClick,
     canSort, sortColumn, sortDirection, onChangeSort
     canSearch, search, onChangeSearch
+    canQuery, onChangeQueryUiObject
     canAdd, mayAdd, onAdd
     canDelete, mayDelete, onDelete, deleteConfirmation
     canEdit, mayEdit, onSubmit
@@ -123,6 +124,7 @@ export ContentEditor = (tableOptions) ->
             rows, totalRowCount, loadMoreRows, onRowClick,
             canSort, sortColumn, sortDirection, onChangeSort
             canSearch, search, onChangeSearch
+            canQuery, onChangeQueryUiObject
             canAdd, mayAdd, onAdd
             canDelete, mayDelete, onDelete: handleOnDelete
             canEdit, mayEdit

@@ -8,7 +8,7 @@ import {getNewSentence, getNewBlock} from './queryEditorHelpers'
 import _ from 'lodash'
 import PartIndex from './PartIndex'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faFilter, faFolder, faFile, faTrash} from '@fortawesome/free-solid-svg-icons'
+import {faFilter, faFolder, faFile, faTimes} from '@fortawesome/free-solid-svg-icons'
 
 
 export QueryBlockEditor = React.memo ({rule, partIndex, bridge, path, onChange, onRemove, onMove, isRoot}) ->
@@ -32,11 +32,11 @@ export QueryBlockEditor = React.memo ({rule, partIndex, bridge, path, onChange, 
   useEffect ->
     c =
       switch conjunction
-        when '$and' then 'and'
-        when '$or' then 'or'
-        when '$nor' then 'nor'
+        when '$and' then 'bg-warning-200'
+        when '$or' then 'bg-ok-200'
+        when '$nor' then 'bg-danger-200'
         else
-          'folder'
+          'bg-secondary-200'
     setBlockTypeClass c
     return
   , [conjunction]
@@ -113,57 +113,49 @@ export QueryBlockEditor = React.memo ({rule, partIndex, bridge, path, onChange, 
 
 
   if isBlock
-    <>
-      <div className={"query-block #{blockTypeClass}"}>
-        <div className="block-header"
-          style={
-            display: 'flex'
-            justifyContent: 'space-between'
-          }
-        >
-          <div className="flex-grow">
-            <Select
-              value={conjunction}
-              options={conjunctionSelectOptions}
-              onChange={changeConjunction}
-              name="conjunction"
-            />
-          </div>
-          <div>
-            <button
-              className="icon-button"
-              onClick={addLogicBlock}
-            >
-              <FontAwesomeIcon icon={faFilter}/>
-            </button>
-            <button
-              className="icon-button"
-              onClick={addContextBlock}
-              disabled={not childHasContextConjunctionSelectOptions}
-            >
-              <FontAwesomeIcon icon={faFolder}/>
-            </button>
-            <button
-              className="icon-button"
-              onClick={addSentence}
-              disabled={not childWouldHaveSubject}
-            >
-              <FontAwesomeIcon icon={faFile}/>
-            </button>
-            {
-              <button
-                className="icon-button"
-                style={marginLeft: '5px'}
-                onClick={onRemove}
-              >
-                <FontAwesomeIcon icon={faTrash}/>
-              </button> unless isRoot
-            }
-          </div>
+    <div className="overflow-visible pt-3 pl-3 pb-1 #{if isRoot then 'pr-3' else 'pr-1'} rounded #{blockTypeClass}">
+      <div className="flex justify-between | block-header">
+        <div className="flex-grow">
+          <Select
+            value={_.find conjunctionSelectOptions, value: conjunction}
+            options={conjunctionSelectOptions}
+            onChange={changeConjunction}
+            name="conjunction"
+          />
         </div>
-        <div>{children}</div>
+        <div>
+          <button
+            className="icon secondary"
+            onClick={addLogicBlock}
+          >
+            <FontAwesomeIcon icon={faFilter}/>
+          </button>
+          <button
+            className="icon secondary"
+            onClick={addContextBlock}
+            disabled={not childHasContextConjunctionSelectOptions}
+          >
+            <FontAwesomeIcon icon={faFolder}/>
+          </button>
+          <button
+            className="icon secondary"
+            onClick={addSentence}
+            disabled={not childWouldHaveSubject}
+          >
+            <FontAwesomeIcon icon={faFile}/>
+          </button>
+          {
+            <button
+              className="icon secondary"
+              onClick={onRemove}
+            >
+              <FontAwesomeIcon icon={faTimes}/>
+            </button> unless isRoot
+          }
+        </div>
       </div>
-    </>
+      <div className="mt-2 pl-2">{children}</div>
+    </div>
   else if rule.type is 'sentence'
     <QuerySentenceEditor
       rule={rule}

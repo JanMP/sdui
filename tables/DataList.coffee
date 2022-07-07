@@ -36,6 +36,7 @@ export DataList = ({
   onChangeSort = (args...) -> console.log "onChangeSort default stump called with arguments:", args...
   canSearch, search,
   onChangeSearch = (args...) -> console.log "onChangeSearch default stump called with arguments:", args...
+  canQuery, onChangeQueryUiObject
   isLoading
   canAdd, mayAdd, onAdd = (args...) -> console.log "onAdd default stump called with arguments:", args...
   canDelete, mayDelete, onDelete = (args...) -> console.log "onDelete default stump called with arguments:", args...
@@ -121,6 +122,7 @@ export DataList = ({
         listSchemaBridge
         loadedRowCount: rows?.length, totalRowCount
         canSearch, search, onChangeSearch
+        canQuery, onChangeQueryUiObject
         canExport, mayExport, onExportTable
         canAdd, mayAdd, onAdd
         canSort, sortColumn, sortDirection, onChangeSort
