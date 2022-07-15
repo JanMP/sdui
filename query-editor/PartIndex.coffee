@@ -20,10 +20,11 @@ export default class PartIndex
     other.str.startsWith @str
   partOf: (rule) ->
     getPart = (part, arr) ->
+      console.log {part, arr}
       myArr = [arr...]
-      if myArr.length > 0 and part.type is 'block'
+      if myArr.length > 0 and part.type isnt 'sentence'
         index = myArr.shift()
         getPart part.content[index], myArr
       else
         part
-    getPart rule, @arr[1..]
+    getPart rule, @arr

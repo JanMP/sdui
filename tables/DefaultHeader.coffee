@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faPlus} from '@fortAwesome/free-solid-svg-icons/faPlus'
 import {faFileDownload} from '@fortAwesome/free-solid-svg-icons/faFileDownload'
@@ -31,6 +31,12 @@ export DefaultHeader = ({
   [rule, setRule] = useState null
 
   toggleQueryEditor = -> setShowQueryEditor (x) -> not x
+
+  useEffect ->
+    unless showQueryEditor
+      setRule null
+      onChangeQueryUiObject null
+  , [showQueryEditor]
 
   onChangeRule = (newRule) ->
     setRule newRule

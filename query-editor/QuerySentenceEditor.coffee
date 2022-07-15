@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react'
+import React, {useState, useEffect} from 'react'
 import {DynamicField} from '../forms/DynamicField.coffee'
 import {SimpleSchema2Bridge as Bridge} from 'uniforms-bridge-simple-schema-2'
 # import CodeListenSelect from '../parts/SearchQueryField'
@@ -13,6 +13,8 @@ import _ from 'lodash'
 
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faTimes} from '@fortawesome/free-solid-svg-icons'
+
+import {useDrag} from 'react-dnd'
 
 
 regexSchema =
@@ -36,7 +38,7 @@ shouldDeleteObject = ({oldPredicate, newPredicate}) ->
   not ((both isList) or (both isOther) or ((isOther oldPredicate) and isRegex newPredicate))
 
 
-export QuerySentenceEditor = React.memo ({rule, partIndex, bridge, path, onChange, onRemove}) ->
+export QuerySentenceEditor = ({rule, partIndex, bridge, path, onChange, onRemove}) ->
     
   subjectSelectOptions = getSubjectSelectOptions {bridge, path}
   haveContext = subjectSelectOptions.length > 0
@@ -44,9 +46,26 @@ export QuerySentenceEditor = React.memo ({rule, partIndex, bridge, path, onChang
     _.some subjectSelectOptions, value: rule.content.subject?.value
   canDisplay = haveContext and subjectFitsContext
 
+  [shouldEraseMyself, setShouldEraseMyself] = useState false
+
+
+  [{isDragging}, drag, dragPreview] = useDrag ->
+    type: 'rule'
+    item: _.cloneDeep rule
+    end: (item, monitor) ->
+      if monitor.didDrop()
+        if monitor.getDropResult()?.dropEffect is 'move'
+          onRemove()
+
+    
+
+    collect: (monitor) ->
+      isDragging: monitor.isDragging()
+
   # if we can't display anything usefull we just get ourselves erased
   useEffect ->
     unless canDisplay
+      console.log "can't display", rule
       onRemove()
     return
   , [canDisplay]
@@ -61,13 +80,11 @@ export QuerySentenceEditor = React.memo ({rule, partIndex, bridge, path, onChang
   # selectOptionsForValue = (d) -> _(d.options).find value: d?.value
 
   changeSubject = (d) ->
-    console.log d
     returnRule (r) ->
       r.content.object.value = null
       r.content.subject = d
 
   changePredicate = (d) ->
-    console.log d
     returnRule (r) ->
       r.content.predicate = d
       if shouldDeleteObject oldPredicate: predicate,  newPredicate: d
@@ -121,51 +138,54 @@ export QuerySentenceEditor = React.memo ({rule, partIndex, bridge, path, onChang
 
   SentenceForm =
     <ErrorBoundary>
-      <div className="flex">
-        <div>
-          <div className="flex inline">
-            <div className="flex-grow">
-              <ErrorBoundary>
-                <Select
-                  className="p-2"
-                  value={_.find subjectSelectOptions, value: subject}
-                  options={subjectSelectOptions}
-                  onChange={changeSubject}
-                  name="subject"
-                />
-              </ErrorBoundary>
-            </div>
-            <div className="flex-grow">
-              <ErrorBoundary>
-                <Select
-                  className="p-2"
-                  value={_.find predicateSelectOptions, value: rule.content.predicate?.value}
-                  options={predicateSelectOptions}
-                  onChange={changePredicate}
-                  name="predicate"
-                />
-              </ErrorBoundary>
+      <div>
+        <div className="flex">
+          <div>
+            <div className="flex inline">
+              <div className="flex-grow">
+                <ErrorBoundary>
+                  <Select
+                    className="p-2"
+                    value={_.find subjectSelectOptions, value: subject}
+                    options={subjectSelectOptions}
+                    onChange={changeSubject}
+                    name="subject"
+                  />
+                </ErrorBoundary>
+              </div>
+              <div className="flex-grow">
+                <ErrorBoundary>
+                  <Select
+                    className="p-2"
+                    value={_.find predicateSelectOptions, value: rule.content.predicate?.value}
+                    options={predicateSelectOptions}
+                    onChange={changePredicate}
+                    name="predicate"
+                  />
+                </ErrorBoundary>
+              </div>
             </div>
           </div>
+          <div>
+            <ErrorBoundary>
+              <DynamicField
+                className="-m-1"
+                schemaBridge={autoFormSchemaBridge}
+                fieldName={objectPath}
+                label={false}
+                value={object}
+                onChange={changeObject}
+                mayEdit={true}
+              />
+            </ErrorBoundary>
+          </div>
         </div>
-        <div>
-          <ErrorBoundary>
-            <DynamicField
-              className="-m-1"
-              schemaBridge={autoFormSchemaBridge}
-              fieldName={objectPath}
-              label={false}
-              value={object}
-              onChange={changeObject}
-              mayEdit={true}
-            />
-          </ErrorBoundary>
-        </div>
+        {<pre>{JSON.stringify {path, partIndex: partIndex.str}, null, 2}</pre> if false}
       </div>
     </ErrorBoundary>
 
 
-  <div className="overflow-visible flex justify-between bg-white rounded mb-2 | query-sentence">
+  <div ref={drag} className="overflow-visible flex justify-between bg-white rounded mb-2 | query-sentence">
     {if canDisplay then SentenceForm}
     <div className="p-2">
       <button className="icon secondary" onClick={onRemove}>

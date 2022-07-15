@@ -10,11 +10,16 @@ import PartIndex from './PartIndex'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faFilter, faFolder, faFile, faTimes} from '@fortawesome/free-solid-svg-icons'
 
+import {useDrop} from 'react-dnd'
 
-export QueryBlockEditor = React.memo ({rule, partIndex, bridge, path, onChange, onRemove, onMove, isRoot}) ->
+
+export QueryBlockEditor = React.memo ({rule, partIndex, bridge, path, onChange, onRemove, onAddAfter, isRoot}) ->
   
   isRoot ?= false
   partIndex ?= ''
+
+  onRemove ?= ->
+  onAddAfter ?= ->
  
   # data handling
   myContext = rule.conjunction?.context
@@ -28,6 +33,16 @@ export QueryBlockEditor = React.memo ({rule, partIndex, bridge, path, onChange, 
   conjunction = rule?.conjunction?.value ? null
   
   [blockTypeClass, setBlockTypeClass] = useState ''
+
+  [{canDrop, isOver}, drop] = useDrop ->
+    accept: 'fnord'
+    drop: (item, monitor) ->
+      unless monitor.didDrop()
+        console.log 'drop', {item}
+        addPart item
+    collect: (monitor) ->
+      isOver: monitor.isOver()
+      canDrop: monitor.canDrop()
 
   useEffect ->
     c =
@@ -55,8 +70,10 @@ export QueryBlockEditor = React.memo ({rule, partIndex, bridge, path, onChange, 
     cantGetInnerPathType = true
 
   useEffect ->
-    if cantGetInnerPathType then onRemove()
-    return
+    if cantGetInnerPathType
+      console.log 'cantGetInnerPathType', rule
+      onRemove()
+      return
   , [cantGetInnerPathType]
 
   childHasContextConjunctionSelectOptions =
@@ -84,11 +101,12 @@ export QueryBlockEditor = React.memo ({rule, partIndex, bridge, path, onChange, 
 
   addSentence = -> returnRule (r) -> r.content.push getNewSentence {bridge, path: innerPath}
 
-  addPart = (index) -> (d) -> returnRule (r) -> r.content.splice index, 0, d
+  addPart = (d) ->
+    console.log "addRule", d
+    returnRule (r) -> r.content.push d
 
-  #drag and drop
-  acceptDrop = (monitor) ->
-    not partIndex.isDescendantOf monitor.getItem().partIndex
+  addPartAfter = (index) -> (d) -> returnRule (r) -> r.content.splice index, 0, d
+
 
   atTop =
     isBlock and rule.content.length > 0
@@ -107,13 +125,13 @@ export QueryBlockEditor = React.memo ({rule, partIndex, bridge, path, onChange, 
           path={innerPath}
           onChange={changePart index}
           onRemove={removePart index}
-          onMove={onMove}
+          onAddAfter={addPartAfter index}
         />
       </div>
 
 
   if isBlock
-    <div className="overflow-visible pt-3 pl-3 pb-1 #{if isRoot then 'pr-3' else 'pr-1'} rounded #{blockTypeClass}">
+    <div ref={drop} className="overflow-visible pt-3 pl-3 pb-1 #{if isRoot then 'pr-3' else 'pr-1'} rounded #{blockTypeClass}">
       <div className="flex justify-between | block-header">
         <div className="flex-grow">
           <Select
@@ -155,6 +173,7 @@ export QueryBlockEditor = React.memo ({rule, partIndex, bridge, path, onChange, 
         </div>
       </div>
       <div className="mt-2 pl-2">{children}</div>
+      {<pre>{JSON.stringify {path,partIndex: partIndex.str}, null, 2}</pre> if false}
     </div>
   else if rule.type is 'sentence'
     <QuerySentenceEditor
@@ -164,5 +183,5 @@ export QueryBlockEditor = React.memo ({rule, partIndex, bridge, path, onChange, 
       path={innerPath}
       onChange={onChange}
       onRemove={onRemove}
-      onMove={onMove}
+      onAddAfter={onAddAfter}
     />

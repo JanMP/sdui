@@ -43,6 +43,9 @@ export default ({queryUiObject, getList}) ->
         throw new Meteor.Error 'invalid-object-type'
 
   unless queryUiObject?
+    return {}
+
+  unless queryUiObject?
     throw new Meteor.Error 'missing-queryUiObject'
   unless queryUiObject.content?
     throw new Meteor.Error 'missing-queryUiObject-content'

@@ -1,6 +1,5 @@
 import React, {useEffect, useState, useRef} from "react"
 import {AutoTableAutoField} from "./AutoTableAutoField.coffee"
-import {SearchInput} from "./SearchInput.coffee"
 import {List, CellMeasurer, CellMeasurerCache,InfiniteLoader} from 'react-virtualized'
 import Draggable from 'react-draggable'
 import {useDebounce} from '@react-hook/debounce'
