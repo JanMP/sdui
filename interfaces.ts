@@ -79,6 +79,7 @@ export interface createTableDataAPIReturn {
   rowCountCollection: Mongo.Collection
   canEdit?: boolean
   canSearch?: boolean
+  canUseQueryEditor?: boolean
   canSort?: boolean
   canAdd?: boolean
   canDelete?: boolean
@@ -106,6 +107,7 @@ interface additionalDataTableOptions {
   formDisabled?: boolean
   formReadOnly?: boolean
   loadEditorData?: ({id: string}) => Promise<any>
+  queryUiObject?: object
 }
 
 export type DataTableOptions = createTableDataAPIReturn & additionalDataTableOptions
@@ -129,6 +131,9 @@ export interface DataTableHeaderOptions {
   canSearch?: boolean
   search?: string
   onChangeSearch?: (searchString: string) => void
+  canUseQueryEditor?: boolean
+  queryUiObject?: object
+  onChangeQueryUiObject: (queryUiObject: object) => void
   canExport?: boolean
   mayExport?: boolean
   onExportTable?: () => void

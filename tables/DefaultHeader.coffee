@@ -18,7 +18,7 @@ export DefaultHeader = ({
   listSchemaBridge
   loadedRowCount, totalRowCount
   canSearch, search, onChangeSearch
-  canQuery, onChangeQueryUiObject
+  canUseQueryEditor, onChangeQueryUiObject
   canExport, mayExport, onExportTable,
   canAdd, mayAdd, onAdd
   canSort, sortColumn, sortDirection, onChangeSort
@@ -70,7 +70,7 @@ export DefaultHeader = ({
             </div>
         }
         {
-          if true
+          if canUseQueryEditor
             <button
               className="icon secondary"
               onClick={toggleQueryEditor} disabled={not true}

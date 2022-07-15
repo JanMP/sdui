@@ -10,11 +10,11 @@ import {useCurrentUserIsInRole} from '../common/roleChecks.coffee'
 import {getColumnsToExport} from '../common/getColumnsToExport.coffee'
 import Papa from 'papaparse'
 import {downloadAsFile} from '../common/downloadAsFile.coffee'
-import queryUiObjectToQuery from '../query-editor/queryUiObjectToQuery.coffee'
 import _ from 'lodash'
 
 
 defaultQuery = {} # ensures equality between runs
+defaultQueryUiObject = {}
 
 ###*
   @typedef {import("../interfaces").DataTableOptions} DataTableOptions
@@ -22,13 +22,12 @@ defaultQuery = {} # ensures equality between runs
 ###*
   @typedef {import("../interfaces").DataTableDisplayOptions} DataTableDisplayOptions
   ###
-
 ###*
   @type {
     (options: {
       dataOptions: DataTableOptions,
       fileListDataOptions?: DataTableOptions
-      DisplayComponent: {(options: DataTableDisplayOptions) => React.FileCallback},
+      DisplayComponent: {(options: DataTableDisplayOptions) : React.FC},
       customComponents?: any
     }) => React.FC
   }
@@ -46,7 +45,8 @@ export MeteorTableDataHandler = ({dataOptions, fileListDataOptions, DisplayCompo
   formSchemaBridge
   canSearch
   canSort
-  canQuery
+  canUseQueryEditor
+  query = {}
   canAdd
   onAdd
   setupNewItem
@@ -96,23 +96,19 @@ export MeteorTableDataHandler = ({dataOptions, fileListDataOptions, DisplayCompo
   [sortDirection, setSortDirection] = useState initialSortDirection
   
   [search, setSearch] = useState ''
-  
-  [query, setQuery] = useState defaultQuery
 
-  onChangeQueryUiObject = (queryUiObject) ->
-    newQuery =
-      try
-        queryUiObjectToQuery {queryUiObject}
-      catch error
-        console.error error
-        {}
-    console.log JSON.stringify newQuery, null, 2
-    setQuery newQuery
+  [queryUiObject, setQueryUiObject] = useState defaultQueryUiObject
 
+  onChangeQueryUiObject = setQueryUiObject
+    # newQuery =
+    #   try
+    #     queryUiObjectToQuery {queryUiObject}
+    #   catch error
+    #     console.error error
+    #     {}
+    # console.log JSON.stringify newQuery, null, 2
+    # setQuery newQuery
 
-  useEffect ->
-    console.log JSON.stringify query, null, 2
-  , [query]
 
   mayEdit = useCurrentUserIsInRole editRole
   mayAdd = useCurrentUserIsInRole addRole
@@ -127,7 +123,7 @@ export MeteorTableDataHandler = ({dataOptions, fileListDataOptions, DisplayCompo
     setIsLoading true
     meteorApply
       method: getRowMethodName
-      data: {search, query, sort, limit, skip}
+      data: {search, query, queryUiObject, sort, limit, skip}
     .then (returnedRows) ->
       setRows returnedRows
       setIsLoading false
@@ -140,7 +136,7 @@ export MeteorTableDataHandler = ({dataOptions, fileListDataOptions, DisplayCompo
     return if usePubSub
     meteorApply
       method: getRowCountMethodName
-      data: {search, query}
+      data: {search, query, queryUiObject}
     .then (result) ->
       setTotalRowCount result?[0]?.count or 0
     .catch console.error
@@ -149,18 +145,18 @@ export MeteorTableDataHandler = ({dataOptions, fileListDataOptions, DisplayCompo
     if query? # handle this
       getTotalRowCount()
     return
-  , [search, query, sourceName]
+  , [search, query, queryUiObject, sourceName]
 
   useEffect ->
     setLimit perLoad
     return
-  , [search, query, sortColumn, sortDirection, sourceName]
+  , [search, query, queryUiObject, sortColumn, sortDirection, sourceName]
 
   skip = 0
 
   subLoading = useTracker ->
     return unless usePubSub
-    handle = Meteor.subscribe rowPublicationName, {search, query, sort, skip, limit}
+    handle = Meteor.subscribe rowPublicationName, {search, query, queryUiObject, sort, skip, limit}
     not handle.ready()
   
   useEffect ->
@@ -170,7 +166,7 @@ export MeteorTableDataHandler = ({dataOptions, fileListDataOptions, DisplayCompo
   countSubLoading = useTracker ->
     return unless showRowCount
     return unless usePubSub
-    handle = Meteor.subscribe rowCountPublicationName, {query, search}
+    handle = Meteor.subscribe rowCountPublicationName, {query, queryUiObject, search}
     not handle.ready()
 
   subRowCount = useTracker ->
@@ -184,7 +180,7 @@ export MeteorTableDataHandler = ({dataOptions, fileListDataOptions, DisplayCompo
 
   subRows = useTracker ->
     return unless usePubSub
-    rowsCollection.find(query, {sort, limit}).fetch()
+    rowsCollection.find(query, {sort, limit}).fetch() # TODO prevent overfetching for queryUiObject
 
   useEffect ->
     unless _.isEqual subRows, rows
@@ -248,7 +244,7 @@ export MeteorTableDataHandler = ({dataOptions, fileListDataOptions, DisplayCompo
     if canExport
       meteorApply
         method: exportRowsMethodName
-        data: {search, query, sort}
+        data: {search, query, queryUiObject, sort}
       .then (rows) ->
         toast.success "Exportdaten vom Server erhalten"
         Papa.unparse rows, columns: getColumnsToExport schema: listSchemaBridge.schema
@@ -268,7 +264,7 @@ export MeteorTableDataHandler = ({dataOptions, fileListDataOptions, DisplayCompo
       rows, totalRowCount, loadMoreRows, onRowClick,
       canSort, sortColumn, sortDirection, onChangeSort
       canSearch, search, onChangeSearch
-      canQuery, onChangeQueryUiObject
+      canUseQueryEditor, queryUiObject, onChangeQueryUiObject
       canAdd, mayAdd, onAdd
       canDelete, mayDelete, onDelete
       canEdit, mayEdit, onSubmit

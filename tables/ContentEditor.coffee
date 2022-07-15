@@ -14,6 +14,14 @@ import {FileSelect} from '../files/FileSelect.coffee'
 import _ from 'lodash'
 
 
+###*
+  @typedef {import("../interfaces").DataTableDisplayOptions} DataTableDisplayOptions
+  ###
+###*
+  @type {
+    (options: DataTableDisplayOptions) => React.FC
+  }
+  ###
 export ContentEditor = (tableOptions) ->
 
   {
@@ -22,11 +30,11 @@ export ContentEditor = (tableOptions) ->
     rows, totalRowCount, loadMoreRows, onRowClick,
     canSort, sortColumn, sortDirection, onChangeSort
     canSearch, search, onChangeSearch
-    canQuery, onChangeQueryUiObject
+    canUseQueryEditor, queryUiObject, onChangeQueryUiObject
     canAdd, mayAdd, onAdd
     canDelete, mayDelete, onDelete, deleteConfirmation
     canEdit, mayEdit, onSubmit
-    autoFormChildren, formDisabled, formReadOnly
+    autoFormChildren, formDisabled
     loadEditorData
     onChangeField,
     canExport, onExportTable
@@ -124,7 +132,7 @@ export ContentEditor = (tableOptions) ->
             rows, totalRowCount, loadMoreRows, onRowClick,
             canSort, sortColumn, sortDirection, onChangeSort
             canSearch, search, onChangeSearch
-            canQuery, onChangeQueryUiObject
+            canUseQueryEditor, queryUiObject, onChangeQueryUiObject
             canAdd, mayAdd, onAdd
             canDelete, mayDelete, onDelete: handleOnDelete
             canEdit, mayEdit
