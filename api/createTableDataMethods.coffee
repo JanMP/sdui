@@ -58,12 +58,15 @@ checkDisableDeleteForRow, checkDisableEditForRow}) ->
         query:
           type: Object
           blackbox: true
+        queryUiObject:
+          type: Object
+          blackbox: true
       .validator()
-    run: ({search, query}) ->
+    run: ({search, query, queryUiObject}) ->
       currentUserMustBeInRole viewTableRole
       if Meteor.isServer
         collection.rawCollection()
-        .aggregate getRowCountPipeline {search, query}
+        .aggregate getRowCountPipeline {search, query, queryUiObject}
         .toArray()
         .catch (error) ->
           console.error "#{sourceName}.getCount", error
@@ -78,6 +81,10 @@ checkDisableDeleteForRow, checkDisableEditForRow}) ->
         query:
           type: Object
           blackbox: true
+        queryUiObject:
+          type: Object
+          blackbox: true
+          optional: true
         sort:
           type: Object
           required: false
@@ -85,11 +92,11 @@ checkDisableDeleteForRow, checkDisableEditForRow}) ->
         limit: Number
         skip: Number
       .validator()
-    run: ({search, query, sort, limit, skip}) ->
+    run: ({search, query, queryUiObject, sort, limit, skip}) ->
       currentUserMustBeInRole viewTableRole
       if Meteor.isServer
         collection.rawCollection()
-        .aggregate getRowsPipeline {search, query, sort, limit, skip},
+        .aggregate getRowsPipeline {search, query, queryUiObject, sort, limit, skip},
           allowDiskUse: true
         .toArray()
         .catch (error) ->
@@ -106,16 +113,20 @@ checkDisableDeleteForRow, checkDisableEditForRow}) ->
           query:
             type: Object
             blackbox: true
+          queryUiObject:
+            type: Object
+            blackbox: true
+            optional: true
           sort:
             type: Object
             required: false
             blackbox: true
         .validator()
-      run: ({search, query, sort}) ->
+      run: ({search, query, queryUiObject, sort}) ->
         currentUserMustBeInRole exportTableRole
         if Meteor.isServer
           collection.rawCollection()
-          .aggregate getExportPipeline {search, query, sort},
+          .aggregate getExportPipeline {search, query, queryUiObject, sort},
             allowDiskUse: true
           .toArray()
           .catch (error) ->

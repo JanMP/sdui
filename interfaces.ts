@@ -13,6 +13,7 @@ export interface createTableDataAPIParams {
   formSchema?: SimpleSchema
   canEdit?: boolean
   canSearch?: boolean
+  canUseQueryEditor?: boolean
   canSort?: boolean
   canAdd?: boolean
   canDelete?: boolean

@@ -2,7 +2,9 @@ import {Meteor} from 'meteor/meteor'
 import {Mongo} from 'meteor/mongo'
 # import {CodeListen} from '/imports/api/CodeListen'
 
+#TODO organise data flow for getList
 export default ({queryUiObject, getList}) ->
+
 
   getList ?= ({subject, predicate, object}) -> []
 
@@ -45,10 +47,8 @@ export default ({queryUiObject, getList}) ->
   unless queryUiObject?
     return {}
 
-  unless queryUiObject?
-    throw new Meteor.Error 'missing-queryUiObject'
   unless queryUiObject.content?
-    throw new Meteor.Error 'missing-queryUiObject-content'
+    return {}
   
   try
     traverseTree queryUiObject

@@ -18,7 +18,7 @@ export createTableDataAPI = ({
   sourceName, sourceSchema, collection
   useObjectIds
   listSchema, formSchema
-  canEdit, canSearch, canSort, canAdd, canDelete, canExport
+  canEdit, canSearch, canUseQueryEditor, canSort, canAdd, canDelete, canExport
   viewTableRole, editRole, addRole, deleteRole, exportTableRole
   getPreSelectPipeline
   getProcessorPipeline,
@@ -44,6 +44,7 @@ export createTableDataAPI = ({
 
   canSearch ?= true
   canSort ?= true
+  canUseQueryEditor ?= true
 
   perLoad ?= 500
 
@@ -123,6 +124,7 @@ export createTableDataAPI = ({
     canEdit
     canSearch
     canSort
+    canUseQueryEditor
     canAdd
     canDelete
     canExport
