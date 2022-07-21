@@ -5,6 +5,17 @@ import {ErrorBoundary} from '../common/ErrorBoundary.coffee'
 import {ConfirmationModal} from '../forms/ConfirmationModal.coffee'
 import {FormModal} from '../forms/FormModal.coffee'
 
+###*
+  @typedef {import("../interfaces").DataTableDisplayOptions} DataTableDisplayOptions
+  ###
+###*
+  @type {
+    (options: {
+      tableOptions: DataTableDisplayOptions
+      DisplayComponent: {(options: DataTableDisplayOptions): React.FC}
+    }) => React.FC
+  }
+  ###
 export TableEditModalHandler = ({tableOptions, DisplayComponent}) ->
   {
     sourceName
@@ -12,6 +23,7 @@ export TableEditModalHandler = ({tableOptions, DisplayComponent}) ->
     rows, totalRowCount, loadMoreRows, onRowClick,
     canSort, sortColumn, sortDirection, onChangeSort
     canSearch, search, onChangeSearch
+    canUseQueryEditor, queryUiObject, onChangeQueryUiObject,
     canAdd, mayAdd, onAdd
     canDelete, mayDelete, onDelete
     canEdit, mayEdit, onSubmit
@@ -101,6 +113,7 @@ export TableEditModalHandler = ({tableOptions, DisplayComponent}) ->
           rows, totalRowCount, loadMoreRows, onRowClick,
           canSort, sortColumn, sortDirection, onChangeSort
           canSearch, search, onChangeSearch
+          canUseQueryEditor, queryUiObject, onChangeQueryUiObject
           canAdd, mayAdd, onAdd
           canDelete, mayDelete, onDelete: handleOnDelete
           canEdit, mayEdit

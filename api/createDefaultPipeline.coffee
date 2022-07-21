@@ -1,5 +1,10 @@
 import {getColumnsToExport} from '../common/getColumnsToExport.coffee'
+import processSearchInput from '../common/processSearchInput.coffee'
+import queryUiObjectToQuery from '../query-editor/queryUiObjectToQuery.coffee'
+
+
 import _ from 'lodash'
+
 
 export createDefaultPipeline = ({getPreSelectPipeline, getProcessorPipeline, listSchema}) ->
 
@@ -7,21 +12,37 @@ export createDefaultPipeline = ({getPreSelectPipeline, getProcessorPipeline, lis
   getProcessorPipeline ?= ({pub}) -> []
 
   searchPipeline = ({search}) ->
-    if search? and search isnt ''
-      keys = listSchema._firstLevelSchemaKeys.filter (key) -> not listSchema._schema[key].sdTable?.hide
-      fieldSearches = keys.map (key) ->
-        switch listSchema.getQuickTypeForKey key
-          when 'string', 'stringArray'
+    unless search? or search is ''
+      return []
+
+    {isValidRegEx, flags, processedString} = processSearchInput search
+
+    parts = if isValidRegEx then [] else (_.compact processedString.split ' ') ? []
+    regexOptions = if isValidRegEx then flags else 'i'
+
+
+    generateQueryPart = (op) ->
+      if parts.length > 1
+        $and: parts.map op
+      else op processedString
+
+    keys = listSchema._firstLevelSchemaKeys.filter (key) -> not listSchema._schema[key].sdTable?.hide
+    fieldSearches = keys.map (key) ->
+      switch listSchema.getQuickTypeForKey key
+        when 'string', 'stringArray'
+          generateQueryPart (part) ->
             "#{key}":
-              $regex: search
-              $options: 'i'
-          when 'number'
+              $regex: part
+              $options: regexOptions
+        when 'number'
+          generateQueryPart (part) ->
             $expr:
               $regexMatch:
                 input: $toString: "$#{key}"
-                regex: search
-                options: 'i'
-          when 'numberArray'
+                regex: part
+                options: regexOptions
+        when 'numberArray'
+          generateQueryPart (part) ->
             $and: [
               "#{key}": $exists: true
             ,
@@ -32,14 +53,15 @@ export createDefaultPipeline = ({getPreSelectPipeline, getProcessorPipeline, lis
                     in:
                       $regexMatch:
                         input: $toString: '$$this'
-                        regex: search
-                        options: 'i'
-            ]
-          else null
-      [$match: $or: _.compact fieldSearches]
-    else
-      []
+                        regex: part
+                        options: regexOptions
+              ]
+        else null
 
+    [$match: $or: _.compact fieldSearches]
+
+
+  getQueryEditorPipeline = ({queryUiObject}) -> [$match: queryUiObjectToQuery {queryUiObject}]
 
   projectStage =
     $project:
@@ -47,22 +69,36 @@ export createDefaultPipeline = ({getPreSelectPipeline, getProcessorPipeline, lis
       .keyBy (key) -> key
       .mapValues -> 1
       .value()
-  
-  defaultGetRowsPipeline = ({pub, search, query = {}, sort = {_id: 1}, limit = 100, skip = 0}) ->
-    [getPreSelectPipeline({pub})...,
-    {$match: query},
-    getProcessorPipeline({pub})...,
-    (searchPipeline {search})...,
-    {$sort: sort}, {$skip: skip}, {$limit: limit}]
-  
-  defaultGetRowCountPipeline = ({pub, search, query = {}}) ->
-    [getPreSelectPipeline({pub})...,
-    {$match: query}, getProcessorPipeline({pub})..., (searchPipeline {search})...,
-    {$count: 'count'}, $addFields: _id: "count"]
 
-  defaultGetExportPipeline = ({search, query = {}, sort = {_id: 1}}) ->
-    [getPreSelectPipeline()...,
-    {$match: query}, getProcessorPipeline()..., (searchPipeline {search})...,
+  defaultGetRowsPipeline = ({pub, search, query = {}, queryUiObject, sort = {_id: 1}, limit = 100, skip = 0}) ->
+    [
+      getPreSelectPipeline({pub})...,
+      {$match: query},
+      getProcessorPipeline({pub})...,
+      getQueryEditorPipeline({queryUiObject})...
+      (searchPipeline {search})...,
+     {$sort: sort}, {$skip: skip}, {$limit: limit}
+    ]
+
+  defaultGetRowCountPipeline = ({pub, search, query = {}, queryUiObject}) ->
+    [
+      getPreSelectPipeline({pub})...,
+      {$match: query},
+      getProcessorPipeline({pub})...,
+      getQueryEditorPipeline({queryUiObject})...
+      (searchPipeline {search})...,
+      {$count: 'count'},
+      $addFields: _id: "count"
+    ]
+
+
+  defaultGetExportPipeline = ({search, query = {}, queryUiObject,  sort = {_id: 1}}) ->
+    [
+      getPreSelectPipeline()...,
+      {$match: query},
+      getProcessorPipeline()...,
+      getQueryEditorPipeline({queryUiObject})...
+      (searchPipeline {search})...,
     {$sort: sort}, projectStage]
 
   {defaultGetRowsPipeline, defaultGetRowCountPipeline, defaultGetExportPipeline}

@@ -1,6 +1,5 @@
 import React, {useEffect, useState, useRef} from "react"
 import {AutoTableAutoField} from "./AutoTableAutoField.coffee"
-import {SearchInput} from "./SearchInput.coffee"
 import {List, CellMeasurer, CellMeasurerCache,InfiniteLoader} from 'react-virtualized'
 import Draggable from 'react-draggable'
 import {useDebounce} from '@react-hook/debounce'
@@ -36,6 +35,7 @@ export DataList = ({
   onChangeSort = (args...) -> console.log "onChangeSort default stump called with arguments:", args...
   canSearch, search,
   onChangeSearch = (args...) -> console.log "onChangeSearch default stump called with arguments:", args...
+  canUseQueryEditor, queryUiObject, onChangeQueryUiObject
   isLoading
   canAdd, mayAdd, onAdd = (args...) -> console.log "onAdd default stump called with arguments:", args...
   canDelete, mayDelete, onDelete = (args...) -> console.log "onDelete default stump called with arguments:", args...
@@ -121,6 +121,7 @@ export DataList = ({
         listSchemaBridge
         loadedRowCount: rows?.length, totalRowCount
         canSearch, search, onChangeSearch
+        canUseQueryEditor, onChangeQueryUiObject, queryUiObject
         canExport, mayExport, onExportTable
         canAdd, mayAdd, onAdd
         canSort, sortColumn, sortDirection, onChangeSort

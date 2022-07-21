@@ -10,10 +10,10 @@ getRowsPipeline, getRowCountPipeline, debounceDelay = 500, observers})  ->
     unless collection?
       throw new Error 'no collection given'
 
-    Meteor.publish "#{sourceName}.rows", ({search, query, sort, limit, skip}) ->
+    Meteor.publish "#{sourceName}.rows", ({search, query, queryUiObject, sort, limit, skip}) ->
       return @ready() unless userWithIdIsInRole id: @userId, role: viewTableRole
       @autorun (computation) ->
-        pipeline = getRowsPipeline {pub: this, search, query, sort, limit, skip}
+        pipeline = getRowsPipeline {pub: this, search, query, queryUiObject, sort, limit, skip}
         ReactiveAggregate this, collection,
           pipeline,
           clientCollection: "#{sourceName}.rows"
@@ -21,9 +21,9 @@ getRowsPipeline, getRowCountPipeline, debounceDelay = 500, observers})  ->
           # noAutomaticObservers: observers?
           observers: observers ? []
    
-    Meteor.publish "#{sourceName}.count", ({search, query = {}}) ->
+    Meteor.publish "#{sourceName}.count", ({search, query = {}, queryUiObject}) ->
       return @ready() unless userWithIdIsInRole id: @userId, role: viewTableRole
-      pipeline = getRowCountPipeline {pub: this, search , query}
+      pipeline = getRowCountPipeline {pub: this, search , query, queryUiObject}
       @autorun (computation) ->
         ReactiveAggregate this, collection,
           pipeline,
