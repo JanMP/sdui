@@ -34,9 +34,14 @@ export RoleSelect = ({row, columnKey, schemaBridge, onChangeField, measure, mayE
       data: {}
     .then allowedRolesToOptions
     .then setOptions
+    return
   , []
 
   valueOptions = row.roles.map (r) -> selectOptionFor role: r.role._id, scope: r.scope
+  rolesList =
+    valueOptions
+    .map (o) -> o.label
+    .join ', '
 
   onChange = (value, change) ->
     console.log {value, change}
@@ -57,4 +62,4 @@ export RoleSelect = ({row, columnKey, schemaBridge, onChangeField, measure, mayE
       isMulti
     />
   else
-    <div>{value.join ', '}</div>
+    <div>{rolesList}</div>

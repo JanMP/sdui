@@ -78,28 +78,12 @@ cellRenderer = ({listSchemaBridge, onChangeField, cache, mayEdit}) ->
         />}
     </CellMeasurer>
 
-# TODO Think this through 
-actionCellRenderer = ({component}) ->
-({dataKey, parent, rowIndex, columnIndex, cellData, rowData}) ->
-  onClick = (e) ->
-    e.stopPropagation()
-    e.nativeEvent.stopImmediatePropagation()
-    if (id = rowData?._id ? rowData?.id)?
-      onDelete {id}
 
-  <div style={paddingTop: ".5rem"}>
-    <button
-      onClick={onClick}
-      className="danger icon"
-    >
-      <FontAwesomeIcon icon={faTrash}/>
-    </button>
-  </div>
-
-deleteButtonCellRenderer = ({mayDelete, onDelete}) ->
+rightButtonCellRenderer = ({canDelete, mayDelete, onDelete, AdditionalButtonsRight}) ->
   ({dataKey, parent, rowIndex, columnIndex, cellData, rowData}) ->
 
     id = rowData?._id ? rowData?.id
+    AdditionalButtonsRight ?= -> null
 
     onClick = (e) ->
       e.stopPropagation()
@@ -107,14 +91,15 @@ deleteButtonCellRenderer = ({mayDelete, onDelete}) ->
       if id?
         onDelete {id}
 
-    <div style={paddingTop: ".5rem"}>
-      <button
+    <div className="pt-2">
+      <AdditionalButtonsRight rowData={rowData}/>
+     {<button
         onClick={onClick}
         className="danger icon"
         disabled={rowData._disableDeleteForRow or not mayDelete}
       >
         <FontAwesomeIcon icon={faTrash}/>
-      </button>
+      </button> if canDelete}
     </div>
 
 rowRenderer = ({canEdit, mayEdit}) ->
@@ -150,16 +135,15 @@ export DataTable = ({
   customComponents = {}
 }) ->
 
-  {Header, actionCell} = customComponents
+  {Header, AdditionalButtonsRight, rightButtonColumnWidth, AdditionalHeaderButtonsLeft, AdditionalHeaderButtonsRight} = customComponents
+  if Header? and (AdditionalHeaderButtonsLeft? or AdditionalHeaderButtonsRight?)
+    console.warn "both Header and AdditionalHeaderButtons are declared"
+  
   Header ?= DefaultHeader
-  {renderer, width} = actionCell ? {}
 
-  if actionCell? and not (renderer? and width?)
-    throw new Error 'actionCell custom Component must have Fields renderer and width'
+  rightButtonColumnWidth ?= 50
 
   schema = listSchemaBridge.schema
-
-  deleteColumnWidth = 50
 
   cacheRef = useRef newCache()
 
@@ -198,7 +182,7 @@ export DataTable = ({
       global.localStorage.setItem sourceName, JSON.stringify {currentEntry..., columnWidths: newWidths}
 
   [columnWidths, setColumnWidths] = useState getColumnWidthsFromLocalStorage() ? defaultColumnWidths
-  totalColumnsWidth = contentContainerWidth - if canDelete then deleteColumnWidth else 0
+  totalColumnsWidth = contentContainerWidth - if canDelete then rightButtonColumnWidth else 0
 
   [debouncedResetTrigger, setDebouncedResetTrigger] = useThrottle 0, 30
 
@@ -277,6 +261,7 @@ export DataTable = ({
         canExport, mayExport, onExportTable,
         canAdd, mayAdd, onAdd
         canSort, sortColumn, sortDirection, onChangeSort
+        AdditionalHeaderButtonsLeft, AdditionalHeaderButtonsRight
       }...}/>
     </div>
    
@@ -306,19 +291,12 @@ export DataTable = ({
           >
             {columns}
             {
-              if actionCell?.render?
+              if canDelete or AdditionalButtonsRight?
                 <Column
                   dataKey="no-data-key"
                   label=""
-                  width={deleteColumnWidth}
-                  cellRenderer={actionCell?.render}
-                />
-              else if canDelete
-                <Column
-                  dataKey="no-data-key"
-                  label=""
-                  width={deleteColumnWidth}
-                  cellRenderer={deleteButtonCellRenderer {mayDelete, onDelete}}
+                  width={rightButtonColumnWidth}
+                  cellRenderer={rightButtonCellRenderer {canDelete, mayDelete, onDelete, AdditionalButtonsRight}}
                 />
             }
           </Table>

@@ -8,11 +8,8 @@ import {Roles} from 'meteor/alanning:roles'
 import {RoleSelect} from './RoleSelect'
 import _ from 'lodash'
 
-log = (o) ->
-  JSON.stringify o, null, 2
-  o
 
-export createUserTableAPI = ({userProfileSchema, getAllowedRoles, viewUserTableRole, editUserRole}) ->
+export createUserTableAPI = ({userProfileSchema, getAllowedRoles, viewUserTableRole = 'admin'  , editUserRole = 'admin'}) ->
 
   getAllowedRoles ?= ->
     global: ['admin', 'editor']
@@ -161,7 +158,7 @@ export createUserTableAPI = ({userProfileSchema, getAllowedRoles, viewUserTableR
           blackbox: true
       .validator()
     run: ({id, value, change}) ->
-      currentUserMustBeInRole 'admin'
+      currentUserMustBeInRole editUserRole
       if Meteor.isServer
         switch change.action
           when 'remove-value'
@@ -171,7 +168,7 @@ export createUserTableAPI = ({userProfileSchema, getAllowedRoles, viewUserTableR
           when 'select-option'
             console.log "set role #{JSON.stringify change.option.value} for user #{id}"
             {role, scope} = change.option.value
-            Roles.setUserRoles [id], role, scope
+            Roles.addUsersToRoles [id], role, scope
           when 'clear'
             console.log "remove roles #{JSON.stringify change.removedValues.map (v) -> v.value} from user #{id}"
             change.removedValues.map((v) -> v.value).forEach ({role, scope}) ->
