@@ -2,7 +2,11 @@
 
 # Variables exported by this module can be imported by other packages and
 # applications. See sdui-tests.js for an example of importing.
-export {userWithIdIsInRole, currentUserIsInRole, currentUserMustBeInRole} from './common/roleChecks.coffee'
+export {
+  userWithIdIsInRole, currentUserIsInRole,
+  useCurrentUserIsInRole, currentUserMustBeInRole,
+  scopesForCurrentUserInRole, useScopesForCurrentUserInRole
+} from './common/roleChecks.coffee'
 export {createTableDataAPI} from './api/createTableDataAPI.coffee'
 export {createUserTableAPI} from './usertable/createUserTableAPI.coffee'
 export {createFilesAPI, filesAPISourceSchema} from './api/createFilesAPI.coffee'

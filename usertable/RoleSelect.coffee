@@ -1,20 +1,50 @@
-import React from 'react'
+import React, {useEffect, useState} from 'react'
 import { HTMLFieldProps, connectField, filterDOMProps } from 'uniforms'
 import Select from 'react-select'
 import {meteorApply} from '../common/meteorApply.coffee'
+import {UseTracker, useSubscribe} from 'meteor/react-meteor-data'
+import _ from 'lodash'
 
-stringToOption = (str) ->
-  value: str
-  label: str
 
-export RoleSelect = ({allowedRoles}) -> ({row, columnKey, schemaBridge, onChangeField, measure, mayEdit}) ->
+selectOptionFor = ({role, scope}) ->
+  value: {role, scope}
+  label: "#{scope ? 'GLOBAL'}: #{role}"
 
-  allowedRoles ?= ['admin', 'user']
-  value = row.roles
-  options = allowedRoles.map stringToOption
-  valueOptions = value.map stringToOption
+allowedRolesToOptions = (allowedRoles) ->
+  globalOptions = allowedRoles.global.map (role) -> selectOptionFor {role}
+  scopedOptions =
+    _(allowedRoles.scope)
+    .keys()
+    .sortBy()
+    .map (scope) ->
+      allowedRoles.scope[scope].map (role) ->
+        selectOptionFor {role, scope}
+    .flatten()
+    .value()
+  [globalOptions..., scopedOptions...]
+
+
+export RoleSelect = ({row, columnKey, schemaBridge, onChangeField, measure, mayEdit}) ->
+
+  [options, setOptions] = useState value: null, label: 'loading allowed roles'
+
+  useEffect ->
+    meteorApply
+      method: 'user.getAllowedRoles'
+      data: {}
+    .then allowedRolesToOptions
+    .then setOptions
+    return
+  , []
+
+  valueOptions = row.roles.map (r) -> selectOptionFor role: r.role._id, scope: r.scope
+  rolesList =
+    valueOptions
+    .map (o) -> o.label
+    .join ', '
 
   onChange = (value, change) ->
+    console.log {value, change}
     meteorApply
       method: 'user.onChangeRoles'
       data:
@@ -32,4 +62,4 @@ export RoleSelect = ({allowedRoles}) -> ({row, columnKey, schemaBridge, onChange
       isMulti
     />
   else
-    <div>{value.join ', '}</div>
+    <div>{rolesList}</div>

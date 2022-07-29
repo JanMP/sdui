@@ -22,8 +22,8 @@ export DefaultHeader = ({
   canExport, mayExport, onExportTable,
   canAdd, mayAdd, onAdd
   canSort, sortColumn, sortDirection, onChangeSort
-  AdditionalButtonsLeft = -> null
-  AdditionalButtonsRight = -> null
+  AdditionalHeaderButtonsLeft = -> null
+  AdditionalHeaderButtonsRight = -> null
 }) ->
 
 
@@ -81,7 +81,7 @@ export DefaultHeader = ({
       </div>
       <div className="flex-shrink flex-grow text-right">
         <div className="children:m-1">
-          <AdditionalButtonsLeft/>
+          <AdditionalHeaderButtonsLeft/>
           {
             if canExport
               <button
@@ -100,7 +100,7 @@ export DefaultHeader = ({
                 <FontAwesomeIcon icon={faPlus}/>
               </button>
           }
-          <AdditionalButtonsRight/>
+          <AdditionalHeaderButtonsRight/>
         </div>
       </div>
     </div>

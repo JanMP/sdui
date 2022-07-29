@@ -48,8 +48,10 @@ export DataList = ({
   selectedRowId = null
 }) ->
 
-  {Header, ListItem, ListItemContent} = customComponents
+  {Header, ListItem, ListItemContent, AdditionalHeaderButtonsLeft, AdditionalHeaderButtonsRight} = customComponents
 
+  if Header? and (AdditionalHeaderButtonsLeft? or AdditionalHeaderButtonsRight?)
+    console.warn "both Header and AdditionalHeaderButtons are declared"
   ListItem ?= DefaultListItem
   Header ?= DefaultHeader
 
@@ -125,6 +127,7 @@ export DataList = ({
         canExport, mayExport, onExportTable
         canAdd, mayAdd, onAdd
         canSort, sortColumn, sortDirection, onChangeSort
+        AdditionalHeaderButtonsLeft, AdditionalHeaderButtonsRight
         }...}/>
     </div>
    

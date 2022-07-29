@@ -2,7 +2,11 @@
 
 # Variables exported by this module can be imported by other packages and
 # applications. See sdui-tests.js for an example of importing.
-export {userWithIdIsInRole, currentUserIsInRole, useCurrentUserIsInRole, currentUserMustBeInRole} from './common/roleChecks.coffee'
+export {
+  userWithIdIsInRole, currentUserIsInRole,
+  useCurrentUserIsInRole, currentUserMustBeInRole,
+  scopesForCurrentUserInRole, useScopesForCurrentUserInRole
+} from './common/roleChecks.coffee'
 export {createTableDataAPI} from './api/createTableDataAPI.coffee'
 export {createFilesAPI, filesAPISourceSchema} from './api/createFilesAPI.coffee'
 export {ActionButton} from './forms/ActionButton.coffee'
@@ -25,3 +29,4 @@ export {FileSelect} from './files/FileSelect.coffee'
 export {config} from './config/config.coffee'
 export {QueryEditor, QueryEditorField} from './query-editor/QueryEditor.coffee'
 export {default as queryUiObjectToQuery} from './query-editor/queryUiObjectToQuery.coffee'
+export {SdDocumentSelect, SdDocumentSelectField} from './tables/SdDocumentSelect.coffee'

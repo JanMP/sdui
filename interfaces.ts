@@ -3,6 +3,13 @@ import {Mongo} from 'meteor/mongo'
 import SimpleSchema from 'simpl-schema'
 import {FC} from React
 
+export interface RoleObject {
+  role:  string | Array<string>
+  scope?: string
+  forAnyScope?: boolean
+}
+
+export type Role = string | Array<string> | RoleObject | ((id: string) => boolean)
 
 export interface createTableDataAPIParams {
   sourceName: string
@@ -18,11 +25,11 @@ export interface createTableDataAPIParams {
   canAdd?: boolean
   canDelete?: boolean
   canExport?: boolean
-  viewTableRole?: string | Array<string>
-  editRole?: string  | Array<string>
-  addRole?: string  | Array<string>
-  deleteRole?: string  | Array<string>
-  exportTableRole?: string | Array<string>
+  viewTableRole?: Role
+  editRole?: Role
+  addRole?: Role
+  deleteRole?: Role
+  exportTableRole?: Role
   query?: object
   initialSortColumn?: string
   initialSortDirection?: 'ASC' | 'DESC'
