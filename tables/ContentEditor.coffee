@@ -48,31 +48,37 @@ export ContentEditor = (tableOptions) ->
   {Preview, RelatedDataPane, FilePane} = customComponents ? {}
 
   onAdd ?= ->
-    newItem = await setupNewItem()
-    openEditor newItem
+    if hasChanged
+      setIdForOverloadConfirmationModal null
+      setOverloadConfirmationModalOpen true
+    else
+      newItem = await setupNewItem()
+      openEditor newItem
 
   # TODO make optional (again) and i18n
   deleteConfirmation ?= "Soll der Eintrag wirklich gelöscht werden?"
 
-  loadEditorData ?= ({id}) -> console.log "loadEditorData id: #{id}"
+  loadEditorData ?= ({id}) -> console.log "stump for loadEditorData id: #{id}"
 
   [editorOpen, setEditorOpen] = useState false
-  [model, setModel] = useState {}
+  [loadedModel, setLoadedModel] = useState {}
+  [changedModel, setChangedModel] = useState {}
+  [isValid, setIsValid] = useState false
   [selectedRowId, setSelectedRowId] = useState "fnord"
 
-  [confirmationModalOpen, setConfirmationModalOpen] = useState false
-  [idForConfirmationModal, setIdForConfirmationModal] = useState ''
+  [deleteConfirmationModalOpen, setDeleteConfirmationModalOpen] = useState false
+  [idForDeleteConfirmationModal, setIdForDeleteConfirmationModal] = useState ''
+  
+  [overloadConfirmationModalOpen, setOverloadConfirmationModalOpen] = useState false
+  [idForOverloadConfirmationModal, setIdForOverloadConfirmationModal] = useState null
 
-  [filePaneOpen, setFilePaneOpen] = useState false
-  toggleFilePaneOpen = -> setFilePaneOpen (x) -> not x
-
-  editorInstance = useRef()
+  hasChanged = not _.isEqual changedModel, loadedModel
 
   contentKey =
     formSchemaBridge.schema._firstLevelSchemaKeys
     .find (key) -> formSchemaBridge.schema._schema[key]?.sdContent?.isContent
   
-  setContent = (content) -> setModel (currentModel) -> {currentModel..., [contentKey]: content}
+  setContent = (content) -> setChangedModel (previousModel) -> {previousModel..., [contentKey]: content}
 
   deleteAndCloseEditor = ({id}) ->
     onDelete {id}
@@ -84,44 +90,71 @@ export ContentEditor = (tableOptions) ->
     else
       ({id}) ->
         if deleteConfirmation?
-          setIdForConfirmationModal id
-          setConfirmationModalOpen true
+          setIdForDeleteConfirmationModal id
+          setDeleteConfirmationModalOpen true
         else
           deleteAndCloseEditor {id}
 
   openEditor = (formModel) ->
-    setModel formModel
+    setLoadedModel formModel
+    setChangedModel formModel
     setEditorOpen true
+  
+  onValidate = (model, error) ->
+    setIsValid not error?
+    error
+
+  onReset = ->
+    setChangedModel loadedModel
 
   handleSubmit =
     (model) ->
       onSubmit?(model)
       .then (result) ->
-        if (id = result?.insertedId)?
+        if (id = result?.insertedId ? model._id)?
           setSelectedRowId id
           loadEditorData {id}
           ?.then openEditor
 
+
+  onConfirmOverload = ->
+    console.log id = idForOverloadConfirmationModal
+    if id?
+      setSelectedRowId id
+      loadEditorData {id}
+        ?.then openEditor
+    else
+      newItem = await setupNewItem()
+      openEditor newItem
+
   if canEdit
     onRowClick =
       ({rowData, index}) ->
-        setSelectedRowId rowData?._id
-        if formSchemaBridge is listSchemaBridge
-          openEditor rows[index]
+        return if rowData._id is loadedModel._id
+        if hasChanged
+          setIdForOverloadConfirmationModal rowData._id
+          setOverloadConfirmationModalOpen true
         else
+          setSelectedRowId rowData._id
           loadEditorData id: rowData._id
           ?.then openEditor
 
   
   <Fill>
     <ErrorBoundary>
+      <ConfirmationModal
+        isOpen={overloadConfirmationModalOpen}
+        setIsOpen={setOverloadConfirmationModalOpen}
+        text="Sie haben ungesicherte Änderungen. Wollen sie die Änderungen Verwerfen?"
+        onConfirm={onConfirmOverload}
+      />
       {
         if canDelete and deleteConfirmation?
           <ConfirmationModal
-            isOpen={confirmationModalOpen}
-            setIsOpen={setConfirmationModalOpen}
+            isOpen={deleteConfirmationModalOpen}
+            setIsOpen={setDeleteConfirmationModalOpen}
             text={deleteConfirmation}
-            onConfirm={-> deleteAndCloseEditor id: idForConfirmationModal}
+            onConfirm={-> deleteAndCloseEditor id: idForDeleteConfirmationModal}
           />
       }
       <LeftResizable size="25%">
@@ -154,7 +187,7 @@ export ContentEditor = (tableOptions) ->
               <Fill allowOverflow>
                 <ErrorBoundary>
                   <SdEditor
-                    value={model?[contentKey]}
+                    value={changedModel?[contentKey]}
                     onChange={setContent}
                   />
                 </ErrorBoundary>
@@ -165,13 +198,28 @@ export ContentEditor = (tableOptions) ->
               <Fill scrollable>
                 <AutoForm
                   schema={formSchemaBridge}
-                  onSubmit={handleSubmit}
-                  model={model}
-                  onChangeModel={setModel}
+                  model={changedModel}
+                  onChangeModel={setChangedModel}
+                  onValidate={onValidate}
                   children={autoFormChildren}
                   disabled={formDisabled}
                   validate="onChange"
+                  submitField={-> null}
                 />
+                <div className="p-2">
+                  <ActionButton
+                    onAction={onReset}
+                    className="button danger"
+                    label="Zurücksetzen"
+                    disabled={not hasChanged}
+                  />
+                  <ActionButton
+                    onAction={-> handleSubmit changedModel}
+                    className="button primary ml-2"
+                    label="Speichern"
+                    disabled={(not hasChanged) or (not isValid)}
+                  />
+                </div>
               </Fill>
             </Fill>
           </LeftResizable>
@@ -184,10 +232,10 @@ export ContentEditor = (tableOptions) ->
               <ErrorBoundary>
                 {
                   if Preview?
-                    <Preview content={model}/>
+                    <Preview content={changedModel}/>
                   else
                     <MarkdownDisplay
-                      markdown={model?[contentKey]}
+                      markdown={changedModel?[contentKey]}
                       contentClass="prose"
                     />
                 }
@@ -196,7 +244,7 @@ export ContentEditor = (tableOptions) ->
             {
               if RelatedDataPane?
                 <BottomResizable size="50%" scrollable>
-                  <RelatedDataPane model={model}/>
+                  <RelatedDataPane model={changedModel}/>
                 </BottomResizable>
             }
           </Fill>

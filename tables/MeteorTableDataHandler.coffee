@@ -46,7 +46,7 @@ export MeteorTableDataHandler = ({dataOptions, fileListDataOptions, DisplayCompo
   canSearch
   canSort
   canUseQueryEditor
-  query = {}
+  query
   canAdd
   onAdd
   setupNewItem
@@ -63,6 +63,9 @@ export MeteorTableDataHandler = ({dataOptions, fileListDataOptions, DisplayCompo
 
   # we only support usePubSub = true atm
   usePubSub = true
+
+  perLoad ?= 500
+  query = defaultQuery
 
   if usePubSub and not (rowsCollection? and rowCountCollection?)
     throw new Error 'usePubSub is true but rowsCollection or rowCountCollection not given'
@@ -193,9 +196,8 @@ export MeteorTableDataHandler = ({dataOptions, fileListDataOptions, DisplayCompo
   , [subLoading]
 
   loadMoreRows = ({startIndex, stopIndex}) ->
-    console.log {startIndex, stopIndex, limit}
     if stopIndex >= limit
-      setLimit limit + perLoad
+      setLimit (l) -> l + perLoad
     new Promise (res, rej) ->
       resolveRef.current = res
       rejectRef.current = rej
