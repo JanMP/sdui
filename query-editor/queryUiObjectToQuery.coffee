@@ -38,7 +38,7 @@ export default ({queryUiObject, getList}) ->
             "#{predicate}": object.value
         if predicate is '$regex'
           unless object.value? and (try (new RegExp object.value)?)
-           result = {}
+            result = {}
         if predicate is '$regex' and obj.content.ignoreCase then result[subject]['$options'] = 'i'
         result
       else

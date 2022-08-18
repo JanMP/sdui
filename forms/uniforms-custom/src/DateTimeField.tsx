@@ -2,7 +2,7 @@ import React, { Ref } from 'react';
 import { HTMLFieldProps, connectField, filterDOMProps } from 'uniforms';
 import setClassNamesForProps from './setClassNamesForProps';
 import {DateTime} from 'luxon'
-import DatePicker from 'react-date-picker'
+import DateTimePicker from 'react-datetime-picker'
 
 
 
@@ -31,18 +31,22 @@ function Date({
     <div className={setClassNamesForProps(props)} {...filterDOMProps(props)}>
       {label && !hasFloatingLabel &&<label htmlFor={id}>{label}</label>}
       
-      <DatePicker
+      <DateTimePicker
         value={value}
         onChange={onChange}
         disabled={disabled}
-        format="dd.MM.y"
+        format="dd.MM.y HH:mm:ss"
         locale="de-DE"
         disableCalendar={true}
+        disableClock={true}
         minDate={min}
         maxDate={max}
         dayPlaceholder="tt"
         monthPlaceholder="mm"
         yearPlaceholder="jjjj"
+        hourPlaceholder="hh"
+        minutePlaceholder="mm"
+        secondPlaceholder="ss"
       />
     
       {label && hasFloatingLabel &&<label htmlFor={id}>{label}</label>}

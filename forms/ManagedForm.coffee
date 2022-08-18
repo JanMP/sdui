@@ -9,6 +9,8 @@ import {ErrorBoundary} from '../common/ErrorBoundary.coffee'
 
 export ManagedForm = ({schemaBridge, model, onChangeModel, onSubmit, disabled, children}) ->
 
+  onChangeModel ?= ->
+
   form = null
   [changedModel, setChangedModel] = useState model
   [isValid, setIsValid] = useState false
@@ -16,21 +18,22 @@ export ManagedForm = ({schemaBridge, model, onChangeModel, onSubmit, disabled, c
   hasChanged = not isEqual changedModel, model
 
   onAction = -> onSubmit changedModel
+  
   onValidate = (model, error) ->
     setIsValid not error?
     error
+  
   handleChange = (newModel) ->
     setChangedModel newModel
     onChangeModel newModel
 
   <ErrorBoundary>
-    <div>{if isValid then 'valid' else 'invalid'}</div>
-    <div className="m-1 p-2 rounded bg-blue-50">
+    <div className="m-1 p-2">
       <AutoForm
         ref={(ref) -> form = ref}
         schema={schemaBridge}
         model={model}
-        onChangeModel={setChangedModel}
+        onChangeModel={handleChange}
         onValidate={onValidate}
         submitField={-> null}
         validate="onChange"
@@ -49,8 +52,5 @@ export ManagedForm = ({schemaBridge, model, onChangeModel, onSubmit, disabled, c
         label="Speichern"
         disabled={(not hasChanged) or (not isValid)}
       />
-    </div>
-    <div>
-      <pre>{JSON.stringify {model, changedModel}, null, 2}</pre>
     </div>
   </ErrorBoundary>
