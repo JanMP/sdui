@@ -2,18 +2,18 @@ import React, { Ref } from 'react';
 import { HTMLFieldProps, connectField, filterDOMProps } from 'uniforms';
 import setClassNamesForProps from './setClassNamesForProps';
 import {DateTime} from 'luxon'
-import DatePicker from 'react-date-picker'
+import TimePicker from 'react-time-picker'
 
 
-
-export type DateFieldProps = HTMLFieldProps<
+export type TimeFieldProps = HTMLFieldProps<
   Date,
   HTMLDivElement,
   { inputRef?: Ref<HTMLInputElement>; max?: Date; min?: Date; hasFloatingLabel?: boolean }
 >;
 
-function Date({
+function Time({
   disabled,
+  
   id,
   inputRef,
   label,
@@ -26,23 +26,24 @@ function Date({
   value,
   hasFloatingLabel,
   ...props
-}: DateFieldProps) {
+}: TimeFieldProps) {
   return (
     <div className={setClassNamesForProps(props)} {...filterDOMProps(props)}>
       {label && !hasFloatingLabel &&<label htmlFor={id}>{label}</label>}
       
-      <DatePicker
+      <TimePicker
         value={value}
         onChange={onChange}
         disabled={disabled}
-        format="dd.MM.y"
+        format="HH:mm:ss"
         locale="de-DE"
-        disableCalendar={true}
-        minDate={min}
-        maxDate={max}
-        dayPlaceholder="tt"
-        monthPlaceholder="mm"
-        yearPlaceholder="jjjj"
+        disableClock={true}
+        minTime={min}
+        maxTime={max}
+        hourPlaceholder="hh"
+        minutePlaceholder="mm"
+        secondPlaceholder="ss"
+        maxDetail="second"
       />
     
       {label && hasFloatingLabel &&<label htmlFor={id}>{label}</label>}
@@ -50,4 +51,4 @@ function Date({
   );
 }
 
-export default connectField<DateFieldProps>(Date, { kind: 'leaf' });
+export default connectField<TimeFieldProps>(Time, { kind: 'leaf' });
