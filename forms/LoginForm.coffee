@@ -31,8 +31,7 @@ signupSchema = new SimpleSchema
   password:
     type: String
     label: 'Passwort'
-    # TODO: change regEx to accomodate sick desire for untripleclickselectable password
-    regEx: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/
+    regEx: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/
     max: 80
     uniforms:
       type: 'password'
