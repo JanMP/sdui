@@ -12,7 +12,7 @@ import PartIndex from './PartIndex'
 import _ from 'lodash'
 
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faTimes} from '@fortawesome/free-solid-svg-icons'
+import {faXmark} from '@fortAwesome/free-solid-svg-icons/faXmark'
 
 import {useDrag} from 'react-dnd'
 
@@ -189,7 +189,7 @@ export QuerySentenceEditor = ({rule, partIndex, bridge, path, onChange, onRemove
     {if canDisplay then SentenceForm}
     <div className="p-2">
       <button className="icon secondary" onClick={onRemove}>
-        <FontAwesomeIcon icon={faTimes}/>
+        <FontAwesomeIcon icon={faXmark}/>
       </button>
     </div>
   </div>
