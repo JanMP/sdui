@@ -18,12 +18,12 @@ Package.onUse(function(api) {
   api.use('reactive-var');
   api.use('alanning:roles@3.4.0');
   api.use('mdg:validated-method@1.2.0');
-  api.use('momentjs:moment@2.29.1');
+  // api.use('momentjs:moment@2.29.1');
   api.use('peerlibrary:reactive-publish@0.10.0');
   api.use('tunguska:reactive-aggregate@1.3.7');
   // api.use('mizzao:user-status@1.0.1');
   api.addFiles('css/sdui.css', 'client');
-  api.mainModule('sdui-client.coffee', 'client');
+  api.mainModule('sdui-client-dynamic.coffee', 'client');
   api.mainModule('sdui-server.coffee', 'server');
 });
 
