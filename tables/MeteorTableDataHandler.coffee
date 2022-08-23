@@ -65,7 +65,7 @@ export MeteorTableDataHandler = ({dataOptions, fileListDataOptions, DisplayCompo
   usePubSub = true
 
   perLoad ?= 500
-  query = defaultQuery
+  query ?= defaultQuery
 
   if usePubSub and not (rowsCollection? and rowCountCollection?)
     throw new Error 'usePubSub is true but rowsCollection or rowCountCollection not given'
