@@ -7,10 +7,6 @@ import {AutoForm} from '../forms/uniforms-custom/select-implementation'
 import {SdEditor} from '../editor/SdEditor.coffee'
 import {MarkdownDisplay} from '../markdown/MarkdownDisplay.coffee'
 import {ActionButton} from '../forms/ActionButton.coffee'
-import {faVial} from '@fortawesome/free-solid-svg-icons/faVial'
-import {faFolderOpen} from '@fortawesome/free-solid-svg-icons/faFolderOpen'
-import {faFolderClosed} from '@fortawesome/free-solid-svg-icons/faFolderClosed'
-import {FileSelect} from '../files/FileSelect.coffee'
 import _ from 'lodash'
 
 
