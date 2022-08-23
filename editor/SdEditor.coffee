@@ -5,7 +5,7 @@ import 'ace-builds/src-noconflict/mode-markdown'
 import 'ace-builds/src-noconflict/theme-chrome'
 
 import {useConfig} from '../config/config.coffee'
-import {FileSelect} from '../files/FileSelect.coffee'
+# import {FileSelect} from '../files/FileSelect.coffee'
 import useSize from '@react-hook/size'
 
 DefaultHeader = ({instance}) ->
@@ -15,9 +15,11 @@ DefaultHeader = ({instance}) ->
 
   return null unless files?
 
-
   <div className="p-1 border-b border-secondary-500 | editor-header__container">
+    No Files UI for now, sorry.
+    {###
     <FileSelect dataOptions={files} editor={editor}/>
+    ###}
   </div>
 
 

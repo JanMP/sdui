@@ -8,8 +8,10 @@ import {getNewSentence, getNewBlock} from './queryEditorHelpers'
 import _ from 'lodash'
 import PartIndex from './PartIndex'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faFilter, faFolder, faFile, faTimes} from '@fortawesome/free-solid-svg-icons'
-
+import {faFilter} from '@fortAwesome/free-solid-svg-icons/faFilter.js'
+import {faFolder} from '@fortAwesome/free-solid-svg-icons/faFolder.js'
+import {faFile} from '@fortAwesome/free-solid-svg-icons/faFile.js'
+import {faTimes} from '@fortAwesome/free-solid-svg-icons/faTimes.js'
 import {useDrop} from 'react-dnd'
 
 
