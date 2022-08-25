@@ -3,9 +3,9 @@ import {SdList} from '../tables/SdList.coffee'
 import {DefaultHeader} from '../tables/DefaultHeader.coffee'
 import toStringWithUnitPrefix from '../common/toStringWithUnitPrefix.coffee'
 import {FileUploadButton} from './FileUploadButton.coffee'
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faUser} from '@fortAwesome/free-solid-svg-icons/faUser'
-import {faTriangleExclamation} from '@fortAwesome/free-solid-svg-icons/faTriangleExclamation'
+import {FontAwesomeIcon} from '@fortAwesome/react-fontawesome'
+import {faUser} from '@fortawesome/free-solid-svg-icons/faUser'
+import {faTriangleExclamation} from '@fortawesome/free-solid-svg-icons/faTriangleExclamation'
 
 ListItemContent  = ({rowData}) ->
   <div className="flex p-2 gap-4 overflow-hidden">

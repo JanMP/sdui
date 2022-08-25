@@ -1,6 +1,6 @@
 import React from 'react'
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faTrash} from '@fortAwesome/free-solid-svg-icons/faTrash'
+import {FontAwesomeIcon} from '@fortAwesome/react-fontawesome'
+import {faTrash} from '@fortawesome/free-solid-svg-icons/faTrash'
 
 DefaultListItemContent = ({rowData, measure}) ->
   <div className="bg-red-100">{JSON.stringify rowData, null, 2}</div>

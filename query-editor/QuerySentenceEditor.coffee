@@ -11,8 +11,8 @@ import {predicateSelectOptions} from './predicates'
 import PartIndex from './PartIndex'
 import _ from 'lodash'
 
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faXmark} from '@fortAwesome/free-solid-svg-icons/faXmark'
+import {FontAwesomeIcon} from '@fortAwesome/react-fontawesome'
+import {faXmark} from '@fortawesome/free-solid-svg-icons/faXmark'
 
 import {useDrag} from 'react-dnd'
 

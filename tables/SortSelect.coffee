@@ -1,9 +1,9 @@
 import React, {useEffect} from 'react'
 import Select from 'react-select'
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faArrowDownAZ} from '@fortAwesome/free-solid-svg-icons/faArrowDownAZ'
-import {faArrowUpZA} from '@fortAwesome/free-solid-svg-icons/faArrowUpZA'
-import {faUpDown} from '@fortAwesome/free-solid-svg-icons/faUpDown'
+import {FontAwesomeIcon} from '@fortAwesome/react-fontawesome'
+import {faArrowDownAZ} from '@fortawesome/free-solid-svg-icons/faArrowDownAZ'
+import {faArrowUpZA} from '@fortawesome/free-solid-svg-icons/faArrowUpZA'
+import {faUpDown} from '@fortawesome/free-solid-svg-icons/faUpDown'
 
 
 
