@@ -48,6 +48,7 @@ checkDisableDeleteForRow, checkDisableEditForRow}) ->
     ({id}) ->
       collection.remove _id: transformIdToMongo id
   
+
   getCount = new ValidatedMethod
     name: "#{sourceName}.getCount"
     validate:
@@ -64,12 +65,13 @@ checkDisableDeleteForRow, checkDisableEditForRow}) ->
       .validator()
     run: ({search, query, queryUiObject}) ->
       currentUserMustBeInRole viewTableRole
-      if Meteor.isServer
-        collection.rawCollection()
-        .aggregate getRowCountPipeline {search, query, queryUiObject}
-        .toArray()
-        .catch (error) ->
-          console.error "#{sourceName}.getCount", error
+      return unless Meteor.isServer
+      collection.rawCollection()
+      .aggregate getRowCountPipeline {search, query, queryUiObject}
+      .toArray()
+      .catch (error) ->
+        console.error "#{sourceName}.getCount", error
+
 
   getRows = new ValidatedMethod
     name: "#{sourceName}.getRows"
@@ -94,13 +96,14 @@ checkDisableDeleteForRow, checkDisableEditForRow}) ->
       .validator()
     run: ({search, query, queryUiObject, sort, limit, skip}) ->
       currentUserMustBeInRole viewTableRole
-      if Meteor.isServer
-        collection.rawCollection()
-        .aggregate getRowsPipeline {search, query, queryUiObject, sort, limit, skip},
-          allowDiskUse: true
-        .toArray()
-        .catch (error) ->
-          console.error "#{sourceName}.getRows", error
+      return unless Meteor.isServer
+      collection.rawCollection()
+      .aggregate getRowsPipeline {search, query, queryUiObject, sort, limit, skip},
+        allowDiskUse: true
+      .toArray()
+      .catch (error) ->
+        console.error "#{sourceName}.getRows", error
+
 
   if canExport
     new ValidatedMethod
@@ -124,13 +127,14 @@ checkDisableDeleteForRow, checkDisableEditForRow}) ->
         .validator()
       run: ({search, query, queryUiObject, sort}) ->
         currentUserMustBeInRole exportTableRole
-        if Meteor.isServer
-          collection.rawCollection()
-          .aggregate getExportPipeline {search, query, queryUiObject, sort},
-            allowDiskUse: true
-          .toArray()
-          .catch (error) ->
-            console.error "#{sourceName}.getRows", error
+        return unless Meteor.isServer
+        collection.rawCollection()
+        .aggregate getExportPipeline {search, query, queryUiObject, sort},
+          allowDiskUse: true
+        .toArray()
+        .catch (error) ->
+          console.error "#{sourceName}.getRows", error
+          
 
   getRowWithId = ({id}) ->
     row = await collection.rawCollection().aggregate(getRowsPipeline {query: _id: id}).toArray()
@@ -152,6 +156,7 @@ checkDisableDeleteForRow, checkDisableEditForRow}) ->
     if row?._disableDeleteForRow
       throw new Meteor.Error '[deleteRowMustNotBeDisabled]', 'Deleting this Row is disabled'
   
+
   if canEdit or canAdd
     new ValidatedMethod
       name: "#{sourceName}.submit"
@@ -162,6 +167,7 @@ checkDisableDeleteForRow, checkDisableEditForRow}) ->
         else
           currentUserMustBeInRole addRole
         await editRowMustNotBeDisabled id: model._id
+        return unless Meteor.isServer
         submitMethodRun
           id: model._id
           data: _.omit model, '_id'
@@ -191,6 +197,7 @@ checkDisableDeleteForRow, checkDisableEditForRow}) ->
       run: ({_id, changeData}) ->
         currentUserMustBeInRole editRole
         await editRowMustNotBeDisabled id: _id
+        return unless Meteor.isServer
         collection.update {_id}, $set: changeData
 
   if canDelete
@@ -203,7 +210,7 @@ checkDisableDeleteForRow, checkDisableEditForRow}) ->
       run: ({id}) ->
         currentUserMustBeInRole deleteRole
         await deleteRowMustNotBeDisabled {id}
-        if Meteor.isServer
-          deleteMethodRun {id}
+        return unless Meteor.isServer
+        deleteMethodRun {id}
 
   {getCount, getRows}
