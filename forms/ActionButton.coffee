@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react'
 
 import {meteorApply} from '../common/meteorApply.coffee'
 import {toast} from 'react-toastify'
-import {FontAwesomeIcon} from '@fortAwesome/react-fontawesome'
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faSpinner} from '@fortawesome/free-solid-svg-icons/faSpinner'
 import {ConfirmationModal} from './ConfirmationModal'
 import _ from 'lodash'
