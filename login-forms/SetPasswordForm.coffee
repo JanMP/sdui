@@ -2,7 +2,7 @@ import React from 'react'
 import {Accounts} from 'meteor/accounts-base'
 import SimpleSchema from 'simpl-schema'
 import SimpleSchemaBridge from 'uniforms-bridge-simple-schema-2'
-import {AutoForm, SubmitField} from './uniforms-custom/select-implementation'
+import {AutoForm, SubmitField} from '../forms/uniforms-custom/select-implementation'
 
 passwordSchema = new SimpleSchema
   password:

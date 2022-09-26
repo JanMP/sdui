@@ -109,12 +109,12 @@ export interface createTableDataAPIReturn {
 }
 
 interface additionalDataTableOptions {
-  onDelete?: ({id: string}) => Promise<any>
+  onDelete?: ({id}: {id: string}) => Promise<any>
   onRowClick?: ({rowData, index}: {rowData: any, index: number}) => void
   autoFormChildren?: [any]
   formDisabled?: boolean
   formReadOnly?: boolean
-  loadEditorData?: ({id: string}) => Promise<any>
+  loadEditorData?: ({id}: {id: string}) => Promise<any>
   queryUiObject?: object
 }
 

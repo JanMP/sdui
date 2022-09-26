@@ -26,7 +26,6 @@ export ActionButton = suspend lazy -> import('./forms/ActionButton.coffee').then
 export SdList = suspend lazy -> import('./tables/SdList.coffee').then (m) -> default: m. SdList
 export SdTable = suspend lazy -> import('./tables/SdTable.coffee').then (m) -> default: m. SdTable
 export SdContentEditor = suspend lazy -> import('./tables/SdContentEditor.coffee').then (m) -> default: m. SdContentEditor
-export MarkdownEditor = suspend lazy -> import('./markdown/MarkdownEditor.coffee').then (m) -> default: m. MarkdownEditor
 export SdEditor = suspend lazy -> import('./editor/SdEditor.coffee').then (m) -> default: m. SdEditor
 export MarkdownDisplay = suspend lazy -> import('./markdown/MarkdownDisplay.coffee').then (m) -> default: m. MarkdownDisplay
 export ColorPicker = suspend lazy -> import('./forms/ColorPicker.coffee').then (m) -> default: m. ColorPicker
@@ -36,7 +35,7 @@ export * from './forms/uniforms-custom/select-implementation'
 export {LongTextField} from './forms/uniforms-custom/src'
 export ManagedForm = suspend lazy -> import('./forms/ManagedForm.coffee').then (m) -> default: m.ManagedForm
 export FormModal = suspend lazy -> import('./forms/FormModal.coffee').then (m) -> default: m.FormModal
-export LoginForm = suspend lazy -> import('./forms/LoginForm.coffee').then (m) -> default: m.LoginForm
+export LoginForm = suspend lazy -> import('./login-forms/LoginForm.coffee').then (m) -> default: m.LoginForm
 
 export QueryEditor = suspend lazy -> import('./query-editor/QueryEditor.coffee').then (m) -> default: m.QueryEditor
 export QueryEditorField = suspend lazy -> import('./query-editor/QueryEditorField.coffee').then (m) -> default: m.QueryEditorField

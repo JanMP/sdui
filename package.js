@@ -15,6 +15,7 @@ Package.onUse(function(api) {
   api.use('ecmascript');
   api.use('coffeescript@2.4.1');
   api.use('typescript');
+  api.use('zodern:types');
   api.use('reactive-var');
   api.use('alanning:roles@3.4.0');
   api.use('mdg:validated-method@1.2.0');
