@@ -28,7 +28,7 @@ export ManagedForm = ({schemaBridge, model, onChangeModel, onSubmit, disabled, c
     onChangeModel newModel
 
   <ErrorBoundary>
-    <div className="m-1 p-2">
+    <div className="managed-form">
       <AutoForm
         ref={(ref) -> form = ref}
         schema={schemaBridge}
@@ -40,17 +40,19 @@ export ManagedForm = ({schemaBridge, model, onChangeModel, onSubmit, disabled, c
         children={children}
         disabled={disabled}
       />
-      <ActionButton
-        onAction={-> form.reset()}
-        className="danger"
-        label="Zurücksetzen"
-        disabled={not hasChanged}
-      />
-      <ActionButton
-        onAction={onAction}
-        className="primary"
-        label="Speichern"
-        disabled={(not hasChanged) or (not isValid)}
-      />
+      <div className="button-container">
+        <ActionButton
+          onAction={-> form.reset()}
+          className="button warning"
+          label="Zurücksetzen"
+          disabled={not hasChanged}
+        />
+        <ActionButton
+          onAction={onAction}
+          className="button primary"
+          label="Speichern"
+          disabled={(not hasChanged) or (not isValid)}
+        />
+      </div>
     </div>
   </ErrorBoundary>

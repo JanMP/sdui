@@ -27,9 +27,9 @@ export ConfirmationModal = ({text, onConfirm = ->, onCancel = ->, isOpen, setIsO
     overlayClassName="overlay"
     shouldFocusAfterRender={false}
   >
-    <div>{text}</div>
-    <div className="mt-4 flex justify-end">
+    <div className="text-container">{text}</div>
+    <div className="button-container">
       <button className="button secondary" onClick={handleCancelClick} >Abbrechen</button>
-      <button className="ml-2 button primary" onClick={handleOkClick} >OK</button>
+      <button className="button primary" onClick={handleOkClick} >OK</button>
     </div>
   </Modal>

@@ -28,30 +28,25 @@ resizableHeaderRenderer = ({onResizeRows, isLastOne}) ->
     onDrag = (e, {deltaX}) ->
       onResizeRows {dataKey, deltaX}
     
-    <div className="w-full overflow-hidden flex justify-end items-center h-[34pt] #{if isLastOne then '' else 'border-r-2 border-secondary-300'}" key={dataKey}>
-      <div className="flex-auto flex justify-between sort-click-target">
-        <div className="flex-auto overflow-hidden whitespace-nowrap text-ellipsis sort-click-target">{label}</div>
-        <div className="flex-none text-secondary-400 mr-2 sort-click-target">
-          {
-            if sortBy is dataKey
-              if sortDirection is 'ASC'
-                <FontAwesomeIcon className="sort-click-target" icon={faSortDown}/>
-              else
-                <FontAwesomeIcon className="sort-click-target" icon={faSortUp} />
-          }
-        </div>
+    <div className={if isLastOne then 'last-column' else ''} key={dataKey}>
+      <div className="sort-click-target">
+        <span className="sort-click-target">{label}</span>
+        {
+          if sortBy is dataKey
+            if sortDirection is 'ASC'
+              <FontAwesomeIcon className="sort-click-target" icon={faSortDown}/>
+            else
+              <FontAwesomeIcon className="sort-click-target" icon={faSortUp} />
+        }
       </div>
       {<Draggable
         axis="x"
-        defaultClassName="flex-none cursor-col-resize text-secondary-500"
-        defaultClassNameDragging="flex-none cursor-col-resize !text-secondary-200 "
+        defaultClassName="drag-handle"
+        defaultClassNameDragging="drag-handle"
         onDrag={onDrag}
         position={x: 0}
       >
-        <FontAwesomeIcon
-          className="mr-2"
-          icon={faGripVertical}
-        />
+        <div />
       </Draggable> unless isLastOne}
     </div>
 
