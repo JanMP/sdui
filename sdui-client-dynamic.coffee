@@ -37,12 +37,8 @@ export {LongTextField} from './forms/uniforms-custom/src'
 export ManagedForm = suspend lazy -> import('./forms/ManagedForm.coffee').then (m) -> default: m.ManagedForm
 export FormModal = suspend lazy -> import('./forms/FormModal.coffee').then (m) -> default: m.FormModal
 export LoginForm = suspend lazy -> import('./forms/LoginForm.coffee').then (m) -> default: m.LoginForm
-# export FileList = suspend lazy -> import('./files/FileList.coffee').then (m) -> default: m.FileList
-# export FileSelect = suspend lazy -> import('./forms/FileSelect.coffee').then (m) -> default: m.FileSelect
+
 export QueryEditor = suspend lazy -> import('./query-editor/QueryEditor.coffee').then (m) -> default: m.QueryEditor
 export QueryEditorField = suspend lazy -> import('./query-editor/QueryEditorField.coffee').then (m) -> default: m.QueryEditorField
 export SdDocumentSelect = suspend lazy -> import('./tables/SdDocumentSelect.coffee').then (m) -> default: m.SdDocumentSelect
 export SdDocumentSelectField = suspend lazy -> import('./tables/SdDocumentSelect.coffee').then (m) -> default: m.SdDocumentSelectField
-export RRuleEditor = suspend lazy -> import('./schedule/RRuleEditor.coffee').then (m) -> default: m.RRuleEditor
-export RRuleEditorField = suspend lazy -> import('./schedule/RRuleEditor.coffee').then (m) -> default: m.RRuleEditorField
-export {Schedule, Rule} from './schedule/rschedule.coffee'

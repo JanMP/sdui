@@ -1,6 +1,0 @@
-# import '@rschedule/luxon-date-adapter/v2/setup'
-# export * from '@rschedule/luxon-date-adapter/v2'
-import '@rschedule/standard-date-adapter/setup'
-export * from '@rschedule/standard-date-adapter'
-export * from '@rschedule/core'
-export * from '@rschedule/core/generators'
