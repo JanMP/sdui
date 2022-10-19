@@ -5,7 +5,7 @@ import {faFileDownload} from '@fortawesome/free-solid-svg-icons/faFileDownload'
 import {faFilter} from '@fortawesome/free-solid-svg-icons/faFilter'
 import {SearchInput} from './SearchInput.coffee'
 import {SortSelect} from './SortSelect.coffee'
-import {QueryEditor} from '../query-editor/QueryEditor.coffee'
+import {QueryEditorModal} from '../query-editor/QueryEditorModal.coffee'
 
 
 ###*
@@ -31,12 +31,6 @@ export DefaultHeader = ({
   [rule, setRule] = useState null
 
   toggleQueryEditor = -> setShowQueryEditor (x) -> not x
-
-  useEffect ->
-    unless showQueryEditor
-      setRule null
-      onChangeQueryUiObject null
-  , [showQueryEditor]
 
   onChangeRule = (newRule) ->
     setRule newRule
@@ -72,7 +66,7 @@ export DefaultHeader = ({
         {
           if canUseQueryEditor
             <button
-              className="query-editor-toggle | icon secondary"
+              className="icon #{if rule? then 'ok' else 'secondary'}"
               onClick={toggleQueryEditor} disabled={not true}
             >
               <FontAwesomeIcon icon={faFilter}/>
@@ -102,14 +96,11 @@ export DefaultHeader = ({
         <AdditionalHeaderButtonsRight/>
       </div>
     </div>
-    <div className="h-full overflow-visible">
-      {
-        if showQueryEditor
-          <QueryEditor
-            bridge={listSchemaBridge}
-            rule={rule}
-            onChange={onChangeRule}
-          />
-      }
-    </div>
+    <QueryEditorModal
+      bridge={listSchemaBridge}
+      rule={rule}
+      onChangeRule={onChangeRule}
+      isOpen={showQueryEditor}
+      setIsOpen={setShowQueryEditor}
+    />
   </>
