@@ -15,7 +15,7 @@ DefaultHeader = ({instance}) ->
 
   return null unless files?
 
-  <div className="p-1 border-b border-secondary-500 | editor-header__container">
+  <div className="sd-editor-header__container">
     No Files UI for now, sorry.
     {###
     <FileSelect dataOptions={files} editor={editor}/>
@@ -43,12 +43,12 @@ export SdEditor = ({value = '', onChange, editorWidth = "100%", editorHeight = "
     editor?.resize()
   , [size]
 
-  <div className="w-full h-full | editor_container" ref={container}>
+  <div className="sd-editor__container" ref={container}>
     <Header instance={instance}/>
     <AceEditor
       ref={instance}
-      mode="markdown"
-      theme="chrome"
+      mode={mode}
+      theme={theme}
       width={editorWidth}
       height={editorHeight}
       value={value}
