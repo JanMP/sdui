@@ -18,7 +18,7 @@ export DefaultHeader = ({
   listSchemaBridge
   loadedRowCount, totalRowCount
   canSearch, search, onChangeSearch
-  canUseQueryEditor, onChangeQueryUiObject
+  canUseQueryEditor, queryUiObject, onChangeQueryUiObject
   canExport, mayExport, onExportTable,
   canAdd, mayAdd, onAdd
   canSort, sortColumn, sortDirection, onChangeSort
@@ -28,21 +28,24 @@ export DefaultHeader = ({
 
 
   [showQueryEditor, setShowQueryEditor] = useState false
-  [rule, setRule] = useState null
+
 
   toggleQueryEditor = -> setShowQueryEditor (x) -> not x
 
-  onChangeRule = (newRule) ->
-    setRule newRule
-    onChangeQueryUiObject newRule
+  useEffect ->
+    console.log queryUiObject
+    unless queryUiObject?
+      onChangeQueryUiObject null
+  , [queryUiObject]
+
+  hasEffectiveQueryUiObject = queryUiObject?.content?.length > 0
 
   <>
     <div className="default-header">
       {
         if totalRowCount
           <div className="row-count">{loadedRowCount}/{totalRowCount}</div>
-        else
-          <div className="row-count"/>
+        else          <div className="row-count"/>
       }
       <div className="middle-container">
         {
@@ -66,7 +69,7 @@ export DefaultHeader = ({
         {
           if canUseQueryEditor
             <button
-              className="icon #{if rule? then 'ok' else 'secondary'}"
+              className="icon #{if hasEffectiveQueryUiObject then 'warning' else 'secondary'}"
               onClick={toggleQueryEditor} disabled={not true}
             >
               <FontAwesomeIcon icon={faFilter}/>
@@ -98,8 +101,8 @@ export DefaultHeader = ({
     </div>
     <QueryEditorModal
       bridge={listSchemaBridge}
-      rule={rule}
-      onChangeRule={onChangeRule}
+      rule={queryUiObject}
+      onChangeRule={onChangeQueryUiObject}
       isOpen={showQueryEditor}
       setIsOpen={setShowQueryEditor}
     />

@@ -16,13 +16,7 @@ import {faXmark} from '@fortawesome/free-solid-svg-icons/faXmark'
   @param {(newValue : boolean) => void} args.setIsOpen
   @return void
   ###
-export QueryEditorModal = ({bridge, rule, onChangeRule, useQuery = false, setUseQuery = ->, isOpen, setIsOpen}) ->
-
-  resetQuery = -> onChangeRule {}
-
-  onChange = (newQueryUiObject) ->
-    console.log newQueryUiObject
-    onChangeRule newQueryUiObject
+export QueryEditorModal = ({bridge, rule, onChangeRule, isOpen, setIsOpen}) ->
 
 
   <Modal
@@ -47,6 +41,6 @@ export QueryEditorModal = ({bridge, rule, onChangeRule, useQuery = false, setUse
     <QueryEditor
       bridge={bridge}
       rule={rule}
-      onChange={onChange}
+      onChange={onChangeRule}
     />
   </Modal>

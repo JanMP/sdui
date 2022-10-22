@@ -12,9 +12,16 @@ import {HTML5Backend} from 'react-dnd-html5-backend'
 
 export QueryEditor = ({bridge, rule, path, onChange}) ->
 
+  resetRule = -> onChange getNewBlock {bridge, path, type: 'logicBlock'}
+  
   path ?= ''
+
+  useEffect ->
+    unless rule?
+      resetRule()
+  , [rule]
+
   unless rule?
-    onChange getNewBlock {bridge, path, type: 'logicBlock'}
     return null
 
   <div className="overflow-visible query-editor">
