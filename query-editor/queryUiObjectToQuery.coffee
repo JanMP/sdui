@@ -47,7 +47,7 @@ export default ({queryUiObject, getList}) ->
   unless queryUiObject?
     return {}
 
-  unless queryUiObject.content?
+  unless queryUiObject.content?.length
     return {}
   
   try

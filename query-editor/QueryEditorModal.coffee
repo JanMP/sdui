@@ -2,7 +2,6 @@ import React, {useState} from 'react'
 import Modal from 'react-modal'
 import {QueryEditor} from './QueryEditor.coffee'
 import {ActionButton} from '../forms/ActionButton.coffee'
-import {faFilterCircleXmark} from '@fortawesome/free-solid-svg-icons/faFilterCircleXmark'
 import {faXmark} from '@fortawesome/free-solid-svg-icons/faXmark'
 
 ###*
@@ -27,11 +26,6 @@ export QueryEditorModal = ({bridge, rule, onChangeRule, isOpen, setIsOpen}) ->
     shouldFocusAfterRender={false}
   >
     <div className="button-container">
-      <ActionButton
-        className="warning icon"
-        onAction={resetQuery}
-        icon={faFilterCircleXmark}
-      />
       <ActionButton
         className="secondary icon"
         onAction={-> setIsOpen false}

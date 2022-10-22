@@ -14,7 +14,7 @@ import _ from 'lodash'
 
 
 defaultQuery = {} # ensures equality between runs
-defaultQueryUiObject = {}
+defaultQueryUiObject = null
 
 ###*
   @typedef {import("../interfaces").DataTableOptions} DataTableOptions

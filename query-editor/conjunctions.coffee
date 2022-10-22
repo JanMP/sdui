@@ -3,11 +3,11 @@ import _ from 'lodash'
 
 conjunctions =
   $and:
-    label: 'satisfy all'
+    label: 'all conditions'
   $or:
-    label: 'satisfy at least one'
+    label: 'at least one condition'
   $nor:
-    label: 'satisfy none'
+    label: 'none of the conditions'
 
 logicConjunctionSelectOptions =
   _(conjunctions)

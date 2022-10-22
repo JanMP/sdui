@@ -6,6 +6,9 @@ import {getNewBlock} from './queryEditorHelpers'
 import PartIndex from './PartIndex'
 import _ from 'lodash'
 
+import {faFilterCircleXmark} from '@fortawesome/free-solid-svg-icons/faFilterCircleXmark'
+import {ActionButton} from '../forms/ActionButton.coffee'
+
 import {DndProvider} from 'react-dnd'
 import {HTML5Backend} from 'react-dnd-html5-backend'
 
@@ -24,7 +27,17 @@ export QueryEditor = ({bridge, rule, path, onChange}) ->
   unless rule?
     return null
 
-  <div className="overflow-visible query-editor">
+
+  <div className="query-editor">
+    <div className="header">
+      <div>Find documents that satisfy</div>
+       <ActionButton
+        className="warning"
+        onAction={resetRule}
+        icon={faFilterCircleXmark}
+        label="reset"
+      />
+    </div>
     <DndProvider backend={HTML5Backend}>
       <QueryBlockEditor
         rule={rule}

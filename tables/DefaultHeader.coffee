@@ -45,7 +45,8 @@ export DefaultHeader = ({
       {
         if totalRowCount
           <div className="row-count">{loadedRowCount}/{totalRowCount}</div>
-        else          <div className="row-count"/>
+        else
+          <div className="row-count"/>
       }
       <div className="middle-container">
         {
