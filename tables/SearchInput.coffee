@@ -20,7 +20,7 @@ export SearchInput = ({value, onChange, className = 'search-input'}) ->
 
 
   <input
-    placeholder="Suchen..."
+    placeholder="Search..."
     className={'search-input' + if showWarning then ' search-input--warn' else ''}
     type="text"
     value={displayValue}

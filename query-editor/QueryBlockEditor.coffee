@@ -18,7 +18,6 @@ import {useDrop} from 'react-dnd'
 export QueryBlockEditor = React.memo ({rule, partIndex, bridge, path, onChange, onRemove, onAddAfter, isRoot}) ->
   
   isRoot ?= false
-  partIndex ?= ''
 
   onRemove ?= ->
   onAddAfter ?= ->
@@ -49,11 +48,11 @@ export QueryBlockEditor = React.memo ({rule, partIndex, bridge, path, onChange, 
   useEffect ->
     c =
       switch conjunction
-        when '$and' then 'bg-warning-200'
-        when '$or' then 'bg-ok-200'
-        when '$nor' then 'bg-danger-200'
+        when '$and' then 'query-block--and'
+        when '$or' then 'query-block--or'
+        when '$nor' then 'query-block--nor'
         else
-          'bg-secondary-200'
+          'query-block--context'
     setBlockTypeClass c
     return
   , [conjunction]
@@ -133,8 +132,8 @@ export QueryBlockEditor = React.memo ({rule, partIndex, bridge, path, onChange, 
 
 
   if isBlock
-    <div ref={drop} className="overflow-visible pt-3 pl-3 pb-1 #{if isRoot then 'pr-3' else 'pr-1'} rounded #{blockTypeClass}">
-      <div className="flex justify-between | block-header">
+    <div ref={drop} className="query-block #{if isRoot then 'query-block--root' else ''} #{blockTypeClass}">
+      <div className="header">
         <div className="flex-grow">
           <Select
             value={_.find conjunctionSelectOptions, value: conjunction}
@@ -174,7 +173,7 @@ export QueryBlockEditor = React.memo ({rule, partIndex, bridge, path, onChange, 
           }
         </div>
       </div>
-      <div className="mt-2 pl-2">{children}</div>
+      <div className="child-container">{children}</div>
       {<pre>{JSON.stringify {path,partIndex: partIndex.str}, null, 2}</pre> if false}
     </div>
   else if rule.type is 'sentence'
