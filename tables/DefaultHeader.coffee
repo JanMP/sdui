@@ -5,7 +5,7 @@ import {faFileDownload} from '@fortawesome/free-solid-svg-icons/faFileDownload'
 import {faFilter} from '@fortawesome/free-solid-svg-icons/faFilter'
 import {SearchInput} from './SearchInput.coffee'
 import {SortSelect} from './SortSelect.coffee'
-import {QueryEditor} from '../query-editor/QueryEditor.coffee'
+import {QueryEditorModal} from '../query-editor/QueryEditorModal.coffee'
 
 
 ###*
@@ -18,7 +18,7 @@ export DefaultHeader = ({
   listSchemaBridge
   loadedRowCount, totalRowCount
   canSearch, search, onChangeSearch
-  canUseQueryEditor, onChangeQueryUiObject
+  canUseQueryEditor, queryUiObject, onChangeQueryUiObject
   canExport, mayExport, onExportTable,
   canAdd, mayAdd, onAdd
   canSort, sortColumn, sortDirection, onChangeSort
@@ -28,19 +28,17 @@ export DefaultHeader = ({
 
 
   [showQueryEditor, setShowQueryEditor] = useState false
-  [rule, setRule] = useState null
+
 
   toggleQueryEditor = -> setShowQueryEditor (x) -> not x
 
   useEffect ->
-    unless showQueryEditor
-      setRule null
+    console.log queryUiObject
+    unless queryUiObject?
       onChangeQueryUiObject null
-  , [showQueryEditor]
+  , [queryUiObject]
 
-  onChangeRule = (newRule) ->
-    setRule newRule
-    onChangeQueryUiObject newRule
+  hasEffectiveQueryUiObject = queryUiObject?.content?.length > 0
 
   <>
     <div className="default-header">
@@ -72,7 +70,7 @@ export DefaultHeader = ({
         {
           if canUseQueryEditor
             <button
-              className="query-editor-toggle | icon secondary"
+              className="icon #{if hasEffectiveQueryUiObject then 'warning' else 'secondary'}"
               onClick={toggleQueryEditor} disabled={not true}
             >
               <FontAwesomeIcon icon={faFilter}/>
@@ -102,14 +100,11 @@ export DefaultHeader = ({
         <AdditionalHeaderButtonsRight/>
       </div>
     </div>
-    <div className="h-full overflow-visible">
-      {
-        if showQueryEditor
-          <QueryEditor
-            bridge={listSchemaBridge}
-            rule={rule}
-            onChange={onChangeRule}
-          />
-      }
-    </div>
+    <QueryEditorModal
+      bridge={listSchemaBridge}
+      rule={queryUiObject}
+      onChangeRule={onChangeQueryUiObject}
+      isOpen={showQueryEditor}
+      setIsOpen={setShowQueryEditor}
+    />
   </>

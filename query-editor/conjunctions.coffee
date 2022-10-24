@@ -3,11 +3,11 @@ import _ from 'lodash'
 
 conjunctions =
   $and:
-    label: 'alle Bedingungen erfüllt'
+    label: 'all conditions'
   $or:
-    label: 'mindestens eine Bedingung erfüllt'
+    label: 'at least one condition'
   $nor:
-    label: 'keine der Bedingungen erfüllt'
+    label: 'none of the conditions'
 
 logicConjunctionSelectOptions =
   _(conjunctions)
@@ -34,9 +34,9 @@ export getConjunctionData = ({bridge, path, type}) ->
       .map (name) ->
         label = bridge.schema._schema[name]?.label ? name
         label = switch type = bridge.getType pathWithName name
-          when Array then "für mindestens einen Eintrag im Underdokument #{label}"
-          when Object then "für das Unterdokument #{label}"
-          else "FEHLER"
+          when Array then "for at least one element of sub-document #{label}"
+          when Object then "for sub-document #{label}"
+          else "Error"
         return
           key: name
           value: name

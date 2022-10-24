@@ -114,6 +114,8 @@ function Select({
         ))
       ) : (
         <ReactSelect
+          className="react-select"
+          classNamePrefix="react-select"
           ref={selectRef}
           isDisabled={disabled}
           isMulti={multiple}
