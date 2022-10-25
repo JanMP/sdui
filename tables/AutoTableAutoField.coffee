@@ -27,7 +27,7 @@ export AutoTableAutoField = ({row, columnKey, schemaBridge, onChangeField, measu
         when Array
           row[columnKey]?.map (entry, i) ->
             if _.isObject entry
-              <pre>{JSON.stringify row[columnKey], null, 2}</pre>
+              <pre>{JSON.stringify row[columnKey][i]}</pre>
             else
               <div key={i} style={whiteSpace: 'normal', marginBottom: '.2rem'}>{entry}</div>
         else
