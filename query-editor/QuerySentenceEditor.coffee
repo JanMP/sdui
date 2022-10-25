@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useRef} from 'react'
 import {DynamicField} from '../forms/DynamicField.coffee'
 import {SimpleSchema2Bridge as Bridge} from 'uniforms-bridge-simple-schema-2'
 # import CodeListenSelect from '../parts/SearchQueryField'
@@ -48,19 +48,17 @@ export QuerySentenceEditor = ({rule, partIndex, bridge, path, onChange, onRemove
 
   [shouldEraseMyself, setShouldEraseMyself] = useState false
 
-
-  [{isDragging}, drag, dragPreview] = useDrag ->
-    type: 'rule'
-    item: _.cloneDeep rule
-    end: (item, monitor) ->
-      if monitor.didDrop()
-        if monitor.getDropResult()?.dropEffect is 'move'
-          onRemove()
-
-    
-
-    collect: (monitor) ->
-      isDragging: monitor.isDragging()
+  #remove useRef when reactivate useDrag
+  drag = useRef null
+  # [{isDragging}, drag, dragPreview] = useDrag ->
+  #   type: 'rule'
+  #   item: _.cloneDeep rule
+  #   end: (item, monitor) ->
+  #     if monitor.didDrop()
+  #       if monitor.getDropResult()?.dropEffect is 'move'
+  #         onRemove()
+  #   collect: (monitor) ->
+  #     isDragging: monitor.isDragging()
 
   # if we can't display anything usefull we just get ourselves erased
   useEffect ->

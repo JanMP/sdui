@@ -12,12 +12,14 @@ import {faFilter} from '@fortawesome/free-solid-svg-icons/faFilter'
 import {faFolder} from '@fortawesome/free-solid-svg-icons/faFolder'
 import {faFile} from '@fortawesome/free-solid-svg-icons/faFile'
 import {faTimes} from '@fortawesome/free-solid-svg-icons/faTimes'
+import {faLock} from '@fortawesome/free-solid-svg-icons/faLock'
 import {useDrop} from 'react-dnd'
 
 
-export QueryBlockEditor = React.memo ({rule, partIndex, bridge, path, onChange, onRemove, onAddAfter, isRoot}) ->
+export QueryBlockEditor = React.memo ({rule, partIndex, bridge, path, onChange, onRemove, onAddAfter, isRoot, locked}) ->
   
   isRoot ?= false
+  locked ?= isRoot
 
   onRemove ?= ->
   onAddAfter ?= ->
@@ -127,6 +129,7 @@ export QueryBlockEditor = React.memo ({rule, partIndex, bridge, path, onChange, 
           onChange={changePart index}
           onRemove={removePart index}
           onAddAfter={addPartAfter index}
+          locked={part.locked}
         />
       </div>
 
@@ -159,22 +162,29 @@ export QueryBlockEditor = React.memo ({rule, partIndex, bridge, path, onChange, 
           <button
             className="icon secondary"
             onClick={addSentence}
-            disabled={not childWouldHaveSubject}
+            disabled={(not childWouldHaveSubject) or (rule.type is 'contextBlock')}
           >
             <FontAwesomeIcon icon={faFile}/>
           </button>
           {
-            <button
-              className="icon secondary"
-              onClick={onRemove}
-            >
-              <FontAwesomeIcon icon={faTimes}/>
-            </button> unless isRoot
+            if locked
+              <button
+                className="icon secondary"
+                disabled
+              >
+                <FontAwesomeIcon icon={faLock}/>
+              </button>
+            else
+              <button
+                className="icon secondary"
+                onClick={onRemove}
+              >
+                <FontAwesomeIcon icon={faTimes}/>
+              </button>
           }
         </div>
       </div>
       <div className="child-container">{children}</div>
-      {<pre>{JSON.stringify {path,partIndex: partIndex.str}, null, 2}</pre> if false}
     </div>
   else if rule.type is 'sentence'
     <QuerySentenceEditor

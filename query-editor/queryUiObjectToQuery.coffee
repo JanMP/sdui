@@ -53,5 +53,6 @@ export default ({queryUiObject, getList}) ->
   try
     traverseTree queryUiObject
   catch error
-    console.error error
+    unless error.error is 'and-or-nor-empty'
+      console.error error
     return error
