@@ -260,42 +260,42 @@ export DataTable = ({
       }...}/>
     </div>
    
-      <InfiniteLoader
-        isRowLoaded={isRowLoaded}
-        loadMoreRows={loadMoreRows}
-        rowCount={totalRowCount}
-      >
-        {({onRowsRendered, registerChild}) ->
-          registerChild tableRef
-          <Table
-            width={contentContainerWidth}
-            height={contentContainerHeight - headerContainerHeight - 10}
-            headerHeight={34}
-            rowHeight={cacheRef.current.rowHeight}
-            rowCount={rows?.length ? 0}
-            rowGetter={getRow}
-            rowClassName={({index}) -> if index %% 2 then 'uneven' else 'even'}
-            rowRenderer={rowRenderer {canEdit, mayEdit}}
-            onRowsRendered={onRowsRendered}
-            ref={tableRef}
-            overscanRowCount={overscanRowCount}
-            onRowClick={onRowClick}
-            sort={sort}
-            sortBy={sortColumn}
-            sortDirection={sortDirection}
-          >
-            {columns}
-            {
-              if canDelete or AdditionalButtonsRight?
-                <Column
-                  dataKey="no-data-key"
-                  label=""
-                  width={rightButtonColumnWidth}
-                  cellRenderer={rightButtonCellRenderer {canDelete, mayDelete, onDelete, AdditionalButtonsRight}}
-                />
-            }
-          </Table>
-        }
-      </InfiniteLoader>
+    <InfiniteLoader
+      isRowLoaded={isRowLoaded}
+      loadMoreRows={loadMoreRows}
+      rowCount={totalRowCount}
+    >
+      {({onRowsRendered, registerChild}) ->
+        registerChild tableRef
+        <Table
+          width={contentContainerWidth}
+          height={contentContainerHeight - headerContainerHeight - 10}
+          headerHeight={34}
+          rowHeight={cacheRef.current.rowHeight}
+          rowCount={rows?.length ? 0}
+          rowGetter={getRow}
+          rowClassName={({index}) -> if index %% 2 then 'uneven' else 'even'}
+          rowRenderer={rowRenderer {canEdit, mayEdit}}
+          onRowsRendered={onRowsRendered}
+          ref={tableRef}
+          overscanRowCount={overscanRowCount}
+          onRowClick={onRowClick}
+          sort={sort}
+          sortBy={sortColumn}
+          sortDirection={sortDirection}
+        >
+          {columns}
+          {
+            if canDelete or AdditionalButtonsRight?
+              <Column
+                dataKey="no-data-key"
+                label=""
+                width={rightButtonColumnWidth}
+                cellRenderer={rightButtonCellRenderer {canDelete, mayDelete, onDelete, AdditionalButtonsRight}}
+              />
+          }
+        </Table>
+      }
+    </InfiniteLoader>
     
   </div>
