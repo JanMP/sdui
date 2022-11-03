@@ -11,28 +11,15 @@ import {getColumnsToExport} from '../common/getColumnsToExport.coffee'
 import Papa from 'papaparse'
 import {downloadAsFile} from '../common/downloadAsFile.coffee'
 import _ from 'lodash'
+import types from '../typeDeclarations.ts'
 
 
 defaultQuery = {} # ensures equality between runs
 defaultQueryUiObject = null
-
 ###*
-  @typedef {import("../interfaces").DataTableOptions} DataTableOptions
+  @type {types.MeteorTableDataHandler}
   ###
-###*
-  @typedef {import("../interfaces").DataTableDisplayOptions} DataTableDisplayOptions
-  ###
-###*
-  @type {
-    (options: {
-      dataOptions: DataTableOptions,
-      fileListDataOptions?: DataTableOptions
-      DisplayComponent: {(options: DataTableDisplayOptions) : React.FC},
-      customComponents?: any
-    }) => React.FC
-  }
-  ###
-export MeteorTableDataHandler = ({dataOptions, fileListDataOptions, DisplayComponent, customComponents}) ->
+export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponents}) ->
   {
   sourceName, listSchemaBridge,
   rowsCollection, rowCountCollection
@@ -103,15 +90,6 @@ export MeteorTableDataHandler = ({dataOptions, fileListDataOptions, DisplayCompo
   [queryUiObject, setQueryUiObject] = useState defaultQueryUiObject
 
   onChangeQueryUiObject = setQueryUiObject
-    # newQuery =
-    #   try
-    #     queryUiObjectToQuery {queryUiObject}
-    #   catch error
-    #     console.error error
-    #     {}
-    # console.log JSON.stringify newQuery, null, 2
-    # setQuery newQuery
-
 
   mayEdit = useCurrentUserIsInRole editRole
   mayAdd = useCurrentUserIsInRole addRole
@@ -278,6 +256,5 @@ export MeteorTableDataHandler = ({dataOptions, fileListDataOptions, DisplayCompo
       mayExport
       isLoading,
       customComponents
-      fileListDataOptions
     }...} />
   </ErrorBoundary>

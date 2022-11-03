@@ -7,13 +7,11 @@ import {SearchInput} from './SearchInput.coffee'
 import {SortSelect} from './SortSelect.coffee'
 import {QueryEditorModal} from '../query-editor/QueryEditorModal.coffee'
 import useSize from '@react-hook/size'
+import types from '../typeDeclarations.ts'
 
 
 ###*
-  @typedef {import("../interfaces").DataTableHeaderOptions} DataTableHeaderOptions
-  ###
-###*
-  @type {(options: DataTableHeaderOptions) => React.FC}
+  @type {types.DefaultHeader}
   ###
 export DefaultHeader = ({
   listSchemaBridge

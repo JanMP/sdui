@@ -8,38 +8,29 @@ import {SdEditor} from '../editor/SdEditor.coffee'
 import {MarkdownDisplay} from '../markdown/MarkdownDisplay.coffee'
 import {ActionButton} from '../forms/ActionButton.coffee'
 import _ from 'lodash'
+import types from '../typeDeclarations.ts'
 
 
-###*
-  @typedef {import("../interfaces").DataTableDisplayOptions} DataTableDisplayOptions
-  ###
-###*
-  @type {
-    (options: DataTableDisplayOptions) => React.FC
-  }
-  ###
-export ContentEditor = (tableOptions) ->
-
-  {
-    sourceName
-    listSchemaBridge, formSchemaBridge
-    rows, totalRowCount, loadMoreRows, onRowClick,
-    canSort, sortColumn, sortDirection, onChangeSort
-    canSearch, search, onChangeSearch
-    canUseQueryEditor, queryUiObject, onChangeQueryUiObject
-    canAdd, mayAdd, onAdd
-    canDelete, mayDelete, onDelete, deleteConfirmation
-    canEdit, mayEdit, onSubmit
-    autoFormChildren, formDisabled
-    loadEditorData
-    onChangeField,
-    canExport, onExportTable
-    mayExport
-    isLoading,
-    overscanRowCount
-    customComponents
-    setupNewItem
-  } = tableOptions
+export ContentEditor = ({
+sourceName
+listSchemaBridge, formSchemaBridge
+rows, totalRowCount, loadMoreRows, onRowClick,
+canSort, sortColumn, sortDirection, onChangeSort
+canSearch, search, onChangeSearch
+canUseQueryEditor, queryUiObject, onChangeQueryUiObject
+canAdd, mayAdd, onAdd
+canDelete, mayDelete, onDelete, deleteConfirmation
+canEdit, mayEdit, onSubmit
+autoFormChildren, formDisabled
+loadEditorData
+onChangeField,
+canExport, onExportTable
+mayExport
+isLoading,
+overscanRowCount
+customComponents
+setupNewItem
+}) ->
 
   {Preview, RelatedDataPane, FilePane} = customComponents ? {}
 

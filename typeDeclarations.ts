@@ -1,6 +1,7 @@
 import SimpleSchema2Bridge from 'uniforms-bridge-simple-schema-2'
 import {Mongo} from 'meteor/mongo'
 import SimpleSchema from 'simpl-schema'
+import { createTableDataAPI } from './sdui-server'
 import {FC} from React
 
 export interface RoleObject {
@@ -14,7 +15,7 @@ export type Role = string | Array<string> | RoleObject | ((id: string) => boolea
 export interface createTableDataAPIParams {
   sourceName: string
   sourceSchema: SimpleSchema
-  collection: Mongo.Collection
+  collection: Mongo.Collection<object>
   useObjectIds?: boolean
   listSchema?: SimpleSchema
   formSchema?: SimpleSchema
@@ -108,7 +109,11 @@ export interface createTableDataAPIReturn {
   perLoad: number
 }
 
-interface additionalDataTableOptions {
+export function createTableDataAPI(options: createTableDataAPIParams): createTableDataAPIReturn
+
+
+// This is for additional options we can shove into our Components
+export interface additionalDataTableOptions {
   onDelete?: ({id}: {id: string}) => Promise<any>
   onRowClick?: ({rowData, index}: {rowData: any, index: number}) => void
   autoFormChildren?: [any]
@@ -120,7 +125,7 @@ interface additionalDataTableOptions {
 
 export type DataTableOptions = createTableDataAPIReturn & additionalDataTableOptions
 
-export interface DataTableDisplayOptions {
+export interface additionalDataTableDisplayOptions {
   rows: [any]
   totalRowCount: number
   loadMoreRows: ({startIndex, stopIndex}: {startIndex: number, stopIndex: number}) => Promise<any>
@@ -131,6 +136,8 @@ export interface DataTableDisplayOptions {
   onChangeSearch: (searchString: string) => void
   onDelete: ({id}: {id: string}) => Promise<any>
 }
+
+export type DataTableDisplayOptions = DataTableOptions & additionalDataTableDisplayOptions
 
 export interface DataTableHeaderOptions {
   listSchemaBridge: object
@@ -152,8 +159,21 @@ export interface DataTableHeaderOptions {
   sortColumn?: string
   sortDirection?: 'ASC' | 'DESC'
   onChangeSort:  ({sortColumn, sortDirection}: {sortColumn: string, sortDirection: 'ASC' | 'DESC'}) => void
-  AdditionalButtonsLeft?: FC
-  AdditionalButtonsRight?: FC
+  AdditionalHeaderButtonsLeft?: FC
+  AdditionalHeaderButtonsRight?: FC
   // query?: object
   // onChangeQuery?: (query: object) => void
 }
+export function DefaultHeader(options: DataTableHeaderOptions): FC
+
+export function DataTableDisplayComponent(options: DataTableDisplayOptions): FC
+
+// TODO gather types of all implemented customComponent props
+export type customComponents = {[key: string]: FC}
+
+export interface MeteorTableDataHandlerOptions {
+  dataOptions: DataTableOptions
+  DisplayComponent: typeof DataTableDisplayComponent
+  customComponents: customComponents
+}
+export function MeteorTableDataHandler(options: MeteorTableDataHandlerOptions): FC
