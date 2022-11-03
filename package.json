@@ -16,7 +16,7 @@
   ],
   "author": "JanMP",
   "license": "ISC",
-  "types": "./typeDeclarations.ts.ts",
+  "types": "./typeDeclarations.ts",
   "bugs": {
     "url": "https://github.com/JanMP/sdui/issues"
   },

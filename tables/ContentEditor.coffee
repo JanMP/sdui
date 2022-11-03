@@ -8,9 +8,11 @@ import {SdEditor} from '../editor/SdEditor.coffee'
 import {MarkdownDisplay} from '../markdown/MarkdownDisplay.coffee'
 import {ActionButton} from '../forms/ActionButton.coffee'
 import _ from 'lodash'
-import types from '../typeDeclarations.ts'
+import * as types from '../typeDeclarations'
 
-
+###*
+  @type {types.DataTableDisplayComponent}
+  ###
 export ContentEditor = ({
 sourceName
 listSchemaBridge, formSchemaBridge

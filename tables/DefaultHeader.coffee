@@ -7,7 +7,7 @@ import {SearchInput} from './SearchInput.coffee'
 import {SortSelect} from './SortSelect.coffee'
 import {QueryEditorModal} from '../query-editor/QueryEditorModal.coffee'
 import useSize from '@react-hook/size'
-import types from '../typeDeclarations.ts'
+import * as types from '../typeDeclarations'
 
 
 ###*

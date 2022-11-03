@@ -4,7 +4,7 @@ import {publishTableData} from './publishTableData.coffee'
 import {createTableDataMethods} from './createTableDataMethods.coffee'
 import {createDefaultPipeline} from './createDefaultPipeline.coffee'
 import SimpleSchema2Bridge from 'uniforms-bridge-simple-schema-2'
-import types from '../typeDeclarations.ts'
+import * as types from '../typeDeclarations'
 
 ###*
   @type {types.createTableDataAPI}

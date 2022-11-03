@@ -11,7 +11,7 @@ import {getColumnsToExport} from '../common/getColumnsToExport.coffee'
 import Papa from 'papaparse'
 import {downloadAsFile} from '../common/downloadAsFile.coffee'
 import _ from 'lodash'
-import types from '../typeDeclarations.ts'
+import * as types from '../typeDeclarations'
 
 
 defaultQuery = {} # ensures equality between runs

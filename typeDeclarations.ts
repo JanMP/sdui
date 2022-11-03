@@ -109,7 +109,7 @@ export interface createTableDataAPIReturn {
   perLoad: number
 }
 
-export function createTableDataAPI(options: createTableDataAPIParams): createTableDataAPIReturn
+export declare function createTableDataAPI(options: createTableDataAPIParams): createTableDataAPIReturn
 
 
 // This is for additional options we can shove into our Components
@@ -135,12 +135,24 @@ export interface additionalDataTableDisplayOptions {
   search: 'string'
   onChangeSearch: (searchString: string) => void
   onDelete: ({id}: {id: string}) => Promise<any>
+  onChangeQueryUiObject: (queryUiObject: object) => void 
+  mayAdd?: boolean
+  onAdd?: () => void
+  mayDelete?: boolean
+  mayEdit?: boolean
+  mayExport?: boolean
+  onExportTable?: () => void
+  isLoading?: boolean
+  overscanRowCount?: number
+  customComponents: customComponents
 }
 
 export type DataTableDisplayOptions = DataTableOptions & additionalDataTableDisplayOptions
 
+export declare function DataTableDisplayComponent(options: DataTableDisplayOptions): FC
+
 export interface DataTableHeaderOptions {
-  listSchemaBridge: object
+  listSchemaBridge: SimpleSchema2Bridge
   loadedRowCount: number
   totalRowCount: number
   canSearch?: boolean
@@ -164,9 +176,7 @@ export interface DataTableHeaderOptions {
   // query?: object
   // onChangeQuery?: (query: object) => void
 }
-export function DefaultHeader(options: DataTableHeaderOptions): FC
-
-export function DataTableDisplayComponent(options: DataTableDisplayOptions): FC
+export declare function DefaultHeader(options: DataTableHeaderOptions): FC
 
 // TODO gather types of all implemented customComponent props
 export type customComponents = {[key: string]: FC}
@@ -176,4 +186,4 @@ export interface MeteorTableDataHandlerOptions {
   DisplayComponent: typeof DataTableDisplayComponent
   customComponents: customComponents
 }
-export function MeteorTableDataHandler(options: MeteorTableDataHandlerOptions): FC
+export declare function MeteorTableDataHandler(options: MeteorTableDataHandlerOptions): FC
