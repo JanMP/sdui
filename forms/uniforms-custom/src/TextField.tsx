@@ -1,11 +1,12 @@
 import React, { Ref } from 'react';
 import { HTMLFieldProps, connectField, filterDOMProps } from 'uniforms';
 import setClassNamesForProps from './setClassNamesForProps';
+import {useTranslation} from 'react-i18next'
 
 export type TextFieldProps = HTMLFieldProps<
-  string,
-  HTMLDivElement,
-  { inputRef?: Ref<HTMLInputElement>; hasFloatingLabel?: boolean }
+string,
+HTMLDivElement,
+{ inputRef?: Ref<HTMLInputElement>; hasFloatingLabel?: boolean }
 >;
 
 function Text({
@@ -22,9 +23,12 @@ function Text({
   value,
   ...props
 }: TextFieldProps) {
+  
+  const {t} = useTranslation()
+
   return (
     <div className={setClassNamesForProps(props)} {...filterDOMProps(props)}>
-      {label && !props.hasFloatingLabel && <label htmlFor={id}>{label}</label>}
+      {label && !props.hasFloatingLabel && <label htmlFor={id}>{t(label)}</label>}
       <input
         autoComplete={autoComplete}
         disabled={disabled}
@@ -37,7 +41,7 @@ function Text({
         type={type}
         value={value ?? ''}
       />
-      {label && props.hasFloatingLabel && <label htmlFor={id}>{label}</label>}
+      {label && props.hasFloatingLabel && <label htmlFor={id}>{t(label)}</label>}
     </div>
   );
 }

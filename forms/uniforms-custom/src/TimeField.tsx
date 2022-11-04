@@ -3,12 +3,12 @@ import { HTMLFieldProps, connectField, filterDOMProps } from 'uniforms';
 import setClassNamesForProps from './setClassNamesForProps';
 import {DateTime} from 'luxon'
 import TimePicker from 'react-time-picker'
-
+import {useTranslation} from 'react-i18next'
 
 export type TimeFieldProps = HTMLFieldProps<
-  Date,
-  HTMLDivElement,
-  { inputRef?: Ref<HTMLInputElement>; max?: Date; min?: Date; hasFloatingLabel?: boolean }
+Date,
+HTMLDivElement,
+{ inputRef?: Ref<HTMLInputElement>; max?: Date; min?: Date; hasFloatingLabel?: boolean }
 >;
 
 function Time({
@@ -27,9 +27,12 @@ function Time({
   hasFloatingLabel,
   ...props
 }: TimeFieldProps) {
+  
+  const {t} = useTranslation()
+
   return (
     <div className={setClassNamesForProps(props)} {...filterDOMProps(props)}>
-      {label && !hasFloatingLabel &&<label htmlFor={id}>{label}</label>}
+      {label && !hasFloatingLabel &&<label htmlFor={id}>{t(label)}</label>}
       
       <TimePicker
         value={value}
@@ -46,7 +49,7 @@ function Time({
         maxDetail="second"
       />
     
-      {label && hasFloatingLabel &&<label htmlFor={id}>{label}</label>}
+      {label && hasFloatingLabel &&<label htmlFor={id}>{t(label)}</label>}
     </div>
   );
 }

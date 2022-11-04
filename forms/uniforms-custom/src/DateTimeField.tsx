@@ -3,13 +3,13 @@ import { HTMLFieldProps, connectField, filterDOMProps } from 'uniforms';
 import setClassNamesForProps from './setClassNamesForProps';
 import {DateTime} from 'luxon'
 import DateTimePicker from 'react-datetime-picker'
-
+import {useTranslation} from 'react-i18next'
 
 
 export type DateFieldProps = HTMLFieldProps<
-  Date,
-  HTMLDivElement,
-  { inputRef?: Ref<HTMLInputElement>; max?: Date; min?: Date; hasFloatingLabel?: boolean }
+Date,
+HTMLDivElement,
+{ inputRef?: Ref<HTMLInputElement>; max?: Date; min?: Date; hasFloatingLabel?: boolean }
 >;
 
 function Date({
@@ -27,9 +27,12 @@ function Date({
   hasFloatingLabel,
   ...props
 }: DateFieldProps) {
+  
+  const {t} = useTranslation()
+  
   return (
     <div className={setClassNamesForProps(props)} {...filterDOMProps(props)}>
-      {label && !hasFloatingLabel &&<label htmlFor={id}>{label}</label>}
+      {label && !hasFloatingLabel &&<label htmlFor={id}>{t(label)}</label>}
       
       <DateTimePicker
         value={value}
@@ -49,7 +52,7 @@ function Date({
         secondPlaceholder="ss"
       />
     
-      {label && hasFloatingLabel &&<label htmlFor={id}>{label}</label>}
+      {label && hasFloatingLabel &&<label htmlFor={id}>{t(label)}</label>}
     </div>
   );
 }

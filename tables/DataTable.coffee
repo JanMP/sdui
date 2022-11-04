@@ -15,7 +15,7 @@ import {faSortDown} from '@fortawesome/free-solid-svg-icons/faSortDown'
 import {faTrash} from '@fortawesome/free-solid-svg-icons/faTrash'
 import {faGripVertical} from '@fortawesome/free-solid-svg-icons/faGripVertical'
 import {DefaultHeader} from './DefaultHeader.coffee'
-
+import {useTranslation} from 'react-i18next'
 
 newCache = -> new CellMeasurerCache
   fixedWidth: true
@@ -24,7 +24,7 @@ newCache = -> new CellMeasurerCache
 
 resizableHeaderRenderer = ({onResizeRows, isLastOne}) ->
   ({columnData, dataKey, disableSort, label, sortBy, sortDirection}) ->
-
+  
     onDrag = (e, {deltaX}) ->
       onResizeRows {dataKey, deltaX}
     
@@ -129,6 +129,8 @@ export DataTable = ({
   overscanRowCount = 10
   customComponents = {}
 }) ->
+
+  {t} = useTranslation()
 
   {Header, AdditionalButtonsRight, rightButtonColumnWidth, AdditionalHeaderButtonsLeft, AdditionalHeaderButtonsRight} = customComponents
   if Header? and (AdditionalHeaderButtonsLeft? or AdditionalHeaderButtonsRight?)
@@ -238,7 +240,7 @@ export DataTable = ({
         className={className}
         key={key}
         dataKey={key}
-        label={schemaForKey.label}
+        label={t(schemaForKey.label)}
         width={columnWidths[i] * totalColumnsWidth}
         cellRenderer={cellRenderer {listSchemaBridge, onChangeField, mayEdit, cache: cacheRef.current}}
         headerRenderer={headerRenderer}

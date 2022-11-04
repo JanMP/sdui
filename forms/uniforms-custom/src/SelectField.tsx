@@ -3,27 +3,26 @@ import xor from 'lodash/xor';
 import React, { useState, useEffect, useRef, useCallback, Ref } from 'react';
 import ReactSelect from 'react-select';
 import { HTMLFieldProps, connectField, filterDOMProps } from 'uniforms';
-
 import setClassNamesForProps from './setClassNamesForProps';
-
+import {useTranslation} from 'react-i18next'
 const base64: typeof btoa =
-  typeof btoa === 'undefined'
-    ? /* istanbul ignore next */ x => Buffer.from(x).toString('base64')
-    : btoa;
+typeof btoa === 'undefined'
+? /* istanbul ignore next */ x => Buffer.from(x).toString('base64')
+: btoa;
 const escape = (x: string) => base64(encodeURIComponent(x)).replace(/=+$/, '');
 
 export type SelectFieldProps = HTMLFieldProps<
-  string | string[],
-  HTMLDivElement,
-  {
-    allowedValues?: string[];
-    checkboxes?: boolean;
-    disableItem?: (value: string) => boolean;
-    inputRef?: Ref<HTMLSelectElement>;
-    transform?: (value: string) => string;
-    components?: any;
-    hasFloatingLabel?: boolean
-  }
+string | string[],
+HTMLDivElement,
+{
+  allowedValues?: string[];
+  checkboxes?: boolean;
+  disableItem?: (value: string) => boolean;
+  inputRef?: Ref<HTMLSelectElement>;
+  transform?: (value: string) => string;
+  components?: any;
+  hasFloatingLabel?: boolean
+}
 >;
 
 function Select({
@@ -46,10 +45,13 @@ function Select({
   sdTable,
   ...props
 }: SelectFieldProps) {
+  
+  const {t} = useTranslation()
+  
   const multiple = fieldType === Array;
   const selectRef = useRef(null);
   const [oldValue, setOldValue] = useState(null);
-
+  
   const optionFromValue = useCallback(
     value => {
       return {
@@ -87,7 +89,7 @@ function Select({
       {...filterDOMProps(props)}
       className={(checkboxes && setClassNamesForProps(props)) || ''}
     >
-      {label && !props.hasFloatingLabel && <label htmlFor={id}>{label}</label>}
+      {label && !props.hasFloatingLabel && <label htmlFor={id}>{t(label)}</label>}
       {checkboxes ? (
         allowedValues!.map(item => (
           <div key={item}>
@@ -109,7 +111,7 @@ function Select({
             <label htmlFor={`${id}-${escape(item)}`}>
               {transform ? transform(item) : item}
             </label>
-            {label && props.hasFloatingLabel && <label htmlFor={id}>{label}</label>}
+            {label && props.hasFloatingLabel && <label htmlFor={id}>{t(label)}</label>}
           </div>
         ))
       ) : (

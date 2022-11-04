@@ -1,11 +1,13 @@
 import React, { Ref } from 'react';
 import { HTMLFieldProps, connectField, filterDOMProps } from 'uniforms';
 import setClassNamesForProps from './setClassNamesForProps';
+import {useTranslation} from 'react-i18next'
+
 
 export type NumFieldProps = HTMLFieldProps<
-  number,
-  HTMLDivElement,
-  { decimal?: boolean; inputRef?: Ref<HTMLInputElement>; hasFloatingLabel?: boolean }
+number,
+HTMLDivElement,
+{ decimal?: boolean; inputRef?: Ref<HTMLInputElement>; hasFloatingLabel?: boolean }
 >;
 
 function Num({
@@ -24,9 +26,12 @@ function Num({
   value,
   ...props
 }: NumFieldProps) {
+  
+  const {t} = useTranslation()
+
   return (
     <div className={setClassNamesForProps(props)} {...filterDOMProps(props)}>
-      {label && !props.hasFloatingLabel && <label htmlFor={id}>{label}</label>}
+      {label && !props.hasFloatingLabel && <label htmlFor={id}>{t(label)}</label>}
       <input
         disabled={disabled}
         id={id}
@@ -45,7 +50,7 @@ function Num({
         type="number"
         value={value ?? ''}
       />
-      {label && props.hasFloatingLabel && <label htmlFor={id}>{label}</label>}
+      {label && props.hasFloatingLabel && <label htmlFor={id}>{t(label)}</label>}
     </div>
   );
 }

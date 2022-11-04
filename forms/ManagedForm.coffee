@@ -4,10 +4,12 @@ import {useForm} from 'uniforms'
 import {ActionButton} from './ActionButton.coffee'
 import isEqual from 'lodash/isEqual'
 import {ErrorBoundary} from '../common/ErrorBoundary.coffee'
-
+import {useTranslation} from 'react-i18next'
 
 
 export ManagedForm = ({schemaBridge, model, onChangeModel, onSubmit, disabled, children}) ->
+
+  {t} = useTranslation()
 
   onChangeModel ?= ->
 
@@ -44,13 +46,13 @@ export ManagedForm = ({schemaBridge, model, onChangeModel, onSubmit, disabled, c
         <ActionButton
           onAction={-> form.reset()}
           className="button warning"
-          label="Zurücksetzen"
+          label={t 'Reset'}
           disabled={not hasChanged}
         />
         <ActionButton
           onAction={onAction}
           className="button primary"
-          label="Speichern"
+          label={t 'Save'}
           disabled={(not hasChanged) or (not isValid)}
         />
       </div>

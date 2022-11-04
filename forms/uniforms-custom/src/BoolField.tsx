@@ -1,11 +1,11 @@
 import React, { Ref } from 'react';
 import { HTMLFieldProps, connectField, filterDOMProps } from 'uniforms';
 import setClassNamesForProps from './setClassNamesForProps';
-
+import {useTranslation} from 'react-i18next'
 export type BoolFieldProps = HTMLFieldProps<
-  boolean,
-  HTMLDivElement,
-  { inputRef?: Ref<HTMLInputElement> }
+boolean,
+HTMLDivElement,
+{ inputRef?: Ref<HTMLInputElement> }
 >;
 
 function Bool({
@@ -19,6 +19,9 @@ function Bool({
   value,
   ...props
 }: BoolFieldProps) {
+  
+  const {t} = useTranslation()
+  
   return (
     <div className={setClassNamesForProps(props)} {...filterDOMProps(props)}>
       <input
@@ -31,7 +34,7 @@ function Bool({
         type="checkbox"
       />
 
-      {label && <label htmlFor={id}>{label}</label>}
+      {label && <label htmlFor={id}>{t(label)}</label>}
     </div>
   );
 }
