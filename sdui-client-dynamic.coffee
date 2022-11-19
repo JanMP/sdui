@@ -14,6 +14,7 @@ export {
 export {useSession} from './common/useSession.coffee'
 export {meteorApply} from './common/meteorApply.coffee'
 export {config} from './config/config.coffee'
+export {default as connectFieldWithLabel} from './forms/connectFieldWithLabel.coffee'
 
 export {createTableDataAPI} from './api/createTableDataAPI.coffee'
 export {createUserTableAPI} from './usertable/createUserTableAPI.coffee'
