@@ -5,7 +5,8 @@ import {faXmark} from '@fortawesome/free-solid-svg-icons/faXmark'
 import {ActionButton} from './ActionButton.coffee'
 
 export FormModal = ({schemaBridge, onSubmit, model,
-isOpen, onRequestClose, header, children, disabled = false, readOnly}) ->
+isOpen, onRequestClose, header, children, disabled = false, readOnly,
+submitField, onChangeModel}) ->
 
   <Modal
     isOpen={isOpen}
@@ -24,5 +25,7 @@ isOpen, onRequestClose, header, children, disabled = false, readOnly}) ->
       model={model}
       children={children}
       disabled={disabled}
+      onChangeModel={onChangeModel}
+      submitField={-> null}
     />
   </Modal>
