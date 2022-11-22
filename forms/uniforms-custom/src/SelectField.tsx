@@ -1,7 +1,7 @@
 import isEqual from 'lodash/isEqual';
 import xor from 'lodash/xor';
 import React, { useState, useEffect, useRef, useCallback, Ref } from 'react';
-import ReactSelect from 'react-select';
+import ReactSelect, {OptionProps} from 'react-select';
 import { HTMLFieldProps, connectField, filterDOMProps } from 'uniforms';
 import setClassNamesForProps from './setClassNamesForProps';
 import {useTranslation} from 'react-i18next'
@@ -22,6 +22,8 @@ HTMLDivElement,
   transform?: (value: string) => string;
   components?: any;
   hasFloatingLabel?: boolean
+  theme?: any;
+  styles?: any
 }
 >;
 
@@ -43,6 +45,8 @@ function Select({
   value,
   components,
   sdTable,
+  styles,
+  theme
   ...props
 }: SelectFieldProps) {
   
@@ -125,6 +129,8 @@ function Select({
           // @ts-ignore
           onChange={onOptionChange}
           options={allowedValues?.map(optionFromValue)}
+          styles={styles}
+          theme={theme}
         />
       )}
     </div>
