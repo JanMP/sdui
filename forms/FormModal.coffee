@@ -8,10 +8,12 @@ export FormModal = ({schemaBridge, onSubmit, model,
 isOpen, onRequestClose, header, children, disabled = false, readOnly,
 submitField, onChangeModel}) ->
 
+  submitField = -> <button className="button primary">Ok</button>
+
   <Modal
     isOpen={isOpen}
     onRequestClose={onRequestClose}
-    className="modal"
+    className="modal form-modal"
     overlayClassName="overlay"
     shouldFocusAfterRender={false}
   >
@@ -26,6 +28,6 @@ submitField, onChangeModel}) ->
       children={children}
       disabled={disabled}
       onChangeModel={onChangeModel}
-      submitField={-> null}
+      submitField={submitField}
     />
   </Modal>
