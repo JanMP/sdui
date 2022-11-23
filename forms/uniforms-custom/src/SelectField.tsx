@@ -24,6 +24,7 @@ HTMLDivElement,
   hasFloatingLabel?: boolean
   theme?: any;
   styles?: any
+  isSearchable?: boolean
 }
 >;
 
@@ -46,7 +47,8 @@ function Select({
   components,
   sdTable,
   styles,
-  theme
+  theme,
+  isSearchable,
   ...props
 }: SelectFieldProps) {
   
@@ -131,6 +133,7 @@ function Select({
           options={allowedValues?.map(optionFromValue)}
           styles={styles}
           theme={theme}
+          isSearchable={isSearchable ?? true}
         />
       )}
     </div>
