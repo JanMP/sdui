@@ -8,6 +8,7 @@ import {Roles} from 'meteor/alanning:roles'
 import {RoleSelect} from './RoleSelect'
 import _ from 'lodash'
 
+SimpleSchema.extendOptions(['sdTable', 'uniforms'])
 
 export createUserTableAPI = ({userProfileSchema, getAllowedRoles, viewUserTableRole = 'admin'  , editUserRole = 'admin'}) ->
 
@@ -130,7 +131,16 @@ export createUserTableAPI = ({userProfileSchema, getAllowedRoles, viewUserTableR
           allowedRoles.scope[scope].forEach (role) ->
             Roles.createRole role, unlessExists: true
 
+  seedUsers = ->
+    if Meteor.isServer
+      Meteor.settings.seedUsers?.forEach ({email, password, roles}) ->
+        unless Meteor.users.findOne('emails.0.address': email)?
+          if (id = Accounts.createUser {email, password})?
+            if Meteor.roleAssignment.find('user._id': id).count() is 0
+              Roles.addUsersToRoles id, roles
+
   createRoles()
+  seedUsers()
 
   new ValidatedMethod
     name: 'user.getAllowedRoles'
