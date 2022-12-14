@@ -10,9 +10,9 @@ import {useCurrentUserIsInRole} from '../common/roleChecks.coffee'
 import {getColumnsToExport} from '../common/getColumnsToExport.coffee'
 import Papa from 'papaparse'
 import {downloadAsFile} from '../common/downloadAsFile.coffee'
+import {useTranslation} from 'react-i18next'
 import _ from 'lodash'
 import * as types from '../typeDeclarations'
-
 
 defaultQuery = {} # ensures equality between runs
 defaultQueryUiObject = null
@@ -47,6 +47,9 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
   viewTableRole, editRole, addRole, deleteRole, exportTableRole
   showRowCount
   } = dataOptions
+
+
+  {t} = useTranslation()
 
   # we only support usePubSub = true atm
   usePubSub = true
@@ -91,6 +94,7 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
 
   onChangeQueryUiObject = setQueryUiObject
 
+  mayView = useCurrentUserIsInRole viewTableRole
   mayEdit = useCurrentUserIsInRole editRole
   mayAdd = useCurrentUserIsInRole addRole
   mayDelete = useCurrentUserIsInRole deleteRole
@@ -212,7 +216,7 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
       method: deleteMethodName
       data: {id}
     .then ->
-      toast.success "Der Eintrag wurde gelöscht"
+      toast.success t "The entry has been deleted"
   
   onChangeField ?= ({_id, changeData}) ->
     meteorApply
@@ -226,7 +230,7 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
         method: exportRowsMethodName
         data: {search, query, queryUiObject, sort}
       .then (rows) ->
-        toast.success "Exportdaten vom Server erhalten"
+        toast.success t "Export data received from Server."
         Papa.unparse rows, columns: getColumnsToExport schema: listSchemaBridge.schema
       .then (csvString) ->
         downloadAsFile
@@ -234,27 +238,34 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
           fileName: (title ? sourceName) + '.csv'
       .catch (error) ->
         console.error error
-        toast.error "Fehler (siehe console.log)"
+        toast.error t "Unexpected Error (see console.log)"
     else throw new Meteor.Error 'onExportTable has been called despite canExport == false'
 
   <ErrorBoundary>
-    <DisplayComponent {{
-      sourceName,
-      listSchemaBridge, formSchemaBridge
-      rows, totalRowCount, loadMoreRows, onRowClick,
-      canSort, sortColumn, sortDirection, onChangeSort
-      canSearch, search, onChangeSearch
-      canUseQueryEditor, queryUiObject, onChangeQueryUiObject
-      canAdd, mayAdd, onAdd
-      canDelete, mayDelete, onDelete
-      canEdit, mayEdit, onSubmit
-      setupNewItem
-      autoFormChildren, formDisabled, formReadOnly
-      loadEditorData
-      onChangeField,
-      canExport, onExportTable
-      mayExport
-      isLoading,
-      customComponents
-    }...} />
+    {
+      if mayView
+        <DisplayComponent {{
+          sourceName,
+          listSchemaBridge, formSchemaBridge
+          rows, totalRowCount, loadMoreRows, onRowClick,
+          canSort, sortColumn, sortDirection, onChangeSort
+          canSearch, search, onChangeSearch
+          canUseQueryEditor, queryUiObject, onChangeQueryUiObject
+          canAdd, mayAdd, onAdd
+          canDelete, mayDelete, onDelete
+          canEdit, mayEdit, onSubmit
+          setupNewItem
+          autoFormChildren, formDisabled, formReadOnly
+          loadEditorData
+          onChangeField,
+          canExport, onExportTable
+          mayExport
+          isLoading,
+          customComponents
+        }...}/>
+      else
+        <div className="may-not-view-message">
+          {t "You do not have the required user accees permission to view this content."}
+        </div>
+  }
   </ErrorBoundary>
