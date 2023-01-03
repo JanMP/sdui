@@ -34,8 +34,14 @@ export QueryBlockEditor = React.memo ({rule, partIndex, bridge, path, onChange, 
   cantGetInnerPathType = false
 
   conjunction = rule?.conjunction?.value ? null
-  
-  [blockTypeClass, setBlockTypeClass] = useState ''
+
+  blockTypeClass =
+    switch conjunction
+      when '$and' then 'query-block--and'
+      when '$or' then 'query-block--or'
+      when '$nor' then 'query-block--nor'
+      else
+        'query-block--context'
 
   [{canDrop, isOver}, drop] = useDrop ->
     accept: 'fnord'
@@ -46,18 +52,6 @@ export QueryBlockEditor = React.memo ({rule, partIndex, bridge, path, onChange, 
     collect: (monitor) ->
       isOver: monitor.isOver()
       canDrop: monitor.canDrop()
-
-  useEffect ->
-    c =
-      switch conjunction
-        when '$and' then 'query-block--and'
-        when '$or' then 'query-block--or'
-        when '$nor' then 'query-block--nor'
-        else
-          'query-block--context'
-    setBlockTypeClass c
-    return
-  , [conjunction]
 
   innerPath = switch
     when myContext? and path then "#{path}.#{myContext}"
