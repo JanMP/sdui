@@ -143,6 +143,7 @@ export QueryBlockEditor = React.memo ({rule, partIndex, bridge, path, onChange, 
           <button
             className="icon secondary"
             onClick={addLogicBlock}
+            disabled={rule.type is 'contextBlock'}
           >
             <FontAwesomeIcon icon={faFilter}/>
           </button>
@@ -178,6 +179,17 @@ export QueryBlockEditor = React.memo ({rule, partIndex, bridge, path, onChange, 
           }
         </div>
       </div>
+      {
+        unless children?.length
+          <div className="child-container--no-children">
+            <span>Please add Conditions for Data Fields </span>
+            <FontAwesomeIcon icon={faFile}/>
+            <span>, Embedded Data Fields from related Data Sets </span>
+            <FontAwesomeIcon icon={faFolder}/>
+            <span> or combinations of Conditions </span>
+            <FontAwesomeIcon icon={faFilter}/>
+          </div>
+      }
       <div className="child-container">{children}</div>
     </div>
   else if rule.type is 'sentence'
