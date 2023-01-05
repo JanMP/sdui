@@ -31,17 +31,19 @@ export ManagedForm = ({schemaBridge, model, onChangeModel, onSubmit, disabled, c
 
   <ErrorBoundary>
     <div className="managed-form">
-      <AutoForm
-        ref={(ref) -> form = ref}
-        schema={schemaBridge}
-        model={model}
-        onChangeModel={handleChange}
-        onValidate={onValidate}
-        submitField={-> null}
-        validate="onChange"
-        children={children}
-        disabled={disabled}
-      />
+     <div className="form-container">
+       <AutoForm
+          ref={(ref) -> form = ref}
+          schema={schemaBridge}
+          model={model}
+          onChangeModel={handleChange}
+          onValidate={onValidate}
+          submitField={-> null}
+          validate="onChange"
+          children={children}
+          disabled={disabled}
+        />
+     </div>
       <div className="button-container">
         <ActionButton
           onAction={-> form.reset()}
