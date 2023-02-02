@@ -12,13 +12,14 @@ import {faFilter} from '@fortawesome/free-solid-svg-icons/faFilter'
 import {faFolder} from '@fortawesome/free-solid-svg-icons/faFolder'
 import {faFile} from '@fortawesome/free-solid-svg-icons/faFile'
 import {faTimes} from '@fortawesome/free-solid-svg-icons/faTimes'
+import {faLock} from '@fortawesome/free-solid-svg-icons/faLock'
 import {useDrop} from 'react-dnd'
 
 
-export QueryBlockEditor = React.memo ({rule, partIndex, bridge, path, onChange, onRemove, onAddAfter, isRoot}) ->
+export QueryBlockEditor = React.memo ({rule, partIndex, bridge, path, onChange, onRemove, onAddAfter, isRoot, locked}) ->
   
   isRoot ?= false
-  partIndex ?= ''
+  locked ?= isRoot
 
   onRemove ?= ->
   onAddAfter ?= ->
@@ -33,8 +34,14 @@ export QueryBlockEditor = React.memo ({rule, partIndex, bridge, path, onChange, 
   cantGetInnerPathType = false
 
   conjunction = rule?.conjunction?.value ? null
-  
-  [blockTypeClass, setBlockTypeClass] = useState ''
+
+  blockTypeClass =
+    switch conjunction
+      when '$and' then 'query-block--and'
+      when '$or' then 'query-block--or'
+      when '$nor' then 'query-block--nor'
+      else
+        'query-block--context'
 
   [{canDrop, isOver}, drop] = useDrop ->
     accept: 'fnord'
@@ -45,18 +52,6 @@ export QueryBlockEditor = React.memo ({rule, partIndex, bridge, path, onChange, 
     collect: (monitor) ->
       isOver: monitor.isOver()
       canDrop: monitor.canDrop()
-
-  useEffect ->
-    c =
-      switch conjunction
-        when '$and' then 'bg-warning-200'
-        when '$or' then 'bg-ok-200'
-        when '$nor' then 'bg-danger-200'
-        else
-          'bg-secondary-200'
-    setBlockTypeClass c
-    return
-  , [conjunction]
 
   innerPath = switch
     when myContext? and path then "#{path}.#{myContext}"
@@ -128,13 +123,14 @@ export QueryBlockEditor = React.memo ({rule, partIndex, bridge, path, onChange, 
           onChange={changePart index}
           onRemove={removePart index}
           onAddAfter={addPartAfter index}
+          locked={part.locked}
         />
       </div>
 
 
   if isBlock
-    <div ref={drop} className="overflow-visible pt-3 pl-3 pb-1 #{if isRoot then 'pr-3' else 'pr-1'} rounded #{blockTypeClass}">
-      <div className="flex justify-between | block-header">
+    <div ref={drop} className="query-block #{if isRoot then 'query-block--root' else ''} #{blockTypeClass}">
+      <div className="header">
         <div className="flex-grow">
           <Select
             value={_.find conjunctionSelectOptions, value: conjunction}
@@ -147,6 +143,7 @@ export QueryBlockEditor = React.memo ({rule, partIndex, bridge, path, onChange, 
           <button
             className="icon secondary"
             onClick={addLogicBlock}
+            disabled={rule.type is 'contextBlock'}
           >
             <FontAwesomeIcon icon={faFilter}/>
           </button>
@@ -160,22 +157,40 @@ export QueryBlockEditor = React.memo ({rule, partIndex, bridge, path, onChange, 
           <button
             className="icon secondary"
             onClick={addSentence}
-            disabled={not childWouldHaveSubject}
+            disabled={(not childWouldHaveSubject) or (rule.type is 'contextBlock')}
           >
             <FontAwesomeIcon icon={faFile}/>
           </button>
           {
-            <button
-              className="icon secondary"
-              onClick={onRemove}
-            >
-              <FontAwesomeIcon icon={faTimes}/>
-            </button> unless isRoot
+            if locked
+              <button
+                className="icon secondary"
+                disabled
+              >
+                <FontAwesomeIcon icon={faLock}/>
+              </button>
+            else
+              <button
+                className="icon secondary"
+                onClick={onRemove}
+              >
+                <FontAwesomeIcon icon={faTimes}/>
+              </button>
           }
         </div>
       </div>
-      <div className="mt-2 pl-2">{children}</div>
-      {<pre>{JSON.stringify {path,partIndex: partIndex.str}, null, 2}</pre> if false}
+      {
+        unless children?.length
+          <div className="child-container--no-children">
+            <span>Please add Conditions for Data Fields </span>
+            <FontAwesomeIcon icon={faFile}/>
+            <span>, Embedded Data Fields from related Data Sets </span>
+            <FontAwesomeIcon icon={faFolder}/>
+            <span> or combinations of Conditions </span>
+            <FontAwesomeIcon icon={faFilter}/>
+          </div>
+      }
+      <div className="child-container">{children}</div>
     </div>
   else if rule.type is 'sentence'
     <QuerySentenceEditor

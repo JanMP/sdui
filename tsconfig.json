@@ -25,6 +25,10 @@
     "baseUrl": ".",
     "paths": {
       /* Support absolute /imports/* with a leading '/' */
+      "meteor/*": [
+        "node_modules/@types/meteor/*",
+        ".meteor/local/types/packages.d.ts"
+      ],
       "@/*": ["*"]
     },
     "moduleResolution": "node",
@@ -33,6 +37,9 @@
     "esModuleInterop": true,
     "preserveSymlinks": true
   },
+  "include": [
+    "**.*.d.ts"
+  ],
   "exclude": [
     "./.meteor/**",
     "./packages/**"

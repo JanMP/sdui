@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useRef} from 'react'
 import {DynamicField} from '../forms/DynamicField.coffee'
 import {SimpleSchema2Bridge as Bridge} from 'uniforms-bridge-simple-schema-2'
 # import CodeListenSelect from '../parts/SearchQueryField'
@@ -48,19 +48,17 @@ export QuerySentenceEditor = ({rule, partIndex, bridge, path, onChange, onRemove
 
   [shouldEraseMyself, setShouldEraseMyself] = useState false
 
-
-  [{isDragging}, drag, dragPreview] = useDrag ->
-    type: 'rule'
-    item: _.cloneDeep rule
-    end: (item, monitor) ->
-      if monitor.didDrop()
-        if monitor.getDropResult()?.dropEffect is 'move'
-          onRemove()
-
-    
-
-    collect: (monitor) ->
-      isDragging: monitor.isDragging()
+  #remove useRef when reactivate useDrag
+  drag = useRef null
+  # [{isDragging}, drag, dragPreview] = useDrag ->
+  #   type: 'rule'
+  #   item: _.cloneDeep rule
+  #   end: (item, monitor) ->
+  #     if monitor.didDrop()
+  #       if monitor.getDropResult()?.dropEffect is 'move'
+  #         onRemove()
+  #   collect: (monitor) ->
+  #     isDragging: monitor.isDragging()
 
   # if we can't display anything usefull we just get ourselves erased
   useEffect ->
@@ -138,56 +136,46 @@ export QuerySentenceEditor = ({rule, partIndex, bridge, path, onChange, onRemove
 
   SentenceForm =
     <ErrorBoundary>
-      <div>
-        <div className="flex">
-          <div>
-            <div className="flex inline">
-              <div className="flex-grow">
-                <ErrorBoundary>
-                  <Select
-                    className="p-2"
-                    value={_.find subjectSelectOptions, value: subject}
-                    options={subjectSelectOptions}
-                    onChange={changeSubject}
-                    name="subject"
-                  />
-                </ErrorBoundary>
-              </div>
-              <div className="flex-grow">
-                <ErrorBoundary>
-                  <Select
-                    className="p-2"
-                    value={_.find predicateSelectOptions, value: rule.content.predicate?.value}
-                    options={predicateSelectOptions}
-                    onChange={changePredicate}
-                    name="predicate"
-                  />
-                </ErrorBoundary>
-              </div>
-            </div>
-          </div>
-          <div>
-            <ErrorBoundary>
-              <DynamicField
-                className="-m-1"
-                schemaBridge={autoFormSchemaBridge}
-                fieldName={objectPath}
-                label={false}
-                value={object}
-                onChange={changeObject}
-                mayEdit={true}
-              />
-            </ErrorBoundary>
-          </div>
+      <div className="sentence__form">
+        <div className="subject">
+          <ErrorBoundary>
+            <Select
+              value={_.find subjectSelectOptions, value: subject}
+              options={subjectSelectOptions}
+              onChange={changeSubject}
+              name="subject"
+            />
+          </ErrorBoundary>
         </div>
-        {<pre>{JSON.stringify {path, partIndex: partIndex.str}, null, 2}</pre> if false}
+        <div className="predicate">
+          <ErrorBoundary>
+            <Select
+              value={_.find predicateSelectOptions, value: rule.content.predicate?.value}
+              options={predicateSelectOptions}
+              onChange={changePredicate}
+              name="predicate"
+            />
+          </ErrorBoundary>
+        </div>
+        <div className="object">
+          <ErrorBoundary>
+            <DynamicField
+              schemaBridge={autoFormSchemaBridge}
+              fieldName={objectPath}
+              label={false}
+              value={object}
+              onChange={changeObject}
+              mayEdit={true}
+            />
+          </ErrorBoundary>
+        </div>
       </div>
     </ErrorBoundary>
 
 
-  <div ref={drag} className="overflow-visible flex justify-between bg-white rounded mb-2 | query-sentence">
+  <div ref={drag} className="sentence">
     {if canDisplay then SentenceForm}
-    <div className="p-2">
+    <div className="button-container">
       <button className="icon secondary" onClick={onRemove}>
         <FontAwesomeIcon icon={faXmark}/>
       </button>

@@ -44,7 +44,7 @@ export SortSelect = ({listSchemaBridge, sortColumn, sortDirection, onChangeSort}
     
   
   <Select
-    className="sort-select-container w-full"
+    className="sort-select__container"
     classNamePrefix="sort-select"
     components={{IndicatorsContainer}}
     value={valueOption}

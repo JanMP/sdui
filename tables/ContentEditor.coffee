@@ -8,38 +8,31 @@ import {SdEditor} from '../editor/SdEditor.coffee'
 import {MarkdownDisplay} from '../markdown/MarkdownDisplay.coffee'
 import {ActionButton} from '../forms/ActionButton.coffee'
 import _ from 'lodash'
-
+import * as types from '../typeDeclarations'
 
 ###*
-  @typedef {import("../interfaces").DataTableDisplayOptions} DataTableDisplayOptions
+  @type {types.DataTableDisplayComponent}
   ###
-###*
-  @type {
-    (options: DataTableDisplayOptions) => React.FC
-  }
-  ###
-export ContentEditor = (tableOptions) ->
-
-  {
-    sourceName
-    listSchemaBridge, formSchemaBridge
-    rows, totalRowCount, loadMoreRows, onRowClick,
-    canSort, sortColumn, sortDirection, onChangeSort
-    canSearch, search, onChangeSearch
-    canUseQueryEditor, queryUiObject, onChangeQueryUiObject
-    canAdd, mayAdd, onAdd
-    canDelete, mayDelete, onDelete, deleteConfirmation
-    canEdit, mayEdit, onSubmit
-    autoFormChildren, formDisabled
-    loadEditorData
-    onChangeField,
-    canExport, onExportTable
-    mayExport
-    isLoading,
-    overscanRowCount
-    customComponents
-    setupNewItem
-  } = tableOptions
+export ContentEditor = ({
+sourceName
+listSchemaBridge, formSchemaBridge
+rows, totalRowCount, loadMoreRows, onRowClick,
+canSort, sortColumn, sortDirection, onChangeSort
+canSearch, search, onChangeSearch
+canUseQueryEditor, queryUiObject, onChangeQueryUiObject
+canAdd, mayAdd, onAdd
+canDelete, mayDelete, onDelete, deleteConfirmation
+canEdit, mayEdit, onSubmit
+autoFormChildren, formDisabled
+loadEditorData
+onChangeField,
+canExport, onExportTable
+mayExport
+isLoading,
+overscanRowCount
+customComponents
+setupNewItem
+}) ->
 
   {Preview, RelatedDataPane, FilePane} = customComponents ? {}
 
@@ -136,7 +129,7 @@ export ContentEditor = (tableOptions) ->
           ?.then openEditor
 
   
-  <Fill>
+  <Fill className="content-editor">
     <ErrorBoundary>
       <ConfirmationModal
         isOpen={overloadConfirmationModalOpen}
@@ -179,7 +172,7 @@ export ContentEditor = (tableOptions) ->
         if mayEdit and editorOpen
           <LeftResizable size="50%">
             <TopResizable size="20%">
-              <Top size="2rem" className="text-sm bg-secondary-200 p-2" allowOverflow>Content</Top>
+              <Top size="2rem" className="pane-header" allowOverflow>Content</Top>
               <Fill allowOverflow>
                 <ErrorBoundary>
                   <SdEditor
@@ -190,31 +183,33 @@ export ContentEditor = (tableOptions) ->
               </Fill>
             </TopResizable>
             <Fill>
-              <Top size="2rem" className="text-sm bg-secondary-200 p-2">Data</Top>
+              <Top size="2rem" className="pane-header">Data</Top>
               <Fill scrollable>
-                <AutoForm
-                  schema={formSchemaBridge}
-                  model={changedModel}
-                  onChangeModel={setChangedModel}
-                  onValidate={onValidate}
-                  children={autoFormChildren}
-                  disabled={formDisabled}
-                  validate="onChange"
-                  submitField={-> null}
-                />
-                <div className="p-2">
-                  <ActionButton
-                    onAction={onReset}
-                    className="button danger"
-                    label="Zurücksetzen"
-                    disabled={not hasChanged}
+                <div className="managed-form">
+                  <AutoForm
+                    schema={formSchemaBridge}
+                    model={changedModel}
+                    onChangeModel={setChangedModel}
+                    onValidate={onValidate}
+                    children={autoFormChildren}
+                    disabled={formDisabled}
+                    validate="onChange"
+                    submitField={-> null}
                   />
-                  <ActionButton
-                    onAction={-> handleSubmit changedModel}
-                    className="button primary ml-2"
-                    label="Speichern"
-                    disabled={(not hasChanged) or (not isValid)}
-                  />
+                  <div className="button-container">
+                    <ActionButton
+                      onAction={onReset}
+                      className="button warning"
+                      label="Zurücksetzen"
+                      disabled={not hasChanged}
+                    />
+                    <ActionButton
+                      onAction={-> handleSubmit changedModel}
+                      className="button primary"
+                      label="Speichern"
+                      disabled={(not hasChanged) or (not isValid)}
+                    />
+                  </div>
                 </div>
               </Fill>
             </Fill>
@@ -223,7 +218,7 @@ export ContentEditor = (tableOptions) ->
       {
         if editorOpen
           <Fill>
-            <Top size="2rem" className="text-sm bg-secondary-200 p-2">Preview</Top>
+            <Top size="2rem" className="pane-header">Preview</Top>
             <Fill scrollable>
               <ErrorBoundary>
                 {

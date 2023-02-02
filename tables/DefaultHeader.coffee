@@ -1,24 +1,23 @@
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useState, useRef} from 'react'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faPlus} from '@fortawesome/free-solid-svg-icons/faPlus'
 import {faFileDownload} from '@fortawesome/free-solid-svg-icons/faFileDownload'
 import {faFilter} from '@fortawesome/free-solid-svg-icons/faFilter'
 import {SearchInput} from './SearchInput.coffee'
 import {SortSelect} from './SortSelect.coffee'
-import {QueryEditor} from '../query-editor/QueryEditor.coffee'
+import {QueryEditorModal} from '../query-editor/QueryEditorModal.coffee'
+import useSize from '@react-hook/size'
+import * as types from '../typeDeclarations'
 
 
 ###*
-  @typedef {import("../interfaces").DataTableHeaderOptions} DataTableHeaderOptions
-  ###
-###*
-  @type {(options: DataTableHeaderOptions) => React.FC}
+  @type {types.DefaultHeader}
   ###
 export DefaultHeader = ({
   listSchemaBridge
   loadedRowCount, totalRowCount
   canSearch, search, onChangeSearch
-  canUseQueryEditor, onChangeQueryUiObject
+  canUseQueryEditor, queryUiObject, onChangeQueryUiObject
   canExport, mayExport, onExportTable,
   canAdd, mayAdd, onAdd
   canSort, sortColumn, sortDirection, onChangeSort
@@ -28,32 +27,40 @@ export DefaultHeader = ({
 
 
   [showQueryEditor, setShowQueryEditor] = useState false
-  [rule, setRule] = useState null
+  
+  # we do this with js because of some weird interaction of react-virtualized and react-select
+  # when the react-select is inside a div with style container-type: inline-size
+  # (react-virtual will draw over the menu of react-select)
+  header = useRef null
+  [width, height] = useSize header
+  widthClass =
+    switch
+      when width < 440 then 'four-rows'
+      when width < 550 then 'two-rows'
+      else ''
 
   toggleQueryEditor = -> setShowQueryEditor (x) -> not x
 
   useEffect ->
-    unless showQueryEditor
-      setRule null
+    console.log queryUiObject
+    unless queryUiObject?
       onChangeQueryUiObject null
-  , [showQueryEditor]
+  , [queryUiObject]
 
-  onChangeRule = (newRule) ->
-    setRule newRule
-    onChangeQueryUiObject newRule
+  hasEffectiveQueryUiObject = queryUiObject?.content?.length > 0
 
-  <div>
-    <div className="flex justify-between p-2 border-b-2 border-secondary-200 flex-wrap gap-2">
+  <>
+    <div ref={header} className="default-header #{widthClass}">
       {
         if totalRowCount
-          <div className="flex-grow">{loadedRowCount}/{totalRowCount}</div>
+          <div className="row-count">{loadedRowCount}/{totalRowCount}</div>
         else
-          <div className="h-0 basis-0 flex-grow"/>
+          <div className="row-count"/>
       }
-      <div className="grow-[20] flex-shrink max-w-[40rem] flex-wrap flex justify-between gap-2">
+      <div className="middle-container">
         {
           if canSort
-            <div className="flex-grow basis-[9rem] min-w-[9rem]">
+            <div className="sort-container">
               <SortSelect {{
                 listSchemaBridge
                 sortColumn, sortDirection, onChangeSort
@@ -62,7 +69,7 @@ export DefaultHeader = ({
         }
         {
           if canSearch
-            <div className="flex-grow basis-[9rem] min-w-[9rem]">
+            <div className="search-container">
               <SearchInput
                 value={search}
                 onChange={onChangeSearch}
@@ -71,47 +78,44 @@ export DefaultHeader = ({
         }
         {
           if canUseQueryEditor
-            <button
-              className="icon secondary"
-              onClick={toggleQueryEditor} disabled={not true}
-            >
-              <FontAwesomeIcon icon={faFilter}/>
-            </button>
+            <div className="query-editor-toggle-container">
+              <button
+                className="icon #{if hasEffectiveQueryUiObject then 'warning' else 'secondary'}"
+                onClick={toggleQueryEditor} disabled={not true}
+              >
+                <FontAwesomeIcon icon={faFilter}/>
+              </button>
+            </div>
         }
       </div>
-      <div className="flex-shrink flex-grow text-right">
-        <div className="children:m-1">
-          <AdditionalHeaderButtonsLeft/>
-          {
-            if canExport
-              <button
-                className="primary icon"
-                onClick={onExportTable} disabled={not mayExport}
-              >
-                <FontAwesomeIcon icon={faFileDownload}/>
-              </button>
-          }
-          {
-            if canAdd
-              <button
-                className="primary icon"
-                onClick={onAdd} disabled={not mayAdd}
-              >
-                <FontAwesomeIcon icon={faPlus}/>
-              </button>
-          }
-          <AdditionalHeaderButtonsRight/>
-        </div>
+      <div className="buttons-container">
+        <AdditionalHeaderButtonsLeft/>
+        {
+          if canExport
+            <button
+              className="primary icon"
+              onClick={onExportTable} disabled={not mayExport}
+            >
+              <FontAwesomeIcon icon={faFileDownload}/>
+            </button>
+        }
+        {
+          if canAdd
+            <button
+              className="primary icon"
+              onClick={onAdd} disabled={not mayAdd}
+            >
+              <FontAwesomeIcon icon={faPlus}/>
+            </button>
+        }
+        <AdditionalHeaderButtonsRight/>
       </div>
     </div>
-    <div className="h-full overflow-visible">
-      {
-        if showQueryEditor
-          <QueryEditor
-            bridge={listSchemaBridge}
-            rule={rule}
-            onChange={onChangeRule}
-          />
-      }
-    </div>
-  </div>
+    <QueryEditorModal
+      bridge={listSchemaBridge}
+      rule={queryUiObject}
+      onChangeRule={onChangeQueryUiObject}
+      isOpen={showQueryEditor}
+      setIsOpen={setShowQueryEditor}
+    />
+  </>

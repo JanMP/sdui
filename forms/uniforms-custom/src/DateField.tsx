@@ -3,7 +3,7 @@ import { HTMLFieldProps, connectField, filterDOMProps } from 'uniforms';
 import setClassNamesForProps from './setClassNamesForProps';
 import {DateTime} from 'luxon'
 import DatePicker from 'react-date-picker'
-
+import {useTranslation} from 'react-i18next'
 
 
 export type DateFieldProps = HTMLFieldProps<
@@ -27,9 +27,12 @@ function Date({
   hasFloatingLabel,
   ...props
 }: DateFieldProps) {
+  
+  const {t} = useTranslation()
+  
   return (
     <div className={setClassNamesForProps(props)} {...filterDOMProps(props)}>
-      {label && !hasFloatingLabel &&<label htmlFor={id}>{label}</label>}
+      {label && !hasFloatingLabel &&<label htmlFor={id}>{t(label)}</label>}
       
       <DatePicker
         value={value}
@@ -45,7 +48,7 @@ function Date({
         yearPlaceholder="jjjj"
       />
     
-      {label && hasFloatingLabel &&<label htmlFor={id}>{label}</label>}
+      {label && hasFloatingLabel &&<label htmlFor={id}>{t(label)}</label>}
     </div>
   );
 }

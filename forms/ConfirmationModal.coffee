@@ -1,5 +1,6 @@
-import React, {useState} from 'react'
+import React from 'react'
 import Modal from 'react-modal'
+import {useTranslation} from 'react-i18next'
 
 ###*
   @param {Object} args
@@ -11,6 +12,8 @@ import Modal from 'react-modal'
   @return void
   ###
 export ConfirmationModal = ({text, onConfirm = ->, onCancel = ->, isOpen, setIsOpen}) ->
+
+  {t} = useTranslation()
 
   handleOkClick = ->
     setIsOpen false
@@ -27,9 +30,9 @@ export ConfirmationModal = ({text, onConfirm = ->, onCancel = ->, isOpen, setIsO
     overlayClassName="overlay"
     shouldFocusAfterRender={false}
   >
-    <div>{text}</div>
-    <div className="mt-4 flex justify-end">
-      <button className="button secondary" onClick={handleCancelClick} >Abbrechen</button>
-      <button className="ml-2 button primary" onClick={handleOkClick} >OK</button>
+    <div className="text-container">{text}</div>
+    <div className="button-container">
+      <button className="button secondary" onClick={handleCancelClick} >{t 'Cancel'}</button>
+      <button className="button primary" onClick={handleOkClick} >{t 'OK'}</button>
     </div>
   </Modal>

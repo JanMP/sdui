@@ -164,9 +164,9 @@ checkDisableDeleteForRow, checkDisableEditForRow}) ->
       run: (model) ->
         if model._id?
           currentUserMustBeInRole editRole
+          await editRowMustNotBeDisabled id: model._id
         else
           currentUserMustBeInRole addRole
-        await editRowMustNotBeDisabled id: model._id
         return unless Meteor.isServer
         submitMethodRun
           id: model._id
@@ -180,7 +180,7 @@ checkDisableDeleteForRow, checkDisableEditForRow}) ->
         .validator()
       run: ({id}) ->
         currentUserMustBeInRole editRole
-        await editRowMustNotBeDisabled: {id}
+        await editRowMustNotBeDisabled {id}
         if Meteor.isServer
           formDataFetchMethodRun {id}
 

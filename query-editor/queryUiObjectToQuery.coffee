@@ -47,11 +47,12 @@ export default ({queryUiObject, getList}) ->
   unless queryUiObject?
     return {}
 
-  unless queryUiObject.content?
+  unless queryUiObject.content?.length
     return {}
   
   try
     traverseTree queryUiObject
   catch error
-    console.error error
+    unless error.error is 'and-or-nor-empty'
+      console.error error
     return error

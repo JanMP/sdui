@@ -1,0 +1,24 @@
+{
+  "name": "sdui",
+  "version": "1.0.1",
+  "description": "Schema Driven UI, a MeteorJS package",
+  "main": "package.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JanMP/sdui.git"
+  },
+  "keywords": [
+    "MeteorJS",
+    "UI"
+  ],
+  "author": "JanMP",
+  "license": "ISC",
+  "types": "./typeDeclarations.ts",
+  "bugs": {
+    "url": "https://github.com/JanMP/sdui/issues"
+  },
+  "homepage": "https://github.com/JanMP/sdui#readme"
+}

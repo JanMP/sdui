@@ -1,21 +1,21 @@
 import omit from 'lodash/omit';
 import React from 'react';
 import { HTMLFieldProps, connectField, filterDOMProps } from 'uniforms';
-
+import {useTranslation} from 'react-i18next'
 const base64: typeof btoa =
-  typeof btoa === 'undefined'
-    ? /* istanbul ignore next */ x => Buffer.from(x).toString('base64')
-    : btoa;
+typeof btoa === 'undefined'
+? /* istanbul ignore next */ x => Buffer.from(x).toString('base64')
+: btoa;
 const escape = (x: string) => base64(encodeURIComponent(x)).replace(/=+$/, '');
 
 export type RadioFieldProps = HTMLFieldProps<
-  string,
-  HTMLDivElement,
-  {
-    allowedValues?: string[];
-    checkboxes?: boolean;
-    transform?: (value: string) => string;
-  }
+string,
+HTMLDivElement,
+{
+  allowedValues?: string[];
+  checkboxes?: boolean;
+  transform?: (value: string) => string;
+}
 >;
 
 function Radio({
@@ -30,9 +30,12 @@ function Radio({
   value,
   ...props
 }: RadioFieldProps) {
+  
+  const {t} = useTranslation()
+
   return (
     <div {...omit(filterDOMProps(props), ['checkboxes'])}>
-      {label && <label>{label}</label>}
+      {label && <label>{t(label)}</label>}
 
       {allowedValues?.map(item => (
         <div key={item}>

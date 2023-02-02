@@ -3,7 +3,7 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faTrash} from '@fortawesome/free-solid-svg-icons/faTrash'
 
 DefaultListItemContent = ({rowData, measure}) ->
-  <div className="bg-red-100">{JSON.stringify rowData, null, 2}</div>
+  <div className="default-list-item__default-content">{JSON.stringify rowData, null, 2}</div>
 
 
 export DefaultListItem = ({
@@ -26,14 +26,14 @@ export DefaultListItem = ({
   handleClick = ->
     if index? then onClick {rowData, index}
 
-  isSelectedClass = if isSelected then ' bg-secondary-100' else ''
-  editableClass = if rowData._disableEditForRow then ' not-editable-row' else 'editable-row'
+  isSelectedClass = if isSelected then ' default-list-item--selected' else ''
+  editableClass = if rowData._disableEditForRow then ' default-list-item--not-editable' else ''
 
-  <div className="p-1 shadow flex justify-between #{isSelectedClass} #{editableClass}" onClick={handleClick}>
+  <div className="default-list-item | #{isSelectedClass} #{editableClass}" onClick={handleClick}>
     <ListItemContent rowData={rowData} measure={measure}/>
     {
       if canDelete
-        <div className="p-2">
+        <div className="button-container">
           <button
             className="icon danger"
             onClick={handleDeleteButtonClick}

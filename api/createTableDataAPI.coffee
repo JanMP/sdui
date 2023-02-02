@@ -4,15 +4,10 @@ import {publishTableData} from './publishTableData.coffee'
 import {createTableDataMethods} from './createTableDataMethods.coffee'
 import {createDefaultPipeline} from './createDefaultPipeline.coffee'
 import SimpleSchema2Bridge from 'uniforms-bridge-simple-schema-2'
+import * as types from '../typeDeclarations'
 
 ###*
-  @typedef {import("../interfaces").createTableDataAPIReturn} createTableDataAPIReturn
-  ###
-###*
-  @typedef {import("../interfaces").createTableDataAPIParams} createTableDataAPIParams
-  ###
-###*
-  @type {(options: createTableDataAPIParams) => createTableDataAPIReturn}
+  @type {types.createTableDataAPI}
   ###
 export createTableDataAPI = ({
   sourceName, sourceSchema, collection

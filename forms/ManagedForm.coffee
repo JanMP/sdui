@@ -4,10 +4,12 @@ import {useForm} from 'uniforms'
 import {ActionButton} from './ActionButton.coffee'
 import isEqual from 'lodash/isEqual'
 import {ErrorBoundary} from '../common/ErrorBoundary.coffee'
-
+import {useTranslation} from 'react-i18next'
 
 
 export ManagedForm = ({schemaBridge, model, onChangeModel, onSubmit, disabled, children}) ->
+
+  {t} = useTranslation()
 
   onChangeModel ?= ->
 
@@ -28,29 +30,33 @@ export ManagedForm = ({schemaBridge, model, onChangeModel, onSubmit, disabled, c
     onChangeModel newModel
 
   <ErrorBoundary>
-    <div className="m-1 p-2">
-      <AutoForm
-        ref={(ref) -> form = ref}
-        schema={schemaBridge}
-        model={model}
-        onChangeModel={handleChange}
-        onValidate={onValidate}
-        submitField={-> null}
-        validate="onChange"
-        children={children}
-        disabled={disabled}
-      />
-      <ActionButton
-        onAction={-> form.reset()}
-        className="danger"
-        label="Zurücksetzen"
-        disabled={not hasChanged}
-      />
-      <ActionButton
-        onAction={onAction}
-        className="primary"
-        label="Speichern"
-        disabled={(not hasChanged) or (not isValid)}
-      />
+    <div className="managed-form">
+     <div className="form-container">
+       <AutoForm
+          ref={(ref) -> form = ref}
+          schema={schemaBridge}
+          model={model}
+          onChangeModel={handleChange}
+          onValidate={onValidate}
+          submitField={-> null}
+          validate="onChange"
+          children={children}
+          disabled={disabled}
+        />
+     </div>
+      <div className="button-container">
+        <ActionButton
+          onAction={-> form.reset()}
+          className="button warning"
+          label={t 'Reset'}
+          disabled={not hasChanged}
+        />
+        <ActionButton
+          onAction={onAction}
+          className="button primary"
+          label={t 'Save'}
+          disabled={(not hasChanged) or (not isValid)}
+        />
+      </div>
     </div>
   </ErrorBoundary>

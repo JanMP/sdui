@@ -72,18 +72,25 @@ onSuccess, successMsg, onError, errorMsg, confirmation, className, disabled}) ->
         />
     }
     <button
-      className={className}
+      className={"action-button | #{className}"}
       disabled={disabled}
       onClick={handleClick}
     >
-      <div className="relative">
-        <div className={if isBusy then "invisible"}>
+      <div style={position: "relative"}>
+        <div style={if isBusy then {visibility: "hidden"}}>
           {<FontAwesomeIcon icon={icon} fixedWidth /> if icon?}
           {<span> {label}</span> if label?}
         </div>
         {
           if isBusy
-            <div className="absolute inset-0 grid place-items-center">
+            <div
+              style={
+                position: "absolute"
+                top: "0px", right: "0px", bottom: "0px", left: "0px"
+                display: "grid"
+                "place-items": "center"
+              }
+            >
               <FontAwesomeIcon icon={faSpinner} fixedWidth spin/>
             </div>
         }

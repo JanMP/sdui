@@ -15,7 +15,7 @@ import {faSortDown} from '@fortawesome/free-solid-svg-icons/faSortDown'
 import {faTrash} from '@fortawesome/free-solid-svg-icons/faTrash'
 import {faGripVertical} from '@fortawesome/free-solid-svg-icons/faGripVertical'
 import {DefaultHeader} from './DefaultHeader.coffee'
-
+import {useTranslation} from 'react-i18next'
 
 newCache = -> new CellMeasurerCache
   fixedWidth: true
@@ -24,34 +24,29 @@ newCache = -> new CellMeasurerCache
 
 resizableHeaderRenderer = ({onResizeRows, isLastOne}) ->
   ({columnData, dataKey, disableSort, label, sortBy, sortDirection}) ->
-
+  
     onDrag = (e, {deltaX}) ->
       onResizeRows {dataKey, deltaX}
     
-    <div className="w-full overflow-hidden flex justify-end items-center h-[34pt] #{if isLastOne then '' else 'border-r-2 border-secondary-300'}" key={dataKey}>
-      <div className="flex-auto flex justify-between sort-click-target">
-        <div className="flex-auto overflow-hidden whitespace-nowrap text-ellipsis sort-click-target">{label}</div>
-        <div className="flex-none text-secondary-400 mr-2 sort-click-target">
-          {
-            if sortBy is dataKey
-              if sortDirection is 'ASC'
-                <FontAwesomeIcon className="sort-click-target" icon={faSortDown}/>
-              else
-                <FontAwesomeIcon className="sort-click-target" icon={faSortUp} />
-          }
-        </div>
+    <div className={if isLastOne then 'last-column' else ''} key={dataKey}>
+      <div className="sort-click-target">
+        <span className="sort-click-target">{label}</span>
+        {
+          if sortBy is dataKey
+            if sortDirection is 'ASC'
+              <FontAwesomeIcon className="sort-click-target" icon={faSortDown}/>
+            else
+              <FontAwesomeIcon className="sort-click-target" icon={faSortUp} />
+        }
       </div>
       {<Draggable
         axis="x"
-        defaultClassName="flex-none cursor-col-resize text-secondary-500"
-        defaultClassNameDragging="flex-none cursor-col-resize !text-secondary-200 "
+        defaultClassName="drag-handle"
+        defaultClassNameDragging="drag-handle"
         onDrag={onDrag}
         position={x: 0}
       >
-        <FontAwesomeIcon
-          className="mr-2"
-          icon={faGripVertical}
-        />
+        <div />
       </Draggable> unless isLastOne}
     </div>
 
@@ -134,6 +129,8 @@ export DataTable = ({
   overscanRowCount = 10
   customComponents = {}
 }) ->
+
+  {t} = useTranslation()
 
   {Header, AdditionalButtonsRight, rightButtonColumnWidth, AdditionalHeaderButtonsLeft, AdditionalHeaderButtonsRight} = customComponents
   if Header? and (AdditionalHeaderButtonsLeft? or AdditionalHeaderButtonsRight?)
@@ -243,7 +240,7 @@ export DataTable = ({
         className={className}
         key={key}
         dataKey={key}
-        label={schemaForKey.label}
+        label={t(schemaForKey.label)}
         width={columnWidths[i] * totalColumnsWidth}
         cellRenderer={cellRenderer {listSchemaBridge, onChangeField, mayEdit, cache: cacheRef.current}}
         headerRenderer={headerRenderer}
@@ -265,42 +262,42 @@ export DataTable = ({
       }...}/>
     </div>
    
-      <InfiniteLoader
-        isRowLoaded={isRowLoaded}
-        loadMoreRows={loadMoreRows}
-        rowCount={totalRowCount}
-      >
-        {({onRowsRendered, registerChild}) ->
-          registerChild tableRef
-          <Table
-            width={contentContainerWidth}
-            height={contentContainerHeight - headerContainerHeight - 10}
-            headerHeight={34}
-            rowHeight={cacheRef.current.rowHeight}
-            rowCount={rows?.length ? 0}
-            rowGetter={getRow}
-            rowClassName={({index}) -> if index %% 2 then 'uneven' else 'even'}
-            rowRenderer={rowRenderer {canEdit, mayEdit}}
-            onRowsRendered={onRowsRendered}
-            ref={tableRef}
-            overscanRowCount={overscanRowCount}
-            onRowClick={onRowClick}
-            sort={sort}
-            sortBy={sortColumn}
-            sortDirection={sortDirection}
-          >
-            {columns}
-            {
-              if canDelete or AdditionalButtonsRight?
-                <Column
-                  dataKey="no-data-key"
-                  label=""
-                  width={rightButtonColumnWidth}
-                  cellRenderer={rightButtonCellRenderer {canDelete, mayDelete, onDelete, AdditionalButtonsRight}}
-                />
-            }
-          </Table>
-        }
-      </InfiniteLoader>
+    <InfiniteLoader
+      isRowLoaded={isRowLoaded}
+      loadMoreRows={loadMoreRows}
+      rowCount={totalRowCount}
+    >
+      {({onRowsRendered, registerChild}) ->
+        registerChild tableRef
+        <Table
+          width={contentContainerWidth}
+          height={contentContainerHeight - headerContainerHeight - 10}
+          headerHeight={34}
+          rowHeight={cacheRef.current.rowHeight}
+          rowCount={rows?.length ? 0}
+          rowGetter={getRow}
+          rowClassName={({index}) -> if index %% 2 then 'uneven' else 'even'}
+          rowRenderer={rowRenderer {canEdit, mayEdit}}
+          onRowsRendered={onRowsRendered}
+          ref={tableRef}
+          overscanRowCount={overscanRowCount}
+          onRowClick={onRowClick}
+          sort={sort}
+          sortBy={sortColumn}
+          sortDirection={sortDirection}
+        >
+          {columns}
+          {
+            if canDelete or AdditionalButtonsRight?
+              <Column
+                dataKey="no-data-key"
+                label=""
+                width={rightButtonColumnWidth}
+                cellRenderer={rightButtonCellRenderer {canDelete, mayDelete, onDelete, AdditionalButtonsRight}}
+              />
+          }
+        </Table>
+      }
+    </InfiniteLoader>
     
   </div>
