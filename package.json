@@ -1,6 +1,6 @@
 {
   "name": "sdui",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Schema Driven UI, a MeteorJS package",
   "main": "package.js",
   "scripts": {

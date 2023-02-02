@@ -1,6 +1,6 @@
 Package.describe({
   name: 'janmp:sdui',
-  version: '1.0.0',
+  version: '1.0.1',
   // Brief, one-line summary of the package.
   summary: 'Some high level React components and setup for backend.',
   // URL to the Git repository containing the source code for this package.
