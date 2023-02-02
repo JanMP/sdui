@@ -23,17 +23,17 @@ export {createUserTableAPI} from './usertable/createUserTableAPI.coffee'
 # server only (eventually)
 export {default as queryUiObjectToQuery} from './query-editor/queryUiObjectToQuery.coffee'
 
-export ActionButton = suspend lazy -> import('./forms/ActionButton.coffee').then (m) -> default: m. ActionButton
-export SdList = suspend lazy -> import('./tables/SdList.coffee').then (m) -> default: m. SdList
-export SdTable = suspend lazy -> import('./tables/SdTable.coffee').then (m) -> default: m. SdTable
-export SdContentEditor = suspend lazy -> import('./tables/SdContentEditor.coffee').then (m) -> default: m. SdContentEditor
+export ActionButton = suspend lazy -> import('./forms/ActionButton.coffee').then (m) -> default: m.ActionButton
+export SdList = suspend lazy -> import('./tables/SdList.coffee').then (m) -> default: m.SdList
+export SdTable = suspend lazy -> import('./tables/SdTable.coffee').then (m) -> default: m.SdTable
+export SdContentEditor = suspend lazy -> import('./tables/SdContentEditor.coffee').then (m) -> default: m.SdContentEditor
 export SdEditor = suspend lazy -> import('./editor/SdEditor.coffee').then (m) -> default: m. SdEditor
-export MarkdownDisplay = suspend lazy -> import('./markdown/MarkdownDisplay.coffee').then (m) -> default: m. MarkdownDisplay
+export MarkdownDisplay = suspend lazy -> import('./markdown/MarkdownDisplay.coffee').then (m) -> default: m.MarkdownDisplay
 export ColorPicker = suspend lazy -> import('./forms/ColorPicker.coffee').then (m) -> default: m. ColorPicker
-export ColorPickerField = suspend lazy -> import('./forms/ColorPicker.coffee').then (m) -> default: m. ColorPickerField
+export ColorPickerField = suspend lazy -> import('./forms/ColorPicker.coffee').then (m) -> default: m.ColorPickerField
+export LongTextField = suspend lazy -> import('./forms/uniforms-custom/src/LongTextField')
 
 export * from './forms/uniforms-custom/select-implementation'
-export {LongTextField} from './forms/uniforms-custom/src'
 export ManagedForm = suspend lazy -> import('./forms/ManagedForm.coffee').then (m) -> default: m.ManagedForm
 export FormModal = suspend lazy -> import('./forms/FormModal.coffee').then (m) -> default: m.FormModal
 export LoginForm = suspend lazy -> import('./login-forms/LoginForm.coffee').then (m) -> default: m.LoginForm
