@@ -43,15 +43,14 @@ function ListAdd({
   }
 
   return (
-    <span
+    // @ts-ignore
+    <button className="icon ok"
+      type="button"
       {...filterDOMProps(props)}
       onClick={onAction}
-      onKeyDown={onAction}
-      role="button"
-      tabIndex={0}
     >
       +
-    </span>
+    </button>
   );
 }
 

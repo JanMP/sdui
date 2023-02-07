@@ -1,5 +1,5 @@
 import React from 'react'
-import {InputText} from 'primereact/inputtext'
+import {InputTextarea} from 'primereact/inputtextarea'
 import connectFieldPlus from '../../connectFieldPlus'
 
 
@@ -9,7 +9,7 @@ export default connectFieldPlus ({
   props...
 }) ->
 
-  <InputText
+  <InputTextarea
     onChange={(e) -> onChange e.target.value}
     {props...}
   />

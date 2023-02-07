@@ -23,7 +23,7 @@ export DynamicField = ({schemaBridge, fieldName, label, value, onChange, validat
     unless _.isEqual value, modelValue
       onChange modelValue
 
-  <div onClick={onClick}>
+  <div className="dynamic-field" onClick={onClick}>
     <AutoForm
       schema={schemaBridgeForFieldName}
       model={"#{fieldName}": value}

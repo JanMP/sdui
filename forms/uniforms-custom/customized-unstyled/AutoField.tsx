@@ -3,7 +3,7 @@ import { createAutoField } from 'uniforms';
 export { AutoFieldProps } from 'uniforms';
 
 import BoolField from './BoolField';
-import DateTimeField from './DateTimeField';
+import DateField from './DateField';
 import ListField from './ListField';
 import NestField from './NestField';
 import NumField from './NumField';
@@ -24,7 +24,7 @@ const AutoField = createAutoField(props => {
     case Boolean:
       return BoolField;
     case Date:
-      return DateTimeField;
+      return DateField;
     case Number:
       return NumField;
     case Object:

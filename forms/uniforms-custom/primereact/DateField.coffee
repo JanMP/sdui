@@ -1,28 +1,24 @@
 import React from 'react'
 import {Calendar} from 'primereact/calendar'
-import {filterDOMProps} from 'uniforms'
 import connectFieldPlus from '../../connectFieldPlus'
+import {useTranslation} from 'react-i18next'
 
-Date = ({
-  disabled
-  id
-  inputRef
-  label
+
+export default connectFieldPlus ({
   max
   min
   name
-  onChange,
-  placeholder
-  readOnly
-  value
+  onChange
   props...
 }) ->
 
+  {t} = useTranslation()
+  
+  props.dateFormat ?= t 'dd.mm.yy'
+  props.minDate ?= min
+  props.maxDate ?= max
+
   <Calendar
-    id={id}
-    value={value}
     onChange={(e) -> onChange e.value}
     {props...}
   />
-
-export default connectFieldPlus Date
