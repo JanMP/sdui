@@ -2,8 +2,7 @@ import React, {useState, useEffect} from 'react'
 import {QuerySentenceEditor} from './QuerySentenceEditor'
 import { getConjunctionData, getConjunctionSelectOptions } from './conjunctions'
 # import { Button, Icon, Select } from 'semantic-ui-react'
-# TODO implement replacement for ConrolledSelect
-import Select from 'react-select'
+import {Dropdown} from 'primereact/dropdown'
 import {getNewSentence, getNewBlock} from './queryEditorHelpers'
 import _ from 'lodash'
 import PartIndex from './PartIndex'
@@ -84,7 +83,7 @@ export QueryBlockEditor = React.memo ({rule, partIndex, bridge, path, onChange, 
     onChange _(clone).cloneDeep() #CHECK if we can do with cloning only once
 
   selectValueObject = (d) ->
-    _(conjunctionData).find value: d?.value
+    _(conjunctionData).find value: d
 
   changeConjunction = (d) -> returnRule (r) -> r.conjunction = selectValueObject d
 
@@ -132,10 +131,10 @@ export QueryBlockEditor = React.memo ({rule, partIndex, bridge, path, onChange, 
     <div ref={drop} className="query-block #{if isRoot then 'query-block--root' else ''} #{blockTypeClass}">
       <div className="header">
         <div className="flex-grow">
-          <Select
-            value={_.find conjunctionSelectOptions, value: conjunction}
+          <Dropdown
+            value={conjunction}
             options={conjunctionSelectOptions}
-            onChange={changeConjunction}
+            onChange={(e) -> changeConjunction e.value}
             name="conjunction"
           />
         </div>

@@ -5,7 +5,7 @@ import {SimpleSchema2Bridge as Bridge} from 'uniforms-bridge-simple-schema-2'
 import {ErrorBoundary} from '../common/ErrorBoundary.coffee'
 
 import SimpleSchema from 'simpl-schema'
-import Select from 'react-select'
+import {Dropdown} from 'primereact/dropdown'
 import {getSubjectSelectOptions} from './subjects'
 import {predicateSelectOptions} from './predicates'
 import PartIndex from './PartIndex'
@@ -78,13 +78,14 @@ export QuerySentenceEditor = ({rule, partIndex, bridge, path, onChange, onRemove
   # selectOptionsForValue = (d) -> _(d.options).find value: d?.value
 
   changeSubject = (d) ->
+    console.log d
     returnRule (r) ->
       r.content.object.value = null
-      r.content.subject = d
+      r.content.subject = _(subjectSelectOptions).find({value: d})
 
   changePredicate = (d) ->
     returnRule (r) ->
-      r.content.predicate = d
+      r.content.predicate = _(predicateSelectOptions).find({value: d})
       if shouldDeleteObject oldPredicate: predicate,  newPredicate: d
         r.content.object.value = null
 
@@ -98,7 +99,7 @@ export QuerySentenceEditor = ({rule, partIndex, bridge, path, onChange, onRemove
   predicate = rule.content.predicate?.value
 
 
-  objectSchema = # TODO check if removing the workaround is viable
+  objectSchema = # TODO [SimpleSchema] check if removing the workaround is viable
     if path
       try
         bridge.schema.getObjectSchema(path).pick subject
@@ -139,21 +140,23 @@ export QuerySentenceEditor = ({rule, partIndex, bridge, path, onChange, onRemove
       <div className="sentence__form">
         <div className="subject">
           <ErrorBoundary>
-            <Select
-              value={_.find subjectSelectOptions, value: subject}
+            <Dropdown
+              value={subject}
               options={subjectSelectOptions}
-              onChange={changeSubject}
+              onChange={(e) -> changeSubject e.value}
               name="subject"
+              style={width: '100%'}
             />
           </ErrorBoundary>
         </div>
         <div className="predicate">
           <ErrorBoundary>
-            <Select
-              value={_.find predicateSelectOptions, value: rule.content.predicate?.value}
+            <Dropdown
+              value={rule.content.predicate?.value}
               options={predicateSelectOptions}
-              onChange={changePredicate}
+              onChange={(e) -> changePredicate e.value}
               name="predicate"
+              style={width: '100%'}
             />
           </ErrorBoundary>
         </div>
