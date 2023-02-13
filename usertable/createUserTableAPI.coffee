@@ -81,6 +81,7 @@ export createUserTableAPI = ({userProfileSchema, getAllowedRoles, viewUserTableR
     roles:
       type: Array
       optional: true
+
     'roles.$':
       type: Object
       blackbox: true
@@ -148,10 +149,12 @@ export createUserTableAPI = ({userProfileSchema, getAllowedRoles, viewUserTableR
     run: ->
       if Meteor.isServer then getAllowedRoles()
 
+
   new ValidatedMethod
     name: 'user.createRoles'
     validate: ->
     run: createRoles
+
 
   new ValidatedMethod
     name: 'user.onChangeRoles'
@@ -163,28 +166,17 @@ export createUserTableAPI = ({userProfileSchema, getAllowedRoles, viewUserTableR
         'value.$':
           type: Object
           blackbox: true
-        change:
-          type: Object
-          blackbox: true
       .validator()
-    run: ({id, value, change}) ->
+    run: ({id, value}) ->
       currentUserMustBeInRole editUserRole
+      scopesForUser = Roles.getGroupsForUser id
+      scopesForValue = _(value).map('scope').uniq().value()
       if Meteor.isServer
-        switch change.action
-          when 'remove-value'
-            console.log "remove role #{JSON.stringify change.removedValue.value} from user #{id}"
-            {role, scope} = change.removedValue.value
-            Roles.removeUsersFromRoles [id], role, scope
-          when 'select-option'
-            console.log "set role #{JSON.stringify change.option.value} for user #{id}"
-            {role, scope} = change.option.value
-            Roles.addUsersToRoles [id], role, scope
-          when 'clear'
-            console.log "remove roles #{JSON.stringify change.removedValues.map (v) -> v.value} from user #{id}"
-            change.removedValues.map((v) -> v.value).forEach ({role, scope}) ->
-              Roles.removeUsersFromRoles [id], role, scope
-          else
-            throw new Meteor.Error 'unknown change action'
+        _(scopesForUser).difference(scopesForValue).forEach (scope) ->
+          Roles.setUserRoles id, [], scope
+        _(value).groupBy('scope').forEach (rolesForScope, scope) ->
+          Roles.setUserRoles id, _(rolesForScope).map('role').value(), if scope is 'null' then null else scope
+
 
   if Meteor.isServer
     Meteor.publish null, ->
@@ -192,6 +184,7 @@ export createUserTableAPI = ({userProfileSchema, getAllowedRoles, viewUserTableR
         Meteor.roleAssignment.find 'user._id': @userId
       else
         @ready()
+
 
   #returning the dataOptions
   createTableDataAPI

@@ -50,6 +50,7 @@ export RoleSelect = ({row, columnKey, schemaBridge, onChangeField, measure, mayE
         id: row._id
         value: value
 
+  rolesList = 'Fnord'
 
   if mayEdit
     if on
@@ -58,6 +59,8 @@ export RoleSelect = ({row, columnKey, schemaBridge, onChangeField, measure, mayE
         options={options}
         onChange={(e) -> onChange e.value}
         name="roles"
+        display="chip"
+        maxSelectedLabels={2}
       />
     else
       <div>
