@@ -4,11 +4,11 @@ import SimpleSchema from 'simpl-schema'
 import SimpleSchemaBridge from 'uniforms-bridge-simple-schema-2'
 import {AutoForm, SubmitField} from '../forms/uniforms-custom/select-implementation'
 
+# TODO [PrimeReact] switch to PrimeReact password input
 passwordSchema = new SimpleSchema
   password:
     type: String
     label: 'Passwort'
-    # TODO: change regEx to accomodate sick desire for untripleclickselectable password
     regEx: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/
     uniforms:
       type: 'password'

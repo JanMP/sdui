@@ -34,11 +34,9 @@ export default (Component) ->
     if error?
       props.className += " p-invalid"
 
-    props.locale ?= 'de'
-
-    useEffect ->
-      console.log props
-    , [props]
+    # useEffect ->
+    #   console.log props
+    # , [props]
    
     <div className={outerClassName}>
       {

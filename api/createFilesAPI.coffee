@@ -6,6 +6,8 @@ import {createTableDataAPI} from './createTableDataAPI.coffee'
 import {FileInputField} from '../files/FileInput.coffee'
 import compact from 'lodash/compact'
 
+# TODO complete rewrite
+
 getSignedUrl = null
 S3 = null
 ListObjectsCommand = null
@@ -178,7 +180,6 @@ getCommonFileListRole, uploadCommonFilesRole}) ->
             key: c.Key
             size: c.Size
 
-    #TODO update this
     updateFilesCollection = ->
       getFileList()
         .then (files) ->
