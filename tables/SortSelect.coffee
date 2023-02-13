@@ -1,10 +1,11 @@
 import React, {useEffect} from 'react'
-import Select from 'react-select'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faArrowDownAZ} from '@fortawesome/free-solid-svg-icons/faArrowDownAZ'
-import {faArrowUpZA} from '@fortawesome/free-solid-svg-icons/faArrowUpZA'
-import {faUpDown} from '@fortawesome/free-solid-svg-icons/faUpDown'
+import {Dropdown} from 'primereact/dropdown'
+import {Button} from 'primereact/button'
 
+sortDirectionIcons =
+  ASC: 'pi pi-sort-amount-down-alt'
+  DESC: 'pi pi-sort-amount-up-alt'
 
 
 export SortSelect = ({listSchemaBridge, sortColumn, sortDirection, onChangeSort}) ->
@@ -12,42 +13,32 @@ export SortSelect = ({listSchemaBridge, sortColumn, sortDirection, onChangeSort}
   schema = listSchemaBridge?.schema
   columnKeys = schema._firstLevelSchemaKeys
 
-  optionForKey = (key) ->
-    value: key
-    label: schema._schema[key]?.label
-
-  options = columnKeys.map optionForKey
-  valueOption = optionForKey sortColumn
-
-  icon = switch sortDirection
-    when'ASC' then faArrowDownAZ
-    when 'DESC' then faArrowUpZA
-    else faArrowDownAZ
+  sortColumnOptions =
+    columnKeys.map (key) ->
+      value: key
+      label: schema._schema[key]?.label
 
   changeValue = ({value}) ->
     onChangeSort
       sortColumn: value
       sortDirection: sortDirection ? 'ASC'
 
-  toggleSortDirection = (e) ->
+  toggleSortDirection = ->
     onChangeSort
       sortColumn: sortColumn ? columnKeys?[0]
       sortDirection: if sortDirection is 'ASC' then 'DESC' else 'ASC'
 
-  IndicatorsContainer = ->
-    <div
-      className="p-[7px] text-center"
-      onMouseDown={(e) -> e.stopPropagation()}
-    >
-      <FontAwesomeIcon className="text-xl z-10 #{if sortColumn? then 'text-gray-600' else 'text-gray-400'}" icon={icon} onClick={toggleSortDirection}/>
-    </div>
-    
-  
-  <Select
-    className="sort-select__container"
-    classNamePrefix="sort-select"
-    components={{IndicatorsContainer}}
-    value={valueOption}
-    options={options}
-    onChange={changeValue}
-  />
+
+  <div className="flex">
+    <Dropdown
+      value={sortColumn}
+      options={sortColumnOptions}
+      onChange={changeValue}
+      style={{width: '100%'}}
+    />
+    <Button
+      className="p-button-secondary"
+      icon={sortDirectionIcons[sortDirection] ? 'pi pi-sort-alt'}
+      onClick={toggleSortDirection}
+    />
+  </div>
