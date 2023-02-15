@@ -5,6 +5,7 @@ import {toast} from 'react-toastify'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faSpinner} from '@fortawesome/free-solid-svg-icons/faSpinner'
 import {ConfirmationModal} from './ConfirmationModal'
+import {Button} from 'primereact/button'
 import _ from 'lodash'
 
 
@@ -71,8 +72,8 @@ onSuccess, successMsg, onError, errorMsg, confirmation, className, disabled}) ->
           onConfirm={doIt}
         />
     }
-    <button
-      className={"action-button | #{className}"}
+    <Button
+      className={className}
       disabled={disabled}
       onClick={handleClick}
     >
@@ -95,5 +96,5 @@ onSuccess, successMsg, onError, errorMsg, confirmation, className, disabled}) ->
             </div>
         }
       </div>
-    </button>
+    </Button>
   </>

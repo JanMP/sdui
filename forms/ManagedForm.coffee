@@ -47,13 +47,13 @@ export ManagedForm = ({schemaBridge, model, onChangeModel, onSubmit, disabled, c
       <div className="button-container">
         <ActionButton
           onAction={-> form.reset()}
-          className="button warning"
+          className="p-button-warning"
           label={t 'Reset'}
           disabled={not hasChanged}
         />
         <ActionButton
           onAction={onAction}
-          className="button primary"
+          className="p-button-primary"
           label={t 'Save'}
           disabled={(not hasChanged) or (not isValid)}
         />
