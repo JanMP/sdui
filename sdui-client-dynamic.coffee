@@ -13,7 +13,7 @@ export {
 } from './common/roleChecks.coffee'
 export {useSession} from './common/useSession.coffee'
 export {meteorApply} from './common/meteorApply.coffee'
-export {config} from './config/config.coffee'
+export {config, useConfig, Configurations} from './config/config.coffee'
 export {default as connectFieldWithLabel} from './forms/connectFieldWithLabel.coffee'
 
 export {createTableDataAPI} from './api/createTableDataAPI.coffee'
