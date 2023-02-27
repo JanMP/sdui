@@ -36,17 +36,17 @@ checkDisableDeleteForRow, checkDisableEditForRow}) ->
   submitMethodRun =
     makeSubmitMethodRunFkt?({collection, transformIdToMongo, transformIdToMiniMongo}) ?
     ({data, id}) ->
-      collection.upsert (transformIdToMongo id), $set: data
+      await collection.upsertAsync (transformIdToMongo id), $set: data
 
   formDataFetchMethodRun =
     makeFormDataFetchMethodRunFkt?({collection, transformIdToMongo, transformIdToMiniMongo}) ?
     ({id}) ->
-      {(formSchema.clean collection.findOne _id: transformIdToMongo id)..., _id: transformIdToMiniMongo id}
+      {(formSchema.clean (await collection.findOneAsync _id: transformIdToMongo id))..., _id: transformIdToMiniMongo id}
 
   deleteMethodRun =
     makeDeleteMethodRunFkt?({collection, transformIdToMongo, transformIdToMiniMongo}) ?
     ({id}) ->
-      collection.remove _id: transformIdToMongo id
+      await collection.removeAsync _id: transformIdToMongo id
   
 
   getCount = new ValidatedMethod
@@ -198,7 +198,7 @@ checkDisableDeleteForRow, checkDisableEditForRow}) ->
         currentUserMustBeInRole editRole
         await editRowMustNotBeDisabled id: _id
         return unless Meteor.isServer
-        collection.update {_id}, $set: changeData
+        await collection.updateAsync {_id}, $set: changeData
 
   if canDelete
     new ValidatedMethod

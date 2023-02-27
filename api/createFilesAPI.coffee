@@ -91,7 +91,7 @@ getCommonFileListRole, uploadCommonFilesRole}) ->
   makeDeleteMethodRunFkt = ({collection, transformIdToMongo, transformIdToMiniMongo}) ->
     ({id}) ->
       if Meteor.isServer
-        entry = collection.findOne _id: id
+        await entry = collection.findOneAsync _id: id
         unless entry?
           throw new Meteor.Error "[#{sourceName}.delete] no entry #{id}"
         unless (key = entry.key)? and typeof key is 'string'

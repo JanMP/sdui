@@ -135,9 +135,9 @@ export createUserTableAPI = ({userProfileSchema, getAllowedRoles, viewUserTableR
   seedUsers = ->
     if Meteor.isServer
       Meteor.settings.seedUsers?.forEach ({email, username, password, roles}) ->
-        unless Meteor.users.findOne('emails.0.address': email)?
+        unless (await Meteor.users.findOneAsync('emails.0.address': email))?
           if (id = Accounts.createUser {email, username, password})?
-            if Meteor.roleAssignment.find('user._id': id).count() is 0
+            unless (await Meteor.roleAssignment.findOneAsync 'user._id': id)?
               Roles.addUsersToRoles id, roles
 
   createRoles()
