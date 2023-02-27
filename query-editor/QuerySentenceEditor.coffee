@@ -3,16 +3,13 @@ import {DynamicField} from '../forms/DynamicField.coffee'
 import {SimpleSchema2Bridge as Bridge} from 'uniforms-bridge-simple-schema-2'
 # import CodeListenSelect from '../parts/SearchQueryField'
 import {ErrorBoundary} from '../common/ErrorBoundary.coffee'
-
 import SimpleSchema from 'simpl-schema'
 import {Dropdown} from 'primereact/dropdown'
 import {getSubjectSelectOptions} from './subjects'
 import {predicateSelectOptions} from './predicates'
 import PartIndex from './PartIndex'
 import _ from 'lodash'
-
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faXmark} from '@fortawesome/free-solid-svg-icons/faXmark'
+import {Button} from 'primereact/button'
 
 import {useDrag} from 'react-dnd'
 
@@ -179,8 +176,10 @@ export QuerySentenceEditor = ({rule, partIndex, bridge, path, onChange, onRemove
   <div ref={drag} className="sentence">
     {if canDisplay then SentenceForm}
     <div className="button-container">
-      <button className="icon secondary" onClick={onRemove}>
-        <FontAwesomeIcon icon={faXmark}/>
-      </button>
+      <Button
+        icon="pi pi-delete-left"
+        severity="danger"
+        rounded text
+        onClick={onRemove}/>
     </div>
   </div>

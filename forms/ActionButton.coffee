@@ -2,8 +2,7 @@ import React, {useState, useEffect} from 'react'
 
 import {meteorApply} from '../common/meteorApply.coffee'
 import {toast} from 'react-toastify'
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faSpinner} from '@fortawesome/free-solid-svg-icons/faSpinner'
+import {ProgressSpinner} from 'primereact/progressspinner'
 import {ConfirmationModal} from './ConfirmationModal'
 import {Button} from 'primereact/button'
 import _ from 'lodash'
@@ -16,7 +15,7 @@ import _ from 'lodash'
   @param {Object?} args.options - method options
   @param {() => void} [args.onAction] - optional callback. either mothod or onAction should be defined
   @param {string?} args.label - optional button label
-  @param {any?} args.icon - optional FontAwesomeIcon (placed before label if label is defined)
+  @param {string?} args.icon - optional PrimeIcon (placed before label if label is defined)
   @param {(result: any) => void} [args.onSuccess] - optional callback on successfull method/action, defaults to toast.sucess(successMsg) if successMsg is defined
   @param {string?} args.successMsg - optional sucess message text
   @param {(error: Error) => void} [args.onError] - optional callback on unsuccessfull method/action, defaults to toast.error(errorMsg ? error)
@@ -79,7 +78,7 @@ onSuccess, successMsg, onError, errorMsg, confirmation, className, disabled}) ->
     >
       <div style={position: "relative"}>
         <div style={if isBusy then {visibility: "hidden"}}>
-          {<FontAwesomeIcon icon={icon} fixedWidth /> if icon?}
+          {<i className={icon}/> if icon?}
           {<span> {label}</span> if label?}
         </div>
         {
@@ -92,7 +91,7 @@ onSuccess, successMsg, onError, errorMsg, confirmation, className, disabled}) ->
                 "place-items": "center"
               }
             >
-              <FontAwesomeIcon icon={faSpinner} fixedWidth spin/>
+              <i className="pi pi-spin pi-spinner"/>
             </div>
         }
       </div>

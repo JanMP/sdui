@@ -3,15 +3,10 @@ import {QuerySentenceEditor} from './QuerySentenceEditor'
 import { getConjunctionData, getConjunctionSelectOptions } from './conjunctions'
 # import { Button, Icon, Select } from 'semantic-ui-react'
 import {Dropdown} from 'primereact/dropdown'
+import {Button} from 'primereact/button'
 import {getNewSentence, getNewBlock} from './queryEditorHelpers'
 import _ from 'lodash'
 import PartIndex from './PartIndex'
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faFilter} from '@fortawesome/free-solid-svg-icons/faFilter'
-import {faFolder} from '@fortawesome/free-solid-svg-icons/faFolder'
-import {faFile} from '@fortawesome/free-solid-svg-icons/faFile'
-import {faTimes} from '@fortawesome/free-solid-svg-icons/faTimes'
-import {faLock} from '@fortawesome/free-solid-svg-icons/faLock'
 import {useDrop} from 'react-dnd'
 
 
@@ -139,54 +134,45 @@ export QueryBlockEditor = React.memo ({rule, partIndex, bridge, path, onChange, 
           />
         </div>
         <div>
-          <button
-            className="icon secondary"
+          <Button
+            icon="pi pi-filter"
+            severity="secondary"
+            rounded text
             onClick={addLogicBlock}
             disabled={rule.type is 'contextBlock'}
-          >
-            <FontAwesomeIcon icon={faFilter}/>
-          </button>
-          <button
-            className="icon secondary"
+          />
+          <Button
+            icon="pi pi-folder"
+            severity="secondary"
+            rounded text
             onClick={addContextBlock}
             disabled={not childHasContextConjunctionSelectOptions}
-          >
-            <FontAwesomeIcon icon={faFolder}/>
-          </button>
-          <button
-            className="icon secondary"
+          />
+          <Button
+            icon="pi pi-file"
+            severity="secondary"
+            rounded text
             onClick={addSentence}
             disabled={(not childWouldHaveSubject) or (rule.type is 'contextBlock')}
-          >
-            <FontAwesomeIcon icon={faFile}/>
-          </button>
-          {
-            if locked
-              <button
-                className="icon secondary"
-                disabled
-              >
-                <FontAwesomeIcon icon={faLock}/>
-              </button>
-            else
-              <button
-                className="icon secondary"
-                onClick={onRemove}
-              >
-                <FontAwesomeIcon icon={faTimes}/>
-              </button>
-          }
+          />
+          <Button
+            icon={if locked then 'pi pi-lock' else 'pi pi-delete-left'}
+            severity={if locked then 'secondary' else 'danger'}
+            rounded text
+            onClick={onRemove}
+            disabled={locked}
+          />
         </div>
       </div>
       {
         unless children?.length
           <div className="child-container--no-children">
             <span>Please add Conditions for Data Fields </span>
-            <FontAwesomeIcon icon={faFile}/>
+            <i className="pi pi-file"/>
             <span>, Embedded Data Fields from related Data Sets </span>
-            <FontAwesomeIcon icon={faFolder}/>
+            <i className="pi pi-folder"/>
             <span> or combinations of Conditions </span>
-            <FontAwesomeIcon icon={faFilter}/>
+            <i className="pi pi-filter"/>
           </div>
       }
       <div className="child-container">{children}</div>
