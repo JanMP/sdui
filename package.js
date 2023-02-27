@@ -1,6 +1,6 @@
 Package.describe({
   name: 'janmp:sdui',
-  version: '1.0.1',
+  version: '2.0.0',
   // Brief, one-line summary of the package.
   summary: 'Some high level React components and setup for backend.',
   // URL to the Git repository containing the source code for this package.
@@ -11,17 +11,17 @@ Package.describe({
 });
 
 Package.onUse(function(api) {
-  api.versionsFrom('2.5.1');
+  api.versionsFrom('2.10.0');
   api.use('ecmascript');
-  api.use('coffeescript@2.4.1');
+  api.use('coffeescript');
   api.use('typescript');
   api.use('zodern:types');
   api.use('reactive-var');
-  api.use('alanning:roles@3.4.0');
-  api.use('mdg:validated-method@1.2.0');
+  api.use('alanning:roles');
+  api.use('mdg:validated-method');
   // api.use('momentjs:moment@2.29.1');
-  api.use('peerlibrary:reactive-publish@0.10.0');
-  api.use('tunguska:reactive-aggregate@1.3.7');
+  api.use('peerlibrary:reactive-publish');
+  api.use('tunguska:reactive-aggregate');
   // api.use('mizzao:user-status@1.0.1'); 
   api.mainModule('sdui-client-dynamic.coffee', 'client');
   api.mainModule('sdui-server.coffee', 'server');
