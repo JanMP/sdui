@@ -178,7 +178,7 @@ export interface DataTableHeaderOptions {
 }
 export declare function DefaultHeader(options: DataTableHeaderOptions): FC
 
-// TODO gather types of all implemented customComponent props
+// TODO [TS] gather types of all implemented customComponent props
 export type customComponents = {[key: string]: FC}
 
 export interface MeteorTableDataHandlerOptions {

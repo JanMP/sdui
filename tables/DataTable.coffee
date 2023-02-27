@@ -9,13 +9,9 @@ import {useDebounce} from '@react-hook/debounce'
 import {useThrottle} from '@react-hook/throttle'
 import useSize from '@react-hook/size'
 import _ from 'lodash'
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faSortUp} from '@fortawesome/free-solid-svg-icons/faSortUp'
-import {faSortDown} from '@fortawesome/free-solid-svg-icons/faSortDown'
-import {faTrash} from '@fortawesome/free-solid-svg-icons/faTrash'
-import {faGripVertical} from '@fortawesome/free-solid-svg-icons/faGripVertical'
 import {DefaultHeader} from './DefaultHeader.coffee'
 import {useTranslation} from 'react-i18next'
+import {Button} from 'primereact/button'
 
 newCache = -> new CellMeasurerCache
   fixedWidth: true
@@ -34,9 +30,9 @@ resizableHeaderRenderer = ({onResizeRows, isLastOne}) ->
         {
           if sortBy is dataKey
             if sortDirection is 'ASC'
-              <FontAwesomeIcon className="sort-click-target" icon={faSortDown}/>
+              <i className="sort-click-target pi pi-sort-amount-down-alt"/>
             else
-              <FontAwesomeIcon className="sort-click-target" icon={faSortUp} />
+              <i className="sort-click-target pi pi-sort-amount-up alt" />
         }
       </div>
       {<Draggable
@@ -88,13 +84,13 @@ rightButtonCellRenderer = ({canDelete, mayDelete, onDelete, AdditionalButtonsRig
 
     <div className="pt-2">
       <AdditionalButtonsRight rowData={rowData}/>
-     {<button
+     {<Button
         onClick={onClick}
-        className="danger icon"
+        rounded text
+        severity="danger"
+        icon="pi pi-delete-left"
         disabled={rowData._disableDeleteForRow or not mayDelete}
-      >
-        <FontAwesomeIcon icon={faTrash}/>
-      </button> if canDelete}
+      /> if canDelete}
     </div>
 
 rowRenderer = ({canEdit, mayEdit}) ->

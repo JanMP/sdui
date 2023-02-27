@@ -1,12 +1,9 @@
 import React, {useEffect, useState, useRef} from 'react'
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faPlus} from '@fortawesome/free-solid-svg-icons/faPlus'
-import {faFileDownload} from '@fortawesome/free-solid-svg-icons/faFileDownload'
-import {faFilter} from '@fortawesome/free-solid-svg-icons/faFilter'
 import {SearchInput} from './SearchInput.coffee'
 import {SortSelect} from './SortSelect.coffee'
 import {QueryEditorModal} from '../query-editor/QueryEditorModal.coffee'
 import useSize from '@react-hook/size'
+import {Button} from 'primereact/button'
 import * as types from '../typeDeclarations'
 
 
@@ -79,12 +76,12 @@ export DefaultHeader = ({
         {
           if canUseQueryEditor
             <div className="query-editor-toggle-container">
-              <button
-                className="icon #{if hasEffectiveQueryUiObject then 'warning' else 'secondary'}"
+              <Button
+                icon="pi pi-filter"
+                rounded text
+                severity={if hasEffectiveQueryUiObject then 'warning' else 'secondary'}
                 onClick={toggleQueryEditor} disabled={not true}
-              >
-                <FontAwesomeIcon icon={faFilter}/>
-              </button>
+              />
             </div>
         }
       </div>
@@ -92,21 +89,21 @@ export DefaultHeader = ({
         <AdditionalHeaderButtonsLeft/>
         {
           if canExport
-            <button
-              className="primary icon"
-              onClick={onExportTable} disabled={not mayExport}
-            >
-              <FontAwesomeIcon icon={faFileDownload}/>
-            </button>
+            <Button
+              icon="pi pi-download"
+              severity="secondary"
+              rounded text
+              onClick={onExportTable}
+              disabled={not mayExport}
+            />
         }
         {
           if canAdd
-            <button
-              className="primary icon"
+            <Button
+              icon="pi pi-plus"
+              rounded text
               onClick={onAdd} disabled={not mayAdd}
-            >
-              <FontAwesomeIcon icon={faPlus}/>
-            </button>
+            />
         }
         <AdditionalHeaderButtonsRight/>
       </div>

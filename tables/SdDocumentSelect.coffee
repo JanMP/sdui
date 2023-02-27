@@ -1,8 +1,10 @@
 import React, {useEffect} from 'react'
 import {MeteorTableDataHandler} from './MeteorTableDataHandler.coffee'
 import {connectField} from 'uniforms'
-import Select from 'react-select'
+import {Dropdown} from 'primereact/dropdown'
 import _ from 'lodash'
+
+# TODO Get this to work
 
 DisplayComponent = (value, onChange, selectOptions) -> (tableOptions) ->
 
@@ -18,14 +20,11 @@ DisplayComponent = (value, onChange, selectOptions) -> (tableOptions) ->
 
   valueOption = (_.find options, {value}) ? if value? then {value, label: "[#{value}]"}
 
-  handleChange = (newValueOption) ->
-    onChange newValueOption?.value
-
   <div>
     {<pre>{JSON.stringify options , null, 2}</pre> if false}
-    <Select
+    <Dropdown
       value={valueOption}
-      onChange={handleChange}
+      onChange={(e) -> onChange e.value}
       options={options}
       onInputChange={tableOptions.onChangeSearch}
     />

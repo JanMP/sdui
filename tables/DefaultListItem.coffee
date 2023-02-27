@@ -1,6 +1,5 @@
 import React from 'react'
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faTrash} from '@fortawesome/free-solid-svg-icons/faTrash'
+import {Button} from 'primereact/button'
 
 DefaultListItemContent = ({rowData, measure}) ->
   <div className="default-list-item__default-content">{JSON.stringify rowData, null, 2}</div>
@@ -34,13 +33,13 @@ export DefaultListItem = ({
     {
       if canDelete
         <div className="button-container">
-          <button
-            className="icon danger"
+          <Button
+            icon="pi pi-delete-left"
+            severity="danger"
+            rounded text
             onClick={handleDeleteButtonClick}
             disabled={rowData._disableDeleteForRow or not mayDelete}
-          >
-            <FontAwesomeIcon icon={faTrash}/>
-          </button>
+          />
         </div>
     }
   </div>
