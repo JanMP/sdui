@@ -1,8 +1,6 @@
 import React, {useState} from 'react'
-import Modal from 'react-modal'
 import {QueryEditor} from './QueryEditor.coffee'
-import {ActionButton} from '../forms/ActionButton.coffee'
-import {faXmark} from '@fortawesome/free-solid-svg-icons/faXmark'
+import {Dialog} from 'primereact/dialog'
 
 ###*
   @param {Object} args
@@ -18,23 +16,13 @@ import {faXmark} from '@fortawesome/free-solid-svg-icons/faXmark'
 export QueryEditorModal = ({bridge, rule, onChangeRule, isOpen, setIsOpen}) ->
 
 
-  <Modal
-    isOpen={isOpen}
-    onRequestClose={-> setIsOpen false}
-    className="modal query-editor-modal"
-    overlayClassName="overlay"
-    shouldFocusAfterRender={false}
+  <Dialog
+    visible={isOpen}
+    onHide={-> setIsOpen false}
   >
-    <div className="button-container">
-      <ActionButton
-        className="secondary icon"
-        onAction={-> setIsOpen false}
-        icon={faXmark}
-      />
-    </div>
     <QueryEditor
       bridge={bridge}
       rule={rule}
       onChange={onChangeRule}
     />
-  </Modal>
+  </Dialog>

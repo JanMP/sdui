@@ -1,5 +1,5 @@
 import React from 'react'
-import Modal from 'react-modal'
+import {ConfirmDialog} from 'primereact/confirmdialog'
 import {useTranslation} from 'react-i18next'
 
 ###*
@@ -23,16 +23,10 @@ export ConfirmationModal = ({text, onConfirm = ->, onCancel = ->, isOpen, setIsO
     setIsOpen false
     onCancel()
 
-  <Modal
-    isOpen={isOpen}
-    onRequestClose={-> setIsOpen false}
-    className="modal confirmation-modal"
-    overlayClassName="overlay"
-    shouldFocusAfterRender={false}
-  >
-    <div className="text-container">{text}</div>
-    <div className="button-container">
-      <button className="button secondary" onClick={handleCancelClick} >{t 'Cancel'}</button>
-      <button className="button primary" onClick={handleOkClick} >{t 'OK'}</button>
-    </div>
-  </Modal>
+  <ConfirmDialog
+    visible={isOpen}
+    onHide={-> setIsOpen false}
+    message={t text}
+    accept={onConfirm}
+    reject={onCancel}
+  />
