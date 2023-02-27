@@ -6,7 +6,6 @@ import {getNewBlock} from './queryEditorHelpers'
 import PartIndex from './PartIndex'
 import _ from 'lodash'
 
-import {faFilterCircleXmark} from '@fortawesome/free-solid-svg-icons/faFilterCircleXmark'
 import {ActionButton} from '../forms/ActionButton.coffee'
 
 import {DndProvider} from 'react-dnd'
@@ -34,7 +33,7 @@ export QueryEditor = ({bridge, rule, path, onChange}) ->
        <ActionButton
         className="warning"
         onAction={resetRule}
-        icon={faFilterCircleXmark}
+        icon="pi pi-filter-slash"
         label="reset"
       />
     </div>
