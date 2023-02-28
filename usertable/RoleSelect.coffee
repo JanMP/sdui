@@ -7,7 +7,7 @@ import _ from 'lodash'
 
 
 selectOptionFor = ({role, scope}) ->
-  value: {role, scope}
+  theValue: {role, scope} # there is a bug 
   label: "#{scope ? 'GLOBAL'}: #{role}"
 
 valueFromRow = (row) ->
@@ -61,11 +61,12 @@ export RoleSelect = ({row, columnKey, schemaBridge, onChangeField, measure, mayE
         name="roles"
         display="chip"
         maxSelectedLabels={2}
+        optionValue="theValue"
       />
     else
       <div>
         <pre>
-         {JSON.stringify {valueOptions, options}, null, 2}
+         {JSON.stringify {options}}
         </pre>
       </div>
   else
