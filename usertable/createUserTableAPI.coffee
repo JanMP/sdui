@@ -163,17 +163,23 @@ export createUserTableAPI = ({userProfileSchema, getAllowedRoles, viewUserTableR
         id: String
         value:
           type: Array
+          optional: true
         'value.$':
           type: Object
           blackbox: true
       .validator()
     run: ({id, value}) ->
       currentUserMustBeInRole editUserRole
-      scopesForUser = Roles.getGroupsForUser id
+      scopesForUser = Roles.getScopesForUser id
       scopesForValue = _(value).map('scope').uniq().value()
       if Meteor.isServer
+        # remove all roles for scopes that are not in the new value
         _(scopesForUser).difference(scopesForValue).forEach (scope) ->
           Roles.setUserRoles id, [], scope
+        # remove all roles for the global scope if global scope is not in the new value
+        if value.filter((role) -> not role.scope?).length is 0
+          Roles.setUserRoles id, []
+        # set roles for all scopes in the new value
         _(value).groupBy('scope').forEach (rolesForScope, scope) ->
           Roles.setUserRoles id, _(rolesForScope).map('role').value(), if scope is 'null' then null else scope
 
