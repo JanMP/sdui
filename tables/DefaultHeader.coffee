@@ -39,7 +39,6 @@ export DefaultHeader = ({
   toggleQueryEditor = -> setShowQueryEditor (x) -> not x
 
   useEffect ->
-    console.log queryUiObject
     unless queryUiObject?
       onChangeQueryUiObject null
   , [queryUiObject]
