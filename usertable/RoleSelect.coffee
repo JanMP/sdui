@@ -59,9 +59,8 @@ export RoleSelect = ({row, columnKey, schemaBridge, onChangeField, measure, mayE
         options={options}
         onChange={(e) -> onChange e.value}
         name="roles"
-        display="chip"
-        maxSelectedLabels={2}
         optionValue="theValue"
+        style={maxWidth: '100%', minWidth: '100%'}
       />
     else
       <div>

@@ -17,6 +17,7 @@ Select = ({
 
   <Dropdown
     onChange={(e) -> onChange e.value}
+    style={minWidh: '100%', maxWidth: '100%'}
     {props...}
   />
 
