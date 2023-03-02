@@ -6,6 +6,7 @@ import {
   joinName,
   useField,
 } from 'uniforms';
+import { Button } from 'primereact/button';
 
 export type ListDelFieldProps = HTMLFieldProps<unknown, HTMLSpanElement>;
 
@@ -40,13 +41,14 @@ function ListDel({ disabled, name, readOnly, ...props }: ListDelFieldProps) {
 
   return (
     // @ts-ignore
-    <button className="icon danger"
-      type="button"
+    <Button
       {...filterDOMProps(props)}
       onClick={onAction}
-    >
-      -
-    </button>
+      icon="pi pi-delete-left"
+      severity="danger"
+      rounded
+      text
+     />
   );
 }
 

@@ -7,6 +7,7 @@ import {
   joinName,
   useField,
 } from 'uniforms';
+import { Button } from 'primereact/button';
 
 export type ListAddFieldProps = HTMLFieldProps<
   unknown,
@@ -44,13 +45,13 @@ function ListAdd({
 
   return (
     // @ts-ignore
-    <button className="icon ok"
-      type="button"
+    <Button
       {...filterDOMProps(props)}
       onClick={onAction}
-    >
-      +
-    </button>
+      icon="pi pi-plus"
+      rounded
+      text
+    />
   );
 }
 
