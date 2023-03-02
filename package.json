@@ -3,9 +3,6 @@
   "version": "2.0.0",
   "description": "Schema Driven UI, a MeteorJS package",
   "main": "package.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/JanMP/sdui.git"
