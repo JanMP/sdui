@@ -21,7 +21,10 @@ export SearchInput = ({value, onChange, className = 'search-input'}) ->
     setDebouncedValue newValue unless warning
 
 
-  <span className="p-input-icon-right">
+  <span
+    className="p-input-icon-right"
+    style={width: '100%'}
+  >
     <i
       className={if showWarning then "pi pi-exclamation-triangle" else"pi pi-search"}
     />
@@ -29,5 +32,6 @@ export SearchInput = ({value, onChange, className = 'search-input'}) ->
       className={classname 'p-invalid': showWarning}
       value={displayValue}
       onChange={(e) -> handleSearchChange e.target.value}
+      style={width: '100%'}
     />
   </span>
