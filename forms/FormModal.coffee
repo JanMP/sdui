@@ -4,10 +4,8 @@ import {Dialog} from 'primereact/dialog'
 import {ManagedForm} from './ManagedForm.coffee'
 
 export FormModal = ({schemaBridge, onSubmit, model,
-isOpen, onRequestClose, header, children, disabled = false, readOnly,
-submitField, onChangeModel}) ->
+isOpen, onRequestClose, header, children, disabled = false, readOnly, onChangeModel}) ->
 
-  # submitField = -> <button className="button primary">Ok</button>
 
   <Dialog
     visible={isOpen}
