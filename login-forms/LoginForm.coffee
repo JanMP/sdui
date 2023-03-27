@@ -4,7 +4,9 @@ import React, {useState} from 'react'
 import {useTracker} from 'meteor/react-meteor-data'
 import SimpleSchema from 'simpl-schema'
 import SimpleSchemaBridge from 'uniforms-bridge-simple-schema-2'
-import {AutoForm, SubmitField} from '../forms/uniforms-custom/select-implementation'
+import {AutoForm} from '../forms/uniforms-custom/select-implementation'
+import {Button} from 'primereact/button'
+
 
 SimpleSchema.extendOptions(['uniforms'])
 
@@ -64,7 +66,7 @@ SignInForm = ->
  
   <AutoForm
     schema={loginSchemaBridge}
-    submitField={-> <SubmitField value="Login" />}
+    submitField={-> <Button label="Login" />}
     onSubmit={login}
   />
 
@@ -78,7 +80,7 @@ SignUpForm = ->
 
   <AutoForm
     schema={signupSchemaBridge}
-    submitField={-> <SubmitField value="Account anlegen" />}
+    submitField={-> <Button label="Account anlegen" />}
     onSubmit={signup}
   />
 
@@ -90,7 +92,7 @@ EmailForm = ->
 
   <AutoForm
     schema={emailSchemaBridge}
-    submitField={-> <SubmitField value="Password zurücksetzen" />}
+    submitField={-> <Button label="Password zurücksetzen" />}
     onSubmit={resetPassword}
   />
 
