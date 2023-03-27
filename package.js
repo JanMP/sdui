@@ -13,13 +13,12 @@ Package.describe({
 Package.onUse(function(api) {
   api.versionsFrom('2.10.0');
   api.use('ecmascript');
-  api.use('coffeescript');
+  api.use('coffeescript@2.7.0');
   api.use('typescript');
   api.use('zodern:types');
   api.use('reactive-var');
-  api.use('alanning:roles');
+  api.use('alanning:roles@3.4.0');
   api.use('mdg:validated-method');
-  // api.use('momentjs:moment@2.29.1');
   api.use('peerlibrary:reactive-publish');
   api.use('tunguska:reactive-aggregate');
   // api.use('mizzao:user-status@1.0.1'); 
