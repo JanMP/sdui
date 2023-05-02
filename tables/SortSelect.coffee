@@ -28,7 +28,7 @@ export SortSelect = ({listSchemaBridge, sortColumn, sortDirection, onChangeSort}
       sortDirection: if sortDirection is 'ASC' then 'DESC' else 'ASC'
 
 
-  <div className="flex">
+  <>
     <Dropdown
       value={sortColumn}
       options={sortColumnOptions}
@@ -40,4 +40,4 @@ export SortSelect = ({listSchemaBridge, sortColumn, sortDirection, onChangeSort}
       icon={sortDirectionIcons[sortDirection] ? 'pi pi-sort-alt'}
       onClick={toggleSortDirection}
     />
-  </div>
+  </>
