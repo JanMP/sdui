@@ -1,7 +1,7 @@
 import React from 'react'
 import {InputTextarea} from 'primereact/inputtextarea'
 import connectFieldPlus from '../../connectFieldPlus'
-
+import {filterDOMProps} from 'uniforms'
 
 export default connectFieldPlus ({
   name
@@ -11,5 +11,5 @@ export default connectFieldPlus ({
 
   <InputTextarea
     onChange={(e) -> onChange e.target.value}
-    {props...}
+    {(filterDOMProps props)...}
   />

@@ -1,6 +1,7 @@
 import React from 'react'
 import {Checkbox} from 'primereact/checkbox'
 import connectFieldPlus from '../../connectFieldPlus'
+import {filterDOMProps} from 'uniforms'
 
 
 export default connectFieldPlus ({
@@ -13,5 +14,5 @@ export default connectFieldPlus ({
   <Checkbox
     onChange={(e) -> onChange e.checked}
     checked={value}
-    {props...}
+    {(filterDOMProps props)...}
   />

@@ -1,6 +1,7 @@
 import React from 'react'
 import connectFieldPlus from '../../connectFieldPlus'
 import {RadioButton} from 'primereact/radiobutton'
+import {filterDOMProps} from 'uniforms'
 
 export default connectFieldPlus ({
   allowedValues
@@ -24,7 +25,7 @@ export default connectFieldPlus ({
             value={item}
             checked={item is value}
             onChange={-> onChange item}
-            {props...}
+            {(filterDOMProps props)...}
           />
           <label htmlFor={idString}>{item}</label>
         </div>

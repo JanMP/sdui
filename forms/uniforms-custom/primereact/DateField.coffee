@@ -2,7 +2,7 @@ import React from 'react'
 import {Calendar} from 'primereact/calendar'
 import connectFieldPlus from '../../connectFieldPlus'
 import {useTranslation} from 'react-i18next'
-
+import {filterDOMProps} from 'uniforms'
 
 export default connectFieldPlus ({
   max
@@ -20,5 +20,5 @@ export default connectFieldPlus ({
 
   <Calendar
     onChange={(e) -> onChange e.value}
-    {props...}
+    {(filterDOMProps props)...}
   />

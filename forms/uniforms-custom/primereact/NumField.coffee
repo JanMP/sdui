@@ -1,7 +1,7 @@
 import React from 'react'
 import {InputNumber} from 'primereact/inputnumber'
 import connectFieldPlus from '../../connectFieldPlus'
-
+import {filterDOMProps} from 'uniforms'
 
 export default connectFieldPlus ({
   decimal
@@ -17,5 +17,5 @@ export default connectFieldPlus ({
   <InputNumber
     onChange={(e) -> onChange e.value}
     useGrouping={useGrouping}
-    {props...}
+    {(filterDOMProps props)...}
   />

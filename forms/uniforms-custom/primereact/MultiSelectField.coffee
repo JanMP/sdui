@@ -1,6 +1,7 @@
 import React, {useEffect} from 'react'
 import {MultiSelect} from 'primereact/multiselect'
 import connectFieldPlus from '../../connectFieldPlus'
+import {filterDOMProps} from 'uniforms'
 
 export default connectFieldPlus ({
   value
@@ -19,5 +20,5 @@ export default connectFieldPlus ({
     options={options}
     onChange={(e) -> onChange e.value}
     display={display}
-    {props...}
+    {(filterDOMProps props)...}
   />
