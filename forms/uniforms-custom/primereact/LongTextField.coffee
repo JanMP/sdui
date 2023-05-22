@@ -6,10 +6,12 @@ import {filterDOMProps} from 'uniforms'
 export default connectFieldPlus ({
   name
   onChange
+  value
   props...
 }) ->
 
   <InputTextarea
     onChange={(e) -> onChange e.target.value}
+    value={value}
     {(filterDOMProps props)...}
   />

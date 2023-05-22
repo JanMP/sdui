@@ -8,6 +8,7 @@ export default connectFieldPlus ({
   useGrouping = false
   name
   onChange
+  value
   props...
 }) ->
 
@@ -15,6 +16,7 @@ export default connectFieldPlus ({
     props.minFractionDigits ?= 1
 
   <InputNumber
+    value={value}
     onChange={(e) -> onChange e.value}
     useGrouping={useGrouping}
     {(filterDOMProps props)...}

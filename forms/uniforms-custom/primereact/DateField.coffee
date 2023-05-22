@@ -4,6 +4,7 @@ import connectFieldPlus from '../../connectFieldPlus'
 import {useTranslation} from 'react-i18next'
 import {filterDOMProps} from 'uniforms'
 
+#TODO: bypass FilterDOMProps for some needed props
 export default connectFieldPlus ({
   max
   min
