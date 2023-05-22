@@ -4,10 +4,11 @@ import connectFieldPlus from '../../connectFieldPlus'
 import {filterDOMProps} from 'uniforms'
 
 export default connectFieldPlus ({
-  value
-  options
+  disabled
   display = 'text'
   onChange
+  options
+  value
   props...
 }) ->
 
@@ -16,9 +17,10 @@ export default connectFieldPlus ({
   , [props]
 
   <MultiSelect
-    value={value}
+    disabled={disabled}
+    display={display}
     options={options}
     onChange={(e) -> onChange e.value}
-    display={display}
+    value={value}
     {(filterDOMProps props)...}
   />

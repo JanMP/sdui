@@ -5,6 +5,7 @@ import {filterDOMProps} from 'uniforms'
 
 export default connectFieldPlus ({
   allowedValues
+  disabled
   id
   name
   onChange
@@ -20,11 +21,12 @@ export default connectFieldPlus ({
         
         <div className="radio-button-field" key={item}>
           <RadioButton
+            checked={item is value}
+            disabled={disabled}
             id={idString}
             name={name}
-            value={item}
-            checked={item is value}
             onChange={-> onChange item}
+            value={item}
             {(filterDOMProps props)...}
           />
           <label htmlFor={idString}>{item}</label>

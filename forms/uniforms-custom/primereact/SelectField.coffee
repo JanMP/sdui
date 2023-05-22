@@ -6,6 +6,7 @@ import {filterDOMProps} from 'uniforms'
 
 Select = ({
   allowedValues
+  disabled
   name
   onChange
   readOnly
@@ -16,9 +17,10 @@ Select = ({
   props.options ?= allowedValues
 
   <Dropdown
-    value={value}
+    disabled={disabled}
     onChange={(e) -> onChange e.value}
     style={minWidh: '100%', maxWidth: '100%'}
+    value={value}
     {(filterDOMProps props)...}
   />
 

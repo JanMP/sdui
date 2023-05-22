@@ -6,6 +6,7 @@ import {filterDOMProps} from 'uniforms'
 
 export default connectFieldPlus ({
   name
+  disabled
   onChange
   value
   props...
@@ -14,5 +15,6 @@ export default connectFieldPlus ({
   <Checkbox
     onChange={(e) -> onChange e.checked}
     checked={value}
+    disabled={disabled}
     {(filterDOMProps props)...}
   />
