@@ -23,9 +23,11 @@ import _ from 'lodash'
   @param {string?} args.confirmation - if defined, a modal will be displayed with this text to request confirmation before method/action is executed
   @param {string?} args.className - applied to <button />
   @param {boolean?} args.disabled
+  @param {Object?} args.buttonProps - props passed to Primereact <Button />
  ###
 export ActionButton = ({method, data, options, onAction, label, icon,
-onSuccess, successMsg, onError, errorMsg, confirmation, className, disabled}) ->
+onSuccess, successMsg, onError, errorMsg, confirmation, className, disabled,
+buttonProps}) ->
 
   data ?= {}
   options ?= {}
@@ -75,6 +77,7 @@ onSuccess, successMsg, onError, errorMsg, confirmation, className, disabled}) ->
       className={className}
       disabled={disabled}
       onClick={handleClick}
+      {buttonProps...}
     >
       <div style={position: "relative"}>
         <div style={if isBusy then {visibility: "hidden"}}>
@@ -88,7 +91,7 @@ onSuccess, successMsg, onError, errorMsg, confirmation, className, disabled}) ->
                 position: "absolute"
                 top: "0px", right: "0px", bottom: "0px", left: "0px"
                 display: "grid"
-                "place-items": "center"
+                placeItems: "center"
               }
             >
               <i className="pi pi-spin pi-spinner"/>
