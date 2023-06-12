@@ -18,6 +18,8 @@ export {default as connectFieldWithLabel} from './forms/connectFieldWithLabel.co
 
 export {createTableDataAPI} from './api/createTableDataAPI.coffee'
 export {createUserTableAPI} from './usertable/createUserTableAPI.coffee'
+
+export {regExpMessages_de, de, setDefaultValidationMessages} from './api/validationMessages.coffee'
 # export {createFilesAPI, filesAPISourceSchema} from './api/createFilesAPI.coffee'
 
 # server only (eventually)
