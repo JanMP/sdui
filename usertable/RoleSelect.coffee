@@ -60,6 +60,7 @@ export RoleSelect = ({row, columnKey, schemaBridge, onChangeField, measure, mayE
         onChange={(e) -> onChange e.value}
         name="roles"
         optionValue="theValue"
+        display="chip"
         style={maxWidth: '100%', minWidth: '100%'}
       />
     else
