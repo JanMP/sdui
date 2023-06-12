@@ -6,6 +6,7 @@ import SimpleSchema from 'simpl-schema'
 import SimpleSchemaBridge from 'uniforms-bridge-simple-schema-2'
 import {AutoForm} from '../forms/uniforms-custom/select-implementation'
 import {Button} from 'primereact/button'
+import {PasswordField} from '../forms/uniforms-custom/select-implementation'
 
 
 SimpleSchema.extendOptions(['uniforms'])
@@ -17,8 +18,7 @@ loginSchema = new SimpleSchema
   password:
     type: String,
     label: 'Passwort'
-    uniforms:
-      type: 'password'
+    uniforms: PasswordField
 
 signupSchema = new SimpleSchema
   email:
@@ -35,15 +35,13 @@ signupSchema = new SimpleSchema
     label: 'Passwort'
     regEx: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/
     max: 80
-    uniforms:
-      type: 'password'
+    uniforms: PasswordField
   passwordRepeat:
     type: String
     label: 'Password wdh.'
     custom: ->
       if @value isnt @field('password').value then 'password mismatch'
-    uniforms:
-      type: 'password'
+    uniforms: PasswordField
 
 emailSchema = new SimpleSchema
   email:
@@ -110,7 +108,7 @@ export LoginForm = ({allowResetPassword = false}) ->
     if formToShow is 'sign-up' then setFormToShow 'sign-in' else setFormToShow 'sign-up'
   
 
-  <div>
+  <div className="sd-login-form">
     <Form />
     { <div>
       <a onClick={-> setFormToShow 'resetPassword'}>Ich habe mein Passwort vergessen</a>

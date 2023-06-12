@@ -22,3 +22,4 @@ export { default as TextField, TextFieldProps } from './TextField';
 export { default as ValidatedForm } from './ValidatedForm';
 export { default as ValidatedQuickForm } from './ValidatedQuickForm';
 export { default as MultiSelectField } from './MultiSelectField';
+export { default as PasswordField } from './PasswordField';

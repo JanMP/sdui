@@ -2,7 +2,8 @@ import React from 'react'
 import {Accounts} from 'meteor/accounts-base'
 import SimpleSchema from 'simpl-schema'
 import SimpleSchemaBridge from 'uniforms-bridge-simple-schema-2'
-import {AutoForm, SubmitField} from '../forms/uniforms-custom/select-implementation'
+import {AutoForm, SubmitField, PasswordField} from '../forms/uniforms-custom/select-implementation'
+
 
 # TODO [PrimeReact] switch to PrimeReact password input
 passwordSchema = new SimpleSchema
@@ -10,8 +11,7 @@ passwordSchema = new SimpleSchema
     type: String
     label: 'Passwort'
     regEx: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/
-    uniforms:
-      type: 'password'
+    uniforms: PasswordField
 
 passwordSchemaBridge = new SimpleSchemaBridge passwordSchema
 
