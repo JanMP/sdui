@@ -12,7 +12,6 @@ import * as types from '../typeDeclarations'
 export createTableDataAPI = ({
   sourceName, sourceSchema, collection
   useObjectIds
-  listSchema, formSchema
   listSchema, formSchema, queryEditorSchema
   canEdit, canSearch, canUseQueryEditor, canSort, canAdd, canDelete, canExport
   viewTableRole, editRole, addRole, deleteRole, exportTableRole
@@ -74,6 +73,7 @@ export createTableDataAPI = ({
 
   listSchema ?= sourceSchema
   formSchema ?= sourceSchema
+  queryEditorSchema ?= listSchema
 
   listSchemaBridge = new SimpleSchema2Bridge(listSchema)
   formSchemaBridge =
@@ -81,10 +81,15 @@ export createTableDataAPI = ({
       listSchemaBridge
     else
       new SimpleSchema2Bridge(formSchema)
+  queryEditorSchemaBridge =
+    if listSchema is queryEditorSchema
+      listSchemaBridge
+    else
+      new SimpleSchema2Bridge(queryEditorSchema)
 
   {defaultGetRowsPipeline
   defaultGetRowCountPipeline
-  defaultGetExportPipeline} = createDefaultPipeline {getPreSelectPipeline, getProcessorPipeline, listSchema}
+  defaultGetExportPipeline} = createDefaultPipeline {getPreSelectPipeline, getProcessorPipeline, listSchema, queryEditorSchema}
 
 
   getRowsPipeline ?= defaultGetRowsPipeline
@@ -115,7 +120,6 @@ export createTableDataAPI = ({
 
   #return props for the ui component
   {
-    sourceName, listSchemaBridge, formSchemaBridge
     sourceName, listSchemaBridge, formSchemaBridge, queryEditorSchemaBridge,
     rowsCollection, rowCountCollection
     canEdit
