@@ -19,6 +19,7 @@ export interface createTableDataAPIParams {
   useObjectIds?: boolean
   listSchema?: SimpleSchema
   formSchema?: SimpleSchema
+  queryEditorSchema?: SimpleSchema
   canEdit?: boolean
   canSearch?: boolean
   canUseQueryEditor?: boolean
@@ -84,6 +85,7 @@ export interface createTableDataAPIReturn {
   sourceName: string
   listSchemaBridge: SimpleSchema2Bridge
   formSchemaBridge: SimpleSchema2Bridge
+  queryEditorSchemaBridge: SimpleSchema2Bridge
   rowsCollection: Mongo.Collection
   rowCountCollection: Mongo.Collection
   canEdit?: boolean
@@ -153,6 +155,7 @@ export declare function DataTableDisplayComponent(options: DataTableDisplayOptio
 
 export interface DataTableHeaderOptions {
   listSchemaBridge: SimpleSchema2Bridge
+  queryEditorSchemaBridge: SimpleSchema2Bridge
   loadedRowCount: number
   totalRowCount: number
   canSearch?: boolean

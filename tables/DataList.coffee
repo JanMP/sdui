@@ -23,6 +23,7 @@ newCache = -> new CellMeasurerCache
 export DataList = ({
   sourceName,
   listSchemaBridge,
+  queryEditorSchemaBridge,
   rows, limit, totalRowCount,
   loadMoreRows = (args...) -> console.log "loadMoreRows default stump called with arguments:", args...
   canSort, sortColumn, sortDirection,
@@ -115,6 +116,7 @@ export DataList = ({
     <div ref={headerContainerRef}>
       <Header {{
         listSchemaBridge
+        queryEditorSchemaBridge
         loadedRowCount: rows?.length, totalRowCount
         canSearch, search, onChangeSearch
         canUseQueryEditor, onChangeQueryUiObject, queryUiObject

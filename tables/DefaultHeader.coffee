@@ -12,6 +12,7 @@ import * as types from '../typeDeclarations'
   ###
 export DefaultHeader = ({
   listSchemaBridge
+  queryEditorSchemaBridge
   loadedRowCount, totalRowCount
   canSearch, search, onChangeSearch
   canUseQueryEditor, queryUiObject, onChangeQueryUiObject
@@ -108,7 +109,7 @@ export DefaultHeader = ({
       </div>
     </div>
     <QueryEditorModal
-      bridge={listSchemaBridge}
+      bridge={queryEditorSchemaBridge}
       rule={queryUiObject}
       onChangeRule={onChangeQueryUiObject}
       isOpen={showQueryEditor}

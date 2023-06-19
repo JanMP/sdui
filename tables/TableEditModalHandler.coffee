@@ -19,7 +19,7 @@ import {FormModal} from '../forms/FormModal.coffee'
 export TableEditModalHandler = ({tableOptions, DisplayComponent}) ->
   {
     sourceName
-    listSchemaBridge, formSchemaBridge
+    listSchemaBridge, formSchemaBridge, queryEditorSchemaBridge
     rows, totalRowCount, loadMoreRows, onRowClick,
     canSort, sortColumn, sortDirection, onChangeSort
     canSearch, search, onChangeSearch
@@ -110,6 +110,7 @@ export TableEditModalHandler = ({tableOptions, DisplayComponent}) ->
         {{
           sourceName
           listSchemaBridge,
+          queryEditorSchemaBridge
           rows, totalRowCount, loadMoreRows, onRowClick,
           canSort, sortColumn, sortDirection, onChangeSort
           canSearch, search, onChangeSearch

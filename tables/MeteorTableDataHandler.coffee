@@ -30,6 +30,7 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
   onSubmit
   onChangeField
   formSchemaBridge
+  queryEditorSchemaBridge,
   canSearch
   canSort
   canUseQueryEditor
@@ -246,7 +247,7 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
       if mayView
         <DisplayComponent {{
           sourceName,
-          listSchemaBridge, formSchemaBridge
+          listSchemaBridge, formSchemaBridge, queryEditorSchemaBridge,
           rows, totalRowCount, loadMoreRows, onRowClick,
           canSort, sortColumn, sortDirection, onChangeSort
           canSearch, search, onChangeSearch

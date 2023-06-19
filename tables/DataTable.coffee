@@ -107,6 +107,7 @@ rowRenderer = ({canEdit, mayEdit}) ->
 export DataTable = ({
   sourceName,
   listSchemaBridge,
+  queryEditorSchemaBridge
   rows, limit, totalRowCount,
   loadMoreRows = (args...) -> console.log "loadMoreRows default stump called with arguments:", args...
   canSort, sortColumn, sortDirection,
@@ -248,6 +249,7 @@ export DataTable = ({
     <div ref={headerContainerRef}>
       <Header {{
         listSchemaBridge
+        queryEditorSchemaBridge
         loadedRowCount: rows?.length, totalRowCount
         canSearch, search, onChangeSearch
         canUseQueryEditor, queryUiObject, onChangeQueryUiObject
