@@ -13,6 +13,7 @@ export createTableDataAPI = ({
   sourceName, sourceSchema, collection
   useObjectIds
   listSchema, formSchema
+  listSchema, formSchema, queryEditorSchema
   canEdit, canSearch, canUseQueryEditor, canSort, canAdd, canDelete, canExport
   viewTableRole, editRole, addRole, deleteRole, exportTableRole
   getPreSelectPipeline
@@ -115,6 +116,7 @@ export createTableDataAPI = ({
   #return props for the ui component
   {
     sourceName, listSchemaBridge, formSchemaBridge
+    sourceName, listSchemaBridge, formSchemaBridge, queryEditorSchemaBridge,
     rowsCollection, rowCountCollection
     canEdit
     canSearch
