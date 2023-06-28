@@ -82,6 +82,7 @@ export interface createTableDataAPIParams {
   debounceDelay?: number
   observers?: Array<any>
   setupNewItem?: () => object
+  onSubmit?: (object) => any
   showRowCount?: boolean
   checkDisableEditForRow?: boolean
   checkDisableDeleteForRow?: boolean 
@@ -109,6 +110,7 @@ export interface createTableDataAPIReturn {
   exportTableRole?: string | Array<string>
   setupNewItem?: () => object
   onSubmit?: (object) => any
+  onDelete?: ({id}: {id: string}) => Promise<any>
   onChangeField?: ({_id: string, changeData: object}) => any
   query?: object
   initialSortColumn?: string
@@ -122,7 +124,6 @@ export declare function createTableDataAPI(options: createTableDataAPIParams): c
 
 // This is for additional options we can shove into our Components
 export interface additionalDataTableOptions {
-  onDelete?: ({id}: {id: string}) => Promise<any>
   onRowClick?: ({rowData, index}: {rowData: any, index: number}) => void
   autoFormChildren?: [any]
   formDisabled?: boolean

@@ -25,6 +25,8 @@ export createTableDataAPI = ({
   query, initialSortColumn, initialSortDirection
   perLoad,
   setupNewItem
+  onSubmit
+  onDelete
   showRowCount
   checkDisableEditForRow
   checkDisableDeleteForRow
@@ -141,5 +143,7 @@ export createTableDataAPI = ({
     query, initialSortColumn, initialSortDirection
     perLoad
     setupNewItem
+    onSubmit
+    onDelete
     showRowCount
   }

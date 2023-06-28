@@ -18,7 +18,7 @@ export {default as connectFieldWithLabel} from './forms/connectFieldWithLabel.co
 
 export {createTableDataAPI} from './api/createTableDataAPI.coffee'
 export {createUserTableAPI} from './usertable/createUserTableAPI.coffee'
-
+export {createChatAPI} from './chat/createChatAPI.coffee'
 export {regExpMessages_de, de, setDefaultValidationMessages} from './api/validationMessages.coffee'
 # export {createFilesAPI, filesAPISourceSchema} from './api/createFilesAPI.coffee'
 
@@ -45,3 +45,4 @@ export QueryEditor = suspend lazy -> import('./query-editor/QueryEditor.coffee')
 export QueryEditorField = suspend lazy -> import('./query-editor/QueryEditorField.coffee').then (m) -> default: m.QueryEditorField
 export SdDocumentSelect = suspend lazy -> import('./tables/SdDocumentSelect.coffee').then (m) -> default: m.SdDocumentSelect
 export SdDocumentSelectField = suspend lazy -> import('./tables/SdDocumentSelect.coffee').then (m) -> default: m.SdDocumentSelectField
+export SdChat = suspend lazy -> import('./chat/SdChat.coffee').then (m) -> default: m.SdChat

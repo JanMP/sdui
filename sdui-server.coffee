@@ -9,6 +9,7 @@ export {
 } from './common/roleChecks.coffee'
 export {createTableDataAPI} from './api/createTableDataAPI.coffee'
 export {createUserTableAPI} from './usertable/createUserTableAPI.coffee'
+export {createChatAPI} from './chat/createChatAPI.coffee'
 export {default as connectFieldWithLabel} from './forms/connectFieldWithLabel.coffee'
 # export {createFilesAPI, filesAPISourceSchema} from './api/createFilesAPI.coffee'
 # export {ActionButton} from './forms/ActionButton.coffee'
