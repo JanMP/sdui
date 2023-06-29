@@ -40,9 +40,6 @@ export DefaultHeader = ({
       onChangeQueryUiObject null
   , [queryUiObject]
 
-  useEffect ->
-    console.log {width}
-  , [width]
 
   hasEffectiveQueryUiObject = queryUiObject?.content?.length > 0
 
