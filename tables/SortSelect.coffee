@@ -3,8 +3,8 @@ import {Dropdown} from 'primereact/dropdown'
 import {Button} from 'primereact/button'
 
 sortDirectionIcons =
-  ASC: 'pi pi-sort-amount-down-alt'
-  DESC: 'pi pi-sort-amount-up-alt'
+  ASC: 'pi pi-sort-amount-up-alt'
+  DESC: 'pi pi-sort-amount-down-alt'
 
 
 export SortSelect = ({listSchemaBridge, sortColumn, sortDirection, onChangeSort}) ->
@@ -28,16 +28,15 @@ export SortSelect = ({listSchemaBridge, sortColumn, sortDirection, onChangeSort}
       sortDirection: if sortDirection is 'ASC' then 'DESC' else 'ASC'
 
 
-  <>
+  <div className="p-inputgroup">
     <Dropdown
       value={sortColumn}
       options={sortColumnOptions}
       onChange={changeValue}
-      style={{width: '100%'}}
     />
     <Button
       className="p-button-secondary"
       icon={sortDirectionIcons[sortDirection] ? 'pi pi-sort-alt'}
       onClick={toggleSortDirection}
     />
-  </>
+  </div>

@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react'
 import {useDebounce} from '@react-hook/debounce'
 import processSearchInput from '../common/processSearchInput.coffee'
 import {InputText} from 'primereact/inputtext'
-import classname from 'classname'
+import classnames from 'classnames'
 
 export SearchInput = ({value, onChange, className = 'search-input'}) ->
 
@@ -21,17 +21,16 @@ export SearchInput = ({value, onChange, className = 'search-input'}) ->
     setDebouncedValue newValue unless warning
 
 
-  <span
-    className="p-input-icon-right"
-    style={width: '100%'}
+  <div
+    className="p-inputgroup"
   >
-    <i
-      className={if showWarning then "pi pi-exclamation-triangle" else"pi pi-search"}
-    />
     <InputText
-      className={classname 'p-invalid': showWarning}
+      className={classnames 'p-invalid': showWarning}
       value={displayValue}
       onChange={(e) -> handleSearchChange e.target.value}
       style={width: '100%'}
     />
-  </span>
+    <span className="p-inputgroup-addon">
+      <i className={if showWarning then "pi pi-exclamation-triangle" else"pi pi-search"}/>
+    </span>
+  </div>

@@ -31,11 +31,7 @@ export DefaultHeader = ({
   # (react-virtual will draw over the menu of react-select)
   header = useRef null
   [width, height] = useSize header
-  widthClass =
-    switch
-      when width < 440 then 'four-rows'
-      when width < 550 then 'two-rows'
-      else ''
+
 
   toggleQueryEditor = -> setShowQueryEditor (x) -> not x
 
@@ -44,38 +40,42 @@ export DefaultHeader = ({
       onChangeQueryUiObject null
   , [queryUiObject]
 
+  useEffect ->
+    console.log {width}
+  , [width]
+
   hasEffectiveQueryUiObject = queryUiObject?.content?.length > 0
 
   <>
-    <div ref={header} className="default-header #{widthClass}">
-      {
-        if totalRowCount
-          <div className="row-count">{loadedRowCount}/{totalRowCount}</div>
-        else
-          <div className="row-count"/>
-      }
-      <div className="middle-container">
+    <div
+      ref={header}
+      className="flex justify-content-between flex-wrap gap-2 p-2 surface-100"
+    >
+      <div className="flex-order-0 flex-grow-0 p-2 text-base">
+        {if totalRowCount then "#{loadedRowCount}/#{totalRowCount}" else null}
+      </div>
+      <div
+        className="flex-order-2 flex-1 flex justify-content-center gap-2
+          #{if width < 780 then 'flex-column' else 'flex-row'}
+        "
+      >
         {
           if canSort
-            <div className="sort-container">
-              <SortSelect {{
-                listSchemaBridge
-                sortColumn, sortDirection, onChangeSort
-              }...}/>
-            </div>
+            <SortSelect {{
+              listSchemaBridge
+              sortColumn, sortDirection, onChangeSort
+            }...}/>
         }
         {
           if canSearch
-            <div className="search-container">
-              <SearchInput
-                value={search}
-                onChange={onChangeSearch}
-              />
-            </div>
+            <SearchInput
+              value={search}
+              onChange={onChangeSearch}
+            />
         }
         {
           if canUseQueryEditor
-            <div className="query-editor-toggle-container">
+            <div>
               <Button
                 icon="pi pi-filter"
                 rounded text
@@ -85,7 +85,9 @@ export DefaultHeader = ({
             </div>
         }
       </div>
-      <div className="buttons-container">
+      <div
+        className="flex justify-content-end #{if width < 900 then 'flex-order-1 w-9' else 'flex-order-3'}"
+      >
         <AdditionalHeaderButtonsLeft/>
         {
           if canExport
