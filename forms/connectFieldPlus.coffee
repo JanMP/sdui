@@ -14,7 +14,7 @@ export default (Component) ->
 
     {t} = useTranslation()
 
-    outerClassName = "u-form-field"
+    outerClassName = "flex flex-column my-4"
     if fieldClassName?
       outerClassName += ' | ' + fieldClassName
     
@@ -23,8 +23,6 @@ export default (Component) ->
         position: 'top'
         showDelay: 500
 
-    if props.fieldType is Boolean
-      labelPosition ?= 'right'
     labelPosition ?=
       if props.fieldType is Boolean
         'right'
@@ -50,17 +48,17 @@ export default (Component) ->
                 <label htmlFor={props.id}>{t label}</label>
               </span>
             when 'left'
-              <div className="inline-left">
-                <label htmlFor={props.id}>{t label}</label>
+              <div className="flex align-items-center gap-2">
+                <label className="text-right w-10rem" htmlFor={props.id}>{t label}</label>
                 <Component {props...}/>
               </div>
             when 'right'
-              <div className="inline-right">
+              <div className="flex align-items-center gap-2">
                 <Component {props...}/>
                 <label htmlFor={props.id}>{t label}</label>
               </div>
             else
-              <div className="inline-top">
+              <div className="flex flex-column">
                 <label htmlFor={props.id}>{t label}</label>
                 <Component {props...}/>
               </div>

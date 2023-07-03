@@ -22,11 +22,11 @@ function List({
   const {t} = useTranslation()
 
   return (
-    <ul {...filterDOMProps(props)} className="u-list-field">
+    <div {...filterDOMProps(props)} className="u-list-field">
       {label && (
         <div>
-          <div className="u-list-field-header">
-            <div>{t(label)}</div>
+          <div className="flex flex-row justify-content-between align-items-center border-primary border-bottom-1 mb-2">
+            <div className="text-lg">{t(label)}</div>
             <div>
               <ListAddField initialCount={initialCount} name="$" />
             </div>
@@ -45,7 +45,7 @@ function List({
             : child,
         ),
       )}
-    </ul>
+    </div>
   );
 }
 

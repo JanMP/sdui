@@ -1,5 +1,6 @@
 import {Meteor} from 'meteor/meteor'
-import React, {Fragment} from 'react'
+import React from 'react'
+import {Message} from 'primereact/message'
 
 export class ErrorBoundary extends React.Component
   constructor: (props) ->
@@ -12,13 +13,13 @@ export class ErrorBoundary extends React.Component
     @setState
       hasError: true
       msg: error.message ? 'unexpectedError'
-    console.log 'Caught by ErrorBoundary:', error
+    console.error 'Caught by ErrorBoundary:', error
 
   resetEditor: ->
     Meteor.call 'ruleEditorWorkspace.openFresh', -> location.reload()
 
   render: ->
     if @state.hasError
-      <div className="error-boundary">{@state.msg}</div>
+      <Message text={@state.msg} />
     else
       @props.children

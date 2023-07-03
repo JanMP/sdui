@@ -10,8 +10,8 @@ function ListItem({
   children = <AutoField label={null} name="" />,
 }: ListItemFieldProps) {
   return (
-    <div className="u-list-item-field">
-      <div className="u-list-item-child-container">{children}</div>
+    <div className="p-card px-4 mb-2 mx-2 flex flex-row align-items-center gap-4">
+      <div className="flex-grow-1">{children}</div>
       <div>
         <ListDelField name="" />
       </div>

@@ -129,7 +129,7 @@ setupNewItem
           ?.then openEditor
 
   
-  <Fill className="content-editor">
+  <Fill className="p-component h-full w-full">
     <ErrorBoundary>
       <ConfirmationModal
         isOpen={overloadConfirmationModalOpen}
@@ -185,7 +185,7 @@ setupNewItem
             <Fill>
               <Top size="2rem" className="pane-header">Data</Top>
               <Fill scrollable>
-                <div className="managed-form">
+                <div className="p-2">
                   <AutoForm
                     schema={formSchemaBridge}
                     model={changedModel}
@@ -196,16 +196,16 @@ setupNewItem
                     validate="onChange"
                     submitField={-> null}
                   />
-                  <div className="button-container">
+                  <div className="mt-4 mr-4 flex justify-content-end gap-2">
                     <ActionButton
                       onAction={onReset}
-                      className="button warning"
+                      className="p-button-warning"
                       label="Zurücksetzen"
                       disabled={not hasChanged}
                     />
                     <ActionButton
                       onAction={-> handleSubmit changedModel}
-                      className="button primary"
+                      className="p-button-primary"
                       label="Speichern"
                       disabled={(not hasChanged) or (not isValid)}
                     />

@@ -25,10 +25,10 @@ export DefaultListItem = ({
   handleClick = ->
     if index? then onClick {rowData, index}
 
-  isSelectedClass = if isSelected then ' default-list-item--selected' else ''
-  editableClass = if rowData._disableEditForRow then ' default-list-item--not-editable' else ''
+  isSelectedClass = if isSelected then ' border-primary porder-2' else ''
+  editableClass = if rowData._disableEditForRow then ' cursor-not-allowed' else ''
 
-  <div className="default-list-item | #{isSelectedClass} #{editableClass}" onClick={handleClick}>
+  <div className="p-card flex flex-row gap-2 | #{isSelectedClass} #{editableClass}" onClick={handleClick}>
     <ListItemContent rowData={rowData} measure={measure}/>
     {
       if canDelete

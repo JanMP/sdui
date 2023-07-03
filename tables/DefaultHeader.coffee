@@ -46,7 +46,7 @@ export DefaultHeader = ({
   <>
     <div
       ref={header}
-      className="flex justify-content-between flex-wrap gap-2 p-2 surface-100"
+      className="flex justify-content-between flex-wrap gap-2 p-2 p-card"
     >
       <div className="flex-order-0 flex-grow-0 p-2 text-base">
         {if totalRowCount then "#{loadedRowCount}/#{totalRowCount}" else null}

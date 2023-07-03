@@ -111,7 +111,7 @@ export DataList = ({
     </div>
 
 
-  <div ref={contentContainerRef} style={height: '100%'} className="bg-white">
+  <div ref={contentContainerRef} className="p-component h-full">
   
     <div ref={headerContainerRef}>
       <Header {{

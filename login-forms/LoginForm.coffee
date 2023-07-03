@@ -108,12 +108,12 @@ export LoginForm = ({allowResetPassword = false}) ->
     if formToShow is 'sign-up' then setFormToShow 'sign-in' else setFormToShow 'sign-up'
   
 
-  <div className="sd-login-form">
+  <div className="p-component w-16rem">
     <Form />
-    { <div>
+    { <div className="text-center mt-4">
       <a onClick={-> setFormToShow 'resetPassword'}>Ich habe mein Passwort vergessen</a>
     </div> if allowResetPassword and formToShow isnt 'resetPassword'}
-    {<div>
+    {<div className="text-center mt-4">
       <a onClick={toggleLoginOrSignup}>{loginOrSignupLabel}</a>
     </div> if loginOrSignupLabel?}
   </div>

@@ -97,9 +97,9 @@ rowRenderer = ({canEdit, mayEdit}) ->
   (props) ->
     if canEdit
       if mayEdit and not props.rowData._disableEditForRow
-        props.className += " editable-row"
+        props.className += " cursor-pointer"
       else
-        props.className += " not-editable-row"
+        props.className += " cursor-not-allowed"
         props.onRowClick = ->
     defaultTableRowRenderer props
 
@@ -244,7 +244,7 @@ export DataTable = ({
       />
 
 
-  <div ref={contentContainerRef} style={height: '100%'} className="bg-white">
+  <div ref={contentContainerRef} className="p-component h-full">
   
     <div ref={headerContainerRef}>
       <Header {{
