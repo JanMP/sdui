@@ -70,15 +70,15 @@ export SdChat = ({dataOptions}) ->
   onSessionListRowClick = ({rowData}) ->
     setSessionId rowData._id
 
-  <div className="sd-chat">
-    <div className="session-list-container">
+  <div className="h-full flex gap-2">
+    <div className="h-full w-15rem">
       <SdList
         dataOptions={{sessionListDataOptions..., onSubmit, onDelete, onRowClick: onSessionListRowClick}}
         customComponents={ListItem: SessionListItem {sessionId}}
       />
     </div>
-    <div className="chat-container">
-      <div className="message-area">
+    <div className="h-full w-full flex flex-column">
+      <div className="h-full flex flex-column gap-2 overflow-y-scroll">
         {messages.map (message) ->
           <Message
             message={message}/>

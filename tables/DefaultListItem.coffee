@@ -2,7 +2,7 @@ import React from 'react'
 import {Button} from 'primereact/button'
 
 DefaultListItemContent = ({rowData, measure}) ->
-  <div className="default-list-item__default-content">{JSON.stringify rowData, null, 2}</div>
+  <div className="flex-grow-1 py-1 px-2">{JSON.stringify rowData, null, 2}</div>
 
 
 export DefaultListItem = ({
@@ -25,21 +25,28 @@ export DefaultListItem = ({
   handleClick = ->
     if index? then onClick {rowData, index}
 
-  isSelectedClass = if isSelected then ' border-primary porder-2' else ''
+  isSelectedClass = if isSelected then ' border-primary border-2' else ''
   editableClass = if rowData._disableEditForRow then ' cursor-not-allowed' else ''
 
-  <div className="p-card flex flex-row gap-2 | #{isSelectedClass} #{editableClass}" onClick={handleClick}>
-    <ListItemContent rowData={rowData} measure={measure}/>
-    {
-      if canDelete
-        <div className="button-container">
-          <Button
-            icon="pi pi-delete-left"
-            severity="danger"
-            rounded text
-            onClick={handleDeleteButtonClick}
-            disabled={rowData._disableDeleteForRow or not mayDelete}
-          />
-        </div>
-    }
+  
+  <div className="p-1">
+    <div
+      className="p-component p-section flex flex-row gap-2 align-content-center
+        #{isSelectedClass} #{editableClass}"
+      onClick={handleClick}
+    >
+      <ListItemContent rowData={rowData} measure={measure}/>
+      {
+        if canDelete
+          <div className="button-container">
+            <Button
+              icon="pi pi-delete-left"
+              severity="danger"
+              rounded text
+              onClick={handleDeleteButtonClick}
+              disabled={rowData._disableDeleteForRow or not mayDelete}
+            />
+          </div>
+      }
+    </div>
   </div>

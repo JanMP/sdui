@@ -30,7 +30,7 @@ export ManagedForm = ({schemaBridge, model, onChangeModel, onSubmit, disabled, c
     onChangeModel newModel
 
   <ErrorBoundary>
-    <div className="flex-shrink-1 overflow-hidden flex flex-column gap-2">
+    <div className="flex-auto overflow-hidden flex flex-column justify-content-between gap-2">
      <div className="flex-shrink-1 overflow-y-scroll p-2">
        <AutoForm
           ref={(ref) -> form = ref}
@@ -44,7 +44,7 @@ export ManagedForm = ({schemaBridge, model, onChangeModel, onSubmit, disabled, c
           disabled={disabled}
         />
      </div>
-      <div className="py-4 flex justify-content-end gap-2">
+      <div className="pt-4 flex justify-content-end gap-2">
         <ActionButton
           onAction={-> form.reset()}
           className="p-button-warning"

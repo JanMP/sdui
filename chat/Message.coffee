@@ -7,19 +7,22 @@ export Message = ({message}) ->
 
   {_id, userId, text, username, email, chatRole} = message
 
-  isCurrentUser = useTracker -> Meteor.userId() is userId
+  # isCurrentUser = useTracker -> Meteor.userId() is userId
 
-  className = "message #{chatRole} #{if isCurrentUser then 'current-user' else ''}"
+  chatRoleClassName =
+    switch chatRole
+      when 'user' then 'surface-300'
+      when 'bot' then 'surface-300'
+      else ''
+
 
   <div
     key={_id}
-    className={className}
+    className={"p-3 flex gap-4 #{chatRoleClassName}"}
   >
-    <div className="gravatar-container">
-      <Gravatar email={email} size={24}/>
-    </div>
+    <Gravatar email={email} className="border-circle"/>
     <div className="content-container">
-      <div>
+      <div className="text font-bold">
         {username}:
       </div>
       <div>

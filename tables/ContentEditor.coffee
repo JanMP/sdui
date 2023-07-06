@@ -3,6 +3,7 @@ import {DataList} from './DataList.coffee'
 import {ErrorBoundary} from '../common/ErrorBoundary.coffee'
 import {ConfirmationModal} from '../forms/ConfirmationModal.coffee'
 import {Fill, LeftResizable, BottomResizable, TopResizable, Top, Bottom} from 'react-spaces'
+import {Splitter, SplitterPanel} from 'primereact/splitter'
 import {AutoForm} from '../forms/uniforms-custom/select-implementation'
 import {SdEditor} from '../editor/SdEditor.coffee'
 import {MarkdownDisplay} from '../markdown/MarkdownDisplay.coffee'
@@ -129,7 +130,7 @@ setupNewItem
           ?.then openEditor
 
   
-  <Fill className="p-component h-full w-full">
+  <div className="p-component h-full w-full">
     <ErrorBoundary>
       <ConfirmationModal
         isOpen={overloadConfirmationModalOpen}
@@ -146,100 +147,103 @@ setupNewItem
             onConfirm={-> deleteAndCloseEditor id: idForDeleteConfirmationModal}
           />
       }
-      <LeftResizable size="25%">
-        <DataList
-          {{
-            sourceName
-            listSchemaBridge,
-            rows, totalRowCount, loadMoreRows, onRowClick,
-            canSort, sortColumn, sortDirection, onChangeSort
-            canSearch, search, onChangeSearch
-            canUseQueryEditor, queryUiObject, onChangeQueryUiObject
-            canAdd, mayAdd, onAdd
-            canDelete, mayDelete, onDelete: handleOnDelete
-            canEdit, mayEdit
-            onChangeField,
-            canExport, onExportTable
-            mayExport
-            isLoading
-            overscanRowCount
-            customComponents
-            selectedRowId
-          }...}
-        />
-      </LeftResizable>
-      {
-        if mayEdit and editorOpen
-          <LeftResizable size="50%">
-            <TopResizable size="20%">
-              <Top size="2rem" className="pane-header" allowOverflow>Content</Top>
-              <Fill allowOverflow>
-                <ErrorBoundary>
-                  <SdEditor
-                    value={changedModel?[contentKey]}
-                    onChange={setContent}
-                  />
-                </ErrorBoundary>
-              </Fill>
-            </TopResizable>
-            <Fill>
-              <Top size="2rem" className="pane-header">Data</Top>
-              <Fill scrollable>
-                <div className="p-2">
-                  <AutoForm
-                    schema={formSchemaBridge}
-                    model={changedModel}
-                    onChangeModel={setChangedModel}
-                    onValidate={onValidate}
-                    children={autoFormChildren}
-                    disabled={formDisabled}
-                    validate="onChange"
-                    submitField={-> null}
-                  />
-                  <div className="mt-4 mr-4 flex justify-content-end gap-2">
-                    <ActionButton
-                      onAction={onReset}
-                      className="p-button-warning"
-                      label="Zurücksetzen"
-                      disabled={not hasChanged}
-                    />
-                    <ActionButton
-                      onAction={-> handleSubmit changedModel}
-                      className="p-button-primary"
-                      label="Speichern"
-                      disabled={(not hasChanged) or (not isValid)}
-                    />
-                  </div>
-                </div>
-              </Fill>
-            </Fill>
-          </LeftResizable>
-      }
-      {
-        if editorOpen
-          <Fill>
-            <Top size="2rem" className="pane-header">Preview</Top>
-            <Fill scrollable>
-              <ErrorBoundary>
-                {
-                  if Preview?
-                    <Preview content={changedModel}/>
-                  else
-                    <MarkdownDisplay
-                      markdown={changedModel?[contentKey]}
-                      contentClass="prose"
-                    />
-                }
-              </ErrorBoundary>
-            </Fill>
-            {
-              if RelatedDataPane?
-                <BottomResizable size="50%" scrollable>
-                  <RelatedDataPane model={changedModel}/>
-                </BottomResizable>
-            }
-          </Fill>
-      }
+      <Splitter className="h-full">
+        <SplitterPanel>
+          {###<DataList
+            {{
+              sourceName
+              listSchemaBridge,
+              rows, totalRowCount, loadMoreRows, onRowClick,
+              canSort, sortColumn, sortDirection, onChangeSort
+              canSearch, search, onChangeSearch
+              canUseQueryEditor, queryUiObject, onChangeQueryUiObject
+              canAdd, mayAdd, onAdd
+              canDelete, mayDelete, onDelete: handleOnDelete
+              canEdit, mayEdit
+              onChangeField,
+              canExport, onExportTable
+              mayExport
+              isLoading
+              overscanRowCount
+              customComponents
+              selectedRowId
+            }...}
+          />###}
+        </SplitterPanel>
+        <SplitterPanel className="bg-red-500">
+          {###
+            if mayEdit and editorOpen
+              <Splitter>
+                <SplitterPanel>
+                  <Splitter layout="vertical">
+                    <SplitterPanel size={20}>
+                      <div>Content</div>
+                      <ErrorBoundary>
+                        <SdEditor
+                          value={changedModel?[contentKey]}
+                          onChange={setContent}
+                        />
+                      </ErrorBoundary>
+                    </SplitterPanel>
+                    <SplitterPanel>
+                      <div>Data</div>
+                      <div className="p-2">
+                        <AutoForm
+                          schema={formSchemaBridge}
+                          model={changedModel}
+                          onChangeModel={setChangedModel}
+                          onValidate={onValidate}
+                          children={autoFormChildren}
+                          disabled={formDisabled}
+                          validate="onChange"
+                          submitField={-> null}
+                        />
+                        <div className="mt-4 mr-4 flex justify-content-end gap-2">
+                          <ActionButton
+                            onAction={onReset}
+                            className="p-button-warning"
+                            label="Zurücksetzen"
+                            disabled={not hasChanged}
+                          />
+                          <ActionButton
+                            onAction={-> handleSubmit changedModel}
+                            className="p-button-primary"
+                            label="Speichern"
+                            disabled={(not hasChanged) or (not isValid)}
+                          />
+                        </div>
+                      </div>
+                    </SplitterPanel>
+                  </Splitter>
+                </SplitterPanel>
+                <SplitterPanel>
+                  <Splitter>
+                    <SplitterPanel>
+                      <div>Preview</div>
+                      <ErrorBoundary>
+                        {
+                          if Preview?
+                            <Preview content={changedModel}/>
+                          else
+                            <MarkdownDisplay
+                              markdown={changedModel?[contentKey]}
+                              contentClass="prose"
+                            />
+                        }
+                      </ErrorBoundary>
+                    </SplitterPanel>
+                    <SplitterPanel>
+                      {
+                        if RelatedDataPane?
+                          <RelatedDataPane model={changedModel}/>
+                      }
+                    </SplitterPanel>
+                  </Splitter> 
+                </SplitterPanel>
+              </Splitter>
+          ###}
+        </SplitterPanel>
+      </Splitter>
     </ErrorBoundary>
-  </Fill>
+  </div>
   

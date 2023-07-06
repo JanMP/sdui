@@ -83,5 +83,7 @@ export createChatSessionListAPI = ({sourceName, sessionListCollection, viewChatR
     canDelete: true
     canEdit: false
     canUseQueryEditor: false
+    canSort: false
+    canSearch: false
     getPreSelectPipeline: getPreSelectPipeline
     getProcessorPipeline: getSessionListProcessorPipeline

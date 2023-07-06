@@ -111,39 +111,40 @@ export DataList = ({
     </div>
 
 
-  <div ref={contentContainerRef} className="p-component h-full">
+  <div ref={contentContainerRef} className="surface-ground w-full h-full">
   
-    <div ref={headerContainerRef}>
-      <Header {{
-        listSchemaBridge
-        queryEditorSchemaBridge
-        loadedRowCount: rows?.length, totalRowCount
-        canSearch, search, onChangeSearch
-        canUseQueryEditor, onChangeQueryUiObject, queryUiObject
-        canExport, mayExport, onExportTable
-        canAdd, mayAdd, onAdd
-        canSort, sortColumn, sortDirection, onChangeSort
-        AdditionalHeaderButtonsLeft, AdditionalHeaderButtonsRight
-        }...}/>
-    </div>
-   
-      <InfiniteLoader
-        isRowLoaded={isRowLoaded}
-        loadMoreRows={loadMoreRows}
-        rowCount={totalRowCount}
-      >
-        {({onRowsRendered, registerChild}) ->
-          registerChild tableRef
-          <List
-            width={contentContainerWidth}
-            height={contentContainerHeight - headerContainerHeight - 10}
-            rowHeight={cacheRef.current.rowHeight}
-            rowCount={rows?.length ? 0}
-            overscanRowCount={overscanRowCount}
-            onRowsRendered={onRowsRendered}
-            rowRenderer={rowRenderer}
-          />
-        }
-      </InfiniteLoader>
+      <div ref={headerContainerRef}>
+        <Header {{
+          listSchemaBridge
+          queryEditorSchemaBridge
+          loadedRowCount: rows?.length, totalRowCount
+          canSearch, search, onChangeSearch
+          canUseQueryEditor, onChangeQueryUiObject, queryUiObject
+          canExport, mayExport, onExportTable
+          canAdd, mayAdd, onAdd
+          canSort, sortColumn, sortDirection, onChangeSort
+          AdditionalHeaderButtonsLeft, AdditionalHeaderButtonsRight
+          }...}/>
+      </div>
+      <div className="absolute">
+        <InfiniteLoader
+          isRowLoaded={isRowLoaded}
+          loadMoreRows={loadMoreRows}
+          rowCount={totalRowCount}
+        >
+          {({onRowsRendered, registerChild}) ->
+            registerChild tableRef
+            <List
+              width={contentContainerWidth}
+              height={contentContainerHeight - headerContainerHeight}
+              rowHeight={cacheRef.current.rowHeight}
+              rowCount={rows?.length ? 0}
+              overscanRowCount={overscanRowCount}
+              onRowsRendered={onRowsRendered}
+              rowRenderer={rowRenderer}
+            />
+          }
+        </InfiniteLoader>
+      </div>
     
   </div>

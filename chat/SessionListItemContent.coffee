@@ -1,7 +1,18 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 
 export SessionListItemContent = ({rowData}) ->
 
-  <div className="p-2">
-    {rowData?.title}
+  usernames =
+    rowData?.users
+    ?.map (user) ->
+      user?.username
+    ?.join ', '
+
+  useEffect ->
+    console.log rowData, usernames
+  , [rowData]
+
+  <div className="flex-grow-1 p-2">
+    <div className="text-lg">{rowData?.title}</div>
+    <div className="text-sm font-light">{usernames}</div>
   </div>

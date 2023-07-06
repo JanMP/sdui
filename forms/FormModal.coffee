@@ -1,5 +1,6 @@
 import React from 'react'
 import {Dialog} from 'primereact/dialog'
+import {className} from 'primereact/utils'
 
 import {ManagedForm} from './ManagedForm.coffee'
 
@@ -11,7 +12,7 @@ isOpen, onRequestClose, header, children, disabled = false, readOnly, onChangeMo
     visible={isOpen}
     onHide={onRequestClose}
     header={header}
-    contentStyle={display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: 0}
+    contentClassName="flex flex-column"
   >
     <ManagedForm
       schemaBridge={schemaBridge}

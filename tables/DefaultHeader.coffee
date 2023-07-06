@@ -4,6 +4,7 @@ import {SortSelect} from './SortSelect.coffee'
 import {QueryEditorModal} from '../query-editor/QueryEditorModal.coffee'
 import useSize from '@react-hook/size'
 import {Button} from 'primereact/button'
+import {Toolbar} from 'primereact/toolbar'
 import * as types from '../typeDeclarations'
 
 
@@ -26,11 +27,9 @@ export DefaultHeader = ({
 
   [showQueryEditor, setShowQueryEditor] = useState false
   
-  # we do this with js because of some weird interaction of react-virtualized and react-select
-  # when the react-select is inside a div with style container-type: inline-size
-  # (react-virtual will draw over the menu of react-select)
-  header = useRef null
-  [width, height] = useSize header
+  # workaround until we can use container queries
+  toolbarRef = useRef null
+  [width, height] = useSize toolbarRef
 
 
   toggleQueryEditor = -> setShowQueryEditor (x) -> not x
@@ -40,73 +39,68 @@ export DefaultHeader = ({
       onChangeQueryUiObject null
   , [queryUiObject]
 
-
   hasEffectiveQueryUiObject = queryUiObject?.content?.length > 0
 
-  <>
-    <div
-      ref={header}
-      className="flex justify-content-between flex-wrap gap-2 p-2 p-card"
-    >
-      <div className="flex-order-0 flex-grow-0 p-2 text-base">
-        {if totalRowCount then "#{loadedRowCount}/#{totalRowCount}" else null}
-      </div>
-      <div
-        className="flex-order-2 flex-1 flex justify-content-center gap-2
-          #{if width < 780 then 'flex-column' else 'flex-row'}
-        "
-      >
-        {
-          if canSort
-            <SortSelect {{
-              listSchemaBridge
-              sortColumn, sortDirection, onChangeSort
-            }...}/>
+  pt =
+    start:
+      className: "flex-order-0"
+    center:
+      className:
+        switch
+          when width < 600 then "flex-grow-1 flex-order-2 flex-wrap gap-2"
+          when width < 655 then "flex-grow-1 flex-order-2 gap-2"
+          else "flex-grow-1 flex-order-1 gap-2"
+    end:
+      className:
+        switch
+          when width < 655 then "flex-order-1"
+          else "flex-order-2"
+
+  startContent =
+    if totalRowCount then <span>{loadedRowCount}/{totalRowCount}</span>
+
+  centerContent =
+    <>
+        {if canSort then <SortSelect {{listSchemaBridge,sortColumn, sortDirection, onChangeSort}...}/>}
+        {if canSearch then <SearchInput value={search} onChange={onChangeSearch}/>}
+    </>
+    
+  endContent =
+    <>
+      {
+        if canUseQueryEditor
+          <Button
+            icon="pi pi-filter"
+            rounded text
+            severity={if hasEffectiveQueryUiObject then 'warning' else 'secondary'}
+            onClick={toggleQueryEditor} disabled={not true}
+          />
         }
-        {
-          if canSearch
-            <SearchInput
-              value={search}
-              onChange={onChangeSearch}
-            />
-        }
-        {
-          if canUseQueryEditor
-            <div>
-              <Button
-                icon="pi pi-filter"
-                rounded text
-                severity={if hasEffectiveQueryUiObject then 'warning' else 'secondary'}
-                onClick={toggleQueryEditor} disabled={not true}
-              />
-            </div>
-        }
-      </div>
-      <div
-        className="flex justify-content-end #{if width < 900 then 'flex-order-1 w-9' else 'flex-order-3'}"
-      >
-        <AdditionalHeaderButtonsLeft/>
-        {
-          if canExport
-            <Button
-              icon="pi pi-download"
-              severity="secondary"
-              rounded text
-              onClick={onExportTable}
-              disabled={not mayExport}
-            />
-        }
-        {
-          if canAdd
-            <Button
-              icon="pi pi-plus"
-              rounded text
-              onClick={onAdd} disabled={not mayAdd}
-            />
-        }
-        <AdditionalHeaderButtonsRight/>
-      </div>
-    </div>
+      <AdditionalHeaderButtonsLeft/>
+      {
+        if canExport
+          <Button
+            icon="pi pi-download"
+            severity="secondary"
+            rounded text
+            onClick={onExportTable}
+            disabled={not mayExport}
+          />
+      }
+      {
+        if canAdd
+          <Button
+            icon="pi pi-plus"
+            rounded text
+            onClick={onAdd} disabled={not mayAdd}
+          />
+      }
+      <AdditionalHeaderButtonsRight/>
+    </>
+
+
+  <div ref={toolbarRef}>
+    <Toolbar start={startContent} center={centerContent} end={endContent} pt={pt}/>
     <QueryEditorModal
       bridge={queryEditorSchemaBridge}
       rule={queryUiObject}
@@ -114,4 +108,4 @@ export DefaultHeader = ({
       isOpen={showQueryEditor}
       setIsOpen={setShowQueryEditor}
     />
-  </>
+  </div>
