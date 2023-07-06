@@ -38,7 +38,7 @@
     "preserveSymlinks": true
   },
   "include": [
-    "**.*.d.ts"
+    "./typeDeclarations.ts"
   ],
   "exclude": [
     "./.meteor/**",
