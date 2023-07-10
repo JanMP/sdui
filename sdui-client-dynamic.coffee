@@ -40,9 +40,13 @@ export * from './forms/uniforms-custom/select-implementation'
 export ManagedForm = suspend lazy -> import('./forms/ManagedForm.coffee').then (m) -> default: m.ManagedForm
 export FormModal = suspend lazy -> import('./forms/FormModal.coffee').then (m) -> default: m.FormModal
 export LoginForm = suspend lazy -> import('./login-forms/LoginForm.coffee').then (m) -> default: m.LoginForm
+export LoginButton = suspend lazy -> import('./login-forms/LoginButton.coffee').then (m) -> default: m.LoginButton
 
 export QueryEditor = suspend lazy -> import('./query-editor/QueryEditor.coffee').then (m) -> default: m.QueryEditor
 export QueryEditorField = suspend lazy -> import('./query-editor/QueryEditorField.coffee').then (m) -> default: m.QueryEditorField
 export SdDocumentSelect = suspend lazy -> import('./tables/SdDocumentSelect.coffee').then (m) -> default: m.SdDocumentSelect
 export SdDocumentSelectField = suspend lazy -> import('./tables/SdDocumentSelect.coffee').then (m) -> default: m.SdDocumentSelectField
 export SdChat = suspend lazy -> import('./chat/SdChat.coffee').then (m) -> default: m.SdChat
+
+export Gravatar = suspend lazy -> import('./forms/GravatarField.coffee').then (m) -> default: m.Gravatar
+export GravatarField = suspend lazy -> import('./forms/GravatarField.coffee').then (m) -> default: m.GravatarField
