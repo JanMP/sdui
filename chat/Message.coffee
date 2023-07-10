@@ -11,8 +11,8 @@ export Message = ({message}) ->
 
   chatRoleClassName =
     switch chatRole
-      when 'user' then 'surface-300'
-      when 'bot' then 'surface-300'
+      when 'user' then 'p-card p-card-secondary'
+      when 'bot' then 'p-card p-card-secondary'
       else ''
 
 
