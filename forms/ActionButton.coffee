@@ -16,6 +16,7 @@ import _ from 'lodash'
   @param {() => void} [args.onAction] - optional callback. either mothod or onAction should be defined
   @param {string?} args.label - optional button label
   @param {string?} args.icon - optional PrimeIcon (placed before label if label is defined)
+  @param {React.Component?} args.customTemplate - optional custom template to be rendered either before or instead of label and icon
   @param {(result: any) => void} [args.onSuccess] - optional callback on successfull method/action, defaults to toast.sucess(successMsg) if successMsg is defined
   @param {string?} args.successMsg - optional sucess message text
   @param {(error: Error) => void} [args.onError] - optional callback on unsuccessfull method/action, defaults to toast.error(errorMsg ? error)
@@ -25,13 +26,13 @@ import _ from 'lodash'
   @param {boolean?} args.disabled
   @param {Object?} args.buttonProps - props passed to Primereact <Button />
  ###
-export ActionButton = ({method, data, options, onAction, label, icon,
+export ActionButton = ({method, data, options, onAction, customTemplate, label, icon,
 onSuccess, successMsg, onError, errorMsg, confirmation, className, disabled,
 buttonProps}) ->
 
   data ?= {}
   options ?= {}
-  label ?= unless icon? then "run #{method}"
+  label ?= unless icon? or customTemplate? then "run #{method}"
 
   onSuccess ?= (result) -> if successMsg? then toast.success successMsg
   onError ?= (error) -> toast.error "#{errorMsg ? error}"
@@ -79,8 +80,9 @@ buttonProps}) ->
       onClick={handleClick}
       {buttonProps...}
     >
-      <div style={position: "relative"}>
-        <div style={if isBusy then {visibility: "hidden"}}>
+      <div className="relative">
+        <div className="flex flex-row gap-2 align-items-center" style={if isBusy then {visibility: "hidden"}}>
+          {<div>{customTemplate}</div> if customTemplate}
           {<i className={icon}/> if icon?}
           {<span> {label}</span> if label?}
         </div>
