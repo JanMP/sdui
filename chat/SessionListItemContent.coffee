@@ -9,7 +9,6 @@ export SessionListItemContent = ({rowData}) ->
     ?.join ', '
 
   useEffect ->
-    console.log rowData, usernames
   , [rowData]
 
   <div className="flex-grow-1 p-2">

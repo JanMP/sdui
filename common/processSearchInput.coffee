@@ -22,5 +22,3 @@ export default (inputString) ->
 
   {isValidRegEx, warn, flags, processedString}
 
-
-# console.log ['/fnord/', 'someting', '/[something/i', '/[-\/\\^$*+?.()|[\]{}]/g'].map processSearchInput

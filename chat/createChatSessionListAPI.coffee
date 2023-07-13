@@ -18,8 +18,6 @@ sourceSchemaDefinition =
     type: String
 
 additionalListFieldsSchemaDefinition =
-  userCount:
-    type: Number
   users:
     type: Array
     optional: true
@@ -42,9 +40,6 @@ export createChatSessionListAPI = ({sourceName, sessionListCollection, viewChatR
   ]
 
   getSessionListProcessorPipeline = -> [
-    $addFields:
-      userCount: {$size: '$userIds'}
-  ,
     $unwind: '$userIds'
   ,
     $lookup:
@@ -64,7 +59,6 @@ export createChatSessionListAPI = ({sourceName, sessionListCollection, viewChatR
       _id: '$_id'
       title: $first: '$title'
       userIds: $push: '$userIds'
-      userCount: $first: '$userCount'
       users: $push:
         username: '$username'
         email: $arrayElemAt: ['$email', 0]
@@ -83,7 +77,8 @@ export createChatSessionListAPI = ({sourceName, sessionListCollection, viewChatR
     canDelete: true
     canEdit: false
     canUseQueryEditor: false
-    canSort: false
-    canSearch: false
+    canSort: true
+    canSearch: true
+
     getPreSelectPipeline: getPreSelectPipeline
     getProcessorPipeline: getSessionListProcessorPipeline
