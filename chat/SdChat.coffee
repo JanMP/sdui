@@ -1,7 +1,8 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useRef} from 'react'
 import {meteorApply} from 'meteor/janmp:sdui'
 import {Fill, Bottom} from 'react-spaces'
 import {InputText} from 'primereact/inputtext'
+import {ScrollPanel} from 'primereact/scrollpanel'
 import {useTracker, useSubscribe} from 'meteor/react-meteor-data'
 import {Message} from './Message.coffee'
 import {SdList} from '../tables/SdList'
@@ -14,10 +15,12 @@ SessionListItem  = ({sessionId}) ->
 
 export SdChat = ({dataOptions}) ->
 
-  {sourceName, sessionListDataOptions} = dataOptions
+  {bots, sourceName, sessionListDataOptions} = dataOptions
 
   [inputValue, setInputValue] = useState ''
-  [sessionId, setSessionId] = useState 'QzDv3XpCHn42RkQLF'
+  [sessionId, setSessionId] = useState null
+
+  scrollAreaRef = useRef null
 
   sessionsAreLoading = useSubscribe "#{sourceName}.sessions"
   messagesAreLoading = useSubscribe "#{sourceName}.messages", {sessionId}
@@ -25,33 +28,46 @@ export SdChat = ({dataOptions}) ->
   session = useTracker ->
     dataOptions.sessionListDataOptions.rowsCollection.findOne sessionId
 
+  useEffect ->
+    meteorApply
+      method: "#{sourceName}.initialSessionForChat"
+      data: {}
+    .then setSessionId
+    undefined
+  , []
+
   messages =
     useTracker ->
       return [] unless session?.userIds?
       dataOptions.collection.find {},
-        sort: createdAt: 1
+        sort: createdAt: -1
         limit: 100
+      .fetch()
+      .reverse()
       .map (message) ->
-        user = session.users.find (user) -> user.userId is message.userId
-        {message..., username: user?.username, email: user?.email}
+        user = bots.find (bot) -> bot.id is message.userId
+        user ?= session.users.find (user) -> user.userId is message.userId
+        {message..., username: user?.username, email: user?.email, customImage: user?.customImage}
 
-  console.log messages
+  useEffect ->
+    scrollAreaRef?.current?.querySelector(':scope > :last-child')?.scrollIntoView()
+  , [messages.length]
+
   addMessage = (event) ->
     event.preventDefault()
     return if inputValue is ''
+    setInputValue ''
     meteorApply
       method: "#{sourceName}.addMessage"
       data:
         text: inputValue
         sessionId: sessionId
-    .then ->
-      setInputValue ''
 
   # This is a shortcut to build a single user Chat for Chatbots
   # TODO: build UI to add users to a chat
   onSubmit = (model) ->
     meteorApply
-      method: "#{sourceName}.sessions.addSingleUserSession"
+      method: "#{sourceName}.addSession"
       data: model
     .then setSessionId
     .catch (error) ->
@@ -61,35 +77,38 @@ export SdChat = ({dataOptions}) ->
   onDelete = ({id}) ->
     if sessionId is id then setSessionId ''
     meteorApply
-      method: "#{sourceName}.sessions.deleteSession"
+      method: "#{sourceName}.deleteSession"
       data: {id}
     .catch (error) ->
       toast.error "#{error}"
-      console.log error
+      console.error error
 
   onSessionListRowClick = ({rowData}) ->
     setSessionId rowData._id
 
-  <div className="h-full flex gap-2">
-    <div className="h-full w-15rem">
+  <div className="h-full w-full flex flex-row gap-4">
+    <div className="w-16rem flex-none">
       <SdList
         dataOptions={{sessionListDataOptions..., onSubmit, onDelete, onRowClick: onSessionListRowClick}}
         customComponents={ListItem: SessionListItem {sessionId}}
       />
     </div>
-    <div className="h-full w-full flex flex-column">
-      <div className="h-full flex flex-column gap-2 overflow-y-scroll">
-        {messages.map (message) ->
-          <Message
-            message={message}/>
-        }
+    <div className="flex-grow-1">
+      <div className="h-full flex flex-column">
+        <div className="h-30rem flex-grow-1 flex-shrink-1 overflow-y-scroll" ref={scrollAreaRef}>
+          {messages.map (message) ->
+            <Message
+              key={message._id}
+              message={message}/>
+          }
+        </div>
+        <form onSubmit={addMessage} className="p-4">
+          <InputText
+            value={inputValue}
+            onChange={(e) -> setInputValue e.target.value}
+            style={width: '100%'}
+          />
+        </form>
       </div>
-      <form onSubmit={addMessage} className="bottom-container">
-        <InputText
-          value={inputValue}
-          onChange={(e) -> setInputValue e.target.value}
-          style={width: '100%'}
-        />
-      </form>
     </div>
   </div>

@@ -8,9 +8,23 @@ import _ from 'lodash'
 
 export createChatMethods = ({
   sourceName, collection, sessionListCollection,
-  viewChatRole, addSessionRole
+  viewChatRole, addSessionRole, reactToNewMessage, onNewSession
 }) ->
 
+  reactToNewMessage ?= ({text, messageId, sessionId}) ->
+  onNewSession ?= ({sessionId}) -> console.log 'onNewSession', {sessionId}
+
+
+  addSession = ({title, userIds}) ->
+    currentUserMustBeInRole addSessionRole
+    return unless Meteor.isServer
+    title ?= '[no title]'
+    userIds ?= [Meteor.userId()]
+    sessionId = sessionListCollection.insert {title, userIds}
+    onNewSession {sessionId}
+    sessionId
+
+  # we don't use this one yet, we use .sessions.addSingleUserSession as a shortcut (we don't have a UI to add users to a chat yet)
   new ValidatedMethod
     name: "#{sourceName}.addSession"
     validate:
@@ -18,18 +32,13 @@ export createChatMethods = ({
         title:
           type: String
           optional: true
-        users:
+        userIds:
           type: Array
           optional: true
-        'users.$':
+        'userIds.$':
           type: String
       .validator()
-    run: ({title, users}) ->
-      currentUserMustBeInRole addSessionRole
-      return unless Meteor.isServer
-      title ?= '[no title]'
-      userIds = [Meteor.userId()]
-      sessionListCollection.insert {title, userIds}
+    run: addSession
 
   new ValidatedMethod
     name: "#{sourceName}.addMessage"
@@ -48,32 +57,18 @@ export createChatMethods = ({
         throw new Meteor.Error 'no session found'
       unless Meteor.userId() in sessionSettings.userIds
         throw new Meteor.Error 'user not in session'
-      collection.insert
+      newMessage =
         userId: Meteor.userId()
         sessionId: sessionId
         text: text
         createdAt: new Date()
         chatRole: 'user'
-
-
-  new ValidatedMethod
-    name: "#{sourceName}.sessions.addSingleUserSession"
-    validate:
-      new SimpleSchema
-        title:
-          type: String
-          optional: true
-      .validator()
-    run: ({title}) ->
-      currentUserMustBeInRole addSessionRole
-      return unless Meteor.isServer
-      title ?= '[no title]'
-      userIds = [Meteor.userId()]
-      sessionListCollection.insert {title, userIds}
-
+      messageId = collection.insert newMessage
+      reactToNewMessage {newMessage..., messageId}
+      messageId
 
   new ValidatedMethod
-    name: "#{sourceName}.sessions.deleteSession"
+    name: "#{sourceName}.deleteSession"
     validate:
       new SimpleSchema
         id:
@@ -84,3 +79,15 @@ export createChatMethods = ({
       return unless Meteor.isServer
       collection.remove sessionId: id
       sessionListCollection.remove id
+  
+  # we look for any session for this user and return the id, so we can select it in the UI
+  # if there is no session yet, we create one
+  new ValidatedMethod
+    name: "#{sourceName}.initialSessionForChat"
+    validate: null
+    run: ->
+      currentUserMustBeInRole addSessionRole
+      return unless Meteor.isServer
+      if (existingSession = sessionListCollection.findOne userIds: [Meteor.userId()])?
+        return existingSession._id
+      addSession {}

@@ -12,9 +12,11 @@ import _ from 'lodash'
   ###
 export Gravatar = (props) ->
 
-  {email, defaultIcon} = props
+  console.log 'Gravatar', props
 
-  url = gravatar.url email,
+  {email, defaultIcon, customImage} = props
+
+  url = customImage ? gravatar.url email,
     size: 200
     defaultIcon: defaultIcon ? 'identicon'
 

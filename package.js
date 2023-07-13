@@ -21,6 +21,7 @@ Package.onUse(function(api) {
   api.use('mdg:validated-method');
   api.use('peerlibrary:reactive-publish');
   api.use('tunguska:reactive-aggregate');
+  api.use('janmp:chatterbrain');
   // api.use('mizzao:user-status@1.0.1'); 
   api.mainModule('sdui-client-dynamic.coffee', 'client');
   api.mainModule('sdui-server.coffee', 'server');

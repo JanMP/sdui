@@ -10,6 +10,7 @@ export {
 export {createTableDataAPI} from './api/createTableDataAPI.coffee'
 export {createUserTableAPI} from './usertable/createUserTableAPI.coffee'
 export {createChatAPI} from './chat/createChatAPI.coffee'
+export {createChatBot} from './chat/createChatBot.coffee'
 export {default as connectFieldWithLabel} from './forms/connectFieldWithLabel.coffee'
 # export {createFilesAPI, filesAPISourceSchema} from './api/createFilesAPI.coffee'
 # export {ActionButton} from './forms/ActionButton.coffee'

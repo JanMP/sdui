@@ -23,7 +23,8 @@ export createChatAPI = ({
   sourceName
   collection
   sessionListCollection
-  viewChatRole, addSessionRole
+  viewChatRole, addSessionRole,
+  bots, reactToNewMessage, onNewSession
 }) ->
 
   # check required props and setup defaults for optional props
@@ -46,6 +47,8 @@ export createChatAPI = ({
       no addSessionRole defined, using '#{viewChatRole}' instead."
   addSessionRole ?= viewChatRole
 
+  bots ?= [] # id, username, email
+
   sessionListDataOptions =
     createChatSessionListAPI {
       sourceName
@@ -60,6 +63,8 @@ export createChatAPI = ({
     sessionListCollection
     viewChatRole
     addSessionRole
+    reactToNewMessage
+    onNewSession
   }
 
   createChatPublications {
@@ -69,4 +74,4 @@ export createChatAPI = ({
     viewChatRole
   }
 
-  {sourceName, collection, sessionListDataOptions}
+  {sourceName, collection, sessionListDataOptions, bots}
