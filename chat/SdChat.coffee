@@ -94,7 +94,7 @@ export SdChat = ({dataOptions}) ->
       />
     </div>
     <div className="flex-grow-1">
-      <div className="h-full flex flex-column">
+      <div className="h-full flex flex-column gap-2">
         <div className="h-30rem flex-grow-1 flex-shrink-1 overflow-y-scroll" ref={scrollAreaRef}>
           {messages.map (message) ->
             <Message
@@ -102,12 +102,17 @@ export SdChat = ({dataOptions}) ->
               message={message}/>
           }
         </div>
-        <form onSubmit={addMessage} className="p-4">
-          <InputText
-            value={inputValue}
-            onChange={(e) -> setInputValue e.target.value}
-            style={width: '100%'}
-          />
+        <form onSubmit={addMessage} className="p-card p-4">
+          <div className="p-inputgroup">
+            <InputText
+              value={inputValue}
+              onChange={(e) -> setInputValue e.target.value}
+              style={width: '100%'}
+            />
+            <span className="p-inputgroup-addon">
+              <i className="pi pi-send" />
+            </span>
+          </div>
         </form>
       </div>
     </div>
