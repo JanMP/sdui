@@ -33,4 +33,4 @@ export AutoTableAutoField = ({row, columnKey, schemaBridge, onChangeField, measu
           else
             <div style={whiteSpace: 'normal'}>{row[columnKey]}</div>
 
-  <div style={padding: '1px'}>{inner}</div>
+  <div className="py-2">{inner}</div>
