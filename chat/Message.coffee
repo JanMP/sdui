@@ -16,11 +16,15 @@ export Message = ({message}) ->
       when 'assistant' then 'p-card p-card-secondary'
       else ''
 
+  gravatarPt =
+    root:
+      className: 'flex-shrink-0'
+
 
   <div
     className={"p-3 mb-2 flex gap-4 #{chatRoleClassName}"}
   >
-    <Gravatar email={email} customImage={customImage} shape="circle" size="xlarge"/>
+    <Gravatar email={email} customImage={customImage} shape="circle" size="xlarge" pt={gravatarPt}/>
     <div className="content-container">
       <div className="text font-bold">
         {username}:
