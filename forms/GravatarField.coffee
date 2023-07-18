@@ -12,8 +12,6 @@ import _ from 'lodash'
   ###
 export Gravatar = (props) ->
 
-  console.log 'Gravatar', props
-
   {email, defaultIcon, customImage} = props
 
   url = customImage ? gravatar.url email,
