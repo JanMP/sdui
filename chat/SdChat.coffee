@@ -51,7 +51,7 @@ export SdChat = ({dataOptions}) ->
 
   useEffect ->
     scrollAreaRef?.current?.querySelector(':scope > :last-child')?.scrollIntoView()
-  , [messages.length]
+  , [messages]
 
   addMessage = (event) ->
     event.preventDefault()
