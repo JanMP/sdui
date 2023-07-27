@@ -18,6 +18,15 @@ export chatSchema = new SimpleSchema
   chatRole:
     type: String
     allowedValues: ['user', 'bot', 'system']
+  usage:
+    type: Object
+    optional: true
+  'usage.model':
+    type: String
+  'usage.prompt':
+    type: Number
+  'usage.completion':
+    type: Number
 
 export createChatAPI = ({
   sourceName
