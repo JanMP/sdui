@@ -3,8 +3,8 @@ import {Dropdown} from 'primereact/dropdown'
 import {Button} from 'primereact/button'
 
 sortDirectionIcons =
-  ASC: 'pi pi-sort-amount-up-alt'
-  DESC: 'pi pi-sort-amount-down-alt'
+  ASC: 'pi pi-sort-amount-down'
+  DESC: 'pi pi-sort-amount-up'
 
 
 export SortSelect = ({listSchemaBridge, sortColumn, sortDirection, onChangeSort}) ->
