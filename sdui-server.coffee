@@ -17,3 +17,4 @@ export {default as connectFieldWithLabel} from './forms/connectFieldWithLabel.co
 # export {SdTable} from './tables/SdTable.coffee'
 # export {SdList} from './tables/SdList.coffee'
 # export {default as AutoForm} from './forms/uniforms-custom/AutoForm.tsx'
+export {default as tokenizer} from './llm/gpt-tokenizer/encoding/cl100k_base.ts'
