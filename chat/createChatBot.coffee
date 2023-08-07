@@ -109,10 +109,6 @@ export createChatBot = ({
         workInProgress: false
 
 
-
-    
-
-
   call: ({messages, logData}) ->
     openAi.createChatCompletion {model, messages, options...}, {responseType: if options?.stream then 'stream'}
     .then (reply) ->
