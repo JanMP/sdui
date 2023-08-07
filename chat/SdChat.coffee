@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useRef} from 'react'
-import {meteorApply} from 'meteor/janmp:sdui'
+import {meteorApply, ActionButton} from 'meteor/janmp:sdui'
 import {Fill, Bottom} from 'react-spaces'
 import {InputText} from 'primereact/inputtext'
 import {ScrollPanel} from 'primereact/scrollpanel'
@@ -13,7 +13,7 @@ import {toast} from 'react-toastify'
 SessionListItem  = ({sessionId}) ->
   (args) ->  <DefaultListItem {{args..., ListItemContent: SessionListItemContent, selectedRowId: sessionId}...} />
 
-export SdChat = ({dataOptions}) ->
+export SdChat = ({dataOptions, singleSession = false, className = ""}) ->
 
   {bots, sourceName, sessionListDataOptions} = dataOptions
 
@@ -28,11 +28,15 @@ export SdChat = ({dataOptions}) ->
   session = useTracker ->
     dataOptions.sessionListDataOptions.rowsCollection.findOne sessionId
 
-  useEffect ->
+  getNewSession = ->
     meteorApply
       method: "#{sourceName}.initialSessionForChat"
       data: {}
     .then setSessionId
+
+  useEffect ->
+    unless sessionId?
+      getNewSession()
     undefined
   , []
 
@@ -50,7 +54,7 @@ export SdChat = ({dataOptions}) ->
         {message..., username: user?.username, email: user?.email, customImage: user?.customImage}
 
   useEffect ->
-    scrollAreaRef?.current?.querySelector(':scope > :last-child')?.scrollIntoView()
+    scrollAreaRef?.current?.querySelector(':scope > :last-child')?.scrollIntoView block: 'end'
   , [messages]
 
   addMessage = (event) ->
@@ -83,11 +87,15 @@ export SdChat = ({dataOptions}) ->
       toast.error "#{error}"
       console.error error
 
+  resetSingleSesion = ->
+    onDelete {id: sessionId}
+    .then getNewSession
+
   onSessionListRowClick = ({rowData}) ->
     setSessionId rowData._id
 
-  <div className="h-full w-full flex flex-row gap-4">
-    <div className="w-16rem flex-none">
+  <div className="h-full w-full flex flex-row gap-4 #{className}">
+    <div className="w-16rem flex-none#{if singleSession then ' hidden' else ''}">
       <SdList
         dataOptions={{sessionListDataOptions..., onSubmit, onDelete, onRowClick: onSessionListRowClick}}
         customComponents={ListItem: SessionListItem {sessionId}}
@@ -95,6 +103,13 @@ export SdChat = ({dataOptions}) ->
     </div>
     <div className="flex-grow-1">
       <div className="h-full flex flex-column gap-2">
+        <div className="flex-grow-0#{if singleSession then '' else ' hidden'}">
+          <ActionButton
+            icon="pi pi-fw pi-times"
+            className="p-button-rounded p-button-text p-button-danger"
+            onAction={resetSingleSesion}
+          />
+        </div>
         <div className="h-30rem flex-grow-1 flex-shrink-1 overflow-y-scroll" ref={scrollAreaRef}>
           {messages.map (message) ->
             <Message

@@ -27,6 +27,9 @@ export chatSchema = new SimpleSchema
     type: Number
   'usage.completion':
     type: Number
+  workInProgress:
+    type: Boolean
+    optional: true
 
 export createChatAPI = ({
   sourceName
