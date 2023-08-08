@@ -35,6 +35,7 @@ export createChatAPI = ({
   sourceName
   collection
   sessionListCollection
+  isSingleSessionChat
   viewChatRole, addSessionRole,
   bots, reactToNewMessage, onNewSession
 }) ->
@@ -46,7 +47,7 @@ export createChatAPI = ({
   unless collection?
     throw new Error 'no collection given'
   
-  unless sessionListCollection?
+  unless sessionListCollection? or isSingleSessionChat
     throw new Error 'no sessionListCollection given'
 
   if not viewChatRole? and Meteor.isServer
@@ -62,17 +63,21 @@ export createChatAPI = ({
   bots ?= [] # id, username, email
 
   sessionListDataOptions =
-    createChatSessionListAPI {
-      sourceName
-      sessionListCollection
-      viewChatRole
-      addSessionRole
-    }
+    if isSingleSessionChat
+      {}
+    else
+      createChatSessionListAPI {
+        sourceName
+        sessionListCollection
+        viewChatRole
+        addSessionRole
+      }
 
   createChatMethods {
     sourceName
     collection
     sessionListCollection
+    isSingleSessionChat
     viewChatRole
     addSessionRole
     reactToNewMessage
@@ -83,7 +88,8 @@ export createChatAPI = ({
     sourceName
     collection
     sessionListCollection
+    isSingleSessionChat
     viewChatRole
   }
 
-  {sourceName, collection, sessionListDataOptions, bots}
+  {sourceName, collection, sessionListDataOptions, isSingleSessionChat, bots}

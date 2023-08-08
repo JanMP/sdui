@@ -1,21 +1,29 @@
+import {Meteor} from 'meteor/meteor'
 import React, {useState, useEffect, useRef} from 'react'
 import {meteorApply, ActionButton} from 'meteor/janmp:sdui'
 import {Fill, Bottom} from 'react-spaces'
 import {InputText} from 'primereact/inputtext'
 import {ScrollPanel} from 'primereact/scrollpanel'
 import {useTracker, useSubscribe} from 'meteor/react-meteor-data'
-import {Message} from './Message.coffee'
+import {DefaultMessage} from './DefaultMessage.coffee'
 import {SdList} from '../tables/SdList'
 import {SessionListItemContent} from './SessionListItemContent'
 import {DefaultListItem} from '../tables/DefaultListItem'
 import {toast} from 'react-toastify'
 
-SessionListItem  = ({sessionId}) ->
+
+DefaultSessionListItem  = ({sessionId}) ->
   (args) ->  <DefaultListItem {{args..., ListItemContent: SessionListItemContent, selectedRowId: sessionId}...} />
 
-export SdChat = ({dataOptions, singleSession = false, className = ""}) ->
 
-  {bots, sourceName, sessionListDataOptions} = dataOptions
+export SdChat = ({dataOptions, className = "", customComponents = {}}) ->
+
+  {SessionListItem, Message} = customComponents
+  SessionListItem ?= DefaultSessionListItem
+  Message ?= DefaultMessage
+
+
+  {bots, sourceName, sessionListDataOptions, isSingleSessionChat} = dataOptions
 
   [inputValue, setInputValue] = useState ''
   [sessionId, setSessionId] = useState null
@@ -26,7 +34,7 @@ export SdChat = ({dataOptions, singleSession = false, className = ""}) ->
   messagesAreLoading = useSubscribe "#{sourceName}.messages", {sessionId}
 
   session = useTracker ->
-    dataOptions.sessionListDataOptions.rowsCollection.findOne sessionId
+    dataOptions?.sessionListDataOptions?.rowsCollection?.findOne sessionId
 
   getNewSession = ->
     meteorApply
@@ -42,7 +50,7 @@ export SdChat = ({dataOptions, singleSession = false, className = ""}) ->
 
   messages =
     useTracker ->
-      return [] unless session?.userIds?
+      return [] unless isSingleSessionChat or session?.userIds?
       dataOptions.collection.find {},
         sort: createdAt: -1
         limit: 100
@@ -50,6 +58,10 @@ export SdChat = ({dataOptions, singleSession = false, className = ""}) ->
       .reverse()
       .map (message) ->
         user = bots.find (bot) -> bot.id is message.userId
+        user ?=
+          if message.userId is Meteor.userId()
+            username: Meteor.user()?.username
+            email: Meteor.user()?.emails?[0]?.address
         user ?= session.users.find (user) -> user.userId is message.userId
         {message..., username: user?.username, email: user?.email, customImage: user?.customImage}
 
@@ -67,6 +79,7 @@ export SdChat = ({dataOptions, singleSession = false, className = ""}) ->
         text: inputValue
         sessionId: sessionId
 
+  # SessionList hook
   # This is a shortcut to build a single user Chat for Chatbots
   # TODO: build UI to add users to a chat
   onSubmit = (model) ->
@@ -78,6 +91,7 @@ export SdChat = ({dataOptions, singleSession = false, className = ""}) ->
       toast.error "#{error}"
       console.log error
 
+  # SessionList hook
   onDelete = ({id}) ->
     if sessionId is id then setSessionId ''
     meteorApply
@@ -87,34 +101,38 @@ export SdChat = ({dataOptions, singleSession = false, className = ""}) ->
       toast.error "#{error}"
       console.error error
 
-  resetSingleSesion = ->
-    onDelete {id: sessionId}
-    .then getNewSession
 
   onSessionListRowClick = ({rowData}) ->
     setSessionId rowData._id
 
   <div className="h-full w-full flex flex-row gap-4 #{className}">
-    <div className="w-16rem flex-none#{if singleSession then ' hidden' else ''}">
-      <SdList
-        dataOptions={{sessionListDataOptions..., onSubmit, onDelete, onRowClick: onSessionListRowClick}}
-        customComponents={ListItem: SessionListItem {sessionId}}
-      />
-    </div>
-    <div className="flex-grow-1">
-      <div className="h-full flex flex-column gap-2">
-        <div className="flex-grow-0#{if singleSession then '' else ' hidden'}">
-          <ActionButton
-            icon="pi pi-fw pi-times"
-            className="p-button-rounded p-button-text p-button-danger"
-            onAction={resetSingleSesion}
+    {
+      unless isSingleSessionChat
+        <div className="w-16rem flex-none">
+          <SdList
+            dataOptions={{sessionListDataOptions..., onSubmit, onDelete, onRowClick: onSessionListRowClick}}
+            customComponents={ListItem: SessionListItem {sessionId}}
           />
         </div>
+    }
+    <div className="flex-grow-1">
+      <div className="h-full flex flex-column gap-2">
+        {
+          if isSingleSessionChat
+            <div className="flex-grow-0">
+              <ActionButton
+                icon="pi pi-fw pi-times"
+                className="p-button-rounded p-button-text p-button-danger"
+                method="#{sourceName}.resetSingleSession"
+              />
+            </div>
+        }
         <div className="h-30rem flex-grow-1 flex-shrink-1 overflow-y-scroll" ref={scrollAreaRef}>
-          {messages.map (message) ->
-            <Message
-              key={message._id}
-              message={message}/>
+          {
+            messages.map (message) ->
+              <Message
+                key={message._id}
+                message={message}/>
           }
         </div>
         <form onSubmit={addMessage} className="p-card p-4">

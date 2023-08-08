@@ -6,6 +6,7 @@ import {ReactiveAggregate} from 'meteor/tunguska:reactive-aggregate'
 
 export createChatPublications = ({
   sourceName, collection, sessionListCollection,
+  isSingleSessionChat,
   viewChatRole
 }) ->
 
@@ -16,7 +17,7 @@ export createChatPublications = ({
   
   Meteor.publish "#{sourceName}.messages", ({sessionId}) ->
     return @ready() unless userWithIdIsInRole id: @userId, role: viewChatRole
-    return @ready() unless @userId in (sessionListCollection.findOne(sessionId)?.userIds ? [])
+    return @ready() unless isSingleSessionChat or  @userId in (sessionListCollection?.findOne(sessionId)?.userIds ? [])
     @autorun (computation) ->
       collection.find {sessionId},
         sort: {createdAt: -1}

@@ -4,7 +4,7 @@ import {useTracker} from 'meteor/react-meteor-data'
 import {Gravatar} from '../forms/GravatarField'
 import {MarkdownDisplay} from '../markdown/MarkdownDisplay'
 
-export Message = ({message}) ->
+export DefaultMessage = ({message}) ->
 
   {_id, userId, text, username, email, chatRole, customImage} = message
 

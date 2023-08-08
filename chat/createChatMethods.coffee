@@ -7,13 +7,12 @@ import {currentUserMustBeInRole, currentUserIsInRole} from '../common/roleChecks
 import _ from 'lodash'
 
 export createChatMethods = ({
-  sourceName, collection, sessionListCollection,
+  sourceName, collection, sessionListCollection, isSingleSessionChat,
   viewChatRole, addSessionRole, reactToNewMessage, onNewSession
 }) ->
 
   reactToNewMessage ?= ({text, messageId, sessionId}) ->
   onNewSession ?= ({sessionId}) -> console.log 'onNewSession', {sessionId}
-
 
   addSession = ({title, userIds}) ->
     currentUserMustBeInRole addSessionRole
@@ -23,6 +22,50 @@ export createChatMethods = ({
     sessionId = sessionListCollection.insert {title, userIds}
     onNewSession {sessionId}
     sessionId
+
+  getSingleSession = ->
+    currentUserMustBeInRole viewChatRole
+    return unless Meteor.isServer
+    sessionId = Meteor.userId()
+    unless collection.findOne sessionId: sessionId
+      onNewSession {sessionId}
+    sessionId
+
+  deleteSingleSession = ->
+    currentUserMustBeInRole viewChatRole
+    return unless Meteor.isServer
+    sessionId = Meteor.userId()
+    collection.remove {sessionId}
+
+
+  new ValidatedMethod
+    name: "#{sourceName}.addMessage"
+    validate:
+      new SimpleSchema
+        text:
+          type: String
+        sessionId:
+          type: String
+      .validator()
+    run: ({text, sessionId}) ->
+      currentUserMustBeInRole viewChatRole
+      return unless Meteor.isServer
+      unless isSingleSessionChat
+        sessionSettings = sessionListCollection?.findOne sessionId
+        unless sessionSettings?
+          throw new Meteor.Error 'no session found'
+        unless Meteor.userId() in sessionSettings.userIds
+          throw new Meteor.Error 'user not in session'
+      newMessage =
+        userId: Meteor.userId()
+        sessionId: if isSingleSessionChat then Meteor.userId() else sessionId
+        text: text
+        createdAt: new Date()
+        chatRole: 'user'
+      messageId = collection.insert newMessage
+      reactToNewMessage {newMessage..., messageId}
+      messageId
+
 
   # we don't use this one yet, we use .sessions.addSingleUserSession as a shortcut (we don't have a UI to add users to a chat yet)
   new ValidatedMethod
@@ -40,32 +83,6 @@ export createChatMethods = ({
       .validator()
     run: addSession
 
-  new ValidatedMethod
-    name: "#{sourceName}.addMessage"
-    validate:
-      new SimpleSchema
-        text:
-          type: String
-        sessionId:
-          type: String
-      .validator()
-    run: ({text, sessionId}) ->
-      currentUserMustBeInRole viewChatRole
-      return unless Meteor.isServer
-      sessionSettings = sessionListCollection.findOne sessionId
-      unless sessionSettings?
-        throw new Meteor.Error 'no session found'
-      unless Meteor.userId() in sessionSettings.userIds
-        throw new Meteor.Error 'user not in session'
-      newMessage =
-        userId: Meteor.userId()
-        sessionId: sessionId
-        text: text
-        createdAt: new Date()
-        chatRole: 'user'
-      messageId = collection.insert newMessage
-      reactToNewMessage {newMessage..., messageId}
-      messageId
 
   new ValidatedMethod
     name: "#{sourceName}.deleteSession"
@@ -86,8 +103,19 @@ export createChatMethods = ({
     name: "#{sourceName}.initialSessionForChat"
     validate: null
     run: ->
-      currentUserMustBeInRole addSessionRole
       return unless Meteor.isServer
-      if (existingSession = sessionListCollection.findOne userIds: [Meteor.userId()])?
+      if isSingleSessionChat
+        return getSingleSession()
+      currentUserMustBeInRole addSessionRole
+      if (existingSession = sessionListCollection?.findOne userIds: [Meteor.userId()])?
         return existingSession._id
       addSession {}
+
+  new ValidatedMethod
+    name: "#{sourceName}.resetSingleSession"
+    validate: null
+    run: ->
+      currentUserMustBeInRole viewChatRole
+      return unless Meteor.isServer
+      deleteSingleSession()
+      getSingleSession()
