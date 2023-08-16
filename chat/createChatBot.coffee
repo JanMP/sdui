@@ -16,7 +16,6 @@ export createChatBot = ({
   replyMessageId = null
 
   handleStream = (reply) ->
-    console.log 'start handleStream'
     text = ''
     done = false
     
