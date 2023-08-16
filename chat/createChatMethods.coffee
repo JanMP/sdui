@@ -46,11 +46,14 @@ export createChatMethods = ({
           type: String
         sessionId:
           type: String
+          optional: true
       .validator()
     run: ({text, sessionId}) ->
       currentUserMustBeInRole viewChatRole
       return unless Meteor.isServer
       unless isSingleSessionChat
+        unless sessionId?
+          throw new Meteor.Error 'no sessionId for non-singleSessionChat given'
         sessionSettings = sessionListCollection?.findOne sessionId
         unless sessionSettings?
           throw new Meteor.Error 'no session found'

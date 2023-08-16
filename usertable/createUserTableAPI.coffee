@@ -92,6 +92,8 @@ export createUserTableAPI = ({userProfileSchema, getAllowedRoles, viewUserTableR
   userListSchema = new SimpleSchema
     email:
       type: String
+    username:
+      type: String
     verified:
       type: Boolean
     online:
@@ -117,6 +119,7 @@ export createUserTableAPI = ({userProfileSchema, getAllowedRoles, viewUserTableR
     $project:
       _id: 1
       email: '$email.address'
+      username: 1
       verified: '$email.verified'
       online: '$status.online'
       roles: 1

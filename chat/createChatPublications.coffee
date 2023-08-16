@@ -18,6 +18,7 @@ export createChatPublications = ({
   Meteor.publish "#{sourceName}.messages", ({sessionId}) ->
     return @ready() unless userWithIdIsInRole id: @userId, role: viewChatRole
     return @ready() unless isSingleSessionChat or  @userId in (sessionListCollection?.findOne(sessionId)?.userIds ? [])
+    sessionId ?= @userId
     @autorun (computation) ->
       collection.find {sessionId},
         sort: {createdAt: -1}
