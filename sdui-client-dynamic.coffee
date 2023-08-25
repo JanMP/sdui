@@ -36,6 +36,8 @@ export ColorPickerField = suspend lazy -> import('./forms/ColorPicker.coffee').t
 # export LongTextField = suspend lazy -> import('./forms/uniforms-custom/primereact/LongTextField.coffee')
 export RatingField = suspend lazy -> import('./forms/RatingField.coffee').then (m) -> default: m.RatingField
 
+export LinkField = suspend lazy -> import('./forms/LinkField.coffee').then (m) -> default: m.LinkField
+export LinkTableField = suspend lazy -> import('./forms/LinkField.coffee').then (m) -> default: m.LinkTableField
 export * from './forms/uniforms-custom/select-implementation'
 export ManagedForm = suspend lazy -> import('./forms/ManagedForm.coffee').then (m) -> default: m.ManagedForm
 export FormModal = suspend lazy -> import('./forms/FormModal.coffee').then (m) -> default: m.FormModal
