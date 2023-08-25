@@ -7,7 +7,6 @@ import {Roles} from 'meteor/alanning:roles'
 import {Random} from 'meteor/random'
 import {WebApp} from 'meteor/webapp'
 
-console.log Random.secret()
 
 export createUserManagementAPI = ({sourceName, path, userRole, adminRole, apiKey}) ->
 

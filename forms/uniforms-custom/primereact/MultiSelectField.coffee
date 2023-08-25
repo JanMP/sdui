@@ -12,10 +12,6 @@ export default connectFieldPlus ({
   props...
 }) ->
 
-  useEffect ->
-    console.log props
-  , [props]
-
   <MultiSelect
     disabled={disabled}
     display={display}
