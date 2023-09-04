@@ -5,7 +5,6 @@ import {currentUserMustBeInRole} from '../common/roleChecks'
 import SimpleSchema from 'simpl-schema'
 import pick from 'lodash/pick'
 import {meteorApply} from '../common/meteorApply'
-import {toast} from 'react-toastify'
 
 sourceSchemaDefinition =
   title:

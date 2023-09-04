@@ -5,7 +5,7 @@ import {meteorApply} from '../common/meteorApply.coffee'
 import {DataList} from './DataList.coffee'
 import {ErrorBoundary} from '../common/ErrorBoundary.coffee'
 import {useTracker} from 'meteor/react-meteor-data'
-import {toast} from 'react-toastify'
+import {Toast} from 'primereact/toast'
 import {useCurrentUserIsInRole} from '../common/roleChecks.coffee'
 import {getColumnsToExport} from '../common/getColumnsToExport.coffee'
 import Papa from 'papaparse'
@@ -92,6 +92,7 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
   [search, setSearch] = useState ''
 
   [queryUiObject, setQueryUiObject] = useState defaultQueryUiObject
+  toast = useRef null
 
   onChangeQueryUiObject = setQueryUiObject
 
@@ -198,7 +199,10 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
       getRows()
       results
     .catch (error) ->
-      toast.error "#{error}"
+      toast.current.show
+        severity: 'error'
+        summary: 'Fehler'
+        detail: "#{error.message}"
       console.log error
 
   loadEditorData = ({id}) ->
@@ -217,7 +221,10 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
       method: deleteMethodName
       data: {id}
     .then ->
-      toast.success t "The entry has been deleted"
+      toast.current.show
+        severity: 'success'
+        summary: 'Erfolg'
+        detail: t "The entry has been deleted"
   
   onChangeField ?= ({_id, changeData}) ->
     meteorApply
@@ -231,39 +238,48 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
         method: exportRowsMethodName
         data: {search, query, queryUiObject, sort}
       .then (rows) ->
-        toast.success t "Export data received from Server."
+        toast.current.show
+          severity: 'success'
+          summary: 'Erfolg'
+          detail: t "Export data received from Server."
         Papa.unparse rows, columns: getColumnsToExport schema: listSchemaBridge.schema
       .then (csvString) ->
         downloadAsFile
           dataString: csvString
           fileName: (title ? sourceName) + '.csv'
       .catch (error) ->
+        toast.current.show
+          severity: 'error'
+          summary: 'Fehler'
+          detail: t "Unexpected Error (see console.log)"
         console.error error
-        toast.error t "Unexpected Error (see console.log)"
     else throw new Meteor.Error 'onExportTable has been called despite canExport == false'
 
   <ErrorBoundary>
     {
       if mayView
-        <DisplayComponent {{
-          sourceName,
-          listSchemaBridge, formSchemaBridge, queryEditorSchemaBridge,
-          rows, totalRowCount, loadMoreRows, onRowClick,
-          canSort, sortColumn, sortDirection, onChangeSort
-          canSearch, search, onChangeSearch
-          canUseQueryEditor, queryUiObject, onChangeQueryUiObject
-          canAdd, mayAdd, onAdd
-          canDelete, mayDelete, onDelete
-          canEdit, mayEdit, onSubmit
-          setupNewItem
-          autoFormChildren, formDisabled, formReadOnly
-          loadEditorData
-          onChangeField,
-          canExport, onExportTable
-          mayExport
-          isLoading,
-          customComponents
-        }...}/>
+        <>
+          <Toast ref={toast}/>
+          <DisplayComponent {{
+            sourceName,
+            listSchemaBridge, formSchemaBridge, queryEditorSchemaBridge,
+            rows, totalRowCount, loadMoreRows, onRowClick,
+            canSort, sortColumn, sortDirection, onChangeSort
+            canSearch, search, onChangeSearch
+            canUseQueryEditor, queryUiObject, onChangeQueryUiObject
+            canAdd, mayAdd, onAdd
+            canDelete, mayDelete, onDelete
+            canEdit, mayEdit, onSubmit
+            setupNewItem
+            autoFormChildren, formDisabled, formReadOnly
+            loadEditorData
+            onChangeField,
+            canExport, onExportTable
+            mayExport
+            isLoading,
+            customComponents
+          }...}/>
+        </>
       else
         <div className="may-not-view-message">
           {t "You do not have the required user accees permission to view this content."}

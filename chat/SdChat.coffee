@@ -9,7 +9,7 @@ import {DefaultMessage} from './DefaultMessage.coffee'
 import {SdList} from '../tables/SdList'
 import {SessionListItemContent} from './SessionListItemContent'
 import {DefaultListItem} from '../tables/DefaultListItem'
-import {toast} from 'react-toastify'
+import {Toast} from 'primereact/toast'
 
 
 DefaultSessionListItem  = ({sessionId}) ->
@@ -29,6 +29,7 @@ export SdChat = ({dataOptions, className = "", customComponents = {}}) ->
   [sessionId, setSessionId] = useState null
 
   scrollAreaRef = useRef null
+  toast = useRef null
 
   sessionsAreLoading = useSubscribe "#{sourceName}.sessions"
   messagesAreLoading = useSubscribe "#{sourceName}.messages", {sessionId}
@@ -88,7 +89,10 @@ export SdChat = ({dataOptions, className = "", customComponents = {}}) ->
       data: model
     .then setSessionId
     .catch (error) ->
-      toast.error "#{error}"
+      toast.current.show
+        severity: 'error'
+        summary: 'Fehler'
+        detail: "#{error.message}"
       console.log error
 
   # SessionList hook
@@ -98,7 +102,10 @@ export SdChat = ({dataOptions, className = "", customComponents = {}}) ->
       method: "#{sourceName}.deleteSession"
       data: {id}
     .catch (error) ->
-      toast.error "#{error}"
+      toast.current.show
+        severity: 'error'
+        summary: 'Fehler'
+        detail: "#{error.message}"
       console.error error
 
 
@@ -106,6 +113,7 @@ export SdChat = ({dataOptions, className = "", customComponents = {}}) ->
     setSessionId rowData._id
 
   <div className="h-full w-full flex flex-row gap-4 #{className}">
+    <Toast ref={toast} />
     {
       unless isSingleSessionChat
         <div className="w-16rem flex-none">

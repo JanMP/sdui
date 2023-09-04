@@ -1,10 +1,10 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState, useRef} from 'react'
 
 import {meteorApply} from '../common/meteorApply.coffee'
-import {toast} from 'react-toastify'
 import {ProgressSpinner} from 'primereact/progressspinner'
 import {ConfirmationModal} from './ConfirmationModal'
 import {Button} from 'primereact/button'
+import {Toast} from 'primereact/toast'
 import _ from 'lodash'
 
 
@@ -32,13 +32,27 @@ buttonProps}) ->
 
   data ?= {}
   options ?= {}
-  label ?= unless icon? or customTemplate? then "run #{method}"
+  label ?= unless icon? or customTemplate? then "run #{method}" else null
 
-  onSuccess ?= (result) -> if successMsg? then toast.success successMsg
-  onError ?= (error) -> toast.error "#{errorMsg ? error}"
+  onSuccess ?=
+    (result) ->
+      if successMsg?
+        toast.current.show
+          severity: 'success'
+          summary: 'Erfolg'
+          detail: successMsg
+          life: 3000
+  
+  onError ?=
+    (error) ->
+      toast.curent.show
+        severity: 'error'
+        summary: 'Fehler'
+        detail: "#{errorMsg ? error.message}"
 
   [isBusy, setIsBusy] = useState false
   [modalIsOpen, setModalIsOpen] = useState false
+  toast = useRef null
 
   doIt = ->
     setModalIsOpen false
@@ -74,6 +88,7 @@ buttonProps}) ->
           onConfirm={doIt}
         />
     }
+    <Toast ref={toast}/>
     <Button
       className={className}
       disabled={disabled}
