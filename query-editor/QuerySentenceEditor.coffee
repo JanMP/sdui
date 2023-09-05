@@ -134,7 +134,7 @@ export QuerySentenceEditor = ({rule, partIndex, bridge, path, onChange, onRemove
 
   SentenceForm =
     <ErrorBoundary>
-      <div className="sentence__form">
+      <div className="sentence__form | flex w-full">
         <div className="subject">
           <ErrorBoundary>
             <Dropdown
@@ -173,7 +173,7 @@ export QuerySentenceEditor = ({rule, partIndex, bridge, path, onChange, onRemove
     </ErrorBoundary>
 
 
-  <div ref={drag} className="sentence">
+  <div ref={drag} className="sentence | overflow-visible flex flex-justify-between ">
     {if canDisplay then SentenceForm}
     <div className="button-container">
       <Button

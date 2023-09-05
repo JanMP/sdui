@@ -1,27 +1,31 @@
 import _ from 'lodash'
 
 
-conjunctions =
-  $and:
-    label: 'all conditions'
-  $or:
-    label: 'at least one condition'
-  $nor:
-    label: 'none of the conditions'
 
-logicConjunctionSelectOptions =
-  _(conjunctions)
-  .keys()
-  .map (key) ->
-    value = conjunctions[key]
-    return
-      key: key
-      value: key
-      label: value.label
-      context: value.context?.key ? null
-  .value()
 
-export getConjunctionData = ({bridge, path, type}) ->
+
+export getConjunctionData = ({bridge, path, type, t}) ->
+  
+  conjunctions =
+    $and:
+      label: t?('sdui:allConditions', 'alle Bedingungen (UND)')
+    $or:
+      label: t?('sdui:anyCondition', 'mindestens eine Bedingung (ODER)')
+    $nor:
+      label: t?('sdui:noCondition', 'keine Bedingung (NOR)')
+  
+  logicConjunctionSelectOptions =
+    _(conjunctions)
+    .keys()
+    .map (key) ->
+      value = conjunctions[key]
+      return
+        key: key
+        value: key
+        label: value.label
+        context: value.context?.key ? null
+    .value()
+  
   if type is 'logicBlock'
     return logicConjunctionSelectOptions
   else
@@ -34,8 +38,8 @@ export getConjunctionData = ({bridge, path, type}) ->
       .map (name) ->
         label = bridge.schema._schema[name]?.label ? name
         label = switch type = bridge.getType pathWithName name
-          when Array then "for at least one element of sub-document #{label}"
-          when Object then "for sub-document #{label}"
+          when Array then "#{t?('sdui:forAtLeastOneOf', 'für mindestens ein Dokument der Liste')} '#{label}'"
+          when Object then "#{t?('sdui:forTheDocument', 'für das Dokument')} '#{label}'"
           else "Error"
         return
           key: name
@@ -45,5 +49,5 @@ export getConjunctionData = ({bridge, path, type}) ->
           label: label
       .value()
 
-export getConjunctionSelectOptions = ({bridge, path, type}) ->
-  getConjunctionData({bridge, path, type}).map (conjunction) -> _.pick conjunction, ['key', 'value', 'label']
+export getConjunctionSelectOptions = ({bridge, path, type, t}) ->
+  getConjunctionData({bridge, path, type, t}).map (conjunction) -> _.pick conjunction, ['key', 'value', 'label']

@@ -5,6 +5,7 @@ import {connectField} from 'uniforms'
 import {getNewBlock} from './queryEditorHelpers'
 import PartIndex from './PartIndex'
 import _ from 'lodash'
+import {useTranslation} from 'react-i18next'
 
 import {ActionButton} from '../forms/ActionButton.coffee'
 
@@ -18,6 +19,8 @@ export QueryEditor = ({bridge, rule, path, onChange}) ->
   
   path ?= ''
 
+  {t} = useTranslation()
+
   useEffect ->
     unless rule?
       resetRule()
@@ -27,14 +30,15 @@ export QueryEditor = ({bridge, rule, path, onChange}) ->
     return null
 
 
-  <div className="query-editor">
-    <div className="header">
-      <div>Find documents that satisfy</div>
+  <div className="query-editor | overflow-visible">
+    <div className="header | flex justify-content-between">
+      <div className="pt-3">{t "sdui:findDocuments", "Finde Dokumente, die folgende Bedingungen erfüllen:"}</div>
        <ActionButton
-        className="warning"
+        className="warning | p-button-raised p-button-rounded p-button-text"
         onAction={resetRule}
         icon="pi pi-filter-slash"
-        label="reset"
+        label={t "sdui:reset", "Zurücksetzen "}
+
       />
     </div>
     <DndProvider backend={HTML5Backend}>

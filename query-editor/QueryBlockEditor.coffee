@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react'
 import {QuerySentenceEditor} from './QuerySentenceEditor'
-import { getConjunctionData, getConjunctionSelectOptions } from './conjunctions'
+import {getConjunctionData, getConjunctionSelectOptions} from './conjunctions'
 # import { Button, Icon, Select } from 'semantic-ui-react'
 import {Dropdown} from 'primereact/dropdown'
 import {Button} from 'primereact/button'
@@ -8,10 +8,13 @@ import {getNewSentence, getNewBlock} from './queryEditorHelpers'
 import _ from 'lodash'
 import PartIndex from './PartIndex'
 import {useDrop} from 'react-dnd'
+import {useTranslation} from 'react-i18next'
 
 
 export QueryBlockEditor = React.memo ({rule, partIndex, bridge, path, onChange, onRemove, onAddAfter, isRoot, locked}) ->
   
+  {t} = useTranslation()
+
   isRoot ?= false
   locked ?= isRoot
 
@@ -22,8 +25,8 @@ export QueryBlockEditor = React.memo ({rule, partIndex, bridge, path, onChange, 
   myContext = rule.conjunction?.context
   isBlock = rule.type in ['contextBlock', 'logicBlock']
 
-  conjunctionData = getConjunctionData {bridge, path, type: rule.type}
-  conjunctionSelectOptions = getConjunctionSelectOptions {bridge, path, type: rule.type}
+  conjunctionData = getConjunctionData {bridge, path, t, type: rule.type}
+  conjunctionSelectOptions = getConjunctionSelectOptions {bridge, path, t, type: rule.type}
 
   cantGetInnerPathType = false
 
@@ -31,11 +34,11 @@ export QueryBlockEditor = React.memo ({rule, partIndex, bridge, path, onChange, 
 
   blockTypeClass =
     switch conjunction
-      when '$and' then 'query-block--and'
-      when '$or' then 'query-block--or'
-      when '$nor' then 'query-block--nor'
+      when '$and' then 'query-block--and | border-orange-400'
+      when '$or' then 'query-block--or | border-green-400'
+      when '$nor' then 'query-block--nor | border-red-400'
       else
-        'query-block--context'
+        'query-block--context | border-400'
 
   [{canDrop, isOver}, drop] = useDrop ->
     accept: 'fnord'
@@ -123,8 +126,11 @@ export QueryBlockEditor = React.memo ({rule, partIndex, bridge, path, onChange, 
 
 
   if isBlock
-    <div ref={drop} className="query-block #{if isRoot then 'query-block--root' else ''} #{blockTypeClass}">
-      <div className="header">
+    queryBlockClassName = "query-block | overflow-visible mt-2 pt-2 pl-2 pr-1 border-top-3 border-left-3"
+    queryBlockRootClass = 'query-block--root | pr-3'
+    className = "#{queryBlockClassName} #{if isRoot then 'query-block--root' else ''} #{blockTypeClass}"
+    <div ref={drop} className={className}>
+      <div className="header | flex justify-content-between">
         <div className="flex-grow">
           <Dropdown
             value={conjunction}
@@ -166,13 +172,13 @@ export QueryBlockEditor = React.memo ({rule, partIndex, bridge, path, onChange, 
       </div>
       {
         unless children?.length
-          <div className="child-container--no-children">
-            <span>Please add Conditions for Data Fields </span>
-            <i className="pi pi-file"/>
-            <span>, Embedded Data Fields from related Data Sets </span>
-            <i className="pi pi-folder"/>
-            <span> or combinations of Conditions </span>
+          <div className="child-container--no-children | p-2 max-w-25rem">
+            <span>{t "sdui:requestToAddContentStart", "Benutze die Icons "}</span>
             <i className="pi pi-filter"/>
+            <i className="pi pi-folder"/>
+            <i className="pi pi-file"/>
+            <span>{t "sdui:requestToAddContentEnd", " um Bedingungen hinzuzufügen."}</span>
+
           </div>
       }
       <div className="child-container">{children}</div>

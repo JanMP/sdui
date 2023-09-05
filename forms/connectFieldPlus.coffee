@@ -14,7 +14,7 @@ export default (Component) ->
 
     {t} = useTranslation()
 
-    outerClassName = "flex flex-column my-4"
+    outerClassName = "flex flex-column#{if label then ' pt-3' else ''}"
     if fieldClassName?
       outerClassName += ' | ' + fieldClassName
     

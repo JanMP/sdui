@@ -3,7 +3,14 @@
     "sdui": {
       "save": "Save",
       "cancel": "Cancel",
-      "reset": "Reset"
+      "reset": "Reset",
+      "findDocuments": "Find documents that satisfy the following conditions",
+      "allConditions": "All conditions (AND)",
+      "anyCondition": "Any condition (OR)",
+      "noCondition": "None of the conditions (NOR)",
+      "requestToAddContentStart": "Click one of the icons ",
+      "requestToAddContentEnd": " to add conditions to the filter"
+
     }
   }
 }
