@@ -32,7 +32,10 @@ export default (Component) ->
     if error?
       props.className += " p-invalid"
 
-    translatedLabel = t props?.name , label
+    translatedLabel =
+      unless label is ""
+        t props?.name , label
+      else ""
 
     # useEffect ->
     #   console.log props
