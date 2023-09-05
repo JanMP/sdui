@@ -32,6 +32,8 @@ export default (Component) ->
     if error?
       props.className += " p-invalid"
 
+    translatedLabel = t props?.name , label
+
     # useEffect ->
     #   console.log props
     # , [props]
@@ -45,21 +47,21 @@ export default (Component) ->
             when 'floating'
               <span className="p-float-label">
                 <Component {props...}/>
-                <label htmlFor={props.id}>{t label}</label>
+                <label htmlFor={props.id}>{translatedLabel}</label>
               </span>
             when 'left'
               <div className="flex align-items-center gap-2">
-                <label className="text-right w-10rem" htmlFor={props.id}>{t label}</label>
+                <label className="text-right w-10rem" htmlFor={props.id}>{translatedLabel}</label>
                 <Component {props...}/>
               </div>
             when 'right'
               <div className="flex align-items-center gap-2">
                 <Component {props...}/>
-                <label htmlFor={props.id}>{t label}</label>
+                <label htmlFor={props.id}>{translatedLabel}</label>
               </div>
             else
               <div className="flex flex-column">
-                <label htmlFor={props.id}>{t label}</label>
+                <label htmlFor={props.id}>{translatedLabel}</label>
                 <Component {props...}/>
               </div>
       }

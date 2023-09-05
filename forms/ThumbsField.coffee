@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react'
-import connectFieldWithLabel from './connectFieldWithLabel'
+import connectFieldPlus from './connectFieldPlus.coffee'
 
 Thumbs = ({value, onChange}) ->
 
@@ -29,7 +29,7 @@ Thumbs = ({value, onChange}) ->
   </>
 
 
-export ThumbsField = connectFieldWithLabel ({value, onChange}) ->
+export ThumbsField = connectFieldPlus ({value, onChange}) ->
 
   <div className="p-component p-card w-full p-4">
     <Thumbs value={value} onChange={onChange}/>

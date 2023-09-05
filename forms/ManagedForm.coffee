@@ -48,13 +48,13 @@ export ManagedForm = ({schemaBridge, model, onChangeModel, onSubmit, disabled, c
         <ActionButton
           onAction={-> form.reset()}
           className="p-button-warning"
-          label={t 'Reset'}
+          label={t 'sdui:reset', 'Zurücksetzen'}
           disabled={not hasChanged}
         />
         <ActionButton
           onAction={onAction}
           className="p-button-primary"
-          label={t 'Save'}
+          label={t 'sdui:save', 'Speichern'}
           disabled={(not hasChanged) or (not isValid)}
         />
       </div>
