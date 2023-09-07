@@ -1,8 +1,7 @@
 import SimpleSchema2Bridge from 'uniforms-bridge-simple-schema-2'
 import {Mongo} from 'meteor/mongo'
 import SimpleSchema from 'simpl-schema'
-import { createTableDataAPI } from './sdui-server'
-import {FC} from React
+import {FC} from 'react'
 
 export interface RoleObject {
   role:  string | Array<string>
@@ -42,7 +41,7 @@ export interface createTableDataAPIParams {
     (_: {
         pub: object,
         search: string,
-        query?: Mongo.Query,
+        query?: Mongo.Query<any>,
         sort?: Mongo.SortSpecifier
         limit?: number
         skip?: number}) => Array<object>
@@ -50,27 +49,27 @@ export interface createTableDataAPIParams {
     (options: {
       pub: object,
       search: string,
-      query?: Mongo.Query}) => Array<object>
+      query?: Mongo.Query<any>}) => Array<object>
   getExportPipeline?:
     (options: {
       search: string,
-      query?: Mongo.Query,
+      query?: Mongo.Query<any>,
       sort?: Mongo.SortSpecifier}) => Array<object>
   makeFormDataFetchMethodRunFkt?:
     (options: {
-      collection: Mongo.Collection
+      collection: Mongo.Collection<any>
       transFormIdToMongo: (id: any) => any
       transFormIdToMiniMongo: (id: any) => any
-    }) => (options: {id: string}) => Mongo.Cursor
+    }) => (options: {id: string}) => Mongo.Cursor<any>
   makeSubmitMethodRunFkt?:
     (options: {
-      collection: Mongo.Collection
+      collection: Mongo.Collection<any>
       transFormIdToMongo: (id: any) => any
       transFormIdToMiniMongo: (id: any) => any
     }) => (options: {data: object, id: string}) => void
   makeDeleteMethodRunFkt?:
     (options: {
-      collection: Mongo.Collection
+      collection: Mongo.Collection<any>
       transFormIdToMongo: (id: any) => any
       transFormIdToMiniMongo: (id: any) => any
     }) => (options: {id: string}) => void
@@ -87,8 +86,8 @@ export interface createTableDataAPIReturn {
   listSchemaBridge: SimpleSchema2Bridge
   formSchemaBridge: SimpleSchema2Bridge
   queryEditorSchemaBridge: SimpleSchema2Bridge
-  rowsCollection: Mongo.Collection
-  rowCountCollection: Mongo.Collection
+  rowsCollection: Mongo.Collection<any>
+  rowCountCollection: Mongo.Collection<any>
   canEdit?: boolean
   canSearch?: boolean
   canUseQueryEditor?: boolean
@@ -105,7 +104,7 @@ export interface createTableDataAPIReturn {
   setupNewItem?: () => object
   onSubmit?: (object) => any
   onDelete?: ({id}: {id: string}) => Promise<any>
-  onChangeField?: ({_id: string, changeData: object}) => any
+  onChangeField?: ({_id, changeData}: {_id: string, changeData: object}) => any
   query?: object
   initialSortColumn?: string
   initialSortDirection?: 'ASC' | 'DESC'

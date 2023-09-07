@@ -9,14 +9,14 @@
     "jsx": "preserve",
     "incremental": true,
     "noEmit": true,
+    "skipLibCheck": false,
 
     /* Strict Type-Checking Options */
     "strict": true,
     "noImplicitAny": false,
     "strictNullChecks": true,
 
-    /* Additional Checks */
-    "noUnusedLocals": true,
+    /* Additional Checks */    "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": false,
     "noFallthroughCasesInSwitch": false,
@@ -33,15 +33,15 @@
     },
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "types": ["node", "mocha"],
+    "types": ["node", "mocha", "meteor"],
     "esModuleInterop": true,
     "preserveSymlinks": true
   },
   "include": [
-    "./typeDeclarations.ts"
+    "*"
   ],
   "exclude": [
-    "./.meteor/**",
-    "./packages/**"
+    "node_modules",
+    ".meteor"
   ]
 }
