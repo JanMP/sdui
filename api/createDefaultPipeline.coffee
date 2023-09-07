@@ -12,8 +12,7 @@ export createDefaultPipeline = ({getPreSelectPipeline, getProcessorPipeline, lis
   getProcessorPipeline ?= ({pub}) -> []
 
   queryEditorSchema ?= listSchema
-
-  searchPipeline = ({search, knnIdsAndScore}) ->
+  searchPipeline = ({search}) ->
     unless search? or search is ''
       return []
 
@@ -59,10 +58,8 @@ export createDefaultPipeline = ({getPreSelectPipeline, getProcessorPipeline, lis
                         options: regexOptions
               ]
         else null
-    
-    knnMatch = if knnIdsAndScore.length then _id: $in: knnIdsAndScore.map (row) -> row._id
-    
-    [$match: $or: _.compact [knnMatch, fieldSearches...]]
+
+    [$match: $or: _.compact fieldSearches]
 
 
   getQueryEditorPipeline = ({queryUiObject}) -> [$match: queryUiObjectToQuery {queryUiObject}]
@@ -74,49 +71,35 @@ export createDefaultPipeline = ({getPreSelectPipeline, getProcessorPipeline, lis
       .mapValues -> 1
       .value()
 
-  addKnnScoresPipeline = (knnIdsAndScore) ->
-    if knnIdsAndScore.length
-      [
-        $addFields: {knnIdsAndScore}
-      ,
-        $addFields: knnScore: $arrayElemAt: ['$knnIdsAndScore.score', $indexOfArray: ['$knnIdsAndScore._id', '$_id']]
-      ,
-        $unset: 'knnIdsAndScore'
-      ]
-    else []
-
-  defaultGetRowsPipeline = ({pub, search, knnIdsAndScore = [], query = {},
-    queryUiObject, sort = {_id: 1}, limit = 100, skip = 0}) ->
-      _.compact [
-        getPreSelectPipeline({pub})...
-        {$match: query}
-        getProcessorPipeline({pub})...
-        getQueryEditorPipeline({queryUiObject})...
-        (searchPipeline {search, knnIdsAndScore})...
-        projectStage
-        (addKnnScoresPipeline knnIdsAndScore)...
-      {$sort: sort}, {$skip: skip}, {$limit: limit}
-      ]
-
-  defaultGetRowCountPipeline = ({pub, search, knnIdsAndScore = [], query = {}, queryUiObject}) ->
+  defaultGetRowsPipeline = ({pub, search, query = {}, queryUiObject, sort = {_id: 1}, limit = 100, skip = 0}) ->
     [
       getPreSelectPipeline({pub})...,
       {$match: query},
       getProcessorPipeline({pub})...,
       getQueryEditorPipeline({queryUiObject})...
-      (searchPipeline {search, knnIdsAndScore})...,
+      (searchPipeline {search})...,
+     {$sort: sort}, {$skip: skip}, {$limit: limit}
+    ]
+
+  defaultGetRowCountPipeline = ({pub, search, query = {}, queryUiObject}) ->
+    [
+      getPreSelectPipeline({pub})...,
+      {$match: query},
+      getProcessorPipeline({pub})...,
+      getQueryEditorPipeline({queryUiObject})...
+      (searchPipeline {search})...,
       {$count: 'count'},
       $addFields: _id: "count"
     ]
 
 
-  defaultGetExportPipeline = ({search, knnIdsAndScore = [], query = {}, queryUiObject,  sort = {_id: 1}}) ->
+  defaultGetExportPipeline = ({search, query = {}, queryUiObject,  sort = {_id: 1}}) ->
     [
       getPreSelectPipeline()...,
       {$match: query},
       getProcessorPipeline()...,
       getQueryEditorPipeline({queryUiObject})...
-      (searchPipeline {search, knnIdsAndScore})...,
+      (searchPipeline {search})...,
     {$sort: sort}, projectStage]
 
   {defaultGetRowsPipeline, defaultGetRowCountPipeline, defaultGetExportPipeline}

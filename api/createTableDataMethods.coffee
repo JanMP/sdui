@@ -14,8 +14,7 @@ useObjectIds,
 getRowsPipeline, getRowCountPipeline, getExportPipeline
 canEdit, canAdd, canDelete, canExport
 formSchema, makeFormDataFetchMethodRunFkt, makeSubmitMethodRunFkt, makeDeleteMethodRunFkt
-checkDisableDeleteForRow, checkDisableEditForRow,
-getKnnIdsAndScore}) ->
+checkDisableDeleteForRow, checkDisableEditForRow}) ->
   
   # The Collection might be using ObjectIds instead of String Ids on Mongo
   transformIdToMongo = (id) ->

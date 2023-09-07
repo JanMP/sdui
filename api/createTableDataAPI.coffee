@@ -30,7 +30,6 @@ export createTableDataAPI = ({
   showRowCount
   checkDisableEditForRow
   checkDisableDeleteForRow
-  getKnnIdsAndScore
 }) ->
 
   # check required props and setup defaults for optional props
@@ -94,7 +93,6 @@ export createTableDataAPI = ({
   defaultGetRowCountPipeline
   defaultGetExportPipeline} = createDefaultPipeline {getPreSelectPipeline, getProcessorPipeline, listSchema, queryEditorSchema}
 
-  getKnnIdsAndScore ?= ({search}) -> new Promise (resolve) -> resolve []
 
   getRowsPipeline ?= defaultGetRowsPipeline
   getRowCountPipeline ?= defaultGetRowCountPipeline
@@ -111,7 +109,6 @@ export createTableDataAPI = ({
   publishTableData {
     viewTableRole, sourceName, collection,
     getRowsPipeline, getRowCountPipeline, debounceDelay, observers
-    getKnnIdsAndScore
     }
 
   createTableDataMethods {
@@ -120,7 +117,6 @@ export createTableDataAPI = ({
     canEdit, canAdd, canDelete, canExport, formSchema,
     makeFormDataFetchMethodRunFkt, makeSubmitMethodRunFkt, makeDeleteMethodRunFkt
     checkDisableDeleteForRow, checkDisableEditForRow
-    getKnnIdsAndScore
   }
 
 

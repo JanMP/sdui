@@ -10,11 +10,6 @@ export interface RoleObject {
   forAnyScope?: boolean
 }
 
-export interface IdAndScore {
-  _id: string
-  score: number
-}
-
 export type Role = string | Array<string> | RoleObject | ((id: string) => boolean)
 
 export interface createTableDataAPIParams {
@@ -86,7 +81,6 @@ export interface createTableDataAPIParams {
   showRowCount?: boolean
   checkDisableEditForRow?: boolean
   checkDisableDeleteForRow?: boolean 
-  getKnnIdsAndScore?: (options: {search: string}) => Promise<Array<IdAndScore>>
 }
 export interface createTableDataAPIReturn {
   sourceName: string
