@@ -1,5 +1,5 @@
 import {Meteor} from 'meteor/meteor'
-import {setupOpenAIApi} from 'meteor/janmp:chatterbrain'
+import {setupOpenAIApi} from '../ai/setupOpenAIApi.coffee'
 import {tokenizer} from 'meteor/janmp:sdui'
 
 export createChatBot = ({
