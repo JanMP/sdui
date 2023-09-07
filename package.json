@@ -17,5 +17,14 @@
   "bugs": {
     "url": "https://github.com/JanMP/sdui/issues"
   },
-  "homepage": "https://github.com/JanMP/sdui#readme"
+  "homepage": "https://github.com/JanMP/sdui#readme",
+  "dependencies": {
+    "@types/meteor": "^2.9.4",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "^20.5.9",
+    "@types/react": "^18.2.21",
+    "@types/simpl-schema": "^1.12.3",
+    "uniforms": "^4.0.0-alpha.5",
+    "uniforms-bridge-simple-schema-2": "^4.0.0-alpha.5"
+  }
 }
