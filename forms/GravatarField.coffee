@@ -18,7 +18,7 @@ export Gravatar = (props) ->
     size: 200
     defaultIcon: defaultIcon ? 'identicon'
 
-  avatarProps = _(props).omit('email', 'defaultIcon').merge(image: url).value()
+  avatarProps = _(props).omit('email', 'defaultIcon', 'customImage').merge(image: url).value()
   
   <Avatar {avatarProps...}/>
 
