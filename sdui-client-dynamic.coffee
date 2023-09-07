@@ -2,7 +2,7 @@
 import React, {Suspense, lazy} from 'react'
 
 suspend = (WrappedComponent) -> (props) ->
-  <Suspense fallback={-> <div>Loading...</div>}><WrappedComponent {props...}/></Suspense>
+  <Suspense fallback={<div>Loading...</div>}><WrappedComponent {props...}/></Suspense>
 
 # Variables exported by this module can be imported by other packages and
 # applications. See sdui-tests.js for an example of importing.
