@@ -109,7 +109,7 @@ export createTableDataAPI = ({
   publishTableData {
     viewTableRole, sourceName, collection,
     getRowsPipeline, getRowCountPipeline, debounceDelay, observers
-    }
+  }
 
   createTableDataMethods {
     viewTableRole, editRole, addRole, deleteRole, exportTableRole, sourceName, collection, useObjectIds,
