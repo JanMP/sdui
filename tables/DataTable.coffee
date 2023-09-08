@@ -24,16 +24,20 @@ resizableHeaderRenderer = ({onResizeRows, isLastOne}) ->
     onDrag = (e, {deltaX}) ->
       onResizeRows {dataKey, deltaX}
     
-    <div className={if isLastOne then 'last-column' else ''} key={dataKey}>
-      <div className="sort-click-target">
-        <span className="sort-click-target">{label}</span>
-        {
-          if sortBy is dataKey
-            if sortDirection is 'ASC'
-              <i className="sort-click-target pi pi-sort-amount-down-alt"/>
+    <div className={"content #{if isLastOne then 'last-column' else ''}"} key={dataKey}>
+      <div className="squishy sort-click-target">
+        <div className="label sort-click-target">{label}</div>
+        <div className="sort-icon sort-click-target">
+          {
+            if sortBy is dataKey
+              if sortDirection is 'ASC'
+                <i className="sort-click-target pi pi-sort-amount-down-alt"/>
+              else
+                <i className="sort-click-target pi pi-sort-amount-up alt" />
             else
-              <i className="sort-click-target pi pi-sort-amount-up alt" />
-        }
+              <i className="sort-click-target pi pi-sort-alt"/>
+          }
+        </div>
       </div>
       {<Draggable
         axis="x"
@@ -42,7 +46,7 @@ resizableHeaderRenderer = ({onResizeRows, isLastOne}) ->
         onDrag={onDrag}
         position={x: 0}
       >
-        <div />
+        <i className="pi pi-arrows-h"/>
       </Draggable> unless isLastOne}
     </div>
 
