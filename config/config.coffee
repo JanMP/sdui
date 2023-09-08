@@ -23,7 +23,7 @@ export config = (options = {}) ->
     lng: unless options.localie is 'de' then options.locale
     resources: options.i18nResources ? i18nResources
     fallbackLng: false
-    debug: true
+    debug: false
 
 
 export useConfig = -> useTracker -> Configurations.get()
