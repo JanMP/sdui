@@ -57,6 +57,7 @@ export createDefaultPipeline = ({getPreSelectPipeline, getProcessorPipeline, lis
                         regex: part
                         options: regexOptions
               ]
+      # TODO: add support for search in object values
         else null
 
     [$match: $or: _.compact fieldSearches]
