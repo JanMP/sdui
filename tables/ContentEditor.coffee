@@ -2,12 +2,13 @@ import React, {useState, useEffect, useRef} from 'react'
 import {DataList} from './DataList.coffee'
 import {ErrorBoundary} from '../common/ErrorBoundary.coffee'
 import {ConfirmationModal} from '../forms/ConfirmationModal.coffee'
-import {Fill, LeftResizable, BottomResizable, TopResizable, Top, Bottom} from 'react-spaces'
 import {Splitter, SplitterPanel} from 'primereact/splitter'
+import {ScrollPanel} from 'primereact/scrollpanel'
 import {AutoForm} from '../forms/uniforms-custom/select-implementation'
 import {SdEditor} from '../editor/SdEditor.coffee'
 import {MarkdownDisplay} from '../markdown/MarkdownDisplay.coffee'
 import {ActionButton} from '../forms/ActionButton.coffee'
+import useSize from '@react-hook/size'
 import _ from 'lodash'
 import * as types from '../typeDeclarations'
 
@@ -37,6 +38,9 @@ setupNewItem
 
   {Preview, RelatedDataPane, FilePane} = customComponents ? {}
 
+  editorContainerRef = useRef null
+  [editorWidth, editorHeight] = useSize editorContainerRef
+
   onAdd ?= ->
     if hasChanged
       setIdForOverloadConfirmationModal null
@@ -44,6 +48,9 @@ setupNewItem
     else
       newItem = await setupNewItem()
       openEditor newItem
+
+  useEffect ->
+    console.log 'editorHeight', editorHeight
 
   # TODO make optional (again) and i18n
   deleteConfirmation ?= "Soll der Eintrag wirklich gelöscht werden?"
@@ -149,7 +156,7 @@ setupNewItem
       }
       <Splitter className="h-full">
         <SplitterPanel>
-          {###<DataList
+          <DataList
             {{
               sourceName
               listSchemaBridge,
@@ -168,16 +175,16 @@ setupNewItem
               customComponents
               selectedRowId
             }...}
-          />###}
+          />
         </SplitterPanel>
-        <SplitterPanel className="bg-red-500">
-          {###
+        <SplitterPanel className="flex">
+          {
             if mayEdit and editorOpen
               <Splitter>
-                <SplitterPanel>
-                  <Splitter layout="vertical">
-                    <SplitterPanel size={20}>
-                      <div>Content</div>
+                <SplitterPanel className="h-full">
+                  <Splitter layout="vertical" onResizeEnd={console.log}>
+                    <SplitterPanel height={40}>
+                      <div>Content {editorHeight}</div>
                       <ErrorBoundary>
                         <SdEditor
                           value={changedModel?[contentKey]}
@@ -187,7 +194,7 @@ setupNewItem
                     </SplitterPanel>
                     <SplitterPanel>
                       <div>Data</div>
-                      <div className="p-2">
+                      <ScrollPanel className="p-2">
                         <AutoForm
                           schema={formSchemaBridge}
                           model={changedModel}
@@ -212,12 +219,12 @@ setupNewItem
                             disabled={(not hasChanged) or (not isValid)}
                           />
                         </div>
-                      </div>
+                      </ScrollPanel>
                     </SplitterPanel>
                   </Splitter>
                 </SplitterPanel>
                 <SplitterPanel>
-                  <Splitter>
+                  <Splitter layout="vertical">
                     <SplitterPanel>
                       <div>Preview</div>
                       <ErrorBoundary>
@@ -232,16 +239,17 @@ setupNewItem
                         }
                       </ErrorBoundary>
                     </SplitterPanel>
-                    <SplitterPanel>
-                      {
-                        if RelatedDataPane?
+                    {
+                      if true or RelatedDataPane?
+                        <SplitterPanel>
                           <RelatedDataPane model={changedModel}/>
-                      }
-                    </SplitterPanel>
-                  </Splitter> 
+                        </SplitterPanel>
+                      else null
+                    }
+                  </Splitter>
                 </SplitterPanel>
               </Splitter>
-          ###}
+          }
         </SplitterPanel>
       </Splitter>
     </ErrorBoundary>

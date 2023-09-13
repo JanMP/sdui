@@ -43,7 +43,7 @@ export SdEditor = ({value = '', onChange, editorWidth = "100%", editorHeight = "
     editor?.resize()
   , [size]
 
-  <div className="sd-editor__container" ref={container}>
+  <div className="sd-editor__container flex-grow-1 h-full" ref={container}>
     <Header instance={instance}/>
     <AceEditor
       ref={instance}
