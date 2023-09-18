@@ -3,7 +3,7 @@ import {connectField, filterDOMProps} from 'uniforms'
 import {useTranslation} from 'react-i18next'
 
 
-export default (Component) ->
+export default connectFieldPlus = (Component) ->
 
   WrappedComponent = ({
     label, labelPosition
