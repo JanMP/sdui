@@ -9,7 +9,7 @@ handleError = (error) -> console.error error
 
 export createRestClient = (settings) ->
   unless settings?
-    console.warn 'janmp:chatterbrain - createRestClient: settings not found'
+    console.warn 'janmp:sdui - createRestClient: settings not found'
     return
   {baseUrl, apiKey} = settings
   config = if apiKey?

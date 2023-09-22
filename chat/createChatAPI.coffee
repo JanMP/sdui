@@ -50,14 +50,14 @@ export createChatAPI = ({
 }) ->
 
   # check required props and setup defaults for optional props
-  unless sourceName?    throw new Error 'no sourceName given'
+  unless sourceName?
+    throw new Error 'no sourceName given'
   
   unless collection?
     throw new Error 'no collection given'
   
   unless sessionListCollection? or isSingleSessionChat
     throw new Error 'no sessionListCollection given'
-
   if not viewChatRole? and Meteor.isServer
     console.warn "[createChatAPI #{sourceName}]:
       no viewChatRole defined, using 'any' instead."

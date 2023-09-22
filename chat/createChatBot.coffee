@@ -1,7 +1,6 @@
 import {Meteor} from 'meteor/meteor'
 import {setupOpenAIApi} from '../ai/setupOpenAIApi.coffee'
 import {tokenizer} from 'meteor/janmp:sdui'
-
 export createChatBot = ({
   model, system, options = {},
   logCollection
@@ -10,6 +9,7 @@ export createChatBot = ({
   contextTokenLimit = 4096 - 1000
 }) ->
   return unless Meteor.isServer
+
   model ?= 'gpt-3.5-turbo'
   system ?= "Du bist ein freundlicher, hilfreicher Chatbot"
   openAi = setupOpenAIApi()
@@ -20,7 +20,6 @@ export createChatBot = ({
     done = false
     
     reply?.data?.on 'data', Meteor.bindEnvironment (chunk) ->
-      # console.log 'chunk'
       chunk.toString()
       .split '\n'
       .filter (line) -> line.trim() isnt ''
@@ -35,9 +34,6 @@ export createChatBot = ({
           text += delta
 
     new Promise (resolve) ->
-      # we do this the ugly way, because I can't get _.throttle to work
-      # with Meteor.bindEnvironment. This problem should disappear with
-      # Meteor 3 because no more fibers.
       interval = Meteor.setInterval ->
         # console.log 'interval'
         chatCollection.update replyMessageId,
@@ -89,16 +85,14 @@ export createChatBot = ({
       sessionId: sessionId
       text: text
       chatRole: 'assistant'
-      createdAt: new Date()
-      workInProgress: true
+      createdAt: new Date()      workInProgress: true
     replyMessageId
 
 
   updateMessageStub: ({messageId, text}) ->
     chatCollection.update messageId,
       $set:
-        text: text
-        createdAt: new Date()
+        text: text        createdAt: new Date()
 
 
   finalizeMessageStub: ({messageId}) ->
