@@ -23,7 +23,7 @@ export SdChat = ({dataOptions, className = "", customComponents = {}}) ->
   Message ?= DefaultMessage
 
 
-  {bots, sourceName, sessionListDataOptions, isSingleSessionChat} = dataOptions
+  {bots, sourceName, sessionListDataOptions, isSingleSessionChat, metaDataCollection} = dataOptions
 
   [inputValue, setInputValue] = useState ''
   [sessionId, setSessionId] = useState null
@@ -65,6 +65,12 @@ export SdChat = ({dataOptions, className = "", customComponents = {}}) ->
             email: Meteor.user()?.emails?[0]?.address
         user ?= session.users.find (user) -> user.userId is message.userId
         {message..., username: user?.username, email: user?.email, customImage: user?.customImage}
+  
+  metaData =
+    useTracker ->
+      return [] unless isSingleSessionChat or session?.userIds?
+      dataOptions.metaDataCollection?.find {sessionId}
+
 
   useEffect ->
     scrollAreaRef?.current?.querySelector(':scope > :last-child')?.scrollIntoView block: 'end'

@@ -31,18 +31,26 @@ export chatSchema = new SimpleSchema
     type: Boolean
     optional: true
 
+export chatMetaDataSchema = new SimpleSchema
+  sessionId: String
+  createdAt: Date
+  type: String
+  data:
+    type: Object
+    blackbox: true
+
 export createChatAPI = ({
   sourceName
   collection
   sessionListCollection
+  metaDataCollection = undefined
   isSingleSessionChat
   viewChatRole, addSessionRole,
   bots, reactToNewMessage, onNewSession
 }) ->
 
   # check required props and setup defaults for optional props
-  unless sourceName?
-    throw new Error 'no sourceName given'
+  unless sourceName?    throw new Error 'no sourceName given'
   
   unless collection?
     throw new Error 'no collection given'
@@ -87,9 +95,10 @@ export createChatAPI = ({
   createChatPublications {
     sourceName
     collection
+    metaDataCollection
     sessionListCollection
     isSingleSessionChat
     viewChatRole
   }
 
-  {sourceName, collection, sessionListDataOptions, isSingleSessionChat, bots}
+  {sourceName, collection, metaDataCollection, sessionListDataOptions, isSingleSessionChat, bots}
