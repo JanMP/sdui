@@ -1,6 +1,18 @@
 import {Meteor} from 'meteor/meteor'
 import {setupOpenAIApi} from '../ai/setupOpenAIApi.coffee'
 import {tokenizer} from 'meteor/janmp:sdui'
+###*
+  @param {Object} options
+  @param {String} options.model - the OpenAI model to use
+  @param {String} options.system - the system message the bot will ALLWAYS recive as first message
+  @param {Object} [options.options={}] - the options for the OpenAI API
+  @param {Object} [options.chatCollection] - the createShatAPI collection
+  @param {Object} [options.botUserData] - the user data for the bot
+  @param {Function} [options.getFunctions] - a function that returns an array of functions that can be called by the bot
+  @param {String} [options.functionCall] - the function call mode, can be 'auto', 'none' or 'manual'
+  @param {Object} [options.logCollection] - the collection to log the chatbot calls
+  @param {Number} [options.contextTokenLimit=8191 - 2000] - the token limit for the context
+  ###
 export createChatBot = ({
   model, system, options = {},
   logCollection
@@ -52,8 +64,19 @@ export createChatBot = ({
               completion: 0
       , 200
 
-
-  buildContext: ({sessionId, additionalMessages = []}, initialLimit = 10) ->
+  ###*
+    Build the context for the chatbot call
+    @param {Object} options
+    @param {String} options.sessionId
+    @param {Array} [options.additionalMessages=[]]
+    @param {Number} [options.initialLimit=20]
+    @example
+      chatBot.buildContext
+        sessionId: '123'
+        additionalMessages: [{content: 'Talk like a Pirate!' Harrr!', role: 'system'}]
+        initialLimit: 20
+    ###
+  buildContext: ({sessionId, additionalMessages = []}, initialLimit = 20) ->
     build = (limit) ->
       if limit < 0
         throw new Meteor.Error 'buildHistory: limit must be >= 0'
@@ -78,7 +101,16 @@ export createChatBot = ({
 
     build initialLimit
 
-
+  ###*
+    @description
+    - create a new message stub
+    - sets createdAt, chatRole to 'assistant'
+    - and workInProgress to 'true
+    @param {Object} options
+    @param {String} options.sessionId
+    @param {String} [options.text='']
+    @returns {String} the id of the new message stub
+    ###
   createMessageStub: ({sessionId, text = ''}) ->
     replyMessageId = chatCollection.insert
       userId: botUserData.id
