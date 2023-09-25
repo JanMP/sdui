@@ -10,6 +10,7 @@ import {SdList} from '../tables/SdList'
 import {SessionListItemContent} from './SessionListItemContent'
 import {DefaultListItem} from '../tables/DefaultListItem'
 import {Toast} from 'primereact/toast'
+import {DefaultMetaDataDisplay} from './DefaultMetaDataDisplay.coffee'
 
 
 DefaultSessionListItem  = ({sessionId}) ->
@@ -18,9 +19,10 @@ DefaultSessionListItem  = ({sessionId}) ->
 
 export SdChat = ({dataOptions, className = "", customComponents = {}}) ->
 
-  {SessionListItem, Message} = customComponents
+  {SessionListItem, Message, MetaDataDisplay} = customComponents
   SessionListItem ?= DefaultSessionListItem
   Message ?= DefaultMessage
+  MetaDataDisplay ?= DefaultMetaDataDisplay
 
 
   {bots, sourceName, sessionListDataOptions, isSingleSessionChat, metaDataCollection} = dataOptions
@@ -33,6 +35,7 @@ export SdChat = ({dataOptions, className = "", customComponents = {}}) ->
 
   sessionsAreLoading = useSubscribe "#{sourceName}.sessions"
   messagesAreLoading = useSubscribe "#{sourceName}.messages", {sessionId}
+  metaDataIsLoading = useSubscribe "#{sourceName}.metaData", {sessionId}
 
   session = useTracker ->
     dataOptions?.sessionListDataOptions?.rowsCollection?.findOne sessionId
@@ -49,9 +52,11 @@ export SdChat = ({dataOptions, className = "", customComponents = {}}) ->
     undefined
   , []
 
+  metaData = useTracker ->
+    dataOptions?.metaDataCollection?.find({sessionId}).fetch()
+  
   messages =
     useTracker ->
-      return [] unless isSingleSessionChat or session?.userIds?
       dataOptions.collection.find {},
         sort: createdAt: -1
         limit: 100
@@ -65,12 +70,6 @@ export SdChat = ({dataOptions, className = "", customComponents = {}}) ->
             email: Meteor.user()?.emails?[0]?.address
         user ?= session.users.find (user) -> user.userId is message.userId
         {message..., username: user?.username, email: user?.email, customImage: user?.customImage}
-  
-  metaData =
-    useTracker ->
-      return [] unless isSingleSessionChat or session?.userIds?
-      dataOptions.metaDataCollection?.find {sessionId}
-
 
   useEffect ->
     scrollAreaRef?.current?.querySelector(':scope > :last-child')?.scrollIntoView block: 'end'
@@ -141,7 +140,7 @@ export SdChat = ({dataOptions, className = "", customComponents = {}}) ->
               />
             </div>
         }
-        <div className="h-30rem flex-grow-1 flex-shrink-1 overflow-y-scroll" ref={scrollAreaRef}>
+        <div className="h-1rem flex-grow-1 flex-shrink-1 overflow-y-scroll" ref={scrollAreaRef}>
           {
             messages.map (message) ->
               <Message
@@ -149,6 +148,7 @@ export SdChat = ({dataOptions, className = "", customComponents = {}}) ->
                 message={message}/>
           }
         </div>
+        <MetaDataDisplay metaData={metaData}/>
         <form onSubmit={addMessage} className="p-card p-4">
           <div className="p-inputgroup">
             <InputText

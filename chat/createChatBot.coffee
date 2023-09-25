@@ -1,6 +1,9 @@
 import {Meteor} from 'meteor/meteor'
 import {setupOpenAIApi} from '../ai/setupOpenAIApi.coffee'
 import {tokenizer} from 'meteor/janmp:sdui'
+import omit from 'lodash/omit'
+import merge from 'lodash/merge'
+
 ###*
   @param {Object} options
   @param {String} options.model - the OpenAI model to use
@@ -15,10 +18,12 @@ import {tokenizer} from 'meteor/janmp:sdui'
   ###
 export createChatBot = ({
   model, system, options = {},
-  logCollection
   chatCollection
   botUserData
-  contextTokenLimit = 4096 - 1000
+  getFunctions = ({sessionId = null}) -> []
+  functionCall = 'none'
+  logCollection
+  contextTokenLimit = 8191 - 2000
 }) ->
   return unless Meteor.isServer
 
@@ -28,8 +33,12 @@ export createChatBot = ({
   replyMessageId = null
 
   handleStream = (reply) ->
-    text = ''
     done = false
+    text = ''
+    deltas = []
+    function_call =
+      name: null
+      arguments: ''
     
     reply?.data?.on 'data', Meteor.bindEnvironment (chunk) ->
       chunk.toString()
@@ -42,8 +51,15 @@ export createChatBot = ({
           return
         try
           response = JSON.parse line
-          delta = response?.choices?[0]?.delta?.content ? ''
-          text += delta
+          dContent = response?.choices?[0]?.delta?.content ? ''
+          text += dContent
+          deltas.push dContent
+          # unless response?.choices?
+          #   console.log 'response:', response
+          if (name = response?.choices?[0]?.delta?.function_call?.name)?
+            function_call.name = name
+          if (args = response?.choices?[0]?.delta?.function_call?.arguments)?
+            function_call.arguments += args
 
     new Promise (resolve) ->
       interval = Meteor.setInterval ->
@@ -58,6 +74,7 @@ export createChatBot = ({
             message:
               content: text
               role: 'assistant'
+              function_call: {name: function_call.name, arguments: try JSON.parse function_call.arguments}
             usage:
               model: model
               prompt: 0
@@ -91,12 +108,12 @@ export createChatBot = ({
           content:
             message.text
             .replace /\[\/\/\]: # \(hide from llm start\)[\s\S]*?\[\/\/\]: # \(hide from llm end\)/g, ''
-      messages = [content: system, role: 'system', history..., additionalMessages...]
+      messages = [{content: system, role: 'system'}, history..., additionalMessages...]
       if tokenizer.isWithinTokenLimit messages, contextTokenLimit
         # console.log 'buildHistory: tokenLimit not reached'
         messages
       else
-        # console.log 'buildHistory: tokenLimit reached, trying again with limit ', limit - 1
+        console.log 'buildHistory: tokenLimit reached, trying again with limit ', limit - 1
         build limit - 1
 
     build initialLimit
@@ -117,45 +134,77 @@ export createChatBot = ({
       sessionId: sessionId
       text: text
       chatRole: 'assistant'
-      createdAt: new Date()      workInProgress: true
+      createdAt: new Date()
+      workInProgress: true
     replyMessageId
 
 
   updateMessageStub: ({messageId, text}) ->
     chatCollection.update messageId,
       $set:
-        text: text        createdAt: new Date()
+        text: text
+        createdAt: new Date()
 
-
+  ###*
+    @description
+    - sets createdAt to new Date()
+    - and workInProgress to 'false
+    @param {Object} options
+    @param {String} options.messageId
+    @returns {String} the id of the 
+    ###
   finalizeMessageStub: ({messageId}) ->
     chatCollection.update messageId,
       $set:
         createdAt: new Date()
         workInProgress: false
 
+  call:
+    ###*
+      Call the chatbot handle the response and functioncalls
+      @param {Object} options
+      @param {String} options.sessionId
+      @param {Array} options.messages
+      @param {Object} options.logData
+      @example
+        chatBot.call
+          sessionId: '123'
+          messages: [{content: 'Hallo', role: 'user'}]
+          logData:
+            userId: '123'
+            messageId: '456'
+            bot: 'chatBot'
+            version: '4.0.0'
+      ###
+    call = ({sessionId, messages, logData}) ->
 
-  call: ({messages, logData}) ->
-    openAi.createChatCompletion {model, messages, options...}, {responseType: if options?.stream then 'stream'}
-    .then (reply) ->
-      if options.stream
-        handleStream reply
-      else
+      functions = getFunctions({sessionId})
+      functionParams = functions.map (f) -> omit f, 'run'
+      openAi.createChatCompletion {model, messages, options..., functions: functionParams, function_call: functionCall}, {responseType: if options?.stream then 'stream'}
+      .then (response) ->
+        if options.stream
+          handleStream response
+        else
+          response?.data?.choices?[0]?.message
+      .then (response) ->
+        # console.log response
         if logCollection and Meteor.isServer
           logCollection.insert {
             model
-            messages,
-            message: reply?.data?.choices?[0].message
-            usage: reply?.data?.usage
+            messages
+            response...
             createdAt: new Date()
             logData...
           }
-        #return
-        message: reply?.data?.choices?[0].message
-        usage:
-          model: model
-          prompt: reply?.data?.usage?.prompt_tokens
-          completion: reply?.data?.usage?.completion_tokens
-    .catch console.error
+        if (fc = response.message.function_call)?.name
+          console.log 'function_call', fc
+          (functions.find (f) -> f.name is fc.name)?.run fc.arguments
+          .then (result) ->
+            console.log result
+            messagesWithResult = messages.concat {content: result, role: 'system'}
+            call {messages: messagesWithResult, logData}
+        response
+      .catch console.error
 
 
   test: -> console.log 'test', {works: true}

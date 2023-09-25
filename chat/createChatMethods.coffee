@@ -7,7 +7,7 @@ import {currentUserMustBeInRole, currentUserIsInRole} from '../common/roleChecks
 import _ from 'lodash'
 
 export createChatMethods = ({
-  sourceName, collection, sessionListCollection, isSingleSessionChat,
+  sourceName, collection, metaDataCollection, sessionListCollection, isSingleSessionChat,
   viewChatRole, addSessionRole, reactToNewMessage, onNewSession
 }) ->
 
@@ -36,6 +36,7 @@ export createChatMethods = ({
     return unless Meteor.isServer
     sessionId = Meteor.userId()
     collection.remove {sessionId}
+    metaDataCollection.remove {sessionId}
 
 
   new ValidatedMethod
@@ -98,6 +99,7 @@ export createChatMethods = ({
       currentUserMustBeInRole addSessionRole
       return unless Meteor.isServer
       collection.remove sessionId: id
+      metaDataCollection.remove sessionId: id
       sessionListCollection.remove id
   
   # we look for any session for this user and return the id, so we can select it in the UI

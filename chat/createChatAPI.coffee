@@ -84,6 +84,7 @@ export createChatAPI = ({
   createChatMethods {
     sourceName
     collection
+    metaDataCollection
     sessionListCollection
     isSingleSessionChat
     viewChatRole
