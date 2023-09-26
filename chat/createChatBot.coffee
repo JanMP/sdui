@@ -197,10 +197,10 @@ export createChatBot = ({
             logData...
           }
         if (fc = response.message.function_call)?.name
-          console.log 'function_call', fc
+          # console.log 'function_call', fc
           (functions.find (f) -> f.name is fc.name)?.run fc.arguments
           .then (result) ->
-            console.log result
+            # console.log result
             messagesWithResult = messages.concat {content: result, role: 'system'}
             call {messages: messagesWithResult, logData}
         response
