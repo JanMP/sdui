@@ -165,6 +165,7 @@ export createChatBot = ({
       @param {Object} options
       @param {String} options.sessionId
       @param {Array} options.messages
+      @param {String} [options.messageId] - the id of the message stub
       @param {Object} options.logData
       @example
         chatBot.call
@@ -176,9 +177,9 @@ export createChatBot = ({
             bot: 'chatBot'
             version: '4.0.0'
       ###
-    call = ({sessionId, messages, logData}) ->
+    call = ({sessionId, messages, messageId, logData}) ->
 
-      functions = getFunctions({sessionId})
+      functions = getFunctions({sessionId, messageId})
       functionParams = functions.map (f) -> omit f, 'run'
       openAi.createChatCompletion {model, messages, options..., functions: functionParams, function_call: functionCall}, {responseType: if options?.stream then 'stream'}
       .then (response) ->
