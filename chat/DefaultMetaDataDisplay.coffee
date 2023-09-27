@@ -19,7 +19,6 @@ export DefaultMetaDataDisplay = ({metaData}) ->
             <div className="absolute top-0 left-0 w-full text-xl text-white text-0 bg-black-alpha-30">
               {item.data.title}
             </div>
-            <div className="absolute bottom-0 left-0 text-xs">{item.messageId}</div>
           </div>
       }
     </div>
