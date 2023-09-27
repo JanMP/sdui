@@ -24,6 +24,7 @@ export DefaultMessage = ({message}) ->
       </div>
       <div>
         <MarkdownDisplay markdown={text} contentClass="chat-message"/>
+        <div className="text-xs">{_id}</div>
       </div>
     </div>
   </div>
