@@ -64,8 +64,10 @@ export class BytePairEncodingCore {
           ? nextSpecialStartIndex
           : text.length
 
-      const textSegment = text.slice(startIndex, endIndex - startIndex)
-
+      let textSegment = text.slice(startIndex, endIndex - startIndex)
+      if (typeof textSegment !== 'string') {
+        textSegment = ''
+      }
       for (const [match] of textSegment.matchAll(this.tokenSplitRegex)) {
         const encodedPiece = this.textEncoder.encode(match)
         const token = this.encoder.get(encodedPiece)

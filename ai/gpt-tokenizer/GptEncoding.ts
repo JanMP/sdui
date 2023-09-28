@@ -159,7 +159,7 @@ export class GptEncoding {
       allowedSpecial = specialTokensSet
     }
 
-    if (disallowedSpecial.size > 0) {
+    if ((disallowedSpecial.size > 0) && (typeof lineToEncode === 'string')) {
       const regexPattern = getSpecialTokenRegex(disallowedSpecial)
       const match = lineToEncode.match(regexPattern)
       if (match !== null) {

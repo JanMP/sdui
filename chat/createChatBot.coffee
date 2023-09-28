@@ -4,6 +4,11 @@ import {tokenizer} from 'meteor/janmp:sdui'
 import omit from 'lodash/omit'
 import merge from 'lodash/merge'
 
+countTokens = (messages) ->
+  messages
+  .map (m) -> tokenizer.encode m.content
+  .reduce ((a, b) -> a + b.length), 0
+
 ###*
   @param {Object} options
   @param {String} options.model - the OpenAI model to use
@@ -35,6 +40,7 @@ export createChatBot = ({
   handleStream = (reply) ->
     done = false
     text = ''
+    oldText = ''
     deltas = []
     function_call =
       name: null
@@ -64,10 +70,12 @@ export createChatBot = ({
     new Promise (resolve) ->
       interval = Meteor.setInterval ->
         # console.log 'interval'
-        chatCollection.update replyMessageId,
-          $set:
-            text: text
-            createdAt: new Date()
+        if replyMessageId? and oldText isnt text
+          oldText = text
+          chatCollection.update replyMessageId,
+            $set:
+              text: text
+              createdAt: new Date()
         if done
           Meteor.clearInterval interval
           resolve
@@ -172,29 +180,35 @@ export createChatBot = ({
           sessionId: '123'
           messages: [{content: 'Hallo', role: 'user'}]
           logData:
-            userId: '123'
-            messageId: '456'
             bot: 'chatBot'
-            version: '4.0.0'
+            version: '1.0.0'
       ###
     call = ({sessionId, messages, messageId, logData}) ->
 
       functions = getFunctions({sessionId, messageId})
       functionParams = functions.map (f) -> omit f, 'run'
-      openAi.createChatCompletion {model, messages, options..., functions: functionParams, function_call: functionCall}, {responseType: if options?.stream then 'stream'}
+      openAi.createChatCompletion {model, messages, options..., functions: functionParams, function_call: functionCall},
+        {responseType: if options?.stream then 'stream'}
       .then (response) ->
         if options.stream
           handleStream response
         else
           response?.data?.choices?[0]?.message
       .then (response) ->
-        # console.log response
         if logCollection and Meteor.isServer
+          prompt_tokens = countTokens messages
+          completion_tokens = countTokens [response.message]
           logCollection.insert {
             model
             messages
             response...
             createdAt: new Date()
+            messageId
+            sessionId
+            usage:
+              model: model
+              prompt_tokens: prompt_tokens
+              completion_tokens: completion_tokens
             logData...
           }
         if (fc = response.message.function_call)?.name
@@ -203,7 +217,7 @@ export createChatBot = ({
           .then (result) ->
             # console.log result
             messagesWithResult = messages.concat {content: result, role: 'system'}
-            call {messages: messagesWithResult, logData}
+            call {sessionId, messageId, messages: messagesWithResult, logData}
         response
       .catch console.error
 
