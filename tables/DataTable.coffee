@@ -31,11 +31,11 @@ resizableHeaderRenderer = ({onResizeRows, isLastOne}) ->
           {
             if sortBy is dataKey
               if sortDirection is 'ASC'
-                <i className="sort-click-target pi pi-sort-amount-down-alt"/>
+                <i className="sort-click-target pi pi-sort-down"/>
               else
-                <i className="sort-click-target pi pi-sort-amount-up alt" />
+                <i className="sort-click-target pi pi-sort-up" />
             else
-              <i className="sort-click-target pi pi-sort-alt"/>
+              <i className="sort-click-target pi pi-sort"/>
           }
         </div>
       </div>
