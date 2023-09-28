@@ -84,6 +84,12 @@ export SdChat = ({dataOptions, className = "", customComponents = {}}) ->
       data:
         text: inputValue
         sessionId: sessionId
+    .catch (error) ->
+      toast.current.show
+        severity: 'error'
+        summary: 'Fehler'
+        detail: "#{error.message}"
+      console.error error
 
   # SessionList hook
   # This is a shortcut to build a single user Chat for Chatbots
