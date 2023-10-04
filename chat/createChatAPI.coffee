@@ -71,15 +71,12 @@ export createChatAPI = ({
   bots ?= [] # id, username, email
 
   sessionListDataOptions =
-    if isSingleSessionChat
-      {}
-    else
-      createChatSessionListAPI {
-        sourceName
-        sessionListCollection
-        viewChatRole
-        addSessionRole
-      }
+    createChatSessionListAPI {
+      sourceName
+      sessionListCollection
+      viewChatRole
+      addSessionRole
+    }
 
   createChatMethods {
     sourceName
@@ -102,4 +99,4 @@ export createChatAPI = ({
     viewChatRole
   }
 
-  {sourceName, collection, metaDataCollection, sessionListDataOptions, isSingleSessionChat, bots}
+  {sourceName, collection, sessionListCollection, metaDataCollection, sessionListDataOptions, isSingleSessionChat, bots}

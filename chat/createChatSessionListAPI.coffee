@@ -15,6 +15,9 @@ sourceSchemaDefinition =
     optional: true
   'userIds.$':
     type: String
+  createdAt:
+    type: Date
+    optional: true
 
 additionalListFieldsSchemaDefinition =
   users:

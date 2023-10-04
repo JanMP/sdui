@@ -19,24 +19,9 @@ export createChatMethods = ({
     return unless Meteor.isServer
     title ?= '[no title]'
     userIds ?= [Meteor.userId()]
-    sessionId = sessionListCollection.insert {title, userIds}
+    sessionId = sessionListCollection.insert {title, userIds, createdAt: new Date()}
     onNewSession {sessionId}
     sessionId
-
-  getSingleSession = ->
-    currentUserMustBeInRole viewChatRole
-    return unless Meteor.isServer
-    sessionId = Meteor.userId()
-    unless collection.findOne sessionId: sessionId
-      onNewSession {sessionId}
-    sessionId
-
-  deleteSingleSession = ->
-    currentUserMustBeInRole viewChatRole
-    return unless Meteor.isServer
-    sessionId = Meteor.userId()
-    collection.remove {sessionId}
-    metaDataCollection.remove {sessionId}
 
 
   new ValidatedMethod
@@ -62,7 +47,7 @@ export createChatMethods = ({
           throw new Meteor.Error 'user not in session'
       newMessage =
         userId: Meteor.userId()
-        sessionId: if isSingleSessionChat then Meteor.userId() else sessionId
+        sessionId: sessionId
         text: text
         createdAt: new Date()
         chatRole: 'user'
@@ -109,10 +94,8 @@ export createChatMethods = ({
     validate: null
     run: ->
       return unless Meteor.isServer
-      if isSingleSessionChat
-        return getSingleSession()
       currentUserMustBeInRole addSessionRole
-      if (existingSession = sessionListCollection?.findOne userIds: [Meteor.userId()])?
+      if (existingSession = sessionListCollection?.findOne {userIds: [Meteor.userId()]}, sort: createdAt: -1)?
         return existingSession._id
       addSession {}
 
@@ -122,5 +105,4 @@ export createChatMethods = ({
     run: ->
       currentUserMustBeInRole viewChatRole
       return unless Meteor.isServer
-      deleteSingleSession()
-      getSingleSession()
+      addSession {}

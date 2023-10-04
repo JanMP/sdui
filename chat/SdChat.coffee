@@ -33,7 +33,6 @@ export SdChat = ({dataOptions, className = "", customComponents = {}}) ->
   scrollAreaRef = useRef null
   toast = useRef null
 
-  sessionsAreLoading = useSubscribe "#{sourceName}.sessions"
   messagesAreLoading = useSubscribe "#{sourceName}.messages", {sessionId}
   metaDataIsLoading = useSubscribe "#{sourceName}.metaData", {sessionId}
 
@@ -57,7 +56,7 @@ export SdChat = ({dataOptions, className = "", customComponents = {}}) ->
   
   messages =
     useTracker ->
-      dataOptions.collection.find {},
+      dataOptions.collection.find {sessionId},
         sort: createdAt: -1
         limit: 100
       .fetch()
@@ -94,7 +93,7 @@ export SdChat = ({dataOptions, className = "", customComponents = {}}) ->
   # SessionList hook
   # This is a shortcut to build a single user Chat for Chatbots
   # TODO: build UI to add users to a chat
-  onSubmit = (model) ->
+  addSession = (model = {}) ->
     meteorApply
       method: "#{sourceName}.addSession"
       data: model
@@ -107,7 +106,7 @@ export SdChat = ({dataOptions, className = "", customComponents = {}}) ->
       console.log error
 
   # SessionList hook
-  onDelete = ({id}) ->
+  deleteSession = ({id}) ->
     if sessionId is id then setSessionId ''
     meteorApply
       method: "#{sourceName}.deleteSession"
@@ -129,7 +128,10 @@ export SdChat = ({dataOptions, className = "", customComponents = {}}) ->
       unless isSingleSessionChat
         <div className="w-16rem flex-none">
           <SdList
-            dataOptions={{sessionListDataOptions..., onSubmit, onDelete, onRowClick: onSessionListRowClick}}
+            dataOptions={{
+              sessionListDataOptions...,
+              onSubmit: addSession, onDelete: deleteSession, onRowClick: onSessionListRowClick
+            }}
             customComponents={ListItem: SessionListItem {sessionId}}
           />
         </div>
@@ -142,7 +144,7 @@ export SdChat = ({dataOptions, className = "", customComponents = {}}) ->
               <ActionButton
                 icon="pi pi-fw pi-times"
                 className="p-button-rounded p-button-text p-button-danger"
-                method="#{sourceName}.resetSingleSession"
+                onAction={addSession}
               />
             </div>
         }
