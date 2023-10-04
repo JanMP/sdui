@@ -11,7 +11,7 @@ import {SessionListItemContent} from './SessionListItemContent'
 import {DefaultListItem} from '../tables/DefaultListItem'
 import {Toast} from 'primereact/toast'
 import {DefaultMetaDataDisplay} from './DefaultMetaDataDisplay.coffee'
-
+import {SessionListHeader} from './SessionListHeader.coffee'
 
 DefaultSessionListItem  = ({sessionId}) ->
   (args) ->  <DefaultListItem {{args..., ListItemContent: SessionListItemContent, selectedRowId: sessionId}...} />
@@ -132,7 +132,10 @@ export SdChat = ({dataOptions, className = "", customComponents = {}}) ->
               sessionListDataOptions...,
               onSubmit: addSession, onDelete: deleteSession, onRowClick: onSessionListRowClick
             }}
-            customComponents={ListItem: SessionListItem {sessionId}}
+            customComponents={
+              ListItem: SessionListItem {sessionId}
+              Header: SessionListHeader
+            }
           />
         </div>
     }

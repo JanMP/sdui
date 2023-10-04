@@ -60,6 +60,7 @@ export createChatSessionListAPI = ({sourceName, sessionListCollection, viewChatR
     $group:
       _id: '$_id'
       title: $first: '$title'
+      createdAt: $first: '$createdAt'
       userIds: $push: '$userIds'
       users: $push:
         username: '$username'
@@ -78,9 +79,9 @@ export createChatSessionListAPI = ({sourceName, sessionListCollection, viewChatR
     canAdd: true
     canDelete: true
     canEdit: false
-    canUseQueryEditor: false
     canSort: true
-    canSearch: true
+    initialSortColumn: 'createdAt'
+    initialSortDirection: 'DESC'
 
     getPreSelectPipeline: getPreSelectPipeline
     getProcessorPipeline: getSessionListProcessorPipeline
