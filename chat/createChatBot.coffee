@@ -101,7 +101,7 @@ export createChatBot = ({
         additionalMessages: [{content: 'Talk like a Pirate!' Harrr!', role: 'system'}]
         initialLimit: 20
     ###
-  buildContext: ({sessionId, additionalMessages = []}, initialLimit = 20) ->
+  buildContext =  ({sessionId, additionalMessages = []}, initialLimit = 20) ->
     build = (limit) ->
       if limit < 0
         throw new Meteor.Error 'buildHistory: limit must be >= 0'
@@ -136,7 +136,7 @@ export createChatBot = ({
     @param {String} [options.text='']
     @returns {String} the id of the new message stub
     ###
-  createMessageStub: ({sessionId, text = ''}) ->
+  createMessageStub = ({sessionId, text = ''}) ->
     replyMessageId = chatCollection.insert
       userId: botUserData.id
       sessionId: sessionId
@@ -147,7 +147,7 @@ export createChatBot = ({
     replyMessageId
 
 
-  updateMessageStub: ({messageId, text}) ->
+  updateMessageStub = ({messageId, text}) ->
     chatCollection.update messageId,
       $set:
         text: text
@@ -161,65 +161,70 @@ export createChatBot = ({
     @param {String} options.messageId
     @returns {String} the id of the 
     ###
-  finalizeMessageStub: ({messageId}) ->
+  finalizeMessageStub = ({messageId}) ->
     chatCollection.update messageId,
       $set:
         createdAt: new Date()
         workInProgress: false
 
-  call:
-    ###*
-      Call the chatbot handle the response and functioncalls
-      @param {Object} options
-      @param {String} options.sessionId
-      @param {Array} options.messages
-      @param {String} [options.messageId] - the id of the message stub
-      @param {Object} options.logData
-      @example
-        chatBot.call
-          sessionId: '123'
-          messages: [{content: 'Hallo', role: 'user'}]
-          logData:
-            bot: 'chatBot'
-            version: '1.0.0'
-      ###
-    call = ({sessionId, messages, messageId, logData}) ->
+  ###*
+    Call the chatbot handle the response and functioncalls
+    @param {Object} options
+    @param {String} options.sessionId
+    @param {Array} options.messages
+    @param {String} [options.messageId] - the id of the message stub
+    @param {Object} options.logData
+    @example
+      chatBot.call
+        sessionId: '123'
+        messages: [{content: 'Hallo', role: 'user'}]
+        logData:
+          bot: 'chatBot'
+          version: '1.0.0'
+    ###
+  call = ({sessionId, messages, messageId, logData}) ->
 
-      functions = getFunctions({sessionId, messageId})
-      functionParams = functions.map (f) -> omit f, 'run'
-      openAi.createChatCompletion {model, messages, options..., functions: functionParams, function_call: functionCall},
-        {responseType: if options?.stream then 'stream'}
-      .then (response) ->
-        if options.stream
-          handleStream response
-        else
-          response?.data?.choices?[0]?.message
-      .then (response) ->
-        if logCollection and Meteor.isServer
-          prompt_tokens = countTokens messages
-          completion_tokens = countTokens [response.message]
-          logCollection.insert {
-            model
-            messages
-            response...
-            createdAt: new Date()
-            messageId
-            sessionId
-            usage:
-              model: model
-              prompt_tokens: prompt_tokens
-              completion_tokens: completion_tokens
-            logData...
-          }
-        if (fc = response.message.function_call)?.name
-          # console.log 'function_call', fc
-          (functions.find (f) -> f.name is fc.name)?.run fc.arguments
-          .then (result) ->
-            # console.log result
-            messagesWithResult = messages.concat {content: result, role: 'system'}
-            call {sessionId, messageId, messages: messagesWithResult, logData}
-        response
-      .catch console.error
+    functions = getFunctions({sessionId, messageId})
+    functionParams = functions.map (f) -> omit f, 'run'
+    openAi.createChatCompletion {model, messages, options..., functions: functionParams, function_call: functionCall},
+      {responseType: if options?.stream then 'stream'}
+    .then (response) ->
+      if options.stream
+        handleStream response
+      else
+        response?.data?.choices?[0]?.message
+    .then (response) ->
+      if logCollection and Meteor.isServer
+        prompt_tokens = countTokens messages
+        completion_tokens = countTokens [response.message]
+        logEntryId = logCollection.insert {
+          model
+          messages: [messages..., response.message]
+          createdAt: new Date()
+          messageId
+          sessionId
+          usage:
+            model: model
+            prompt_tokens: prompt_tokens
+            completion_tokens: completion_tokens
+          logData...
+        }
+      console.log 'response', response.message.content
+      updateMessageStub {messageId, text: response.message.content}
+      finalizeMessageStub {messageId}
+      if (fc = response.message.function_call)?.name
+        # console.log 'function_call', fc
+        (functions.find (f) -> f.name is fc.name)?.run fc.arguments
+        .then (result) ->
+          if logCollection and Meteor.isServer
+            logCollection.update logEntryId,
+              # push {content: result, role: 'system'} to messages
+              $push:
+                messages:
+                  content: result
+                  role: 'system'
 
+          messagesWithResult = [messages..., {content: result, role: 'system'}]
+          call {sessionId, messageId, messages: messagesWithResult, logData}
 
-  test: -> console.log 'test', {works: true}
+  {call, createMessageStub, updateMessageStub, finalizeMessageStub, buildContext}

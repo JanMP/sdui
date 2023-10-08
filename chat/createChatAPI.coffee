@@ -11,13 +11,13 @@ export chatSchema = new SimpleSchema
     type: String
   sessionId:
     type: String
-  text:
-    type: String
   createdAt:
     type: Date
+  text:
+    type: String
   chatRole:
     type: String
-    allowedValues: ['user', 'bot', 'system']
+    allowedValues: ['user', 'assistant', 'system']
   usage:
     type: Object
     optional: true
