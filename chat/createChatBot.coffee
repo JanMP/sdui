@@ -126,6 +126,7 @@ export createChatBot = ({
 
     build initialLimit
 
+
   ###*
     @description
     - create a new message stub
@@ -167,12 +168,14 @@ export createChatBot = ({
         createdAt: new Date()
         workInProgress: false
 
+
   ###*
     Call the chatbot handle the response and functioncalls
     @param {Object} options
     @param {String} options.sessionId
-    @param {Array} options.messages
+    @param {Object} options.message
     @param {String} [options.messageId] - the id of the message stub
+    @param {Array} options.messages
     @param {Object} options.logData
     @example
       chatBot.call
@@ -182,7 +185,21 @@ export createChatBot = ({
           bot: 'chatBot'
           version: '1.0.0'
     ###
-  call = ({sessionId, messages, messageId, logData}) ->
+  call = ({sessionId, message, messageId, messages, logData}) ->
+
+    if logCollection and Meteor.isServer and message?
+      logCollection.insert {
+        model
+        messageId
+        sessionId
+        message
+        createdAt: new Date()
+        usage:
+          model: model
+          prompt_tokens: 0
+          completion_tokens: 0
+        logData...
+      }
 
     functions = getFunctions({sessionId, messageId})
     functionParams = functions.map (f) -> omit f, 'run'
@@ -197,19 +214,18 @@ export createChatBot = ({
       if logCollection and Meteor.isServer
         prompt_tokens = countTokens messages
         completion_tokens = countTokens [response.message]
-        logEntryId = logCollection.insert {
+        logCollection.insert {
           model
-          messages: [messages..., response.message]
-          createdAt: new Date()
           messageId
           sessionId
+          message: response.message
+          createdAt: new Date()
           usage:
             model: model
             prompt_tokens: prompt_tokens
             completion_tokens: completion_tokens
           logData...
         }
-      console.log 'response', response.message.content
       updateMessageStub {messageId, text: response.message.content}
       finalizeMessageStub {messageId}
       if (fc = response.message.function_call)?.name
@@ -217,14 +233,22 @@ export createChatBot = ({
         (functions.find (f) -> f.name is fc.name)?.run fc.arguments
         .then (result) ->
           if logCollection and Meteor.isServer
-            logCollection.update logEntryId,
-              # push {content: result, role: 'system'} to messages
-              $push:
-                messages:
-                  content: result
-                  role: 'system'
+            logCollection.insert {
+              model
+              messageId
+              sessionId
+              message:
+                content: result
+                role: 'system'
+              createdAt: new Date()
+              usage:
+                model: model
+                prompt_tokens: 0
+                completion_tokens: 0
+              logData...
+            }
 
           messagesWithResult = [messages..., {content: result, role: 'system'}]
-          call {sessionId, messageId, messages: messagesWithResult, logData}
+          call {sessionId, message: null, messageId, messages: messagesWithResult, logData}
 
   {call, createMessageStub, updateMessageStub, finalizeMessageStub, buildContext}
