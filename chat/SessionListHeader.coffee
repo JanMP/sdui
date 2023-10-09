@@ -14,4 +14,4 @@ export SessionListHeader = ({onAdd}) ->
       }
     />
 
-  <Toolbar end={endContent} />
+  <Toolbar center={endContent} />
