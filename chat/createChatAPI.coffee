@@ -5,7 +5,6 @@ import {createChatPublications} from './createChatPublications'
 import SimpleSchema from 'simpl-schema'
 import {createChatSessionListAPI} from './createChatSessionListAPI'
 
-
 export chatSchema = new SimpleSchema
   userId:
     type: String
@@ -39,15 +38,47 @@ export chatMetaDataSchema = new SimpleSchema
     type: Object
     blackbox: true
 
+export minLogSchemaDefinition =
+  userId: String
+  sessionId: String
+  messageId: String
+  createdAt: Date
+  message:
+    type: Object
+  'message.content': String
+  'message.role': String
+
+
+###*
+  @param {Object} options
+  @param {String} options.sourceName
+  @param {Mongo.Collection} options.collection
+  @param {Mongo.Collection} options.sessionListCollection
+  @param {Mongo.Collection} [options.metaDataCollection]
+  @param {Mongo.Collection} [options.logCollection]
+  @param {Mongo.Collection} [options.usageLimitCollection]
+  @param {Boolean} [options.isSingleSessionChat]
+  @param {Object} [options.viewChatRole]
+  @param {Object} [options.addSessionRole]
+  @param {Array} [options.bots]
+  @param {Function} [options.reactToNewMessage]
+  @param {() => {maxMessagesPerDay?: number, maxSessionsPerDay?: number, maxMessagesPerSession?: number, maxMessageLength?: number} | void} [options.getUsageLimits]
+  @param {Function} [options.onNewSession]
+  @returns {Object} dataOptions
+  ###
 export createChatAPI = ({
   sourceName
   collection
   sessionListCollection
-  metaDataCollection = undefined
+  metaDataCollection
+  logCollection
+  usageLimitCollection
   isSingleSessionChat
   viewChatRole, addSessionRole,
   bots, reactToNewMessage, onNewSession
+  getUsageLimits = ->
 }) ->
+
 
   # check required props and setup defaults for optional props
   unless sourceName?
@@ -81,22 +112,26 @@ export createChatAPI = ({
   createChatMethods {
     sourceName
     collection
-    metaDataCollection
     sessionListCollection
+    metaDataCollection
+    logCollection
     isSingleSessionChat
     viewChatRole
     addSessionRole
     reactToNewMessage
     onNewSession
+    getUsageLimits
   }
 
   createChatPublications {
     sourceName
     collection
-    metaDataCollection
     sessionListCollection
+    metaDataCollection
+    logCollection
     isSingleSessionChat
     viewChatRole
+    getUsageLimits
   }
 
-  {sourceName, collection, sessionListCollection, metaDataCollection, sessionListDataOptions, isSingleSessionChat, bots}
+  {sourceName, collection, sessionListCollection, metaDataCollection, usageLimitCollection, sessionListDataOptions, isSingleSessionChat, bots}
