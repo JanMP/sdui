@@ -37,7 +37,7 @@ buttonProps}) ->
   onSuccess ?=
     (result) ->
       if successMsg?
-        toast.current.show
+        toast.current?.show
           severity: 'success'
           summary: 'Erfolg'
           detail: successMsg
@@ -45,7 +45,7 @@ buttonProps}) ->
   
   onError ?=
     (error) ->
-      toast.curent.show
+      toast.curent?.show
         severity: 'error'
         summary: 'Fehler'
         detail: "#{errorMsg ? error.message}"

@@ -71,7 +71,6 @@ export createChatMethods = ({
     return false unless getUsageLimits()?.maxMessageLength?
     text.length > getUsageLimits().maxMessageLength
   
-  
   addSession = ({title, userIds}) ->
     if sessionsPerDayLimitReached()
       throw new Meteor.Error "Tut uns Leid, wir erlauben momentan nur #{getUsageLimits()?.maxSessionsPerDay} Chats pro Tag. Bitte versuche es morgen nochmal."
@@ -121,7 +120,6 @@ export createChatMethods = ({
       messageId
 
 
-  # we don't use this one yet, we use .sessions.addSingleUserSession as a shortcut (we don't have a UI to add users to a chat yet)
   new ValidatedMethod
     name: "#{sourceName}.addSession"
     validate:

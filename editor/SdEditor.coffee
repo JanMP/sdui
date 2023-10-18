@@ -15,11 +15,8 @@ DefaultHeader = ({instance}) ->
 
   return null unless files?
 
-  <div className="sd-editor-header__container">
-    No Files UI for now, sorry.
-    {###
-    <FileSelect dataOptions={files} editor={editor}/>
-    ###}
+  <div className="p-2">
+    <h1>SdEditor</h1>
   </div>
 
 
@@ -43,7 +40,7 @@ export SdEditor = ({value = '', onChange, editorWidth = "100%", editorHeight = "
     editor?.resize()
   , [size]
 
-  <div className="sd-editor__container flex-grow-1 h-full" ref={container}>
+  <div className="flex-grow-1 h-full" ref={container}>
     <Header instance={instance}/>
     <AceEditor
       ref={instance}

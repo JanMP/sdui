@@ -60,11 +60,6 @@ export SdChat = ({dataOptions, className = "", customComponents = {}}) ->
   metaData = useTracker ->
     dataOptions?.metaDataCollection?.find({sessionId}).fetch()
 
-
-  useEffect ->
-    console.log 'usageLimits', currentLimits
-  , [currentLimits]
-
   messageIsTooLong = inputValue?.length > currentLimits?.maxMessageLength
   noMoreMessagesToday = currentLimits?.messagesPerDayLeft <= 0
   noMoreMessagesThisSession = currentLimits?.messagesPerSessionLeft <= 0
