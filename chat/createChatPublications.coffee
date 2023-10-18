@@ -71,12 +71,21 @@ export createChatPublications = ({
         ,
           $group:
             _id: null
-            numberOfMessagesToday: $sum: 1
+            numberOfMessagesToday:
+              $sum:
+                $cond:
+                  if: {$eq: ['$message.role', 'user']}
+                  then: 1
+                  else: 0
             numberOfMessagesThisSession:
               $sum:
                 $cond:
                   if: {$eq: ['$sessionId', sessionId]}
-                  then: 1
+                  then:
+                    $cond:
+                      if: {$eq: ['$message.role', 'user']}
+                      then: 1
+                      else: 0
                   else: 0
             sessionsToday: $addToSet: '$sessionId'
         ,
