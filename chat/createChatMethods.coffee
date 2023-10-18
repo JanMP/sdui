@@ -158,7 +158,7 @@ export createChatMethods = ({
     run: ->
       return unless Meteor.isServer
       currentUserMustBeInRole addSessionRole
-      if (existingSession = sessionListCollection?.findOne {userIds: [Meteor.userId()]}, sort: createdAt: -1)?
+      if (existingSession = sessionListCollection?.findOne {userIds: [Meteor.userId()]}, sort: createdAt: 1)?
         return existingSession._id
       addSession {}
 
@@ -168,7 +168,7 @@ export createChatMethods = ({
     run: ->
       currentUserMustBeInRole viewChatRole
       return unless Meteor.isServer
-      if (existingSession = sessionListCollection?.findOne {userIds: [Meteor.userId()]}, sort: createdAt: -1)?
+      if (existingSession = sessionListCollection?.findOne {userIds: [Meteor.userId()]}, sort: createdAt: 1)?
         metaDataCollection.remove sessionId: existingSession._id
         sessionListCollection.remove existingSession._id
       addSession {}
