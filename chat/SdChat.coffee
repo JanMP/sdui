@@ -168,7 +168,8 @@ export SdChat = ({dataOptions, className = "", customComponents = {}}) ->
               {<span>{t "sdui:sessionsPerDayLimitReached", "(max Chats/Tag erreicht)"}</span> if noMoreSessionsToday}
             </div>
         }
-        {<div className="p-2 bg-red-500">
+        <div className="p-2 text-sm"><span className="text-bold">Noch übrig: </span>{currentLimits?.messagesPerDayLeft} Msgs/Tag, {currentLimits?.messagesPerSessionLeft} Msgs/Chat, {currentLimits?.sessionsPerDayLeft} Chats/Tag</div>
+        {<div className="p-2">
           <pre>{JSON.stringify currentLimits, null, 2}</pre>
         </div> if false}
         <div className="h-1rem flex-grow-1 flex-shrink-1 overflow-y-scroll" ref={scrollAreaRef}>
