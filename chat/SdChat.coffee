@@ -28,6 +28,8 @@ export SdChat = ({dataOptions, className = "", customComponents = {}}) ->
 
   {bots, sourceName, sessionListDataOptions, isSingleSessionChat, metaDataCollection} = dataOptions
 
+  console.log 'dataOptions', dataOptions
+
   [inputValue, setInputValue] = useState ''
   [sessionId, setSessionId] = useState null
 
@@ -43,7 +45,7 @@ export SdChat = ({dataOptions, className = "", customComponents = {}}) ->
     (dataOptions?.sessionListDataOptions?.rowsCollection?.findOne sessionId) ? {}
 
   currentLimits = useTracker ->
-    dataOptions?.usageLimitsCollection?.findOne {sessionId}
+    dataOptions?.usageLimitCollection?.findOne()
 
   getInitialSession = ->
     meteorApply

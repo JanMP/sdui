@@ -39,6 +39,7 @@ export createChatMethods = ({
     messagesByUserToday =
       logCollection?.find
         userId: Meteor.userId()
+        'message.role': 'user'
         createdAt:
           $gte: new Date(new Date().setHours(0,0,0,0))
       .count()
@@ -64,6 +65,7 @@ export createChatMethods = ({
       logCollection?.find
         userId: Meteor.userId()
         sessionId: sessionId
+        'message.role': 'user'
       .count()
     messagesPerSession >= limit
 
@@ -158,7 +160,7 @@ export createChatMethods = ({
     run: ->
       return unless Meteor.isServer
       currentUserMustBeInRole addSessionRole
-      if (existingSession = sessionListCollection?.findOne {userIds: [Meteor.userId()]}, sort: createdAt: 1)?
+      if (existingSession = sessionListCollection?.findOne {userIds: [Meteor.userId()]}, sort: createdAt: -1)?
         return existingSession._id
       addSession {}
 
@@ -168,7 +170,7 @@ export createChatMethods = ({
     run: ->
       currentUserMustBeInRole viewChatRole
       return unless Meteor.isServer
-      if (existingSession = sessionListCollection?.findOne {userIds: [Meteor.userId()]}, sort: createdAt: 1)?
+      if (existingSession = sessionListCollection?.findOne {userIds: [Meteor.userId()]}, sort: createdAt: -1)?
         metaDataCollection.remove sessionId: existingSession._id
         sessionListCollection.remove existingSession._id
       addSession {}
