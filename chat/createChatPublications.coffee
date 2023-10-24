@@ -62,43 +62,52 @@ export createChatPublications = ({
       maxMessagesPerSession = limits?.maxMessagesPerSession ? 20
       maxMessageLength = limits?.maxMessageLength ? 1000
 
-      ReactiveAggregate this, logCollection,
-        [
-          $match:
-            userId: @userId
-            createdAt:
-              $gte: new Date(new Date().setHours(0,0,0,0))
-        ,
-          $group:
-            _id: null
-            numberOfMessagesToday:
-              $sum:
-                $cond:
-                  if: {$eq: ['$message.role', 'user']}
-                  then: 1
-                  else: 0
-            numberOfMessagesThisSession:
-              $sum:
-                $cond:
-                  if: {$eq: ['$sessionId', sessionId]}
-                  then:
-                    $cond:
-                      if: {$eq: ['$message.role', 'user']}
-                      then: 1
-                      else: 0
-                  else: 0
-            sessionsToday: $addToSet: '$sessionId'
-        ,
-          $addFields:
-            numberOfSessionsToday: {$size: '$sessionsToday'}
-        ,
-          $addFields:
-            _id: sessionId
-            maxMessageLength: maxMessageLength
-            messagesPerDayLeft: {$subtract: [maxMessagesPerDay, '$numberOfMessagesToday']}
-            sessionsPerDayLeft: {$subtract: [maxSessionsPerDay, '$numberOfSessionsToday']}
-            messagesPerSessionLeft: {$subtract: [maxMessagesPerSession, '$numberOfMessagesThisSession']}
-        ]
-        clientCollection: "#{sourceName}.usageLimits"
-        debounceDelay: 200
-        observers: []
+      unless logCollection.findOne userId: @userId
+        @added "#{sourceName}.usageLimits", @userId, {
+          _id: @userId
+          sessionId, maxMessageLength, maxMessagesPerDay, maxSessionsPerDay, maxMessagesPerSession
+          numberOfMessagesToday: 0
+          numberOfMessagesThisSession: 0
+          messagesPerDayLeft: maxMessagesPerDay
+          sessionsPerDayLeft: maxSessionsPerDay
+          messagesPerSessionLeft: maxMessagesPerSession
+        }
+      else
+        ReactiveAggregate this, logCollection,
+          [
+            $match:
+              userId: @userId
+              'message.role': 'user'
+          ,
+            $group:
+              _id: null
+              numberOfMessagesToday:
+                $sum:
+                  $cond:
+                    if: $gte: ['$createdAt', new Date(new Date().setHours(0,0,0,0))]
+                    then: 1
+                    else: 0
+              numberOfMessagesThisSession:
+                $sum:
+                  $cond:
+                    if: $eq: ['$sessionId', sessionId]
+                    then: 1
+                    else: 0
+              sessionsToday: $addToSet: '$sessionId'
+          ,
+            $addFields:
+              numberOfSessionsToday: {$size: '$sessionsToday'}
+          ,
+            $addFields:
+              _id: sessionId ? @userId
+              sessionId: sessionId
+              maxMessageLength: maxMessageLength
+              maxMessagesPerDay: maxMessagesPerDay
+              maxSessionsPerDay: maxSessionsPerDay
+              messagesPerDayLeft: {$subtract: [maxMessagesPerDay, '$numberOfMessagesToday']}
+              sessionsPerDayLeft: {$subtract: [maxSessionsPerDay, '$numberOfSessionsToday']}
+              messagesPerSessionLeft: {$subtract: [maxMessagesPerSession, '$numberOfMessagesThisSession']}
+          ],
+          clientCollection: "#{sourceName}.usageLimits"
+          debounceDelay: 200
+          observers: []
