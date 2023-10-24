@@ -79,6 +79,7 @@ export createDefaultPipeline = ({getPreSelectPipeline, getProcessorPipeline, lis
       getProcessorPipeline({pub})...,
       getQueryEditorPipeline({queryUiObject})...
       (searchPipeline {search})...,
+      projectStage, # This is super important. Dont delete it by mistake again...
      {$sort: sort}, {$skip: skip}, {$limit: limit}
     ]
 
