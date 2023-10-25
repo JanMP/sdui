@@ -1,10 +1,9 @@
 import {Meteor} from 'meteor/meteor'
 import React, {useState, useEffect, useRef} from 'react'
+import {useTracker, useSubscribe} from 'meteor/react-meteor-data'
 import {meteorApply, ActionButton} from 'meteor/janmp:sdui'
-import {Fill, Bottom} from 'react-spaces'
 import {InputText} from 'primereact/inputtext'
 import {ScrollPanel} from 'primereact/scrollpanel'
-import {useTracker, useSubscribe} from 'meteor/react-meteor-data'
 import {DefaultMessage} from './DefaultMessage.coffee'
 import {SdList} from '../tables/SdList'
 import {SessionListItemContent} from './SessionListItemContent'
@@ -12,29 +11,45 @@ import {DefaultListItem} from '../tables/DefaultListItem'
 import {Toast} from 'primereact/toast'
 import {DefaultMetaDataDisplay} from './DefaultMetaDataDisplay.coffee'
 import {SessionListHeader} from './SessionListHeader.coffee'
+import {Tooltip} from 'primereact/tooltip'
 import {useTranslation} from 'react-i18next'
 
 DefaultSessionListItem  = ({sessionId}) ->
   (args) ->  <DefaultListItem {{args..., ListItemContent: SessionListItemContent, selectedRowId: sessionId}...} />
 
+defaultProcessMessageText = ({text, metaData, addLinkedMetaData}) ->
+  text?.replace /\[\[(.+?)\]\]/g, (match, title) ->
+    metaDataItem = metaData?.find((m) -> m.data?.title is title)
+    url = metaDataItem?.data.url
+    id = metaDataItem?._id
+    if url?
+      addLinkedMetaData id
+      "<a class='shortlink' id='#{id}' href='#{url}' target='_blank'>#{title}</a>"
+    else
+      "<span class='text-500' id='#{id}'>#{title}</span>"
 
-export SdChat = ({dataOptions, className = "", customComponents = {}}) ->
+
+export SdChat = ({dataOptions, className = "", customComponents = {}, processMessageText}) ->
 
   {SessionListItem, Message, MetaDataDisplay} = customComponents
   SessionListItem ?= DefaultSessionListItem
   Message ?= DefaultMessage
   MetaDataDisplay ?= DefaultMetaDataDisplay
-
+  
+  processMessageText ?= defaultProcessMessageText
 
   {bots, sourceName, sessionListDataOptions, isSingleSessionChat, metaDataCollection} = dataOptions
 
-  console.log 'dataOptions', dataOptions
 
   [inputValue, setInputValue] = useState ''
   [sessionId, setSessionId] = useState null
 
   scrollAreaRef = useRef null
   toast = useRef null
+
+  linkedMetaData = useRef new Set()
+  addLinkedMetaData = (id) -> linkedMetaData.current.add id
+  
   {t} = useTranslation()
 
   messagesAreLoading = useSubscribe "#{sourceName}.messages", {sessionId}
@@ -81,7 +96,8 @@ export SdChat = ({dataOptions, className = "", customComponents = {}}) ->
             username: Meteor.user()?.username
             email: Meteor.user()?.emails?[0]?.address
         user ?= session.users.find (user) -> user.userId is message.userId
-        {message..., username: user?.username, email: user?.email, customImage: user?.customImage}
+        text = processMessageText {text: message.text, metaData, addLinkedMetaData}
+        {message..., text,  username: user?.username, email: user?.email, customImage: user?.customImage}
 
   useEffect ->
     scrollAreaRef?.current?.querySelector(':scope > :last-child')?.scrollIntoView block: 'end'
@@ -179,10 +195,12 @@ export SdChat = ({dataOptions, className = "", customComponents = {}}) ->
             messages.map (message) ->
               <Message
                 key={message._id}
-                message={message}/>
+                message={message}
+                metaData={metaData}
+              />
           }
         </div>
-        <MetaDataDisplay metaData={metaData}/>
+        <MetaDataDisplay metaData={metaData} linkedItems={linkedMetaData.current}/>
         <form onSubmit={addMessage} className="p-card p-4">
           <div className="p-inputgroup flex ">
             <InputText

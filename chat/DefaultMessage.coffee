@@ -8,7 +8,6 @@ export DefaultMessage = ({message}) ->
 
   {_id, userId, text, username, email, chatRole, customImage} = message
 
-
   gravatarPt =
     root:
       className: 'flex-shrink-0'
