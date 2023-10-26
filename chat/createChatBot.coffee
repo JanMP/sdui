@@ -161,7 +161,7 @@ export createChatBot = ({
     - and workInProgress to 'false
     @param {Object} options
     @param {String} options.messageId
-    @returns {String} the id of the 
+    @returns {String} the id of the Message
     ###
   finalizeMessageStub = ({messageId}) ->
     chatCollection.update messageId,
