@@ -100,7 +100,8 @@ export SdChat = ({dataOptions, className = "", customComponents = {}, processMes
         {message..., text,  username: user?.username, email: user?.email, customImage: user?.customImage}
 
   useEffect ->
-    scrollAreaRef?.current?.querySelector(':scope > :last-child')?.scrollIntoView block: 'end'
+    # console.log 'scrolling to bottom', messages?[-1..]?[0]?.workInProgress
+    scrollAreaRef?.current?.querySelector(':scope > :last-child')?.scrollIntoView behavior: 'smooth', block: 'end'
   , [messages]
 
   handleError = (error) ->
