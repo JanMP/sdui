@@ -76,6 +76,7 @@ export createChatBot = ({
             $set:
               text: text
               createdAt: new Date()
+              workInProgress: true
         if done
           Meteor.clearInterval interval
           resolve
