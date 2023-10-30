@@ -56,9 +56,8 @@ emailSchemaBridge = new SimpleSchemaBridge emailSchema
 
 SignInForm = ->
   login = ({email, password}) ->
-    console.log 'login', {email, password}
+    # console.log 'login', {email, password}
     Meteor.loginWithPassword email, password, (error) ->
-      console.log 'login callback'
       if error
         alert 'Login fehlgeschlagen: ' + error
  
@@ -71,7 +70,6 @@ SignInForm = ->
 
 SignUpForm = ->
   signup = (model) ->
-    console.log 'wtf'
     Accounts.createUser model, (error) ->
       if error
         alert 'User Account konnte nicht angelegt werden: ' + error?.message
