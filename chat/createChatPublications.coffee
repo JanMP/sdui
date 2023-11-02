@@ -93,7 +93,12 @@ export createChatPublications = ({
                     if: $eq: ['$sessionId', sessionId]
                     then: 1
                     else: 0
-              sessionsToday: $addToSet: '$sessionId'
+              sessionsToday:
+                $addToSet:
+                  $cond:
+                    if: $gte: ['$createdAt', new Date(new Date().setHours(0,0,0,0))]
+                    then: '$sessionId'
+                    else: null
           ,
             $addFields:
               numberOfSessionsToday: {$size: '$sessionsToday'}
