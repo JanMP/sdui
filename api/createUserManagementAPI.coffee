@@ -37,18 +37,18 @@ export createUserManagementAPI = ({sourceName, path, userRole, adminRole, apiKey
       res.writeHead 500
       res.end error.message
 
-  # WebApp.connectHandlers.use "#{path}/remove", (req, res, next) ->
-  #   return unless checkAuth req, res
-  #   [username] = req.url.split('/').splice(1)
-  #   try
-  #     user = Meteor.users.findOne {username}
-  #     Roles.removeUsersFromRoles user._id, userRole.role, userRole.scope
-  #     result = Meteor.users.remove user._id
-  #     res.writeHead 200
-  #     res.end JSON.stringify result
-  #   catch error
-  #     res.writeHead 500
-  #     res.end error.message
+  WebApp.connectHandlers.use "#{path}/remove", (req, res, next) ->
+    return unless checkAuth req, res
+    [username] = req.url.split('/').splice(1)
+    try
+      user = Meteor.users.findOne {username}
+      Roles.removeUsersFromRoles user._id, userRole.role, userRole.scope
+      result = Meteor.users.remove user._id
+      res.writeHead 200
+      res.end JSON.stringify result
+    catch error
+      res.writeHead 500
+      res.end error.message
 
 
   new ValidatedMethod
@@ -71,19 +71,19 @@ export createUserManagementAPI = ({sourceName, path, userRole, adminRole, apiKey
       Roles.addUsersToRoles id, userRole.role, userRole.scope
       {id, username, password}
 
-  # new ValidatedMethod
-  #   name: "#{sourceName}.removeUser"
-  #   validate:
-  #     new SimpleSchema
-  #       username:
-  #         type: String
-  #     .validator()
-  #   run: ({username}) ->
-  #     currentUserMustBeInRole adminRole
-  #     return unless Meteor.isServer
-  #     user = Meteor.users.findOne {username}
-  #     userMustBeInRole user, userRole
-  #     unless user
-  #       throw new Meteor.Error 'user-not-found', "user #{username} not found"
-  #     Roles .removeUsersFromRoles user._id, userRole.role, userRole.scope
-  #     Meteor.users.remove user._id
+  new ValidatedMethod
+    name: "#{sourceName}.removeUser"
+    validate:
+      new SimpleSchema
+        username:
+          type: String
+      .validator()
+    run: ({username}) ->
+      currentUserMustBeInRole adminRole
+      return unless Meteor.isServer
+      user = Meteor.users.findOne {username}
+      userMustBeInRole user, userRole
+      unless user
+        throw new Meteor.Error 'user-not-found', "user #{username} not found"
+      Roles .removeUsersFromRoles user._id, userRole.role, userRole.scope
+      Meteor.users.remove user._id
