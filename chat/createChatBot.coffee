@@ -88,7 +88,7 @@ export createChatBot = ({
               model: model
               prompt: 0
               completion: 0
-      , 200
+      , 700
 
   ###*
     Build the context for the chatbot call
@@ -99,7 +99,7 @@ export createChatBot = ({
     @example
       chatBot.buildContext
         sessionId: '123'
-        additionalMessages: [{content: 'Talk like a Pirate!' Harrr!', role: 'system'}]
+        additionalMessages: [{content: 'Talk like a Pirate! Harrr!', role: 'system'}]
         initialLimit: 20
     ###
   buildContext =  ({sessionId, additionalMessages = []}, initialLimit = 20) ->
@@ -113,6 +113,7 @@ export createChatBot = ({
         .fetch()
         .reverse()
         .map (message) ->
+          # console.log 'message', message
           role: message.chatRole
           content:
             message.text
@@ -210,16 +211,18 @@ export createChatBot = ({
       if options.stream
         handleStream response
       else
-        response?.data?.choices?[0]?.message
-    .then (response) ->
+        # console.log 'response.data', response?.data
+        response?.data
+    .then (data) ->
+      message = data?.choices?[0]?.message
       if logCollection and Meteor.isServer
-        prompt_tokens = countTokens messages
-        completion_tokens = countTokens [response.message]
+        prompt_tokens = data.usage.prompt_tokens ? 0 # countTokens messages
+        completion_tokens = data.usage.completion_tokens ? 0 # countTokens [data.message]
         logCollection.insert {
           model
           messageId
           sessionId
-          message: response.message
+          message
           createdAt: new Date()
           usage:
             model: model
@@ -227,11 +230,11 @@ export createChatBot = ({
             completion_tokens: completion_tokens
           logData...
         }
-      updateMessageStub {messageId, text: response.message.content}
+      updateMessageStub {messageId, text: message?.content}
       finalizeMessageStub {messageId}
-      if (fc = response.message.function_call)?.name
-        # console.log 'function_call', fc
-        (functions.find (f) -> f.name is fc.name)?.run fc.arguments
+      if (fc = message?.function_call)?.name
+        console.log 'function_call', fc
+        (functions.find (f) -> f.name is fc.name)?.run JSON.parse fc.arguments
         .then (result) ->
           if logCollection and Meteor.isServer
             logCollection.insert {
@@ -248,8 +251,23 @@ export createChatBot = ({
                 completion_tokens: 0
               logData...
             }
-
           messagesWithResult = [messages..., {content: result, role: 'system'}]
           call {sessionId, message: null, messageId, messages: messagesWithResult, logData}
+        .catch (error) ->
+          logCollection.insert {
+            model
+            messageId
+            sessionId
+            message:
+              content: error.message
+              role: 'system'
+            createdAt: new Date()
+            usage:
+              model: model
+              prompt_tokens: 0
+              completion_tokens: 0
+            logData...
+          }
+          throw new Meteor.Error error.message
 
   {call, createMessageStub, updateMessageStub, finalizeMessageStub, buildContext}
