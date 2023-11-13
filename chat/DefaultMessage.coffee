@@ -10,7 +10,8 @@ export DefaultMessage = ({message}) ->
 
   {_id, userId, text, username, email, chatRole, customImage} = message
 
-  {toPDF, targetRef} = usePDF filename: "Nachricht_von_Cooky.pdf"
+  # TODO: make configurable
+  {toPDF, targetRef} = usePDF filename: "Nachricht_von_CooKi.pdf"
 
   gravatarPt =
     root:
