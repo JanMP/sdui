@@ -7,8 +7,8 @@ export DefaultMetaDataDisplay = ({metaData, linkedItems}) ->
 
   onClickFor = (item) ->
     ->
-      #console.log item.data
-      window.open item.data.url
+      console.log item.data
+      window.open item.data.url, '_blank'
 
   <div className="overflow-x-scroll">
     <div className="w-1rem h-8rem flex gap-2">
