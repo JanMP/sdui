@@ -34,61 +34,64 @@ export createChatBot = ({
 
   model ?= 'gpt-3.5-turbo'
   system ?= "Du bist ein freundlicher, hilfreicher Chatbot"
-  openAi = setupOpenAIApi()
+  openAI = setupOpenAIApi()
   replyMessageId = null
 
   handleStream = (reply) ->
     done = false
-    text = ''
-    oldText = ''
-    deltas = []
-    function_call =
-      name: null
-      arguments: ''
+    content = ''
+    oldContent = ''
+    finishReason = null
+    objectFromDeltas = {}
+
+    addDelta = ({objectFromDeltas, delta}) ->
+      for key of delta
+        objectFromDeltas[key] =
+          if delta[key] is null then null
+          else if typeof delta[key] is 'string'
+            (objectFromDeltas?[key] ? '') + delta[key]
+          else if typeof delta[key] is 'object'
+            addDelta {objectFromDeltas: (objectFromDeltas?[key] ? {}), delta: delta[key]}
+      objectFromDeltas
+
+    updateContent = ->
+      if oldContent isnt content
+        oldContent = content
+        chatCollection.update replyMessageId,
+          $set:
+            text: content
+            createdAt: new Date()
+            workInProgress: true
     
-    reply?.data?.on 'data', Meteor.bindEnvironment (chunk) ->
-      chunk.toString()
-      .split '\n'
-      .filter (line) -> line.trim() isnt ''
-      .forEach (line) ->
-        line = line.replace?(/^data: /, '') ? line
-        if line is '[DONE]' or typeof line isnt 'string'
+    interval = Meteor.setInterval updateContent, 700
+
+    for await chunk from reply
+      try
+        delta = chunk?.choices?[0]?.delta
+        finishReason = chunk?.choices?[0]?.finish_reason
+        objectFromDeltas = addDelta {objectFromDeltas, delta}
+        content = objectFromDeltas.content
+        if finishReason
           done = true
-          return
-        try
-          response = JSON.parse line
-          dContent = response?.choices?[0]?.delta?.content ? ''
-          text += dContent
-          deltas.push dContent
-          # unless response?.choices?
-          #   console.log 'response:', response
-          if (name = response?.choices?[0]?.delta?.function_call?.name)?
-            function_call.name = name
-          if (args = response?.choices?[0]?.delta?.function_call?.arguments)?
-            function_call.arguments += args
+          unless finishReason in ['stop','function_call']
+            throw new Meteor.Error "handleStream: finish_reason #{finishReason}"
+      catch error
+        done = true
+        throw new Meteor.Error "handleStream: #{error.message}"
 
     new Promise (resolve) ->
-      interval = Meteor.setInterval ->
-        # console.log 'interval'
-        if replyMessageId? and oldText isnt text
-          oldText = text
-          chatCollection.update replyMessageId,
-            $set:
-              text: text
-              createdAt: new Date()
-              workInProgress: true
-        if done
-          Meteor.clearInterval interval
-          resolve
-            message:
-              content: text
-              role: 'assistant'
-              function_call: {name: function_call.name, arguments: try JSON.parse function_call.arguments}
-            usage:
-              model: model
-              prompt: 0
-              completion: 0
-      , 700
+      if done
+        updateContent()
+        Meteor.clearInterval interval
+        resolve
+          message:
+            content: content
+            role: 'assistant'
+            function_call: {name: objectFromDeltas.function_call?.name, arguments: try JSON.parse objectFromDeltas.function_call?.arguments}
+          usage:
+            model: model
+            prompt: 0
+            completion: 0
 
   ###*
     Build the context for the chatbot call
@@ -115,9 +118,7 @@ export createChatBot = ({
         .map (message) ->
           # console.log 'message', message
           role: message.chatRole
-          content:
-            message.text
-            .replace /\[\/\/\]: # \(hide from llm start\)[\s\S]*?\[\/\/\]: # \(hide from llm end\)/g, ''
+          content: message.text
       messages = [{content: system, role: 'system'}, history..., additionalMessages...]
       if tokenizer.isWithinTokenLimit messages, contextTokenLimit
         # console.log 'buildHistory: tokenLimit not reached'
@@ -205,19 +206,23 @@ export createChatBot = ({
 
     functions = getFunctions({sessionId, messageId})
     functionParams = functions.map (f) -> omit f, 'run'
-    openAi.createChatCompletion {model, messages, options..., functions: functionParams, function_call: functionCall},
+    openAI.chat.completions.create {
+      model, messages, options...,
+      functions: functionParams, function_call: functionCall},
       {responseType: if options?.stream then 'stream'}
     .then (response) ->
       if options.stream
         handleStream response
       else
         # console.log 'response.data', response?.data
-        response?.data
-    .then (data) ->
-      message = data?.choices?[0]?.message
+        message: response.choices[0].message
+        usage: response.usage
+    .then (response) ->
+      # console.log 'response', response
+      message = response.message
       if logCollection and Meteor.isServer
-        prompt_tokens = data.usage.prompt_tokens ? 0 # countTokens messages
-        completion_tokens = data.usage.completion_tokens ? 0 # countTokens [data.message]
+        prompt_tokens = response?.usage.prompt_tokens ? 0 # countTokens messages
+        completion_tokens = response?.usage.completion_tokens ? 0 # countTokens [data.message]
         logCollection.insert {
           model
           messageId
@@ -234,7 +239,7 @@ export createChatBot = ({
       finalizeMessageStub {messageId}
       if (fc = message?.function_call)?.name
         console.log 'function_call', fc
-        (functions.find (f) -> f.name is fc.name)?.run JSON.parse fc.arguments
+        (functions.find (f) -> f.name is fc.name)?.run fc.arguments
         .then (result) ->
           if logCollection and Meteor.isServer
             logCollection.insert {

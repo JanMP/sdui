@@ -1,7 +1,7 @@
-import {Configuration, OpenAIApi} from 'openai'
+import {Meteor} from 'meteor/meteor'
+import {OpenAI} from 'openai'
 
 export setupOpenAIApi = ->
-  unless (openaiSettings = Meteor.settings.openai)?
+  unless (openAISettings = Meteor.settings.openai)?
     throw new Meteor.Error 'no openai configuration in settings json'
-  configuration = new Configuration openaiSettings
-  new OpenAIApi configuration
+  new OpenAI openAISettings
