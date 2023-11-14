@@ -6,7 +6,7 @@ import merge from 'lodash/merge'
 
 countTokens = (messages) ->
   messages
-  .map (m) -> tokenizer.encode m.content
+  .map (m) -> tokenizer.encode m.content ? ''
   .reduce ((a, b) -> a + b.length), 0
 
 ###*
@@ -221,8 +221,16 @@ export createChatBot = ({
       # console.log 'response', response
       message = response.message
       if logCollection and Meteor.isServer
-        prompt_tokens = response?.usage.prompt_tokens ? 0 # countTokens messages
-        completion_tokens = response?.usage.completion_tokens ? 0 # countTokens [data.message]
+        prompt_tokens =
+          if options?.stream
+            countTokens messages
+          else
+            response?.usage.prompt_tokens ? 0
+        completion_tokens =
+          if options?.stream
+            countTokens [message]
+          else
+            response?.usage.completion_tokens ? 0
         logCollection.insert {
           model
           messageId
