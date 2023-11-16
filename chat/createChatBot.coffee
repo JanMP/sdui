@@ -105,7 +105,7 @@ export createChatBot = ({
         additionalMessages: [{content: 'Talk like a Pirate! Harrr!', role: 'system'}]
         initialLimit: 20
     ###
-  buildContext =  ({sessionId, additionalMessages = []}, initialLimit = 20) ->
+  buildContext =  ({sessionId, additionalMessages = [], initialLimit = 20}) ->
     build = (limit) ->
       if limit < 0
         throw new Meteor.Error 'buildHistory: limit must be >= 0'
@@ -114,18 +114,23 @@ export createChatBot = ({
           sort: {createdAt: -1}
           limit: limit
         .fetch()
+        .filter (message) -> message.text?
         .reverse()
         .map (message) ->
           # console.log 'message', message
           role: message.chatRole
           content: message.text
       messages = [{content: system, role: 'system'}, history..., additionalMessages...]
-      if tokenizer.isWithinTokenLimit messages, contextTokenLimit
-        # console.log 'buildHistory: tokenLimit not reached'
+      try
+        if tokenizer.isWithinTokenLimit messages, contextTokenLimit
+          # console.log 'buildHistory: tokenLimit not reached'
+          messages
+        else
+          console.log 'buildHistory: tokenLimit reached, trying again with limit ', limit - 1
+          build limit - 1
+      catch error
+        console.error "The fucking tokenizer is broken: #{error.message}"
         messages
-      else
-        console.log 'buildHistory: tokenLimit reached, trying again with limit ', limit - 1
-        build limit - 1
 
     build initialLimit
 
@@ -150,7 +155,11 @@ export createChatBot = ({
       workInProgress: true
     replyMessageId
 
-
+  ###*
+    @description
+    - sets createdAt to new Date()
+    - sets text to the new text
+    ###
   updateMessageStub = ({messageId, text}) ->
     chatCollection.update messageId,
       $set:
@@ -170,6 +179,15 @@ export createChatBot = ({
       $set:
         createdAt: new Date()
         workInProgress: false
+
+  createSystemMessage = ({sessionId, text}) ->
+    chatCollection.insert
+      userId: botUserData.id
+      sessionId: sessionId
+      text: text
+      chatRole: 'system'
+      createdAt: new Date()
+      workInProgress: false
 
 
   ###*
@@ -249,23 +267,25 @@ export createChatBot = ({
         console.log 'function_call', fc
         (functions.find (f) -> f.name is fc.name)?.run fc.arguments
         .then (result) ->
-          if logCollection and Meteor.isServer
-            logCollection.insert {
-              model
-              messageId
-              sessionId
-              message:
-                content: result
-                role: 'system'
-              createdAt: new Date()
-              usage:
-                model: model
-                prompt_tokens: 0
-                completion_tokens: 0
-              logData...
-            }
-          messagesWithResult = [messages..., {content: result, role: 'system'}]
-          call {sessionId, message: null, messageId, messages: messagesWithResult, logData}
+          systemMessage =
+            content: result
+            role: 'system'
+          # if logCollection and Meteor.isServer
+          #   logCollection.insert {
+          #     model
+          #     messageId
+          #     sessionId
+          #     message: systemMessage
+          #     createdAt: new Date()
+          #     usage:
+          #       model: model
+          #       prompt_tokens: 0
+          #       completion_tokens: 0
+          #     logData...
+          #   }
+          systemMessageId = createSystemMessage {sessionId, text: result}
+          messagesWithResult = buildContext {sessionId}
+          call {sessionId, message: systemMessage, messageId: messageId, messages: messagesWithResult, logData}
         .catch (error) ->
           logCollection.insert {
             model
