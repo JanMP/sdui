@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react'
 import connectFieldPlus from './connectFieldPlus.coffee'
 
-Thumbs = ({value, onChange}) ->
+export Thumbs = ({value, onChange}) ->
 
   upColor = if value is 'up' then 'green' else 'grey'
   downColor = if value is 'down' then 'red' else 'grey'

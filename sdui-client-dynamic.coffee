@@ -35,6 +35,7 @@ export MarkdownDisplay = suspend lazy -> import('./markdown/MarkdownDisplay.coff
 export ColorPicker = suspend lazy -> import('./forms/ColorPicker.coffee').then (m) -> default: m. ColorPicker
 export ColorPickerField = suspend lazy -> import('./forms/ColorPicker.coffee').then (m) -> default: m.ColorPickerField
 export RatingField = suspend lazy -> import('./forms/RatingField.coffee').then (m) -> default: m.RatingField
+export Thumbs = suspend lazy -> import('./forms/ThumbsField.coffee').then (m) -> default: m.Thumbs
 export ThumbsField = suspend lazy -> import('./forms/ThumbsField.coffee').then (m) -> default: m.ThumbsField
 export ThumbsTableField = suspend lazy -> import('./forms/ThumbsField.coffee').then (m) -> default: m.ThumbsTableField
 export LinkField = suspend lazy -> import('./forms/LinkField.coffee').then (m) -> default: m.LinkField
