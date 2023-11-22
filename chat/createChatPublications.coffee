@@ -57,10 +57,10 @@ export createChatPublications = ({
     @autorun (computation) ->
 
       limits = getUsageLimits()
-      maxMessagesPerDay = limits?.maxMessagesPerDay ? 100
-      maxSessionsPerDay = limits?.maxSessionsPerDay ? 20
-      maxMessagesPerSession = limits?.maxMessagesPerSession ? 20
-      maxMessageLength = limits?.maxMessageLength ? 1000
+      maxMessagesPerDay = limits?.maxMessagesPerDay ? 0
+      maxSessionsPerDay = limits?.maxSessionsPerDay ? 0
+      maxMessagesPerSession = limits?.maxMessagesPerSession ? 0
+      maxMessageLength = limits?.maxMessageLength ? 0
 
       unless logCollection.findOne userId: @userId
         @added "#{sourceName}.usageLimits", @userId, {
