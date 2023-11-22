@@ -38,24 +38,12 @@ export chatMetaDataSchema = new SimpleSchema
     type: Object
     blackbox: true
 
-export minLogSchemaDefinition =
-  userId: String
-  sessionId: String
-  messageId: String
-  createdAt: Date
-  message:
-    type: Object
-  'message.content': String
-  'message.role': String
-
-
 ###*
   @param {Object} options
   @param {String} options.sourceName
   @param {Mongo.Collection} options.collection
   @param {Mongo.Collection} options.sessionListCollection
   @param {Mongo.Collection} [options.metaDataCollection]
-  @param {Mongo.Collection} [options.logCollection]
   @param {Mongo.Collection} [options.usageLimitCollection]
   @param {Boolean} [options.isSingleSessionChat]
   @param {Object} [options.viewChatRole]
@@ -71,7 +59,6 @@ export createChatAPI = ({
   collection
   sessionListCollection
   metaDataCollection
-  logCollection
   usageLimitCollection
   isSingleSessionChat
   viewChatRole, addSessionRole,
@@ -93,7 +80,6 @@ export createChatAPI = ({
     console.warn "[createChatAPI #{sourceName}]:
       no viewChatRole defined, using 'any' instead."
   viewChatRole ?= 'any'
-
   if not addSessionRole? and Meteor.isServer
     console.warn "[createChatAPI #{sourceName}]:
       no addSessionRole defined, using '#{viewChatRole}' instead."
@@ -114,7 +100,6 @@ export createChatAPI = ({
     collection
     sessionListCollection
     metaDataCollection
-    logCollection
     isSingleSessionChat
     viewChatRole
     addSessionRole
@@ -128,7 +113,6 @@ export createChatAPI = ({
     collection
     sessionListCollection
     metaDataCollection
-    logCollection
     isSingleSessionChat
     viewChatRole
     getUsageLimits

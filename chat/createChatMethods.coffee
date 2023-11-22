@@ -12,7 +12,6 @@ import _ from 'lodash'
   @param {Mongo.Collection} options.collection
   @param {Mongo.Collection} options.sessionListCollection
   @param {Mongo.Collection} [options.metaDataCollection]
-  @param {Mongo.Collection} [options.logCollection]
   @param {Boolean} [options.isSingleSessionChat]
   @param {String} [options.viewChatRole]
   @param {String} [options.addSessionRole]
@@ -22,7 +21,7 @@ import _ from 'lodash'
   ###
 export createChatMethods = ({
   sourceName
-  collection, sessionListCollection, metaDataCollection, logCollection
+  collection, sessionListCollection, metaDataCollection
   isSingleSessionChat,
   viewChatRole, addSessionRole,
   reactToNewMessage, onNewSession
@@ -33,45 +32,45 @@ export createChatMethods = ({
   onNewSession ?= ({sessionId}) -> console.log 'onNewSession', {sessionId}
 
 
-  messagesPerDayLimitReached =  ->
-    return false unless logCollection? and getUsageLimits?()?.maxMessagesPerDay?
-    limit = getUsageLimits().maxMessagesPerDay
-    messagesByUserToday =
-      logCollection?.find
-        userId: Meteor.userId()
-        'message.role': 'user'
-        createdAt:
-          $gte: new Date(new Date().setHours(0,0,0,0))
-      .count()
-    messagesByUserToday >= limit
+  messagesPerDayLimitReached =  -> false
+    # return false unless logCollection? and getUsageLimits?()?.maxMessagesPerDay?
+    # limit = getUsageLimits().maxMessagesPerDay
+    # messagesByUserToday =
+    #   logCollection?.find
+    #     userId: Meteor.userId()
+    #     'message.role': 'user'
+    #     createdAt:
+    #       $gte: new Date(new Date().setHours(0,0,0,0))
+    #   .count()
+    # messagesByUserToday >= limit
 
-  sessionsPerDayLimitReached =  ->
-    return false unless logCollection? and getUsageLimits?()?.maxSessionsPerDay?
-    limit = getUsageLimits().maxSessionsPerDay
-    sessionsByUserToday =
-      _(
-        logCollection?.find
-          userId: Meteor.userId()
-          createdAt:
-            $gte: new Date(new Date().setHours(0,0,0,0))
-        .map (logEntry) -> logEntry.sessionId
-      ).uniq().value().length
-    sessionsByUserToday >= limit
+  sessionsPerDayLimitReached =  -> false
+    # return false unless logCollection? and getUsageLimits?()?.maxSessionsPerDay?
+    # limit = getUsageLimits().maxSessionsPerDay
+    # sessionsByUserToday =
+    #   _(
+    #     logCollection?.find
+    #       userId: Meteor.userId()
+    #       createdAt:
+    #         $gte: new Date(new Date().setHours(0,0,0,0))
+    #     .map (logEntry) -> logEntry.sessionId
+    #   ).uniq().value().length
+    # sessionsByUserToday >= limit
 
-  messagesPerSessionLimitReached = ({sessionId}) ->
-    return false unless logCollection? and getUsageLimits?()?.maxMessagesPerSession?
-    limit = getUsageLimits().maxMessagesPerSession
-    messagesPerSession =
-      logCollection?.find
-        userId: Meteor.userId()
-        sessionId: sessionId
-        'message.role': 'user'
-      .count()
-    messagesPerSession >= limit
+  messagesPerSessionLimitReached = ({sessionId}) -> false
+    # return false unless logCollection? and getUsageLimits?()?.maxMessagesPerSession?
+    # limit = getUsageLimits().maxMessagesPerSession
+    # messagesPerSession =
+    #   logCollection?.find
+    #     userId: Meteor.userId()
+    #     sessionId: sessionId
+    #     'message.role': 'user'
+    #   .count()
+    # messagesPerSession >= limit
 
-  textTooLong = ({text}) ->
-    return false unless getUsageLimits()?.maxMessageLength?
-    text.length > getUsageLimits().maxMessageLength
+  textTooLong = ({text}) -> false
+    # return false unless getUsageLimits()?.maxMessageLength?
+    # text.length > getUsageLimits().maxMessageLength
   
   addSession = ({title, userIds}) ->
     if sessionsPerDayLimitReached()
@@ -137,6 +136,14 @@ export createChatMethods = ({
       .validator()
     run: addSession
 
+  archiveSessionData = ({sessionId}) ->
+    if (existingSession = sessionListCollection?.findOne sessionId)?
+      metaDataCollection.update {sessionId},
+        $set:
+          archived: true
+      sessionListCollection.update {sessionId},
+        $set:
+          archived: true
 
   new ValidatedMethod
     name: "#{sourceName}.deleteSession"
@@ -148,8 +155,7 @@ export createChatMethods = ({
     run: ({id}) ->
       currentUserMustBeInRole addSessionRole
       return unless Meteor.isServer
-      collection.remove sessionId: id
-      metaDataCollection.remove sessionId: id
+      archiveSessionData {sessionId: id}
       sessionListCollection.remove id
   
   # we look for any session for this user and return the id, so we can select it in the UI
@@ -171,6 +177,5 @@ export createChatMethods = ({
       currentUserMustBeInRole viewChatRole
       return unless Meteor.isServer
       if (existingSession = sessionListCollection?.findOne {userIds: [Meteor.userId()]}, sort: createdAt: -1)?
-        metaDataCollection.remove sessionId: existingSession._id
-        sessionListCollection.remove existingSession._id
+        archiveSessionData {sessionId: existingSession._id}
       addSession {}
