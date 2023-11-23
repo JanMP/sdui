@@ -19,7 +19,7 @@ export {default as connectFieldPlus} from './forms/connectFieldPlus.coffee'
 
 export {createTableDataAPI} from './api/createTableDataAPI.coffee'
 export {createUserTableAPI} from './usertable/createUserTableAPI.coffee'
-export {createChatAPI} from './chat/createChatAPI.coffee'
+export {createChatAPI, chatSchema} from './chat/createChatAPI.coffee'
 export {regExpMessages_de, de, setDefaultValidationMessages} from './api/validationMessages.coffee'
 # export {createFilesAPI, filesAPISourceSchema} from './api/createFilesAPI.coffee'
 

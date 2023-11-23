@@ -20,6 +20,7 @@ countTokens = (messages) ->
   @param {Function} [options.getFunctions] - a function that returns an array of functions that can be called by the bot
   @param {String} [options.functionCall] - the function call mode, can be 'auto', 'none' or 'manual'
   @param {Number} [options.contextTokenLimit=8191 - 2000] - the token limit for the context
+  @param {String} [options.version] - the version of the chatbot, for logging
   ###
 export createChatBot = ({
   model, system, options = {},
@@ -128,7 +129,7 @@ export createChatBot = ({
           console.log 'buildHistory: tokenLimit reached, trying again with limit ', limit - 1
           build limit - 1
       catch error
-        console.error "The fucking tokenizer is broken: #{error.message}"
+        console.error "The tokenizer is broken: #{error.message}"
         messages
 
     build initialLimit
@@ -196,30 +197,12 @@ export createChatBot = ({
     @param {Object} options.message
     @param {String} [options.messageId] - the id of the message stub
     @param {Array} options.messages
-    @param {Object} options.logData
     @example
       chatBot.call
         sessionId: '123'
         messages: [{content: 'Hallo', role: 'user'}]
-        logData:
-          bot: 'chatBot'
-          version: '1.0.0'
     ###
-  call = ({sessionId, message, messageId, messages, logData}) ->
-
-    # if logCollection and Meteor.isServer and message?
-    #   logCollection.insert {
-    #     model
-    #     messageId
-    #     sessionId
-    #     message
-    #     createdAt: new Date()
-    #     usage:
-    #       model: model
-    #       prompt_tokens: 0
-    #       completion_tokens: 0
-    #     logData...
-    #   }
+  call = ({sessionId, message, messageId, messages}) ->
 
     functions = getFunctions({sessionId, messageId})
     functionParams = functions.map (f) -> omit f, 'run'
@@ -237,29 +220,16 @@ export createChatBot = ({
     .then (response) ->
       # console.log 'response', response
       message = response.message
-      # if logCollection and Meteor.isServer
-      #   prompt_tokens =
-      #     if options?.stream
-      #       countTokens messages
-      #     else
-      #       response?.usage.prompt_tokens ? 0
-      #   completion_tokens =
-      #     if options?.stream
-      #       countTokens [message]
-      #     else
-      #       response?.usage.completion_tokens ? 0
-      #   logCollection.insert {
-      #     model
-      #     messageId
-      #     sessionId
-      #     message
-      #     createdAt: new Date()
-      #     usage:
-      #       model: model
-      #       prompt_tokens: prompt_tokens
-      #       completion_tokens: completion_tokens
-      #     logData...
-      #   }
+      prompt_tokens =
+        if options?.stream
+          countTokens messages
+        else
+          response?.usage.prompt_tokens ? 0
+      completion_tokens =
+        if options?.stream
+          countTokens [message]
+        else
+          response?.usage.completion_tokens ? 0
       updateMessageStub {messageId, text: message?.content}
       finalizeMessageStub {messageId}
       if (fc = message?.function_call)?.name
@@ -269,37 +239,11 @@ export createChatBot = ({
           systemMessage =
             content: result
             role: 'system'
-          # if logCollection and Meteor.isServer
-          #   logCollection.insert {
-          #     model
-          #     messageId
-          #     sessionId
-          #     message: systemMessage
-          #     createdAt: new Date()
-          #     usage:
-          #       model: model
-          #       prompt_tokens: 0
-          #       completion_tokens: 0
-          #     logData...
-          #   }
           systemMessageId = createSystemMessage {sessionId, text: result}
           messagesWithResult = buildContext {sessionId}
-          call {sessionId, message: systemMessage, messageId: messageId, messages: messagesWithResult, logData}
+          call {sessionId, message: systemMessage, messageId: messageId, messages: messagesWithResult}
         .catch (error) ->
-          # logCollection.insert {
-          #   model
-          #   messageId
-          #   sessionId
-          #   message:
-          #     content: error.message
-          #     role: 'system'
-          #   createdAt: new Date()
-          #   usage:
-          #     model: model
-          #     prompt_tokens: 0
-          #     completion_tokens: 0
-          #   logData...
-          # }
+          # TODO: write System Message with error
           throw new Meteor.Error error.message
 
   {call, createMessageStub, updateMessageStub, finalizeMessageStub, buildContext}
