@@ -52,6 +52,8 @@ export chatMetaDataSchema = new SimpleSchema
   @param {Function} [options.reactToNewMessage]
   @param {() => {maxMessagesPerDay?: number, maxSessionsPerDay?: number, maxMessagesPerSession?: number, maxMessageLength?: number} | void} [options.getUsageLimits]
   @param {Function} [options.onNewSession]
+  @param {Number} [options.messagesLimit] - Max Number of Messages displayed in Chat, default: 100
+  @param {Number} [options.timeLimit] - Max Age in ms for a message to be displayed, infinity if undefined
   @returns {Object} dataOptions
   ###
 export createChatAPI = ({
@@ -63,6 +65,8 @@ export createChatAPI = ({
   isSingleSessionChat
   viewChatRole, addSessionRole,
   bots, reactToNewMessage, onNewSession
+  messagesLimit = 100
+  timeLimit
   getUsageLimits = ->
 }) ->
 
@@ -116,6 +120,8 @@ export createChatAPI = ({
     isSingleSessionChat
     viewChatRole
     getUsageLimits
+    messagesLimit
+    timeLimit
   }
 
   {sourceName, collection, sessionListCollection, metaDataCollection, usageLimitCollection, sessionListDataOptions, isSingleSessionChat, bots}
