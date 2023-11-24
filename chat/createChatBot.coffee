@@ -9,7 +9,6 @@ countTokens = (messages) ->
   messages
   .map (m) -> tokenizer.encode m.content ? ''
   .reduce ((a, b) -> a + b.length), 0
-
 ###*
   @param {Object} options
   @param {Mongo.Collection} options.messageCollection
@@ -118,7 +117,7 @@ export createChatBot = ({
       if limit < 0
         throw new Meteor.Error 'buildHistory: limit must be >= 0'
       history =
-        chatCollection.find query,
+        messageCollection.find query,
           sort: {createdAt: -1}
           limit: limit
         .fetch()
