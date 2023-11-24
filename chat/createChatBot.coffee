@@ -97,22 +97,14 @@ export createChatBot = ({
     @param {Object} options
     @param {String} options.sessionId
     @param {Array} [options.additionalMessages=[]]
-    @param {Number} [options.initialLimit=20]
-    @param {Number} [options.timeLimit] - the time limit for the messages
+    @param {Number} [options.initialLimit=15]
     @example
       chatBot.buildContext
         sessionId: '123'
         additionalMessages: [{content: 'Talk like a Pirate! Harrr!', role: 'system'}]
         initialLimit: 20
     ###
-  buildContext =  ({sessionId, additionalMessages = [], initialLimit = 15, timeLimit}) ->
-    query = if timeLimit?
-      sessionId: sessionId
-      workInProgress: {$ne: true}
-      createdAt:
-        $gte: new Date(new Date() - timeLimit)
-    else
-      {sessionId, workInProgress: {$ne: true}}
+  buildContext =  ({sessionId, additionalMessages = [], initialLimit = 15}) ->
     build = (limit) ->
       if limit < 0
         throw new Meteor.Error 'buildHistory: limit must be >= 0'

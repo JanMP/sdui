@@ -20,8 +20,7 @@ export createChatPublications = ({
   isSingleSessionChat,
   viewChatRole
   getUsageLimits
-  messagesLimit
-  timeLimit
+  messagesLimit = 100
 }) ->
 
   return unless Meteor.isServer
@@ -30,19 +29,13 @@ export createChatPublications = ({
     throw new Error 'no collection given'
 
   Meteor.publish "#{sourceName}.messages", ({sessionId}) ->
-    query = if timeLimit?
-      sessionId: sessionId
-      createdAt:
-        $gte: new Date(new Date() - timeLimit)
-    else
-      {sessionId}
     return @ready() unless sessionId?
     # return @ready() unless userWithIdIsInRole id: @userId, role: viewChatRole
     # return @ready() unless isSingleSessionChat or  @userId in (sessionListCollection?.findOne(sessionId)?.userIds ? [])
     @autorun (computation) ->
-      collection.find query,
+      collection.find {sessionId},
         sort: {createdAt: -1}
-        limit: 100
+        limit: messagesLimit
 
   Meteor.publish "#{sourceName}.metaData", ({sessionId}) ->
     return @ready() unless sessionId?
