@@ -11,7 +11,7 @@ import {Tacker} from 'meteor/tracker'
   @param {Mongo.Collection} options.sessionListCollection
   @param {Mongo.Collection} [options.metaDataCollection]
   @param {Mongo.Collection} [options.logCollection]
-  @param {Mongo}
+  @param {Number} [options.messagesLimit]
   @param {Boolean} [options.isSingleSessionChat]
   @param {String} [options.viewChatRole]
   @param {Function} [options.getUsageLimits]
@@ -22,6 +22,7 @@ export createChatPublications = ({
   isSingleSessionChat,
   viewChatRole
   getUsageLimits
+  messagesLimit = 100
 }) ->
 
   return unless Meteor.isServer
@@ -36,7 +37,7 @@ export createChatPublications = ({
     @autorun (computation) ->
       collection.find {sessionId},
         sort: {createdAt: -1}
-        limit: 100
+        limit: messagesLimit
 
   Meteor.publish "#{sourceName}.metaData", ({sessionId}) ->
     return @ready() unless sessionId?

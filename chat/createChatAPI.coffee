@@ -64,6 +64,7 @@ export minLogSchemaDefinition =
   @param {Function} [options.reactToNewMessage]
   @param {() => {maxMessagesPerDay?: number, maxSessionsPerDay?: number, maxMessagesPerSession?: number, maxMessageLength?: number} | void} [options.getUsageLimits]
   @param {Function} [options.onNewSession]
+  @param {Number} [options.messagesLimit] - max number of messages to be published
   @returns {Object} dataOptions
   ###
 export createChatAPI = ({
@@ -76,6 +77,7 @@ export createChatAPI = ({
   isSingleSessionChat
   viewChatRole, addSessionRole,
   bots, reactToNewMessage, onNewSession
+  messagesLimit = 100
   getUsageLimits = ->
 }) ->
 
@@ -132,6 +134,7 @@ export createChatAPI = ({
     isSingleSessionChat
     viewChatRole
     getUsageLimits
+    messagesLimit
   }
 
   {sourceName, collection, sessionListCollection, metaDataCollection, usageLimitCollection, sessionListDataOptions, isSingleSessionChat, bots}
