@@ -13,6 +13,7 @@ import {Tacker} from 'meteor/tracker'
   @param {Boolean} [options.isSingleSessionChat]
   @param {String} [options.viewChatRole]
   @param {Function} [options.getUsageLimits]
+  @param {Number} [options.messagesLimit] - max number of messages to be published
   ###
 export createChatPublications = ({
   sourceName,

@@ -109,7 +109,7 @@ export createChatBot = ({
       if limit < 0
         throw new Meteor.Error 'buildHistory: limit must be >= 0'
       history =
-        messageCollection.find query,
+        messageCollection.find {sessionId, workInProgress: {$ne: true}},
           sort: {createdAt: -1}
           limit: limit
         .fetch()
