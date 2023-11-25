@@ -137,13 +137,16 @@ export createChatMethods = ({
     run: addSession
 
   archiveSessionData = ({sessionId}) ->
-    if (existingSession = sessionListCollection?.findOne sessionId)?
-      metaDataCollection.update {sessionId},
+    if (existingSession = await sessionListCollection?.findOneAsync sessionId)?
+      messageCollection.updateAsync {sessionId},
         $set:
           archived: true
-      sessionListCollection.update {sessionId},
+      , multi: true
+      metaDataCollection.updateAsync {sessionId},
         $set:
           archived: true
+      , multi: true
+      sessionListCollection.removeAsync {_id: sessionId}
 
   new ValidatedMethod
     name: "#{sourceName}.deleteSession"
@@ -156,7 +159,6 @@ export createChatMethods = ({
       currentUserMustBeInRole addSessionRole
       return unless Meteor.isServer
       archiveSessionData {sessionId: id}
-      sessionListCollection.remove id
   
   # we look for any session for this user and return the id, so we can select it in the UI
   # if there is no session yet, we create one
