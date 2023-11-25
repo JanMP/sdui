@@ -16,7 +16,7 @@ export chatSchema = new SimpleSchema
     type: String
   chatRole:
     type: String
-    allowedValues: ['user', 'assistant', 'system']
+    allowedValues: ['user', 'assistant', 'system', 'log']
   usage:
     type: Object
     optional: true
@@ -41,7 +41,7 @@ export chatMetaDataSchema = new SimpleSchema
 ###*
   @param {Object} options
   @param {String} options.sourceName
-  @param {Mongo.Collection} options.collection
+  @param {Mongo.Collection} options.messageCollection
   @param {Mongo.Collection} options.sessionListCollection
   @param {Mongo.Collection} [options.metaDataCollection]
   @param {Mongo.Collection} [options.usageLimitCollection]
@@ -57,7 +57,7 @@ export chatMetaDataSchema = new SimpleSchema
   ###
 export createChatAPI = ({
   sourceName
-  collection
+  messageCollection,
   sessionListCollection
   metaDataCollection
   usageLimitCollection
@@ -73,8 +73,8 @@ export createChatAPI = ({
   unless sourceName?
     throw new Error 'no sourceName given'
   
-  unless collection?
-    throw new Error 'no collection given'
+  unless messageCollection?
+    throw new Error 'no messageCollection given'
   
   unless sessionListCollection? or isSingleSessionChat
     throw new Error 'no sessionListCollection given'
@@ -99,7 +99,7 @@ export createChatAPI = ({
 
   createChatMethods {
     sourceName
-    collection
+    messageCollection
     sessionListCollection
     metaDataCollection
     isSingleSessionChat
@@ -112,7 +112,7 @@ export createChatAPI = ({
 
   createChatPublications {
     sourceName
-    collection
+    messageCollection
     sessionListCollection
     metaDataCollection
     isSingleSessionChat
@@ -121,4 +121,4 @@ export createChatAPI = ({
     messagesLimit
   }
 
-  {sourceName, collection, sessionListCollection, metaDataCollection, usageLimitCollection, sessionListDataOptions, isSingleSessionChat, bots}
+  {sourceName, messageCollection, sessionListCollection, metaDataCollection, usageLimitCollection, sessionListDataOptions, isSingleSessionChat, bots}

@@ -9,7 +9,7 @@ import _ from 'lodash'
 ###*
   @param {Object} options
   @param {String} options.sourceName
-  @param {Mongo.Collection} options.collection
+  @param {Mongo.Collection} options.messageCollection
   @param {Mongo.Collection} options.sessionListCollection
   @param {Mongo.Collection} [options.metaDataCollection]
   @param {Boolean} [options.isSingleSessionChat]
@@ -21,7 +21,7 @@ import _ from 'lodash'
   ###
 export createChatMethods = ({
   sourceName
-  collection, sessionListCollection, metaDataCollection
+  messageCollection, sessionListCollection, metaDataCollection
   isSingleSessionChat,
   viewChatRole, addSessionRole,
   reactToNewMessage, onNewSession
@@ -116,7 +116,7 @@ export createChatMethods = ({
         text: text
         createdAt: new Date()
         chatRole: 'user'
-      messageId = collection.insert newMessage
+      messageId = messageCollection.insert newMessage
       reactToNewMessage {newMessage..., messageId}
       messageId
 
@@ -176,6 +176,6 @@ export createChatMethods = ({
     run: ->
       currentUserMustBeInRole viewChatRole
       return unless Meteor.isServer
-      if (existingSession = sessionListCollection?.findOne {userIds: [Meteor.userId()]}, sort: createdAt: -1)?
+      if (existingSession = await sessionListCollection?.findOneAsync {userIds: [Meteor.userId()]}, sort: createdAt: -1)?
         archiveSessionData {sessionId: existingSession._id}
       addSession {}
