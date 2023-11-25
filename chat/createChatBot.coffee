@@ -9,6 +9,7 @@ countTokens = (messages) ->
   messages
   .map (m) -> tokenizer.encode m.content ? ''
   .reduce ((a, b) -> a + b.length), 0
+
 ###*
   @param {Object} options
   @param {Mongo.Collection} options.messageCollection
