@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react'
+import React from 'react'
 import connectFieldPlus from './connectFieldPlus.coffee'
 
 export Thumbs = ({value, onChange}) ->
