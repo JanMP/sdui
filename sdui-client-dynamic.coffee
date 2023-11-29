@@ -45,7 +45,9 @@ export ManagedForm = suspend lazy -> import('./forms/ManagedForm.coffee').then (
 export FormModal = suspend lazy -> import('./forms/FormModal.coffee').then (m) -> default: m.FormModal
 export LoginForm = suspend lazy -> import('./login-forms/LoginForm.coffee').then (m) -> default: m.LoginForm
 export LoginButton = suspend lazy -> import('./login-forms/LoginButton.coffee').then (m) -> default: m.LoginButton
-
+export FeedbackButton = suspend lazy -> import('./forms/FeedbackButtonField.coffee').then (m) -> default: m.FeedbackButton
+export FeedbackButtonField = suspend lazy -> import('./forms/FeedbackButtonField.coffee').then (m) -> default: m.FeedbackButtonField
+export FeedbackButtonTableField = suspend lazy -> import('./forms/FeedbackButtonField.coffee').then (m) -> default: m.FeedbackButtonTableField
 export QueryEditor = suspend lazy -> import('./query-editor/QueryEditor.coffee').then (m) -> default: m.QueryEditor
 export QueryEditorField = suspend lazy -> import('./query-editor/QueryEditorField.coffee').then (m) -> default: m.QueryEditorField
 export SdDocumentSelect = suspend lazy -> import('./tables/SdDocumentSelect.coffee').then (m) -> default: m.SdDocumentSelect

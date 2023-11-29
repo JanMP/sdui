@@ -5,6 +5,7 @@ import {tokenizer} from 'meteor/janmp:sdui'
 import omit from 'lodash/omit'
 import merge from 'lodash/merge'
 
+
 countTokens = (messages) ->
   messages
   .map (m) -> tokenizer.encode m.content ? ''
@@ -109,8 +110,12 @@ export createChatBot = ({
     build = (limit) ->
       if limit < 0
         throw new Meteor.Error 'buildHistory: limit must be >= 0'
+      query =
+        sessionId: sessionId
+        workInProgress: $ne: true
+        chatRole: $ne: 'log'
       history =
-        messageCollection.find {sessionId, workInProgress: {$ne: true}},
+        messageCollection.find query,
           sort: {createdAt: -1}
           limit: limit
         .fetch()
@@ -172,13 +177,17 @@ export createChatBot = ({
     - and workInProgress to 'false
     @param {Object} options
     @param {String} options.messageId
+    @param {String} options.text
+    @param {Object} options.usage
     @returns {String} the id of the Message
     ###
-  finalizeMessageStub = ({messageId}) ->
+  finalizeMessageStub = ({messageId, text, usage}) ->
     messageCollection.update messageId,
       $set:
         createdAt: new Date()
         workInProgress: false
+        text: text
+        usage: usage
 
   createSystemMessage = ({sessionId, text}) ->
     messageCollection.insert
@@ -189,13 +198,24 @@ export createChatBot = ({
       createdAt: new Date()
       workInProgress: false
 
+  createLogMessage = ({sessionId, text = undefined, functionCall = undefined, error = undefined}) ->
+    messageCollection.insert
+      userId: botUserData.id
+      sessionId: sessionId
+      text: text
+      functionCall: functionCall
+      error: error
+      chatRole: 'log'
+      createdAt: new Date()
+      workInProgress: false
+
 
   ###*
     Call the chatbot handle the response and functioncalls
     @param {Object} options
     @param {String} options.sessionId
     @param {Object} options.message
-    @param {String} [options.messageId] - the id of the message stub
+    @param {String} options.messageId - the id of the message stub
     @param {Array} options.messages
     @example
       chatBot.call
@@ -230,20 +250,24 @@ export createChatBot = ({
           countTokens [message]
         else
           response?.usage.completion_tokens ? 0
-      updateMessageStub {messageId, text: message?.content}
-      finalizeMessageStub {messageId}
+      usage =
+        model: model
+        prompt: prompt_tokens
+        completion: completion_tokens
+      finalizeMessageStub {messageId, text: message?.content, usage}
       if (fc = message?.function_call)?.name
+        createLogMessage {sessionId, functionCall: fc}
         console.log 'function_call', fc
         (functions.find (f) -> f.name is fc.name)?.run fc.arguments
         .then (result) ->
           systemMessage =
             content: result
             role: 'system'
-          systemMessageId = createSystemMessage {sessionId, text: result}
+          createSystemMessage {sessionId, text: result}
           messagesWithResult = buildContext {sessionId}
           call {sessionId, message: systemMessage, messageId: messageId, messages: messagesWithResult}
-        .catch (error) ->
-          # TODO: write System Message with error
-          throw new Meteor.Error error.message
+    .catch (error) ->
+      createLogMessage {sessionId, error: error}
+      throw error
 
   {call, createMessageStub, updateMessageStub, finalizeMessageStub, buildContext}

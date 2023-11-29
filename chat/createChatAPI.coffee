@@ -29,6 +29,16 @@ export chatSchema = new SimpleSchema
   workInProgress:
     type: Boolean
     optional: true
+  feedback:
+    type: Object
+    optional: true
+  'feedback.thumbs':
+    type: String
+    allowedValues: ['up', 'down']
+    optional: true
+  'feedback.comment':
+    type: String
+    optional: true
 
 export chatMetaDataSchema = new SimpleSchema
   sessionId: String

@@ -128,6 +128,15 @@ export SdChat = ({dataOptions, className = "", customComponents = {}, processMes
         sessionId: sessionId
     .catch handleError
 
+  setFeedBackHandlerForMessage = (messageId) -> (feedback) ->
+    console.log 'setFeedBackHandlerForMessage', {messageId, feedback}
+    meteorApply
+      method: "#{sourceName}.setFeedBackForMessage"
+      data:
+        messageId: messageId
+        feedback: feedback
+    .catch handleError
+
   # SessionList hook
   # This is a shortcut to build a single user Chat for Chatbots
   # TODO: build UI to add users to a chat
@@ -198,6 +207,7 @@ export SdChat = ({dataOptions, className = "", customComponents = {}, processMes
                 key={message._id}
                 message={message}
                 metaData={metaData}
+                onChangeFeedback={setFeedBackHandlerForMessage message._id}
               />
           }
         </div>
