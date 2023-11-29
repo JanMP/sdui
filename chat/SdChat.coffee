@@ -219,7 +219,7 @@ export SdChat = ({dataOptions, className = "", customComponents = {}, processMes
               onChange={(e) -> setInputValue e.target.value}
               style={width: '100%'}
               className={if messageIsTooLong then 'p-invalid' else ''}
-              disabled={noMoreMessagesToday}
+              disabled={noMoreMessagesToday or noMoreMessagesThisSession}
             />
             <span className="p-inputgroup-addon">
               <i className="pi pi-send" />
