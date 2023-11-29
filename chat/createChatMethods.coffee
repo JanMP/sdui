@@ -52,7 +52,6 @@ export createChatMethods = ({
             $gte: new Date(new Date().setHours(0,0,0,0))
         .mapAsync (logEntry) -> logEntry.sessionId
       ).uniq().value().length
-    console.log {sessionsByUserToday, limit}
     sessionsByUserToday >= limit
 
   messagesPerSessionLimitReached = ({sessionId}) ->
@@ -63,7 +62,6 @@ export createChatMethods = ({
         sessionId: sessionId
         chatRole: 'user'
       .countAsync()
-    console.log {messagesPerSession, limit}
     messagesPerSession >= limit
 
   textTooLong = ({text}) ->
