@@ -15,5 +15,6 @@ export default connectFieldPlus ({
     disabled={disabled}
     onChange={(e) -> onChange e.target.value}
     value={value}
+    autoResize={true}
     {(filterDOMProps props)...}
   />

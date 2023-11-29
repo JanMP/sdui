@@ -9,7 +9,7 @@ export {
 } from './common/roleChecks.coffee'
 export {createTableDataAPI} from './api/createTableDataAPI.coffee'
 export {createUserTableAPI} from './usertable/createUserTableAPI.coffee'
-export {createChatAPI} from './chat/createChatAPI.coffee'
+export {createChatAPI, chatSchema} from './chat/createChatAPI.coffee'
 export {createChatBot} from './chat/createChatBot.coffee'
 export {createUserManagementAPI} from './api/createUserManagementAPI.coffee'
 export {default as connectFieldPlus} from './forms/connectFieldPlus.coffee'

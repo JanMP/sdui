@@ -84,7 +84,7 @@ export SdChat = ({dataOptions, className = "", customComponents = {}, processMes
 
   messages =
     useTracker ->
-      dataOptions.collection.find {sessionId, chatRole: $ne: 'system'},
+      dataOptions.messageCollection.find {sessionId, chatRole: $ne: 'system'},
         sort: createdAt: -1
         limit: 100
       .fetch()
@@ -126,6 +126,15 @@ export SdChat = ({dataOptions, className = "", customComponents = {}, processMes
       data:
         text: inputValue
         sessionId: sessionId
+    .catch handleError
+
+  setFeedBackHandlerForMessage = (messageId) -> (feedback) ->
+    console.log 'setFeedBackHandlerForMessage', {messageId, feedback}
+    meteorApply
+      method: "#{sourceName}.setFeedBackForMessage"
+      data:
+        messageId: messageId
+        feedback: feedback
     .catch handleError
 
   # SessionList hook
@@ -198,6 +207,7 @@ export SdChat = ({dataOptions, className = "", customComponents = {}, processMes
                 key={message._id}
                 message={message}
                 metaData={metaData}
+                onChangeFeedback={setFeedBackHandlerForMessage message._id}
               />
           }
         </div>
@@ -209,7 +219,7 @@ export SdChat = ({dataOptions, className = "", customComponents = {}, processMes
               onChange={(e) -> setInputValue e.target.value}
               style={width: '100%'}
               className={if messageIsTooLong then 'p-invalid' else ''}
-              disabled={noMoreMessagesToday}
+              disabled={noMoreMessagesToday or noMoreMessagesThisSession}
             />
             <span className="p-inputgroup-addon">
               <i className="pi pi-send" />

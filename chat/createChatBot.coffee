@@ -1,8 +1,10 @@
 import {Meteor} from 'meteor/meteor'
+import {Mongo} from 'meteor/mongo'
 import {setupOpenAIApi} from '../ai/setupOpenAIApi.coffee'
 import {tokenizer} from 'meteor/janmp:sdui'
 import omit from 'lodash/omit'
 import merge from 'lodash/merge'
+
 
 countTokens = (messages) ->
   messages
@@ -11,23 +13,22 @@ countTokens = (messages) ->
 
 ###*
   @param {Object} options
+  @param {Mongo.Collection} options.messageCollection
   @param {String} options.model - the OpenAI model to use
   @param {String} options.system - the system message the bot will ALLWAYS recive as first message
   @param {Object} [options.options={}] - the options for the OpenAI API
-  @param {Object} [options.chatCollection] - the createShatAPI collection
   @param {Object} [options.botUserData] - the user data for the bot
   @param {Function} [options.getFunctions] - a function that returns an array of functions that can be called by the bot
   @param {String} [options.functionCall] - the function call mode, can be 'auto', 'none' or 'manual'
-  @param {Object} [options.logCollection] - the collection to log the chatbot calls
   @param {Number} [options.contextTokenLimit=8191 - 2000] - the token limit for the context
+  @param {String} [options.version] - the version of the chatbot, for logging
   ###
 export createChatBot = ({
   model, system, options = {},
-  chatCollection
+  messageCollection,
   botUserData
   getFunctions = ({sessionId = null}) -> []
   functionCall = 'none'
-  logCollection
   contextTokenLimit = 8191 - 2000
 }) ->
   return unless Meteor.isServer
@@ -57,7 +58,7 @@ export createChatBot = ({
     updateContent = ->
       if oldContent isnt content
         oldContent = content
-        chatCollection.update replyMessageId,
+        messageCollection.update replyMessageId,
           $set:
             text: content
             createdAt: new Date()
@@ -109,8 +110,12 @@ export createChatBot = ({
     build = (limit) ->
       if limit < 0
         throw new Meteor.Error 'buildHistory: limit must be >= 0'
+      query =
+        sessionId: sessionId
+        workInProgress: $ne: true
+        chatRole: $ne: 'log'
       history =
-        chatCollection.find {sessionId, workInProgress: {$ne: true}},
+        messageCollection.find query,
           sort: {createdAt: -1}
           limit: limit
         .fetch()
@@ -129,7 +134,7 @@ export createChatBot = ({
           console.log 'buildHistory: tokenLimit reached, trying again with limit ', limit - 1
           build limit - 1
       catch error
-        console.error "The fucking tokenizer is broken: #{error.message}"
+        console.error "The tokenizer is broken: #{error.message}"
         messages
 
     build initialLimit
@@ -146,7 +151,7 @@ export createChatBot = ({
     @returns {String} the id of the new message stub
     ###
   createMessageStub = ({sessionId, text = ''}) ->
-    replyMessageId = chatCollection.insert
+    replyMessageId = messageCollection.insert
       userId: botUserData.id
       sessionId: sessionId
       text: text
@@ -161,7 +166,7 @@ export createChatBot = ({
     - sets text to the new text
     ###
   updateMessageStub = ({messageId, text}) ->
-    chatCollection.update messageId,
+    messageCollection.update messageId,
       $set:
         text: text
         createdAt: new Date()
@@ -172,22 +177,39 @@ export createChatBot = ({
     - and workInProgress to 'false
     @param {Object} options
     @param {String} options.messageId
+    @param {String} options.text
+    @param {Object} options.usage
     @returns {String} the id of the Message
     ###
-  finalizeMessageStub = ({messageId}) ->
-    chatCollection.update messageId,
+  finalizeMessageStub = ({messageId, text, usage}) ->
+    messageCollection.update messageId,
       $set:
         createdAt: new Date()
         workInProgress: false
+        text: text
+        usage: usage
 
-  createSystemMessage = ({sessionId, text}) ->
-    chatCollection.insert
+  createSystemMessage = ({sessionId, text, usage = undefined}) ->
+    messageCollection.insert
       userId: botUserData.id
       sessionId: sessionId
       text: text
       chatRole: 'system'
       createdAt: new Date()
       workInProgress: false
+      usage: usage
+
+  createLogMessage = ({sessionId, text = undefined, functionCall = undefined, error = undefined, usage = undefined}) ->
+    messageCollection.insert
+      userId: botUserData.id
+      sessionId: sessionId
+      text: text
+      functionCall: functionCall
+      error: error
+      chatRole: 'log'
+      createdAt: new Date()
+      workInProgress: false
+      usage: usage
 
 
   ###*
@@ -195,33 +217,14 @@ export createChatBot = ({
     @param {Object} options
     @param {String} options.sessionId
     @param {Object} options.message
-    @param {String} [options.messageId] - the id of the message stub
+    @param {String} options.messageId - the id of the message stub
     @param {Array} options.messages
-    @param {Object} options.logData
     @example
       chatBot.call
         sessionId: '123'
         messages: [{content: 'Hallo', role: 'user'}]
-        logData:
-          bot: 'chatBot'
-          version: '1.0.0'
     ###
-  call = ({sessionId, message, messageId, messages, logData}) ->
-
-    if logCollection and Meteor.isServer and message?
-      logCollection.insert {
-        model
-        messageId
-        sessionId
-        message
-        createdAt: new Date()
-        usage:
-          model: model
-          prompt_tokens: 0
-          completion_tokens: 0
-        logData...
-      }
-
+  call = ({sessionId, message, messageId, messages}) ->
     functions = getFunctions({sessionId, messageId})
     functionParams = functions.map (f) -> omit f, 'run'
     openAI.chat.completions.create {
@@ -238,69 +241,33 @@ export createChatBot = ({
     .then (response) ->
       # console.log 'response', response
       message = response.message
-      if logCollection and Meteor.isServer
-        prompt_tokens =
-          if options?.stream
-            countTokens messages
-          else
-            response?.usage.prompt_tokens ? 0
-        completion_tokens =
-          if options?.stream
-            countTokens [message]
-          else
-            response?.usage.completion_tokens ? 0
-        logCollection.insert {
-          model
-          messageId
-          sessionId
-          message
-          createdAt: new Date()
-          usage:
-            model: model
-            prompt_tokens: prompt_tokens
-            completion_tokens: completion_tokens
-          logData...
-        }
-      updateMessageStub {messageId, text: message?.content}
-      finalizeMessageStub {messageId}
+      prompt_tokens =
+        if options?.stream
+          countTokens messages
+        else
+          response?.usage.prompt_tokens ? 0
+      completion_tokens =
+        if options?.stream
+          countTokens [message]
+        else
+          response?.usage.completion_tokens ? 0
+      usage =
+        model: model
+        prompt: prompt_tokens
+        completion: completion_tokens
+      finalizeMessageStub {messageId, text: message?.content, usage}
       if (fc = message?.function_call)?.name
-        console.log 'function_call', fc
+        createLogMessage {sessionId, functionCall: fc, usage}
         (functions.find (f) -> f.name is fc.name)?.run fc.arguments
         .then (result) ->
           systemMessage =
             content: result
             role: 'system'
-          # if logCollection and Meteor.isServer
-          #   logCollection.insert {
-          #     model
-          #     messageId
-          #     sessionId
-          #     message: systemMessage
-          #     createdAt: new Date()
-          #     usage:
-          #       model: model
-          #       prompt_tokens: 0
-          #       completion_tokens: 0
-          #     logData...
-          #   }
-          systemMessageId = createSystemMessage {sessionId, text: result}
+          createSystemMessage {sessionId, text: result}
           messagesWithResult = buildContext {sessionId}
-          call {sessionId, message: systemMessage, messageId: messageId, messages: messagesWithResult, logData}
-        .catch (error) ->
-          logCollection.insert {
-            model
-            messageId
-            sessionId
-            message:
-              content: error.message
-              role: 'system'
-            createdAt: new Date()
-            usage:
-              model: model
-              prompt_tokens: 0
-              completion_tokens: 0
-            logData...
-          }
-          throw new Meteor.Error error.message
+          call {sessionId, message: systemMessage, messageId: messageId, messages: messagesWithResult}
+    .catch (error) ->
+      createLogMessage {sessionId, error: error}
+      throw error
 
   {call, createMessageStub, updateMessageStub, finalizeMessageStub, buildContext}

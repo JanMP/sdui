@@ -7,18 +7,17 @@ import {Tacker} from 'meteor/tracker'
 ###*
   @param {Object} options
   @param {String} options.sourceName
-  @param {Mongo.Collection} options.collection
+  @param {Mongo.Collection} options.messageCollection
   @param {Mongo.Collection} options.sessionListCollection
   @param {Mongo.Collection} [options.metaDataCollection]
-  @param {Mongo.Collection} [options.logCollection]
-  @param {Number} [options.messagesLimit]
   @param {Boolean} [options.isSingleSessionChat]
   @param {String} [options.viewChatRole]
   @param {Function} [options.getUsageLimits]
+  @param {Number} [options.messagesLimit] - max number of messages to be published
   ###
 export createChatPublications = ({
   sourceName,
-  collection, sessionListCollection, metaDataCollection, logCollection
+  messageCollection, sessionListCollection, metaDataCollection
   isSingleSessionChat,
   viewChatRole
   getUsageLimits
@@ -27,15 +26,18 @@ export createChatPublications = ({
 
   return unless Meteor.isServer
 
-  unless collection?
+  unless messageCollection?
     throw new Error 'no collection given'
 
   Meteor.publish "#{sourceName}.messages", ({sessionId}) ->
     return @ready() unless sessionId?
-    # return @ready() unless userWithIdIsInRole id: @userId, role: viewChatRole
-    # return @ready() unless isSingleSessionChat or  @userId in (sessionListCollection?.findOne(sessionId)?.userIds ? [])
+    return @ready() unless userWithIdIsInRole id: @userId, role: viewChatRole
+    return @ready() unless @userId in (sessionListCollection?.findOne(sessionId)?.userIds ? [])
     @autorun (computation) ->
-      collection.find {sessionId},
+      query =
+        sessionId: sessionId
+        chatRole: $in: ['user', 'assistant']
+      messageCollection.find query,
         sort: {createdAt: -1}
         limit: messagesLimit
 
@@ -50,20 +52,20 @@ export createChatPublications = ({
         limit: 100
 
   Meteor.publish "#{sourceName}.usageLimits", ({sessionId}) ->
+
     return @ready() unless sessionId?
-    return @ready() unless logCollection?
-    # return @ready() unless getUsageLimits?()?
+    return @ready() unless getUsageLimits?()?
     return @ready() unless userWithIdIsInRole id: @userId, role: viewChatRole
 
     @autorun (computation) ->
 
       limits = getUsageLimits()
-      maxMessagesPerDay = limits?.maxMessagesPerDay ? 0
-      maxSessionsPerDay = limits?.maxSessionsPerDay ? 0
-      maxMessagesPerSession = limits?.maxMessagesPerSession ? 0
-      maxMessageLength = limits?.maxMessageLength ? 0
+      maxMessagesPerDay = limits?.maxMessagesPerDay ? 100
+      maxSessionsPerDay = limits?.maxSessionsPerDay ? 20
+      maxMessagesPerSession = limits?.maxMessagesPerSession ? 20
+      maxMessageLength = limits?.maxMessageLength ? 1000
 
-      unless logCollection.findOne userId: @userId
+      unless messageCollection.findOne userId: @userId
         @added "#{sourceName}.usageLimits", @userId, {
           _id: @userId
           sessionId, maxMessageLength, maxMessagesPerDay, maxSessionsPerDay, maxMessagesPerSession
@@ -74,11 +76,11 @@ export createChatPublications = ({
           messagesPerSessionLeft: maxMessagesPerSession
         }
       else
-        ReactiveAggregate this, logCollection,
+        ReactiveAggregate this, messageCollection,
           [
             $match:
               userId: @userId
-              'message.role': 'user'
+              chatRole: 'user'
           ,
             $group:
               _id: null

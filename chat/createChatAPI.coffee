@@ -16,7 +16,7 @@ export chatSchema = new SimpleSchema
     type: String
   chatRole:
     type: String
-    allowedValues: ['user', 'assistant', 'system']
+    allowedValues: ['user', 'assistant', 'system', 'log']
   usage:
     type: Object
     optional: true
@@ -29,6 +29,16 @@ export chatSchema = new SimpleSchema
   workInProgress:
     type: Boolean
     optional: true
+  feedback:
+    type: Object
+    optional: true
+  'feedback.thumbs':
+    type: String
+    allowedValues: ['up', 'down']
+    optional: true
+  'feedback.comment':
+    type: String
+    optional: true
 
 export chatMetaDataSchema = new SimpleSchema
   sessionId: String
@@ -38,24 +48,12 @@ export chatMetaDataSchema = new SimpleSchema
     type: Object
     blackbox: true
 
-export minLogSchemaDefinition =
-  userId: String
-  sessionId: String
-  messageId: String
-  createdAt: Date
-  message:
-    type: Object
-  'message.content': String
-  'message.role': String
-
-
 ###*
   @param {Object} options
   @param {String} options.sourceName
-  @param {Mongo.Collection} options.collection
+  @param {Mongo.Collection} options.messageCollection
   @param {Mongo.Collection} options.sessionListCollection
   @param {Mongo.Collection} [options.metaDataCollection]
-  @param {Mongo.Collection} [options.logCollection]
   @param {Mongo.Collection} [options.usageLimitCollection]
   @param {Boolean} [options.isSingleSessionChat]
   @param {Object} [options.viewChatRole]
@@ -69,10 +67,9 @@ export minLogSchemaDefinition =
   ###
 export createChatAPI = ({
   sourceName
-  collection
+  messageCollection,
   sessionListCollection
   metaDataCollection
-  logCollection
   usageLimitCollection
   isSingleSessionChat
   viewChatRole, addSessionRole,
@@ -86,8 +83,8 @@ export createChatAPI = ({
   unless sourceName?
     throw new Error 'no sourceName given'
   
-  unless collection?
-    throw new Error 'no collection given'
+  unless messageCollection?
+    throw new Error 'no messageCollection given'
   
   unless sessionListCollection? or isSingleSessionChat
     throw new Error 'no sessionListCollection given'
@@ -95,7 +92,6 @@ export createChatAPI = ({
     console.warn "[createChatAPI #{sourceName}]:
       no viewChatRole defined, using 'any' instead."
   viewChatRole ?= 'any'
-
   if not addSessionRole? and Meteor.isServer
     console.warn "[createChatAPI #{sourceName}]:
       no addSessionRole defined, using '#{viewChatRole}' instead."
@@ -113,10 +109,9 @@ export createChatAPI = ({
 
   createChatMethods {
     sourceName
-    collection
+    messageCollection
     sessionListCollection
     metaDataCollection
-    logCollection
     isSingleSessionChat
     viewChatRole
     addSessionRole
@@ -127,14 +122,13 @@ export createChatAPI = ({
 
   createChatPublications {
     sourceName
-    collection
+    messageCollection
     sessionListCollection
     metaDataCollection
-    logCollection
     isSingleSessionChat
     viewChatRole
     getUsageLimits
     messagesLimit
   }
 
-  {sourceName, collection, sessionListCollection, metaDataCollection, usageLimitCollection, sessionListDataOptions, isSingleSessionChat, bots}
+  {sourceName, messageCollection, sessionListCollection, metaDataCollection, usageLimitCollection, sessionListDataOptions, isSingleSessionChat, bots}
