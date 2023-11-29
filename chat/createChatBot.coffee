@@ -189,7 +189,7 @@ export createChatBot = ({
         text: text
         usage: usage
 
-  createSystemMessage = ({sessionId, text}) ->
+  createSystemMessage = ({sessionId, text, usage = undefined}) ->
     messageCollection.insert
       userId: botUserData.id
       sessionId: sessionId
@@ -197,8 +197,9 @@ export createChatBot = ({
       chatRole: 'system'
       createdAt: new Date()
       workInProgress: false
+      usage: usage
 
-  createLogMessage = ({sessionId, text = undefined, functionCall = undefined, error = undefined}) ->
+  createLogMessage = ({sessionId, text = undefined, functionCall = undefined, error = undefined, usage = undefined}) ->
     messageCollection.insert
       userId: botUserData.id
       sessionId: sessionId
@@ -208,6 +209,7 @@ export createChatBot = ({
       chatRole: 'log'
       createdAt: new Date()
       workInProgress: false
+      usage: usage
 
 
   ###*
@@ -223,7 +225,6 @@ export createChatBot = ({
         messages: [{content: 'Hallo', role: 'user'}]
     ###
   call = ({sessionId, message, messageId, messages}) ->
-
     functions = getFunctions({sessionId, messageId})
     functionParams = functions.map (f) -> omit f, 'run'
     openAI.chat.completions.create {
@@ -256,8 +257,7 @@ export createChatBot = ({
         completion: completion_tokens
       finalizeMessageStub {messageId, text: message?.content, usage}
       if (fc = message?.function_call)?.name
-        createLogMessage {sessionId, functionCall: fc}
-        console.log 'function_call', fc
+        createLogMessage {sessionId, functionCall: fc, usage}
         (functions.find (f) -> f.name is fc.name)?.run fc.arguments
         .then (result) ->
           systemMessage =
