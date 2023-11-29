@@ -31,46 +31,44 @@ export createChatMethods = ({
   reactToNewMessage ?= ({text, messageId, sessionId}) ->
   onNewSession ?= ({sessionId}) -> console.log 'onNewSession', {sessionId}
 
+  messagesPerDayLimitReached =  ->
+    return false unless (limit = getUsageLimits?()?.maxMessagesPerDay)?
+    messagesByUserToday =
+      await messageCollection.find
+        userId: Meteor.userId()
+        chatRole: 'user'
+        createdAt:
+          $gte: new Date(new Date().setHours(0,0,0,0))
+      .countAsync()
+    messagesByUserToday >= limit
 
-  messagesPerDayLimitReached =  -> false
-    # return false unless logCollection? and getUsageLimits?()?.maxMessagesPerDay?
-    # limit = getUsageLimits().maxMessagesPerDay
-    # messagesByUserToday =
-    #   logCollection?.find
-    #     userId: Meteor.userId()
-    #     'message.role': 'user'
-    #     createdAt:
-    #       $gte: new Date(new Date().setHours(0,0,0,0))
-    #   .count()
-    # messagesByUserToday >= limit
+  sessionsPerDayLimitReached =  ->
+    return false unless (limit = getUsageLimits?()?.maxSessionsPerDay)?
+    sessionsByUserToday =
+      _(
+        await messageCollection.find
+          userId: Meteor.userId()
+          createdAt:
+            $gte: new Date(new Date().setHours(0,0,0,0))
+        .mapAsync (logEntry) -> logEntry.sessionId
+      ).uniq().value().length
+    console.log {sessionsByUserToday, limit}
+    sessionsByUserToday >= limit
 
-  sessionsPerDayLimitReached =  -> false
-    # return false unless logCollection? and getUsageLimits?()?.maxSessionsPerDay?
-    # limit = getUsageLimits().maxSessionsPerDay
-    # sessionsByUserToday =
-    #   _(
-    #     logCollection?.find
-    #       userId: Meteor.userId()
-    #       createdAt:
-    #         $gte: new Date(new Date().setHours(0,0,0,0))
-    #     .map (logEntry) -> logEntry.sessionId
-    #   ).uniq().value().length
-    # sessionsByUserToday >= limit
+  messagesPerSessionLimitReached = ({sessionId}) ->
+    return false unless (limit = getUsageLimits?()?.maxMessagesPerSession)?
+    messagesPerSession =
+      await messageCollection.find
+        userId: Meteor.userId()
+        sessionId: sessionId
+        chatRole: 'user'
+      .countAsync()
+    console.log {messagesPerSession, limit}
+    messagesPerSession >= limit
 
-  messagesPerSessionLimitReached = ({sessionId}) -> false
-    # return false unless logCollection? and getUsageLimits?()?.maxMessagesPerSession?
-    # limit = getUsageLimits().maxMessagesPerSession
-    # messagesPerSession =
-    #   logCollection?.find
-    #     userId: Meteor.userId()
-    #     sessionId: sessionId
-    #     'message.role': 'user'
-    #   .count()
-    # messagesPerSession >= limit
-
-  textTooLong = ({text}) -> false
-    # return false unless getUsageLimits()?.maxMessageLength?
-    # text.length > getUsageLimits().maxMessageLength
+  textTooLong = ({text}) ->
+    return false unless getUsageLimits()?.maxMessageLength?
+    text.length > getUsageLimits().maxMessageLength
 
   userIsInSession = ({sessionId}) ->
     Meteor.userId() in (await sessionListCollection?.findOneAsync(sessionId)?.userIds ? [])
@@ -83,7 +81,7 @@ export createChatMethods = ({
     userIsInSession {sessionId}
   
   addSession = ({title, userIds}) ->
-    if sessionsPerDayLimitReached()
+    if await sessionsPerDayLimitReached()
       throw new Meteor.Error "Tut uns Leid, wir erlauben momentan nur #{getUsageLimits()?.maxSessionsPerDay} Chats pro Tag. Bitte versuche es morgen nochmal."
     currentUserMustBeInRole addSessionRole
     return unless Meteor.isServer
@@ -110,16 +108,16 @@ export createChatMethods = ({
         throw new Meteor.Error 'no sessionId given'
       unless userIsInSession {sessionId}
         throw new Meteor.Error 'user not in session'
-      if messagesPerDayLimitReached()
+      if await messagesPerDayLimitReached()
         throw new Meteor.Error "Tut uns Leid, wir erlauben momentan nur #{getUsageLimits()?.maxMessagesPerSession} Nachrichten pro Tag. Bitte versuche es morgen nochmal."
-      if messagesPerSessionLimitReached {sessionId}
+      if await messagesPerSessionLimitReached {sessionId}
         throw new Meteor.Error "Tut uns Leid, wir erlauben momentan nur #{getUsageLimits()?.maxMessagesPerSession} Nachrichten pro Chat."
       if textTooLong {text}
         throw new Meteor.Error "Tut uns Leid, wir erlauben momentan nur #{usageLimits.maxMessageLength} Zeichen pro Nachricht. Bitte versuche es nochmal mit einer kürzeren Nachricht."
       unless isSingleSessionChat
         unless sessionId?
           throw new Meteor.Error 'no sessionId for non-singleSessionChat given'
-        sessionSettings = sessionListCollection?.findOne sessionId
+        sessionSettings = await sessionListCollection?.findOneAsync sessionId
         unless sessionSettings?
           throw new Meteor.Error 'no session found'
         unless Meteor.userId() in sessionSettings.userIds
@@ -130,7 +128,7 @@ export createChatMethods = ({
         text: text
         createdAt: new Date()
         chatRole: 'user'
-      messageId = messageCollection.insert newMessage
+      messageId = await messageCollection.insertAsync newMessage
       try
         await reactToNewMessage {newMessage..., messageId}
       catch error
