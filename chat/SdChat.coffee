@@ -54,13 +54,13 @@ export SdChat = ({dataOptions, className = "", customComponents = {}, processMes
 
   messagesAreLoading = useSubscribe "#{sourceName}.messages", {sessionId}
   metaDataIsLoading = useSubscribe "#{sourceName}.metaData", {sessionId}
-  usageLimitsIsLoading = useSubscribe "#{sourceName}.usageLimits", {sessionId}
+  # usageLimitsIsLoading = useSubscribe "#{sourceName}.usageLimits", {sessionId}
 
   session = useTracker ->
     (dataOptions?.sessionListDataOptions?.rowsCollection?.findOne sessionId) ? {}
 
-  currentLimits = useTracker ->
-    dataOptions?.usageLimitCollection?.findOne()
+  # currentLimits = useTracker ->
+  #   dataOptions?.usageLimitCollection?.findOne()
 
   getInitialSession = ->
     meteorApply
@@ -196,7 +196,7 @@ export SdChat = ({dataOptions, className = "", customComponents = {}, processMes
               {<span>{t "sdui:sessionsPerDayLimitReached", "(max Chats/Tag erreicht)"}</span> if noMoreSessionsToday}
             </div>
         }
-        <div className="p-2 text-sm"><span className="text-bold">Noch übrig: </span>{currentLimits?.messagesPerDayLeft} Msgs/Tag, {currentLimits?.messagesPerSessionLeft} Msgs/Chat, {currentLimits?.sessionsPerDayLeft} Chats/Tag</div>
+        {<div className="p-2 text-sm"><span className="text-bold">Noch übrig: </span>{currentLimits?.messagesPerDayLeft} Msgs/Tag, {currentLimits?.messagesPerSessionLeft} Msgs/Chat, {currentLimits?.sessionsPerDayLeft} Chats/Tag</div> if false}
         {<div className="p-2">
           <pre>{JSON.stringify currentLimits, null, 2}</pre>
         </div> if false}
