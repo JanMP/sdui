@@ -118,4 +118,5 @@ export createChatPublications = ({
           ],
           clientCollection: "#{sourceName}.usageLimits"
           debounceDelay: 200
-          observers: []
+          noAutomaticObserver: true
+          observers: [messageCollection.find {userId: @userId}]
