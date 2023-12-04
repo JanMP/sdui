@@ -73,6 +73,7 @@ export interface createTableDataAPIParams {
       transFormIdToMongo: (id: any) => any
       transFormIdToMiniMongo: (id: any) => any
     }) => (options: {id: string}) => void
+  noAutomaticObserver?: boolean
   debounceDelay?: number
   observers?: Array<any>
   setupNewItem?: () => object

@@ -20,6 +20,7 @@ export createTableDataAPI = ({
   # CHECK if they work or if we should get rid of the following:
   getRowsPipeline, getRowCountPipeline, getExportPipeline
   makeFormDataFetchMethodRunFkt, makeSubmitMethodRunFkt, makeDeleteMethodRunFkt
+  noAutomaticObserver
   debounceDelay
   observers
   query, initialSortColumn, initialSortDirection
@@ -108,7 +109,8 @@ export createTableDataAPI = ({
   
   publishTableData {
     viewTableRole, sourceName, collection,
-    getRowsPipeline, getRowCountPipeline, debounceDelay, observers
+    getRowsPipeline, getRowCountPipeline,
+    noAutomaticObserver, debounceDelay, observers
   }
 
   createTableDataMethods {
