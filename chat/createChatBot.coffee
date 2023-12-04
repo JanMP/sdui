@@ -36,9 +36,8 @@ export createChatBot = ({
   model ?= 'gpt-3.5-turbo'
   system ?= "Du bist ein freundlicher, hilfreicher Chatbot"
   openAI = setupOpenAIApi()
-  replyMessageId = null
 
-  handleStream = (reply) ->
+  handleStream = ({response, messageStubId}) ->
     done = false
     content = ''
     oldContent = ''
@@ -58,7 +57,7 @@ export createChatBot = ({
     updateContent = ->
       if oldContent isnt content
         oldContent = content
-        messageCollection.update replyMessageId,
+        messageCollection.update messageStubId,
           $set:
             text: content
             createdAt: new Date()
@@ -66,7 +65,7 @@ export createChatBot = ({
     
     interval = Meteor.setInterval updateContent, 700
 
-    for await chunk from reply
+    for await chunk from response
       try
         delta = chunk?.choices?[0]?.delta
         finishReason = chunk?.choices?[0]?.finish_reason
@@ -151,14 +150,13 @@ export createChatBot = ({
     @returns {String} the id of the new message stub
     ###
   createMessageStub = ({sessionId, text = ''}) ->
-    replyMessageId = messageCollection.insert
+    messageCollection.insertAsync
       userId: botUserData.id
       sessionId: sessionId
       text: text
       chatRole: 'assistant'
       createdAt: new Date()
       workInProgress: true
-    replyMessageId
 
   ###*
     @description
@@ -166,7 +164,7 @@ export createChatBot = ({
     - sets text to the new text
     ###
   updateMessageStub = ({messageId, text}) ->
-    messageCollection.update messageId,
+    messageCollection.updateAsync messageId,
       $set:
         text: text
         createdAt: new Date()
@@ -182,7 +180,7 @@ export createChatBot = ({
     @returns {String} the id of the Message
     ###
   finalizeMessageStub = ({messageId, text, usage}) ->
-    messageCollection.update messageId,
+    messageCollection.updateAsync messageId,
       $set:
         createdAt: new Date()
         workInProgress: false
@@ -190,7 +188,7 @@ export createChatBot = ({
         usage: usage
 
   createSystemMessage = ({sessionId, text, usage = undefined}) ->
-    messageCollection.insert
+    messageCollection.insertAsync
       userId: botUserData.id
       sessionId: sessionId
       text: text
@@ -200,7 +198,7 @@ export createChatBot = ({
       usage: usage
 
   createLogMessage = ({sessionId, text = undefined, functionCall = undefined, error = undefined, usage = undefined}) ->
-    messageCollection.insert
+    messageCollection.insertAsync
       userId: botUserData.id
       sessionId: sessionId
       text: text
@@ -216,7 +214,6 @@ export createChatBot = ({
     Call the chatbot handle the response and functioncalls
     @param {Object} options
     @param {String} options.sessionId
-    @param {Object} options.message
     @param {String} options.messageId - the id of the message stub
     @param {Array} options.messages
     @example
@@ -224,7 +221,7 @@ export createChatBot = ({
         sessionId: '123'
         messages: [{content: 'Hallo', role: 'user'}]
     ###
-  call = ({sessionId, message, messageId, messages}) ->
+  call = ({sessionId, messageId, messages}) ->
     functions = getFunctions({sessionId, messageId})
     functionParams = functions.map (f) -> omit f, 'run'
     openAI.chat.completions.create {
@@ -233,7 +230,7 @@ export createChatBot = ({
       {responseType: if options?.stream then 'stream'}
     .then (response) ->
       if options.stream
-        handleStream response
+        handleStream {response, messageStubId: messageId}
       else
         # console.log 'response.data', response?.data
         message: response.choices[0].message
@@ -255,8 +252,9 @@ export createChatBot = ({
         model: model
         prompt: prompt_tokens
         completion: completion_tokens
-      finalizeMessageStub {messageId, text: message?.content, usage}
-      if (fc = message?.function_call)?.name
+      unless (fc = message?.function_call)?.name
+        finalizeMessageStub {messageId, text: message?.content, usage}
+      else
         createLogMessage {sessionId, functionCall: fc, usage}
         (functions.find (f) -> f.name is fc.name)?.run fc.arguments
         .then (result) ->
@@ -265,7 +263,7 @@ export createChatBot = ({
             role: 'system'
           createSystemMessage {sessionId, text: result}
           messagesWithResult = buildContext {sessionId}
-          call {sessionId, message: systemMessage, messageId: messageId, messages: messagesWithResult}
+          call {sessionId, messageId: messageId, messages: messagesWithResult}
     .catch (error) ->
       createLogMessage {sessionId, error: error}
       throw error
