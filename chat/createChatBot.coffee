@@ -255,6 +255,10 @@ export createChatBot = ({
       unless (fc = message?.function_call)?.name
         finalizeMessageStub {messageId, text: message?.content, usage}
       else
+        fc.arguments =
+          if typeof fc.arguments is 'string'
+            JSON.parse fc.arguments
+          else fc.arguments
         createLogMessage {sessionId, functionCall: fc, usage}
         (functions.find (f) -> f.name is fc.name)?.run fc.arguments
         .then (result) ->
