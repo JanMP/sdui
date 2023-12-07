@@ -169,6 +169,14 @@ export SdChat = ({dataOptions, className = "", customComponents = {}, processMes
   onSessionListRowClick = ({rowData}) ->
     setSessionId rowData._id
 
+  setClassForLimit = (limit) ->
+    switch
+      when limit <= 1  then 'fadein animation-duration-500 animation-iteration-infinite text-red-500'
+      when limit <= 2  then 'text-red-500'
+      when limit <= 3  then 'text-orange-500'
+      when limit <= 4 then 'text-orange-800'
+      else ''
+
   <div className="h-full w-full flex flex-row gap-4 #{className}">
     <Toast ref={toast} />
     {
@@ -188,17 +196,23 @@ export SdChat = ({dataOptions, className = "", customComponents = {}, processMes
     }
     <div className="flex-grow-1">
       <div className="h-full flex flex-column gap-2">
-      <div className="flex-grow-0 flex align-items-center">
+      <div className="flex-grow-0 flex align-items-center justify-content-between">
           {
             if isSingleSessionChat
                 <ActionButton
-                  icon="pi pi-fw pi-times"
-                  className="p-button-rounded p-button-text p-button-danger"
+                  label="Neuer Chat"
+                  icon="pi pi-fw pi-refresh"
+                  className="p-button-rounded p-button-sm p-button-outlined p-button-primary"
                   onAction={resetSingleSession}
                   disabled={noMoreSessionsToday}
                 />
           }
-          <div className="p-2 text-sm">Noch übrig: {currentLimits?.messagesPerDayLeft} Msgs/Tag, {currentLimits?.messagesPerSessionLeft} Msgs/Chat, {currentLimits?.sessionsPerDayLeft} Chats/Tag</div>
+          <div className="p-2 text-sm">
+            Noch übrig:
+            <span className={setClassForLimit currentLimits?.messagesPerDayLeft}> {currentLimits?.messagesPerDayLeft} Msgs/Tag,</span>
+            <span className={setClassForLimit currentLimits?.messagesPerSessionLeft}> {currentLimits?.messagesPerSessionLeft} Msgs/Chat,</span>
+            <span className={setClassForLimit currentLimits?.sessionsPerDayLeft}> {currentLimits?.sessionsPerDayLeft} Chats/Tag</span>
+          </div>
         </div>
         {<div className="p-2">
           <pre>{JSON.stringify currentLimits, null, 2}</pre>
