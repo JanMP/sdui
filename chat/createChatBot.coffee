@@ -176,7 +176,7 @@ export createChatBot = ({
     @param {Object} options
     @param {String} options.messageId
     @param {String} options.text
-    @param {Object} options.usage
+    @param {Object} [options.usage]
     @returns {String} the id of the Message
     ###
   finalizeMessageStub = ({messageId, text, usage}) ->
@@ -258,9 +258,6 @@ export createChatBot = ({
         createLogMessage {sessionId, functionCall: fc, usage}
         (functions.find (f) -> f.name is fc.name)?.run fc.arguments
         .then (result) ->
-          systemMessage =
-            content: result
-            role: 'system'
           createSystemMessage {sessionId, text: result}
           messagesWithResult = buildContext {sessionId}
           call {sessionId, messageId: messageId, messages: messagesWithResult}
