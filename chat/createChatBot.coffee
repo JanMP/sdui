@@ -15,7 +15,7 @@ countTokens = (messages) ->
   @param {Object} options
   @param {Mongo.Collection} options.messageCollection
   @param {String} options.model - the OpenAI model to use
-  @param {String} options.system - the system message the bot will ALLWAYS recive as first message
+  @param {String} options.getSystemPrompt - a function that returns the system message the bot will ALLWAYS recive as first message
   @param {Object} [options.options={}] - the options for the OpenAI API
   @param {Object} [options.botUserData] - the user data for the bot
   @param {Function} [options.getFunctions] - a function that returns an array of functions that can be called by the bot
@@ -24,7 +24,7 @@ countTokens = (messages) ->
   @param {String} [options.version] - the version of the chatbot, for logging
   ###
 export createChatBot = ({
-  model, system, options = {},
+  model, getSystemPrompt, options = {},
   messageCollection,
   botUserData
   getFunctions = ({sessionId = null}) -> []
@@ -32,9 +32,9 @@ export createChatBot = ({
   contextTokenLimit = 8191 - 2000
 }) ->
   return unless Meteor.isServer
+  console.log 'createChatBot', {model, getSystemPrompt, options, messageCollection, botUserData, getFunctions, functionCall, contextTokenLimit}
 
   model ?= 'gpt-3.5-turbo'
-  system ?= "Du bist ein freundlicher, hilfreicher Chatbot"
   openAI = setupOpenAIApi()
 
   handleStream = ({response, messageStubId}) ->
@@ -106,25 +106,28 @@ export createChatBot = ({
         initialLimit: 20
     ###
   buildContext =  ({sessionId, additionalMessages = [], initialLimit = 15}) ->
+    fetchedSystemPrompt = getSystemPrompt?()
+    system = if typeof fetchedSystemPrompt is 'string' then fetchedSystemPrompt else "Du bist ein freundlicher, hilfreicher Chatbot"
+    query =
+      sessionId: sessionId
+      workInProgress: $ne: true
+      chatRole: $ne: 'log'
+    history =
+      messageCollection.find query,
+        sort: {createdAt: -1}
+        limit: initialLimit
+      .fetch()
+      .filter (message) -> message.text?
+      .reverse()
+      .map (message) ->
+        # console.log 'message', message
+        role: message.chatRole
+        content: message.text
     build = (limit) ->
       if limit < 0
         throw new Meteor.Error 'buildHistory: limit must be >= 0'
-      query =
-        sessionId: sessionId
-        workInProgress: $ne: true
-        chatRole: $ne: 'log'
-      history =
-        messageCollection.find query,
-          sort: {createdAt: -1}
-          limit: limit
-        .fetch()
-        .filter (message) -> message.text?
-        .reverse()
-        .map (message) ->
-          # console.log 'message', message
-          role: message.chatRole
-          content: message.text
-      messages = [{content: system, role: 'system'}, history..., additionalMessages...]
+      croppedHistory = history[0..limit]
+      messages = [{content: system, role: 'system'}, croppedHistory..., additionalMessages...]
       try
         if tokenizer.isWithinTokenLimit messages, contextTokenLimit
           # console.log 'buildHistory: tokenLimit not reached'
