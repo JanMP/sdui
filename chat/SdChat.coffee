@@ -19,18 +19,16 @@ DefaultSessionListItem  = ({sessionId}) ->
 
 
 defaultProcessMessageText = ({text, metaData, addLinkedMetaData}) ->
-  replacer = (match, title) ->
-    metaDataItem = metaData?.find((m) -> m.data?.title is title)
-    url = metaDataItem?.data.url
-    id = metaDataItem?._id
-    if url?
+  replacer = (match, title, url) ->
+    metaDataItem = metaData?.find((m) -> m.data?.url is url)
+    if metaDataItem?
+      id = metaDataItem._id
       addLinkedMetaData id
-      "<a class='shortlink' id='#{id}' href='#{url}' target='_blank'>#{title}</a>"
+      "<a class='text-primary-500' id='#{id}' href='#{url}' target='_blank'>#{title}</a>"
     else
-      "<span class='text-500' id='#{id}'>#{title}</span>"
+      "<a class='text-blue-500' href='#{url}' target='_blank'>#{title}</a>"
   text
-  ?.replace /\[\[(.+?)\]\]/g, replacer
-  ?.replace /\[(.+?)\]\(.+?\)/g, replacer
+  ?.replace /\[(.+?)\]\((.+?)\)/g, replacer
 
 
 export SdChat = ({dataOptions, className = "", customComponents = {}, processMessageText}) ->
@@ -43,7 +41,6 @@ export SdChat = ({dataOptions, className = "", customComponents = {}, processMes
   processMessageText ?= defaultProcessMessageText
 
   {bots, sourceName, sessionListDataOptions, isSingleSessionChat, metaDataCollection} = dataOptions
-
 
   [inputValue, setInputValue] = useState ''
   [sessionId, setSessionId] = useState null
