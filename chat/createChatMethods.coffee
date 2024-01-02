@@ -28,7 +28,7 @@ export createChatMethods = ({
   getUsageLimits
 }) ->
 
-  reactToNewMessage ?= ({text, messageId, sessionId}) ->
+  reactToNewMessage ?= ({text, messageId, sessionId}) -> Promise.resolve('no reactToNewMessage function given')
   onNewSession ?= ({sessionId}) -> console.log 'onNewSession', {sessionId}
 
   messagesPerDayLimitReached =  ->
@@ -116,9 +116,9 @@ export createChatMethods = ({
         createdAt: new Date()
         chatRole: 'user'
       messageId = await messageCollection.insertAsync newMessage
-      try
-        await reactToNewMessage {newMessage..., messageId}
-      catch error
+      # @ts-ignore
+      reactToNewMessage {newMessage..., messageId}
+      .catch (error) ->
         throw new Meteor.Error error.message, 'Error while trying to react to new message from user'
       messageId
 
