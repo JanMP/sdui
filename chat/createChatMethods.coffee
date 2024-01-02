@@ -134,6 +134,27 @@ export createChatMethods = ({
       messageId
 
   new ValidatedMethod
+    name: "#{sourceName}.addLogMessage"
+    validate:
+      new SimpleSchema
+        text:
+          type: String
+        sessionId:
+          type: String
+      .validator()
+    run: ({text, sessionId}) ->
+      currentUserMustBeInRole viewChatRole
+      return unless Meteor.isServer
+      unless userIsInSession {sessionId}
+        throw new Meteor.Error 'user not in session'
+      messageCollection.insertAsync
+        userId: Meteor.userId()
+        sessionId: sessionId
+        text: text
+        createdAt: new Date()
+        chatRole: 'log'
+
+  new ValidatedMethod
     name: "#{sourceName}.setFeedBackForMessage"
     validate:
       new SimpleSchema
