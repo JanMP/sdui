@@ -97,13 +97,10 @@ export createChatMethods = ({
           type: String
         sessionId:
           type: String
-          optional: true
       .validator()
     run: ({text, sessionId}) ->
       currentUserMustBeInRole viewChatRole
       return unless Meteor.isServer
-      unless {sessionId}
-        throw new Meteor.Error 'no sessionId given'
       unless userIsInSession {sessionId}
         throw new Meteor.Error 'user not in session'
       if await messagesPerDayLimitReached()
@@ -112,14 +109,6 @@ export createChatMethods = ({
         throw new Meteor.Error "Tut uns Leid, wir erlauben momentan nur #{getUsageLimits()?.maxMessagesPerSession} Nachrichten pro Chat."
       if textTooLong {text}
         throw new Meteor.Error "Tut uns Leid, wir erlauben momentan nur #{usageLimits.maxMessageLength} Zeichen pro Nachricht. Bitte versuche es nochmal mit einer kürzeren Nachricht."
-      unless isSingleSessionChat
-        unless sessionId?
-          throw new Meteor.Error 'no sessionId for non-singleSessionChat given'
-        sessionSettings = await sessionListCollection?.findOneAsync sessionId
-        unless sessionSettings?
-          throw new Meteor.Error 'no session found'
-        unless Meteor.userId() in sessionSettings.userIds
-          throw new Meteor.Error 'user not in session'
       newMessage =
         userId: Meteor.userId()
         sessionId: sessionId
