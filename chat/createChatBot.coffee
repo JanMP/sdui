@@ -219,18 +219,21 @@ export createChatBot = ({
     @param {String} options.sessionId
     @param {String} options.messageId - the id of the message stub
     @param {Array} options.messages
+    @param {Boolean} [options.allowFunctionCall=true] - if false, the bot will not call any functions
     @example
       chatBot.call
         sessionId: '123'
         messages: [{content: 'Hallo', role: 'user'}]
     ###
-  call = ({sessionId, messageId, messages}) ->
+  call = ({sessionId, messageId, messages, allowFunctionCall = true}) ->
     functions = getFunctions({sessionId, messageId})
     functionParams = functions.map (f) -> omit f, 'run'
     openAI.chat.completions.create {
       model, messages, options...,
-      functions: functionParams, function_call: functionCall},
-      {responseType: if options?.stream then 'stream'}
+      functions: if allowFunctionCall then functionParams,
+      function_call: if allowFunctionCall then functionCall,
+      # responseType: if options?.stream then 'stream'
+    }
     .then (response) ->
       if options.stream
         handleStream {response, messageStubId: messageId}
@@ -267,7 +270,7 @@ export createChatBot = ({
         .then (result) ->
           createSystemMessage {sessionId, text: result}
           messagesWithResult = buildContext {sessionId}
-          call {sessionId, messageId: messageId, messages: messagesWithResult}
+          call {sessionId, messageId: messageId, messages: messagesWithResult, allowFunctionCall: false}
     .catch (error) ->
       createLogMessage {sessionId, error: error}
       throw error
