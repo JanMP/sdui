@@ -9,6 +9,7 @@ export {
 } from './common/roleChecks.coffee'
 export {createTableDataAPI} from './api/createTableDataAPI.coffee'
 export {createUserTableAPI} from './usertable/createUserTableAPI.coffee'
+export {createQAArticlesAPI} from './qa-articles/createQAArticlesAPI.coffee'
 export {createChatAPI, chatSchema} from './chat/createChatAPI.coffee'
 export {createChatBot} from './chat/createChatBot.coffee'
 export {createUserManagementAPI} from './api/createUserManagementAPI.coffee'
