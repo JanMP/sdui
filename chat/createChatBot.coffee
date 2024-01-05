@@ -32,7 +32,6 @@ export createChatBot = ({
   contextTokenLimit = 8191 - 2000
 }) ->
   return unless Meteor.isServer
-  console.log 'createChatBot', {model, getSystemPrompt, options, messageCollection, botUserData, getFunctions, functionCall, contextTokenLimit}
 
   model ?= 'gpt-3.5-turbo'
   openAI = setupOpenAIApi()

@@ -34,10 +34,6 @@ export RoleSelect = ({row, columnKey, schemaBridge, onChangeField, measure, mayE
   [options, setOptions] = useState null
 
   useEffect ->
-    console.log 'roleselect value', valueFromRow row
-  , [row]
-
-  useEffect ->
     meteorApply
       method: 'user.getAllowedRoles'
       data: {}
