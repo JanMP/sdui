@@ -13,6 +13,8 @@ isOpen, onRequestClose, header, children, disabled = false, readOnly, onChangeMo
     onHide={onRequestClose}
     header={header}
     contentClassName="flex flex-column"
+    style={minWidth: '50vw'}
+    maximizable
   >
     <ManagedForm
       schemaBridge={schemaBridge}
