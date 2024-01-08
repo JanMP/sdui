@@ -34,6 +34,15 @@ listSchema =
 
 formSchema = new SimpleSchema pick sourceSchemaDefinition, ['title']
 
+###*
+  @description
+    setup a SdList for the chat sessions (to be displayed on the left hand side of the chat)
+  @param {Object} options
+  @param {String} options.sourceName
+  @param {Mongo.Collection} options.sessionListCollection
+  @param {String} options.viewChatRole
+  @param {String} options.addSessionRole
+  ###
 export createChatSessionListAPI = ({sourceName, sessionListCollection, viewChatRole, addSessionRole}) ->
   
   getPreSelectPipeline = -> [
