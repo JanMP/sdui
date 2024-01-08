@@ -85,7 +85,7 @@ export createChatMethods = ({
     return unless Meteor.isServer
     title ?= '[no title]'
     userIds ?= [Meteor.userId()]
-    sessionId = sessionListCollection.insert {title, userIds, createdAt: new Date()}
+    sessionId = await sessionListCollection.insertAsync {title, userIds, createdAt: new Date()}
     onNewSession {sessionId}
     sessionId
 
