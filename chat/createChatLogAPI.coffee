@@ -86,6 +86,7 @@ listSchemaDefinition =
     label: 'Daumen runter'
 
 listSchema = new SimpleSchema listSchemaDefinition
+queryEditorSchema = new SimpleSchema _.omit listSchemaDefinition, ['models', 'models.$']
 
 
 getAddSessionPipeline = ({sourceName}) -> [
@@ -170,12 +171,13 @@ export createChatLogAPI = ({sourceName, messageCollection, viewTableRole}) ->
     sourceSchema: chatSchema
     collection: messageCollection
     listSchema: listSchema
+    queryEditorSchema: queryEditorSchema
     viewTableRole: viewTableRole
     canEdit: false
     showRowCount: true
     getProcessorPipeline: getProcessorPipelineForSourceName {sourceName}
     canExport: true
-    canUseQueryEditor: false
+    canUseQueryEditor: true
     initialSortColumn: 'createdAt'
     initialSortDirection: 'DESC'
     noAutomaticObserver: true
