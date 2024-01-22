@@ -133,7 +133,7 @@ addUsernamePipeline = [
     user: 0
 ]
 
-getProcessorPipeline = ({sourceName}) -> [
+getProcessorPipelineForSourceName = ({sourceName}) -> -> [
   addCostsPipeline...
   (getAddSessionPipeline {sourceName})...
   summaryPipeline...
@@ -173,7 +173,7 @@ export createChatLogAPI = ({sourceName, messageCollection, viewTableRole}) ->
     viewTableRole: viewTableRole
     canEdit: false
     showRowCount: true
-    getProcessorPipeline: getProcessorPipeline
+    getProcessorPipeline: getProcessorPipelineForSourceName {sourceName}
     canExport: true
     canUseQueryEditor: false
     initialSortColumn: 'createdAt'
