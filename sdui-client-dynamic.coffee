@@ -21,6 +21,7 @@ export {createTableDataAPI} from './api/createTableDataAPI.coffee'
 export {createUserTableAPI} from './usertable/createUserTableAPI.coffee'
 export {createQAArticlesAPI} from './qa-articles/createQAArticlesAPI.coffee'
 export {createChatAPI, chatSchema} from './chat/createChatAPI.coffee'
+export {createChatLogAPI, addCostsPipeline} from './chat/createChatLogAPI.coffee'
 export {regExpMessages_de, de, setDefaultValidationMessages} from './api/validationMessages.coffee'
 # export {createFilesAPI, filesAPISourceSchema} from './api/createFilesAPI.coffee'
 
@@ -54,6 +55,7 @@ export QueryEditorField = suspend lazy -> import('./query-editor/QueryEditorFiel
 export SdDocumentSelect = suspend lazy -> import('./tables/SdDocumentSelect.coffee').then (m) -> default: m.SdDocumentSelect
 export SdDocumentSelectField = suspend lazy -> import('./tables/SdDocumentSelect.coffee').then (m) -> default: m.SdDocumentSelectField
 export SdChat = suspend lazy -> import('./chat/SdChat.coffee').then (m) -> default: m.SdChat
+export SdChatLog = suspend lazy -> import('./chat/SdChatLog.coffee').then (m) -> default: m.SdChatLog
 
 export Gravatar = suspend lazy -> import('./forms/GravatarField.coffee').then (m) -> default: m.Gravatar
 export GravatarField = suspend lazy -> import('./forms/GravatarField.coffee').then (m) -> default: m.GravatarField
