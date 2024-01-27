@@ -131,17 +131,17 @@ export createChatMethods = ({
         sessionId:
           type: String
       .validator()
-    run: ({text, sessionId}) ->
-      currentUserMustBeInRole viewChatRole
-      return unless Meteor.isServer
-      unless userIsInSession {sessionId}
-        throw new Meteor.Error 'user not in session'
-      messageCollection.insertAsync
-        userId: Meteor.userId()
-        sessionId: sessionId
-        text: text
-        createdAt: new Date()
-        chatRole: 'log'
+    run: ({text, sessionId}) -> Promise.resolve "turned off because sanity"
+      # currentUserMustBeInRole viewChatRole
+      # return unless Meteor.isServer
+      # unless userIsInSession {sessionId}
+      #   throw new Meteor.Error 'user not in session'
+      # messageCollection.insertAsync
+      #   userId: Meteor.userId()
+      #   sessionId: sessionId
+      #   text: text
+      #   createdAt: new Date()
+      #   chatRole: 'log'
 
   new ValidatedMethod
     name: "#{sourceName}.setFeedBackForMessage"
