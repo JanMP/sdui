@@ -29,7 +29,8 @@ defaultProcessMessageText = ({text, metaData, addLinkedMetaData}) ->
       "<a class='text-blue-500' href='#{url}' target='_blank'>#{title}</a>"
   text
   ?.replace /\[(.+?)\]\((.+?)\)/g, replacer
-
+  ?.replace /\[(.+?)\]\(([^\)]+?)$/g, (match, title, url) -> "#{title}..."
+  
 
 export SdChat = ({dataOptions, className = "", customComponents = {}, processMessageText}) ->
 
