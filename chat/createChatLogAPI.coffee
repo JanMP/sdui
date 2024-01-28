@@ -16,6 +16,9 @@ if Meteor.isServer
       'gpt-4-1106-preview':
         prompt: 0.00001
         completion: 0.00003
+      'gpt-4-0125-preview':
+        prompt: 0.00001
+        completion: 0.00003
       'gpt-3.5-turbo-1106':
         prompt: 0.000001
         completion: 0.000002
