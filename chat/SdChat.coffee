@@ -29,7 +29,7 @@ defaultProcessMessageText = ({text, metaData, addLinkedMetaData}) ->
       "<a class='text-blue-500' href='#{url}' target='_blank'>#{title}</a>"
   text
   ?.replace /\[(.+?)\]\((.+?)\)/g, replacer
-  ?.replace /\[(.+?)\]\(([^\)]+?)$/g, (match, title, url) -> "#{title}..."
+  ?.replace /\[(.+?)\]\(([^\)]+?)$/g, (match, title, url) -> "[#{title}]() ... <span class='pi pi-spin text-primary-200 pi-spinner'/>"
   
 
 export SdChat = ({dataOptions, className = "", customComponents = {}, processMessageText}) ->
@@ -92,6 +92,14 @@ export SdChat = ({dataOptions, className = "", customComponents = {}, processMes
       .fetch()
       .reverse()
       .map (message) ->
+        # console.log message.chatRole
+        if message.workInProgress
+          if message.text is null
+            message.text = """
+              Lass mich nachdenken...<br>
+              Ich schaue mal nach, ob ich was finden kann...
+            """
+            console.log message
         user = bots.find (bot) -> bot.id is message.userId
         user ?=
           if message.userId is Meteor.userId()
