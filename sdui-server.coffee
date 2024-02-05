@@ -19,3 +19,4 @@ export {default as connectFieldWithLabel} from './forms/connectFieldWithLabel.co
 export {default as tokenizer} from './ai/gpt-tokenizer/encoding/cl100k_base'
 export {setupOpenAIApi} from './ai/setupOpenAIApi.coffee'
 export {default as createQdrantCollection} from './ai/qdrant/createQdrantCollection'
+export {createAppLayoutAPI} from './app-layout/createAppLayoutAPI.coffee'
