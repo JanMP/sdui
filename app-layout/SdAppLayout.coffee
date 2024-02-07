@@ -1,67 +1,109 @@
 import {Meteor} from 'meteor/meteor'
-import {BrowserRouter as Router, Routes, Route, useLocation, useNavigate} from 'react-router-dom'
+import {BrowserRouter as Router, Routes, Route, useLocation, useNavigate, useRoutes} from 'react-router-dom'
 import React from 'react'
-import {Menu} from 'primereact/menu'
+import {TieredMenu} from 'primereact/tieredmenu'
 import {BreadCrumb} from 'primereact/breadcrumb'
 import {AppToolbar} from './AppToolbar.coffee'
+import {PathNotFound} from './PathNotFound.coffee'
+import {LoginPage} from './LoginPage.coffee'
+import {RoleGuard, AccessDeniedPage} from './RoleGuard.coffee'
+import {useCurrentUserIsInRole} from '../common/roleChecks.coffee'
+
 import _ from 'lodash'
 
+defaultRoutes = [
+  label: '404', path: '*', element: <PathNotFound/>
+,
+  label: 'Login', path: '/login', element: <LoginPage/>
+]
+
 MainMenu = ({sourceArray}) ->
-  navigate = useNavigate({sourceArray})
+  navigate = useNavigate()
+  
   classNameForPath = (path) ->
     if location.pathname is path
       'border-primary-500 border-1'
     else
       ''
+
   processMenuItems = (items, parentPath) ->
+    
     _(items).map (item) ->
-      if item.items
-        item.items = processMenuItems item.items, item.path
       if item.path
         if parentPath
           item.path = parentPath + '/' + item.path
+      if item.items
+        item.items = processMenuItems item.items, item.path
+      else
         item.command = -> navigate item.path
-        item.className = classNameForPath item.path
-      item
+      item.className = classNameForPath item.path
+      item.disabled = item.disabled ? if item.role then not useCurrentUserIsInRole item.role else false
+      item unless item.disabled and item.hideOnDisabled
+    .compact()
     .value()
 
   menuItems = processMenuItems _.cloneDeep sourceArray
-  
-  <Menu multiple model={menuItems} className="h-full"/>
+
+  <TieredMenu multiple model={menuItems} className="h-full"/>
 
 
 MainRoutes = ({sourceArray}) ->
   processRoutes = (items) ->
-    _(items).map (item) ->
+    items.map (item) ->
+      if item.items? and item.role?
+        item.element = <RoleGuard role={item.role}/>
       children = if item.items? then processRoutes item.items
-      <Route path={item.path} children={children} element={item.element}/>
-  routes = processRoutes _.cloneDeep sourceArray
-  <Routes children={routes}/>
+      return
+        path: item.path
+        element:
+          if (not item.role?) or useCurrentUserIsInRole item.role
+            item.element
+          else
+            <AccessDeniedPage/>
+        children: children
+  routes = processRoutes _.cloneDeep [sourceArray..., defaultRoutes...]
+  useRoutes routes
 
-BreadCrumbForPath = ->
+
+BreadCrumbTemplate = (item, options) ->
+  <><span className={item.icon ? ''}/>  <span>{item.label}</span></>
+
+
+BreadCrumbForPath = ({sourceArray}) ->
   location = useLocation()
-  breadCrumbs = _.map location.pathname.split('/'), (path) ->
-    if path is ''
-      {label: 'Home', icon: 'pi pi-fw pi-home', path: '/'}
-    else
-      {label: path, path: path}
-  # <pre>{JSON.stringify locbreaation, null, 2}</pre>
+  routes = [sourceArray..., defaultRoutes...]
+  breadCrumbs =
+    location.pathname
+    .split('/')[1..]
+    .reduce (prev, curr) ->
+      [prev..., (routes.find (route) -> route.path is "/#{curr}") ? (prev[-1..][0]?.items?.find (route) -> route.path is curr)]
+    , []
+    .filter (item) -> item?
+    .map (item) -> {item..., template: BreadCrumbTemplate}
 
   <BreadCrumb model={breadCrumbs}/>
 
-export SdAppLayout = ({dataOptions, toolbarStart}) ->
-  {sourceName, sourceArray} = dataOptions
+
+export SdAppLayout = ({dataOptions}) ->
+  {sourceName, sourceArray, toolbarStart} = dataOptions
 
   <Router>
-    <div className="h-screen w-screen flex flex-column bg-gray-500">
-      <AppToolbar toolbarStart={toolbarStart ? -> null}/>
+    <div className="h-screen w-screen p-1 surface-ground" style={
+      display: 'grid'
+      gridTemplateRows: 'auto 1fr'
+      justifyItems: 'stretch'
+      gridGap: '5px'
+    }>
+      <AppToolbar toolbarStart={toolbarStart}/>
 
-      <div className="flex-grow-1 grid p-2">
-        <div className="col-fixed">
+      <div className="surface-ground" style={display: 'grid', gridTemplateColumns: 'auto 1fr', justifyItems: 'stretch', gridGap: '5px'}>
+
+        <div>
           <MainMenu sourceArray={sourceArray}/>
         </div>
-        <div className="col">
-          <BreadCrumbForPath/>
+
+        <div className="h-full" style={display: 'grid', gridTemplateRows: 'auto 1fr', gridGap: '5px'}>
+          <BreadCrumbForPath sourceArray={sourceArray}/>
           <MainRoutes sourceArray={sourceArray}/>
         </div>
       </div>
