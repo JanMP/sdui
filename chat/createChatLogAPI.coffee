@@ -22,6 +22,9 @@ if Meteor.isServer
       'gpt-3.5-turbo-1106':
         prompt: 0.000001
         completion: 0.000002
+      'gpt-3.5-turbo-0125':
+        prompt: 0.0000005
+        completion: 0.0000015
       'gpt-4':
         prompt: 0.00003
         completion: 0.00006
