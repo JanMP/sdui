@@ -12,29 +12,43 @@ import useSize from '@react-hook/size'
 import _ from 'lodash'
 import * as types from '../typeDeclarations'
 
+PanelHeader = ({title}) ->
+  <div className="surface-200 p-1 text-center flex-none">
+    {title}
+  </div>
+
 ###*
-  @type {types.DataTableDisplayComponent}
+  @typedef {import("../interfaces").DataTableDisplayOptions} DataTableDisplayOptions
   ###
-export ContentEditor = ({
-sourceName
-listSchemaBridge, formSchemaBridge
-rows, totalRowCount, loadMoreRows, onRowClick,
-canSort, sortColumn, sortDirection, onChangeSort
-canSearch, search, onChangeSearch
-canUseQueryEditor, queryUiObject, onChangeQueryUiObject
-canAdd, mayAdd, onAdd
-canDelete, mayDelete, onDelete, deleteConfirmation
-canEdit, mayEdit, onSubmit
-autoFormChildren, formDisabled
-loadEditorData
-onChangeField,
-canExport, onExportTable
-mayExport
-isLoading,
-overscanRowCount
-customComponents
-setupNewItem
-}) ->
+###*
+  @type {
+    (options: {
+      tableOptions: DataTableDisplayOptions
+      DisplayComponent: {(options: DataTableDisplayOptions): React.FC}
+    }) => React.FC
+  }
+  ###
+export ContentEditor = ({tableOptions}) ->
+  {
+  sourceName
+  listSchemaBridge, formSchemaBridge
+  rows, totalRowCount, loadMoreRows, onRowClick,
+  canSort, sortColumn, sortDirection, onChangeSort
+  canSearch, search, onChangeSearch
+  canUseQueryEditor, queryUiObject, onChangeQueryUiObject
+  canAdd, mayAdd, onAdd
+  canDelete, mayDelete, onDelete, deleteConfirmation
+  canEdit, mayEdit, onSubmit
+  autoFormChildren, formDisabled
+  loadEditorData
+  onChangeField,
+  canExport, onExportTable
+  mayExport
+  isLoading,
+  overscanRowCount
+  customComponents
+  setupNewItem
+  } = tableOptions
 
   {Preview, RelatedDataPane, FilePane} = customComponents ? {}
 
@@ -154,8 +168,8 @@ setupNewItem
             onConfirm={-> deleteAndCloseEditor id: idForDeleteConfirmationModal}
           />
       }
-      <Splitter className="h-full">
-        <SplitterPanel>
+      <Splitter className="h-full bg-blue-300">
+        <SplitterPanel className="h-full border-red-500 border-2" size={25}>
           <DataList
             {{
               sourceName
@@ -181,20 +195,15 @@ setupNewItem
           {
             if mayEdit and editorOpen
               <Splitter>
-                <SplitterPanel className="h-full">
-                  <Splitter layout="vertical" onResizeEnd={console.log}>
-                    <SplitterPanel height={40}>
-                      <div>Content {editorHeight}</div>
-                      <ErrorBoundary>
-                        <SdEditor
-                          value={changedModel?[contentKey]}
-                          onChange={setContent}
-                        />
-                      </ErrorBoundary>
-                    </SplitterPanel>
+                <SplitterPanel>
+                  <Splitter layout="vertical" pt={root: className: "bg-blue-100"}>
                     <SplitterPanel>
-                      <div>Data</div>
-                      <ScrollPanel className="p-2">
+                      <PanelHeader title="Content"/>
+                      <div>fnord</div>
+                    </SplitterPanel>
+                    <SplitterPanel className ="flex flex-column flex-shrink-1">
+                      <PanelHeader title="Data"/>
+                      <div className="flex-shrink-1 p-2 overflow-scroll">
                         <AutoForm
                           schema={formSchemaBridge}
                           model={changedModel}
@@ -205,7 +214,7 @@ setupNewItem
                           validate="onChange"
                           submitField={-> null}
                         />
-                        <div className="mt-4 mr-4 flex justify-content-end gap-2">
+                        <div className="mt-4 mr-2 flex justify-content-end gap-2">
                           <ActionButton
                             onAction={onReset}
                             className="p-button-warning"
@@ -219,34 +228,12 @@ setupNewItem
                             disabled={(not hasChanged) or (not isValid)}
                           />
                         </div>
-                      </ScrollPanel>
+                      </div>
                     </SplitterPanel>
                   </Splitter>
                 </SplitterPanel>
                 <SplitterPanel>
-                  <Splitter layout="vertical">
-                    <SplitterPanel>
-                      <div>Preview</div>
-                      <ErrorBoundary>
-                        {
-                          if Preview?
-                            <Preview content={changedModel}/>
-                          else
-                            <MarkdownDisplay
-                              markdown={changedModel?[contentKey]}
-                              contentClass="prose"
-                            />
-                        }
-                      </ErrorBoundary>
-                    </SplitterPanel>
-                    {
-                      if true or RelatedDataPane?
-                        <SplitterPanel>
-                          <RelatedDataPane model={changedModel}/>
-                        </SplitterPanel>
-                      else null
-                    }
-                  </Splitter>
+                  <PanelHeader title="Preview"/>
                 </SplitterPanel>
               </Splitter>
           }
