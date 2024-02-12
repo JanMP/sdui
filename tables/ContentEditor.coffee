@@ -12,29 +12,6 @@ import useSize from '@react-hook/size'
 import _ from 'lodash'
 import * as types from '../typeDeclarations'
 
-PanelHeader = ({title, headerRef}) ->
-  <div ref={headerRef} className="surface-200 p-1 text-center flex-none">
-    {title}
-  </div>
-
-EditorContainer = ({value, onChange}) ->
-  containerRef = useRef null
-  headerRef = useRef null
-  [headerWidth, headerHeight] = useSize headerRef
-  [containerWidth, containerHeight] = useSize containerRef
-  
-  useEffect ->
-    console.log containerHeight, headerHeight
-  , [containerHeight, headerHeight]
-
-  <div ref={containerRef} className="h-full border-1 border-red-500">
-    <PanelHeader title="Content"/>
-    <SdEditor
-      value={value}
-      onChange={onChange}
-      editorHeight={"#{containerHeight - 30}px"}
-    />
-  </div>
 
 ###*
   @typedef {import("../interfaces").DataTableDisplayOptions} DataTableDisplayOptions
@@ -69,7 +46,11 @@ export ContentEditor = ({tableOptions}) ->
   setupNewItem
   } = tableOptions
 
-  {Preview, RelatedDataPane, FilePane} = customComponents ? {}
+  {Preview, RelatedDataPane} = customComponents ? {}
+
+  useEffect ->
+    console.log 'customComponents', customComponents
+  , [customComponents]
 
   onAdd ?= ->
     if hasChanged
@@ -211,10 +192,12 @@ export ContentEditor = ({tableOptions}) ->
                 <SplitterPanel>
                   <Splitter layout="vertical">
                     <SplitterPanel>
-                      <EditorContainer value={changedModel[contentKey]} onChange={setContent}/>
+                      <SdEditor
+                        value={changedModel[contentKey]}
+                        onChange={setContent}
+                      />
                     </SplitterPanel>
                     <SplitterPanel className ="flex-column min-h-0 max-h-full">
-                      <PanelHeader title="Data"/>
                       <div className="p-2 overflow-scroll" style={height: "100%"}>
                         <AutoForm
                           schema={formSchemaBridge}
@@ -245,7 +228,33 @@ export ContentEditor = ({tableOptions}) ->
                   </Splitter>
                 </SplitterPanel>
                 <SplitterPanel>
-                  <PanelHeader title="Preview"/>
+                  {
+                    if RelatedDataPane?
+                      <Splitter layout="vertical">
+                        <SplitterPanel>
+                          {
+                            if Preview?
+                              <Preview content={changedModel}/>
+                            else
+                              <MarkdownDisplay
+                                markdown={changedModel?[contentKey]}
+                                contentClass="prose"
+                              />
+                          }
+                        </SplitterPanel>
+                        <SplitterPanel>
+                          <RelatedDataPane model={changedModel}/>
+                        </SplitterPanel>
+                      </Splitter>
+                    else
+                      if Preview?
+                        <Preview content={changedModel}/>
+                      else
+                        <MarkdownDisplay
+                          markdown={changedModel?[contentKey]}
+                          contentClass="prose"
+                        />
+                  }
                 </SplitterPanel>
               </Splitter>
           }
