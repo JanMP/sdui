@@ -12,9 +12,28 @@ import useSize from '@react-hook/size'
 import _ from 'lodash'
 import * as types from '../typeDeclarations'
 
-PanelHeader = ({title}) ->
-  <div className="surface-200 p-1 text-center flex-none">
+PanelHeader = ({title, headerRef}) ->
+  <div ref={headerRef} className="surface-200 p-1 text-center flex-none">
     {title}
+  </div>
+
+EditorContainer = ({value, onChange}) ->
+  containerRef = useRef null
+  headerRef = useRef null
+  [headerWidth, headerHeight] = useSize headerRef
+  [containerWidth, containerHeight] = useSize containerRef
+  
+  useEffect ->
+    console.log containerHeight, headerHeight
+  , [containerHeight, headerHeight]
+
+  <div ref={containerRef} className="h-full border-1 border-red-500">
+    <PanelHeader title="Content"/>
+    <SdEditor
+      value={value}
+      onChange={onChange}
+      editorHeight={"#{containerHeight - 30}px"}
+    />
   </div>
 
 ###*
@@ -52,9 +71,6 @@ export ContentEditor = ({tableOptions}) ->
 
   {Preview, RelatedDataPane, FilePane} = customComponents ? {}
 
-  editorContainerRef = useRef null
-  [editorWidth, editorHeight] = useSize editorContainerRef
-
   onAdd ?= ->
     if hasChanged
       setIdForOverloadConfirmationModal null
@@ -62,9 +78,6 @@ export ContentEditor = ({tableOptions}) ->
     else
       newItem = await setupNewItem()
       openEditor newItem
-
-  useEffect ->
-    console.log 'editorHeight', editorHeight
 
   # TODO make optional (again) and i18n
   deleteConfirmation ?= "Soll der Eintrag wirklich gelöscht werden?"
@@ -169,7 +182,7 @@ export ContentEditor = ({tableOptions}) ->
           />
       }
       <Splitter className="h-full bg-blue-300">
-        <SplitterPanel className="h-full border-red-500 border-2" size={25}>
+        <SplitterPanel className="h-full" size={25}>
           <DataList
             {{
               sourceName
@@ -196,14 +209,13 @@ export ContentEditor = ({tableOptions}) ->
             if mayEdit and editorOpen
               <Splitter>
                 <SplitterPanel>
-                  <Splitter layout="vertical" pt={root: className: "bg-blue-100"}>
+                  <Splitter layout="vertical">
                     <SplitterPanel>
-                      <PanelHeader title="Content"/>
-                      <div>fnord</div>
+                      <EditorContainer value={changedModel[contentKey]} onChange={setContent}/>
                     </SplitterPanel>
-                    <SplitterPanel className ="flex flex-column flex-shrink-1">
+                    <SplitterPanel className ="flex-column min-h-0 max-h-full">
                       <PanelHeader title="Data"/>
-                      <div className="flex-shrink-1 p-2 overflow-scroll">
+                      <div className="p-2 overflow-scroll" style={height: "100%"}>
                         <AutoForm
                           schema={formSchemaBridge}
                           model={changedModel}

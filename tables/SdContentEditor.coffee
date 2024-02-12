@@ -7,9 +7,9 @@ import {DataList} from './DataList.coffee'
 
 DisplayComponent = (tableOptions) ->
 
-  useEffect ->
-    console.log 'DisplayComponent', tableOptions
-  , [tableOptions]
+  # useEffect ->
+  #   console.log 'DisplayComponent', tableOptions
+  # , [tableOptions]
 
   <ContentEditor
     tableOptions={tableOptions}
