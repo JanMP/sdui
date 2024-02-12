@@ -12,34 +12,45 @@ import useSize from '@react-hook/size'
 import _ from 'lodash'
 import * as types from '../typeDeclarations'
 
+
 ###*
-  @type {types.DataTableDisplayComponent}
+  @typedef {import("../interfaces").DataTableDisplayOptions} DataTableDisplayOptions
   ###
-export ContentEditor = ({
-sourceName
-listSchemaBridge, formSchemaBridge
-rows, totalRowCount, loadMoreRows, onRowClick,
-canSort, sortColumn, sortDirection, onChangeSort
-canSearch, search, onChangeSearch
-canUseQueryEditor, queryUiObject, onChangeQueryUiObject
-canAdd, mayAdd, onAdd
-canDelete, mayDelete, onDelete, deleteConfirmation
-canEdit, mayEdit, onSubmit
-autoFormChildren, formDisabled
-loadEditorData
-onChangeField,
-canExport, onExportTable
-mayExport
-isLoading,
-overscanRowCount
-customComponents
-setupNewItem
-}) ->
+###*
+  @type {
+    (options: {
+      tableOptions: DataTableDisplayOptions
+      DisplayComponent: {(options: DataTableDisplayOptions): React.FC}
+    }) => React.FC
+  }
+  ###
+export ContentEditor = ({tableOptions}) ->
+  {
+  sourceName
+  listSchemaBridge, formSchemaBridge
+  rows, totalRowCount, loadMoreRows, onRowClick,
+  canSort, sortColumn, sortDirection, onChangeSort
+  canSearch, search, onChangeSearch
+  canUseQueryEditor, queryUiObject, onChangeQueryUiObject
+  canAdd, mayAdd, onAdd
+  canDelete, mayDelete, onDelete, deleteConfirmation
+  canEdit, mayEdit, onSubmit
+  autoFormChildren, formDisabled
+  loadEditorData
+  onChangeField,
+  canExport, onExportTable
+  mayExport
+  isLoading,
+  overscanRowCount
+  customComponents
+  setupNewItem
+  } = tableOptions
 
-  {Preview, RelatedDataPane, FilePane} = customComponents ? {}
+  {Preview, RelatedDataPane} = customComponents ? {}
 
-  editorContainerRef = useRef null
-  [editorWidth, editorHeight] = useSize editorContainerRef
+  useEffect ->
+    console.log 'customComponents', customComponents
+  , [customComponents]
 
   onAdd ?= ->
     if hasChanged
@@ -48,9 +59,6 @@ setupNewItem
     else
       newItem = await setupNewItem()
       openEditor newItem
-
-  useEffect ->
-    console.log 'editorHeight', editorHeight
 
   # TODO make optional (again) and i18n
   deleteConfirmation ?= "Soll der Eintrag wirklich gelöscht werden?"
@@ -154,8 +162,8 @@ setupNewItem
             onConfirm={-> deleteAndCloseEditor id: idForDeleteConfirmationModal}
           />
       }
-      <Splitter className="h-full">
-        <SplitterPanel>
+      <Splitter className="h-full bg-blue-300">
+        <SplitterPanel className="h-full" size={25}>
           <DataList
             {{
               sourceName
@@ -181,20 +189,16 @@ setupNewItem
           {
             if mayEdit and editorOpen
               <Splitter>
-                <SplitterPanel className="h-full">
-                  <Splitter layout="vertical" onResizeEnd={console.log}>
-                    <SplitterPanel height={40}>
-                      <div>Content {editorHeight}</div>
-                      <ErrorBoundary>
-                        <SdEditor
-                          value={changedModel?[contentKey]}
-                          onChange={setContent}
-                        />
-                      </ErrorBoundary>
-                    </SplitterPanel>
+                <SplitterPanel>
+                  <Splitter layout="vertical">
                     <SplitterPanel>
-                      <div>Data</div>
-                      <ScrollPanel className="p-2">
+                      <SdEditor
+                        value={changedModel[contentKey]}
+                        onChange={setContent}
+                      />
+                    </SplitterPanel>
+                    <SplitterPanel className ="flex-column min-h-0 max-h-full">
+                      <div className="p-2 overflow-scroll" style={height: "100%"}>
                         <AutoForm
                           schema={formSchemaBridge}
                           model={changedModel}
@@ -205,7 +209,7 @@ setupNewItem
                           validate="onChange"
                           submitField={-> null}
                         />
-                        <div className="mt-4 mr-4 flex justify-content-end gap-2">
+                        <div className="mt-4 mr-2 flex justify-content-end gap-2">
                           <ActionButton
                             onAction={onReset}
                             className="p-button-warning"
@@ -219,34 +223,38 @@ setupNewItem
                             disabled={(not hasChanged) or (not isValid)}
                           />
                         </div>
-                      </ScrollPanel>
+                      </div>
                     </SplitterPanel>
                   </Splitter>
                 </SplitterPanel>
                 <SplitterPanel>
-                  <Splitter layout="vertical">
-                    <SplitterPanel>
-                      <div>Preview</div>
-                      <ErrorBoundary>
-                        {
-                          if Preview?
-                            <Preview content={changedModel}/>
-                          else
-                            <MarkdownDisplay
-                              markdown={changedModel?[contentKey]}
-                              contentClass="prose"
-                            />
-                        }
-                      </ErrorBoundary>
-                    </SplitterPanel>
-                    {
-                      if true or RelatedDataPane?
+                  {
+                    if RelatedDataPane?
+                      <Splitter layout="vertical">
+                        <SplitterPanel>
+                          {
+                            if Preview?
+                              <Preview content={changedModel}/>
+                            else
+                              <MarkdownDisplay
+                                markdown={changedModel?[contentKey]}
+                                contentClass="prose"
+                              />
+                          }
+                        </SplitterPanel>
                         <SplitterPanel>
                           <RelatedDataPane model={changedModel}/>
                         </SplitterPanel>
-                      else null
-                    }
-                  </Splitter>
+                      </Splitter>
+                    else
+                      if Preview?
+                        <Preview content={changedModel}/>
+                      else
+                        <MarkdownDisplay
+                          markdown={changedModel?[contentKey]}
+                          contentClass="prose"
+                        />
+                  }
                 </SplitterPanel>
               </Splitter>
           }
