@@ -85,9 +85,9 @@ BreadCrumbForPath = ({sourceArray}) ->
 
 
 export SdAppLayout = ({dataOptions}) ->
-  {sourceName, sourceArray, toolbarStart} = dataOptions
+  {sourceName, sourceArray, toolbarStart, routerLess} = dataOptions
 
-  <Router>
+  layoutBody =
     <div className="h-screen w-screen p-1 surface-ground" style={
       display: 'grid'
       gridTemplateRows: 'auto 1fr'
@@ -108,4 +108,10 @@ export SdAppLayout = ({dataOptions}) ->
         </div>
       </div>
     </div>
-  </Router>
+
+  if routerLess
+    layoutBody
+  else
+    <Router>
+      {layoutBody}
+    </Router>

@@ -10,6 +10,7 @@ import {Meteor} from 'meteor/meteor'
   ###
 export createAppLayoutAPI = ({
   sourceName, sourceArray, toolbarStart = -> null
+  routerLess = false
 }) ->
-  {sourceName, sourceArray, toolbarStart}
+  {sourceName, sourceArray, toolbarStart, routerLess}
 
