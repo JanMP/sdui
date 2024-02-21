@@ -27,7 +27,7 @@ import * as types from '../typeDeclarations'
 export ContentEditor = ({tableOptions}) ->
   {
   sourceName
-  listSchemaBridge, formSchemaBridge
+  listSchemaBridge, formSchemaBridge, queryEditorSchemaBridge
   rows, totalRowCount, loadMoreRows, onRowClick,
   canSort, sortColumn, sortDirection, onChangeSort
   canSearch, search, onChangeSearch
@@ -47,6 +47,14 @@ export ContentEditor = ({tableOptions}) ->
   } = tableOptions
 
   {Preview, RelatedDataPane} = customComponents ? {}
+
+  Preview ?= ({content}) ->
+    <div className="overflow-scroll min-h-0 max-h-full">
+      <MarkdownDisplay
+        markdown={content?[contentKey]}
+        contentClass="prose"
+      />
+    </div>
 
   useEffect ->
     console.log 'customComponents', customComponents
@@ -162,12 +170,12 @@ export ContentEditor = ({tableOptions}) ->
             onConfirm={-> deleteAndCloseEditor id: idForDeleteConfirmationModal}
           />
       }
-      <Splitter className="h-full bg-blue-300">
+      <Splitter className="h-full">
         <SplitterPanel className="h-full" size={25}>
           <DataList
             {{
               sourceName
-              listSchemaBridge,
+              listSchemaBridge, queryEditorSchemaBridge,
               rows, totalRowCount, loadMoreRows, onRowClick,
               canSort, sortColumn, sortDirection, onChangeSort
               canSearch, search, onChangeSearch
@@ -231,29 +239,15 @@ export ContentEditor = ({tableOptions}) ->
                   {
                     if RelatedDataPane?
                       <Splitter layout="vertical">
-                        <SplitterPanel>
-                          {
-                            if Preview?
-                              <Preview content={changedModel}/>
-                            else
-                              <MarkdownDisplay
-                                markdown={changedModel?[contentKey]}
-                                contentClass="prose"
-                              />
-                          }
+                        <SplitterPanel className="min-h-0 max-h-full">
+                          <Preview content={changedModel}/>
                         </SplitterPanel>
-                        <SplitterPanel>
+                        <SplitterPanel className="min-h-0 max-h-full">
                           <RelatedDataPane model={changedModel}/>
                         </SplitterPanel>
                       </Splitter>
                     else
-                      if Preview?
-                        <Preview content={changedModel}/>
-                      else
-                        <MarkdownDisplay
-                          markdown={changedModel?[contentKey]}
-                          contentClass="prose"
-                        />
+                      <Preview content={changedModel}/>
                   }
                 </SplitterPanel>
               </Splitter>
