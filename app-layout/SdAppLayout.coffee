@@ -12,9 +12,9 @@ import {useCurrentUserIsInRole} from '../common/roleChecks.coffee'
 import _ from 'lodash'
 
 defaultRoutes = [
-  label: '404', path: '*', element: <PathNotFound/>
-,
   label: 'Login', path: '/login', element: <LoginPage/>
+,
+  label: '404', path: '*', element: <PathNotFound/>
 ]
 
 MainMenu = ({sourceArray}) ->

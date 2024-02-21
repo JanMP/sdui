@@ -10,8 +10,8 @@ export AppToolbar = ({toolbarStart}) ->
 
   loginButton =
     <LoginButton
-      onLoginClick={ -> navigate '/login' }
-      onUserClick={ -> navigate '/login'}
+      onLoginClick={ -> navigate 'login' }
+      onUserClick={ -> navigate 'login'}
     />
     
   <Toolbar start={toolbarStart ? -> null} end={loginButton}/>
