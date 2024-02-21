@@ -35,4 +35,7 @@ getDefaultMdInstance = ->
 
   
 export MarkdownDisplay = ({markdown = '', contentClass, markdownItInstance = getDefaultMdInstance()}) ->
-  <div dangerouslySetInnerHTML={__html: markdownItInstance.render(markdown)} className={contentClass} />
+  <div
+    dangerouslySetInnerHTML={__html: markdownItInstance.render(markdown)}
+    className={contentClass}
+  />
