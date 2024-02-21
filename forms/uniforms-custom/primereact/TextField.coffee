@@ -13,7 +13,7 @@ export default connectFieldPlus ({
 
   <InputText
     disabled={disabled}
-    value={value}
+    value={value ? ""}
     onChange={(e) -> onChange e.target.value}
     {(filterDOMProps props)...}
   />
