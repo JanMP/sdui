@@ -76,7 +76,7 @@ BreadCrumbForPath = ({sourceArray}) ->
     location.pathname
     .split('/')[1..]
     .reduce (prev, curr) ->
-      [prev..., (routes.find (route) -> route.path is "/#{curr}") ? (prev[-1..][0]?.items?.find (route) -> route.path is curr)]
+      [prev..., (routes.find (route) -> route.path is "/#{curr}" or route.path is curr) ? (prev[-1..][0]?.items?.find (route) -> route.path is curr)]
     , []
     .filter (item) -> item?
     .map (item) -> {item..., template: BreadCrumbTemplate}
