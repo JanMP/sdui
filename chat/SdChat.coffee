@@ -93,13 +93,6 @@ export SdChat = ({dataOptions, className = "", customComponents = {}, processMes
       .reverse()
       .map (message) ->
         # console.log message.chatRole
-        if message.workInProgress
-          if message.text is null
-            message.text = """
-              Lass mich nachdenken...<br>
-              Ich schaue mal nach, ob ich was finden kann...
-            """
-            console.log message
         user = bots.find (bot) -> bot.id is message.userId
         user ?=
           if message.userId is Meteor.userId()
