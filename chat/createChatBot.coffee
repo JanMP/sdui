@@ -42,41 +42,37 @@ export createChatBot = ({
     oldContent = ''
     finishReason = null
     objectFromDeltas = {}
+    toolCalls = []
 
     addDelta = ({objectFromDeltas, delta}) ->
-      console.log JSON.stringify {objectFromDeltas, delta}, null, 2
+      # console.log JSON.stringify {objectFromDeltas, delta}, null, 2
       for key of delta
-        objectFromDeltas[key] =
-          if delta[key] is null then null
-          else if typeof delta[key] is 'string'
+        objectFromDeltas[key] = switch
+          when key is 'tool_calls'
+            for toolCallChunk in delta.tool_calls
+              if toolCalls.length <= toolCallChunk.index
+                toolCalls.push
+                  id: ''
+                  type: 'function'
+                  function:
+                    name: ''
+                    arguments: ''
+              toolCall = toolCalls[toolCallChunk.index]
+              if toolCallChunk.id?
+                toolCall.id += toolCallChunk.id
+              if toolCallChunk.function?.name?
+                toolCall.function.name += toolCallChunk.function.name
+              if toolCallChunk.function?.arguments?
+                toolCall.function.arguments += toolCallChunk.function.arguments
+                
+          when delta[key] is null then null
+          when typeof delta[key] is 'string'
             (objectFromDeltas?[key] ? '') + delta[key]
-          else if typeof delta[key] is 'object'
-            if _.isArray delta[key]
-              objectFromDeltas[key] = addDelta
-                objectFromDeltas:(objectFromDeltas?[key]?[_.toInteger delta.index] ? [])
-                delta: delta[key]
-            else
-              addDelta {objectFromDeltas: (objectFromDeltas?[key] ? {}), delta: delta[key]}
+          when typeof delta[key] is 'object'
+            addDelta {objectFromDeltas: (objectFromDeltas?[key] ? {}), delta: delta[key]}
+          else
+            throw new Meteor.Error "handleStream: addDelta: unknown type #{typeof delta[key]}"
       objectFromDeltas
-
-    fixArrays = (object) ->
-      console.log 'object', object
-      # console.log 'keysIn', _(object).keysIn().value()
-      unless _.isObject object
-        console.log 'is not Object', object
-        object
-      else
-        keys = _(object).keysIn()
-        if keys.every (key) -> key.match /\d+/
-          console.log 'is Array', object
-          keys
-          .map (key) -> fixArrays object[key]
-          .value()
-        else
-          console.log 'is Object', object
-          _(object)
-          .mapValues (value) -> fixArrays value
-          .value()
 
     updateContent = ->
       if oldContent isnt content
@@ -107,14 +103,13 @@ export createChatBot = ({
     new Promise (resolve) ->
       if done
         updateContent()
-        console.log 'objectFromDeltas', JSON.stringify objectFromDeltas, null, 2
-        # console.log 'fixedObjectFromDeltas', fixedObjectFromDeltas = fixArrays objectFromDeltas
+        # console.log 'objectFromDeltas', JSON.stringify objectFromDeltas, null, 2
         Meteor.clearInterval interval
         resolve
           message:
             content: content
             role: 'assistant'
-            tool_calls: objectFromDeltas.tool_calls
+            tool_calls: toolCalls
           usage:
             model: model
             prompt: 0
@@ -227,12 +222,12 @@ export createChatBot = ({
       workInProgress: false
       usage: usage
 
-  createLogMessage = ({sessionId, text = undefined, toolChoice = undefined, error = undefined, usage = undefined}) ->
+  createLogMessage = ({sessionId, text = undefined, toolCall = undefined, error = undefined, usage = undefined}) ->
     messageCollection.insertAsync
       userId: botUserData.id
       sessionId: sessionId
       text: text
-      toolChoice: toolChoice
+      toolCall: toolCall
       error: error
       chatRole: 'log'
       createdAt: new Date()
@@ -271,7 +266,7 @@ export createChatBot = ({
         message: response.choices[0].message
         usage: response.usage
     .then (response) ->
-      console.log 'response', JSON.stringify response, null, 2
+      # console.log 'response', JSON.stringify response, null, 2
       message = response.message
       prompt_tokens =
         if options?.stream
@@ -287,19 +282,19 @@ export createChatBot = ({
         model: model
         prompt: prompt_tokens
         completion: completion_tokens
-      unless (toolCalls = message?.tool_calls)?
+      unless (toolCalls = message?.tool_calls)? and toolCalls.length
         finalizeMessageStub {messageId, text: message?.content, usage}
       else
-        console.log 'toolCalls', JSON.stringify toolCalls, null, 2
         Promise.allSettled toolCalls.map (tc) ->
           return unless tc.function?.arguments?
           tc.function.arguments =
             if typeof tc.function.arguments is 'string'
               JSON.parse tc.function.arguments
             else tc.function.arguments
-          createLogMessage {sessionId, functionCall: tc, usage}
+          createLogMessage {sessionId, toolCall: tc, usage}
           (toolsWithRun.find (t) -> t.function.name is tc.function.name)?.run tc.function.arguments
         .then (result) ->
+          return unless result?
           createSystemMessage {sessionId, text: JSON.stringify result}
           messagesWithResult = buildContext {sessionId}
           call {sessionId, messageId: messageId, messages: messagesWithResult, allowFunctionCall: false}
