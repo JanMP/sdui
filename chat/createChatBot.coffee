@@ -2,8 +2,8 @@ import {Meteor} from 'meteor/meteor'
 import {Mongo} from 'meteor/mongo'
 import {setupOpenAIApi} from '../ai/setupOpenAIApi.coffee'
 import {tokenizer} from 'meteor/janmp:sdui'
-import omit from 'lodash/omit'
-import merge from 'lodash/merge'
+import _ from 'lodash'
+
 
 
 countTokens = (messages) ->
@@ -18,8 +18,8 @@ countTokens = (messages) ->
   @param {String} options.getSystemPrompt - a function that returns the system message the bot will ALLWAYS recive as first message
   @param {Object} [options.options={}] - the options for the OpenAI API
   @param {Object} [options.botUserData] - the user data for the bot
-  @param {Function} [options.getFunctions] - a function that returns an array of functions that can be called by the bot
-  @param {String} [options.functionCall] - the function call mode, can be 'auto', 'none' or 'manual'
+  @param {Function} [options.getTools] - a function that returns an array of functions that can be called by the bot
+  @param {String} [options.toolChoice] - the function call mode, can be 'auto', 'none' or 'manual'
   @param {Number} [options.contextTokenLimit=8191 - 2000] - the token limit for the context
   @param {String} [options.version] - the version of the chatbot, for logging
   ###
@@ -27,8 +27,8 @@ export createChatBot = ({
   model, getSystemPrompt, options = {},
   messageCollection,
   botUserData
-  getFunctions = ({sessionId = null}) -> []
-  functionCall = 'none'
+  getTools = ({sessionId = null}) -> []
+  toolChoice = 'none'
   contextTokenLimit = 8191 - 2000
 }) ->
   return unless Meteor.isServer
@@ -44,14 +44,39 @@ export createChatBot = ({
     objectFromDeltas = {}
 
     addDelta = ({objectFromDeltas, delta}) ->
+      console.log JSON.stringify {objectFromDeltas, delta}, null, 2
       for key of delta
         objectFromDeltas[key] =
           if delta[key] is null then null
           else if typeof delta[key] is 'string'
             (objectFromDeltas?[key] ? '') + delta[key]
           else if typeof delta[key] is 'object'
-            addDelta {objectFromDeltas: (objectFromDeltas?[key] ? {}), delta: delta[key]}
+            if _.isArray delta[key]
+              objectFromDeltas[key] = addDelta
+                objectFromDeltas:(objectFromDeltas?[key]?[_.toInteger delta.index] ? [])
+                delta: delta[key]
+            else
+              addDelta {objectFromDeltas: (objectFromDeltas?[key] ? {}), delta: delta[key]}
       objectFromDeltas
+
+    fixArrays = (object) ->
+      console.log 'object', object
+      # console.log 'keysIn', _(object).keysIn().value()
+      unless _.isObject object
+        console.log 'is not Object', object
+        object
+      else
+        keys = _(object).keysIn()
+        if keys.every (key) -> key.match /\d+/
+          console.log 'is Array', object
+          keys
+          .map (key) -> fixArrays object[key]
+          .value()
+        else
+          console.log 'is Object', object
+          _(object)
+          .mapValues (value) -> fixArrays value
+          .value()
 
     updateContent = ->
       if oldContent isnt content
@@ -70,9 +95,10 @@ export createChatBot = ({
         finishReason = chunk?.choices?[0]?.finish_reason
         objectFromDeltas = addDelta {objectFromDeltas, delta}
         content = objectFromDeltas.content
+        # console.log 'delta', JSON.stringify delta, null, 2
         if finishReason
           done = true
-          unless finishReason in ['stop','function_call']
+          unless finishReason in ['stop','tool_calls']
             throw new Meteor.Error "handleStream: finish_reason #{finishReason}"
       catch error
         done = true
@@ -81,12 +107,14 @@ export createChatBot = ({
     new Promise (resolve) ->
       if done
         updateContent()
+        console.log 'objectFromDeltas', JSON.stringify objectFromDeltas, null, 2
+        # console.log 'fixedObjectFromDeltas', fixedObjectFromDeltas = fixArrays objectFromDeltas
         Meteor.clearInterval interval
         resolve
           message:
             content: content
             role: 'assistant'
-            function_call: {name: objectFromDeltas.function_call?.name, arguments: try JSON.parse objectFromDeltas.function_call?.arguments}
+            tool_calls: objectFromDeltas.tool_calls
           usage:
             model: model
             prompt: 0
@@ -199,12 +227,12 @@ export createChatBot = ({
       workInProgress: false
       usage: usage
 
-  createLogMessage = ({sessionId, text = undefined, functionCall = undefined, error = undefined, usage = undefined}) ->
+  createLogMessage = ({sessionId, text = undefined, toolChoice = undefined, error = undefined, usage = undefined}) ->
     messageCollection.insertAsync
       userId: botUserData.id
       sessionId: sessionId
       text: text
-      functionCall: functionCall
+      toolChoice: toolChoice
       error: error
       chatRole: 'log'
       createdAt: new Date()
@@ -225,14 +253,16 @@ export createChatBot = ({
         messages: [{content: 'Hallo', role: 'user'}]
     ###
   call = ({sessionId, messageId, messages, allowFunctionCall = true}) ->
-    functions = getFunctions({sessionId, messageId})
-    functionParams = functions.map (f) -> omit f, 'run'
-    openAI.chat.completions.create {
+    toolsWithRun = getTools({sessionId, messageId})
+    tools = toolsWithRun.map (f) -> _.omit f, 'run'
+    params = {
       model, messages, options...,
-      functions: if allowFunctionCall then functionParams,
-      function_call: if allowFunctionCall then functionCall,
+      tools: if allowFunctionCall then tools,
+      tool_choice: if allowFunctionCall then toolChoice,
       # responseType: if options?.stream then 'stream'
     }
+    # console.log 'params', JSON.stringify params, null, 2
+    openAI.chat.completions.create params
     .then (response) ->
       if options.stream
         handleStream {response, messageStubId: messageId}
@@ -241,7 +271,7 @@ export createChatBot = ({
         message: response.choices[0].message
         usage: response.usage
     .then (response) ->
-      # console.log 'response', response
+      console.log 'response', JSON.stringify response, null, 2
       message = response.message
       prompt_tokens =
         if options?.stream
@@ -257,17 +287,20 @@ export createChatBot = ({
         model: model
         prompt: prompt_tokens
         completion: completion_tokens
-      unless (fc = message?.function_call)?.name
+      unless (toolCalls = message?.tool_calls)?
         finalizeMessageStub {messageId, text: message?.content, usage}
       else
-        fc.arguments =
-          if typeof fc.arguments is 'string'
-            JSON.parse fc.arguments
-          else fc.arguments
-        createLogMessage {sessionId, functionCall: fc, usage}
-        (functions.find (f) -> f.name is fc.name)?.run fc.arguments
+        console.log 'toolCalls', JSON.stringify toolCalls, null, 2
+        Promise.allSettled toolCalls.map (tc) ->
+          return unless tc.function?.arguments?
+          tc.function.arguments =
+            if typeof tc.function.arguments is 'string'
+              JSON.parse tc.function.arguments
+            else tc.function.arguments
+          createLogMessage {sessionId, functionCall: tc, usage}
+          (toolsWithRun.find (t) -> t.function.name is tc.function.name)?.run tc.function.arguments
         .then (result) ->
-          createSystemMessage {sessionId, text: result}
+          createSystemMessage {sessionId, text: JSON.stringify result}
           messagesWithResult = buildContext {sessionId}
           call {sessionId, messageId: messageId, messages: messagesWithResult, allowFunctionCall: false}
     .catch (error) ->

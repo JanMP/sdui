@@ -58,12 +58,12 @@ HistoryDisplay = ({sourceName, rowData}) ->
                   markdown={entry?.text}
                   contentClass="surface-100 px-3 py-1"
                 />
-              else if entry?.functionCall?
+              else if entry?.toolCallCall?
                 <div className="bg-blue-100 p-3">
                   <span>Funktion: </span>
-                  <span className="font-bold">{entry?.functionCall.name} </span>
+                  <span className="font-bold">{entry?.toolCallCall.name} </span>
                   <span>mit Argumenten: </span>
-                  <pre className="font-bold">{JSON.stringify entry?.functionCall.arguments, null, 2}</pre>
+                  <pre className="font-bold">{JSON.stringify entry?.toolCallCall.arguments, null, 2}</pre>
                 </div>
               else if entry?.error?
                 <div className="bg-red-100 px-3 py-1">
