@@ -58,12 +58,12 @@ HistoryDisplay = ({sourceName, rowData}) ->
                   markdown={entry?.text}
                   contentClass="surface-100 px-3 py-1"
                 />
-              else if entry?.toolCallCall?
+              else if entry?.toolCall?
                 <div className="bg-blue-100 p-3">
                   <span>Funktion: </span>
-                  <span className="font-bold">{entry?.toolCallCall.name} </span>
+                  <span className="font-bold">{entry?.toolCall?.function?.name} </span>
                   <span>mit Argumenten: </span>
-                  <pre className="font-bold">{JSON.stringify entry?.toolCallCall.arguments, null, 2}</pre>
+                  <pre className="font-bold">{JSON.stringify entry?.toolCall?.function?.arguments, null, 2}</pre>
                 </div>
               else if entry?.error?
                 <div className="bg-red-100 px-3 py-1">
@@ -72,7 +72,8 @@ HistoryDisplay = ({sourceName, rowData}) ->
                 </div>
               else
                 <div className="surface-200 px-3 py-1">
-                  <span className="font-bold">Keine Nachricht</span>
+                  <span className="font-bold">Unbekannter Eintrag</span>
+                  <pre>{JSON.stringify entry, null, 2}</pre>
                 </div>
             }
           </div>
