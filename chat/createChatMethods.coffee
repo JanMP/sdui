@@ -119,7 +119,9 @@ export createChatMethods = ({
       # @ts-ignore
       reactToNewMessage {newMessage..., messageId}
       .catch (error) ->
-        throw new Meteor.Error error.message, 'Error while trying to react to new message from user'
+        console.error error
+        if Meteor.isClient
+          throw new Meteor.Error error
       messageId
 
   new ValidatedMethod
