@@ -1,10 +1,7 @@
 import {Meteor} from 'meteor/meteor'
 import {Mongo} from 'meteor/mongo'
-import {setupOpenAIApi} from '../ai/setupOpenAIApi.coffee'
 import {tokenizer} from 'meteor/janmp:sdui'
 import _ from 'lodash'
-
-
 
 countTokens = (messages) ->
   messages
@@ -13,28 +10,31 @@ countTokens = (messages) ->
 
 ###*
   @param {Object} options
-  @param {Mongo.Collection} options.messageCollection
-  @param {String} options.model - the OpenAI model to use
+  @param {Object} options.chatClient - the js chat client
+  @param {Boolean} options.stream - if true, the bot will stream its response
+  @param {String} options.model - the model name to use
   @param {String} options.getSystemPrompt - a function that returns the system message the bot will ALLWAYS recive as first message
-  @param {Object} [options.options={}] - the options for the OpenAI API
-  @param {Object} [options.botUserData] - the user data for the bot
-  @param {Function} [options.getTools] - a function that returns an array of functions that can be called by the bot
-  @param {String} [options.toolChoice] - the function call mode, can be 'auto', 'none' or 'manual'
+  @param {Function} [options.getTools=({sessionId = null}) => []] - a function that returns an array of tools that can be called by the bot
+  @param {String} [options.toolChoice] - the function call mode
+  @param {Object} [options.options={}] - additional options for the llm call
   @param {Number} [options.contextTokenLimit=8191 - 2000] - the token limit for the context
-  @param {String} [options.version] - the version of the chatbot, for logging
+  @param {Boolean} [options.allowRecursiveToolCalls=false] - if true, the bot may call tools on 2nd call
+  @param {Mongo.Collection} options.messageCollection
+  @param {Object} [options.botUserData] - the user data for the bot
   ###
 export createChatBot = ({
-  model, getSystemPrompt, options = {},
+  chatClient,
+  stream = false,
+  model, getSystemPrompt,
+  getTools = ({sessionId = null}) -> []
+  toolChoice,
+  options = {}
+  contextTokenLimit = 8191 - 2000
+  allowRecursiveToolCalls = false
   messageCollection,
   botUserData
-  getTools = ({sessionId = null}) -> []
-  toolChoice = 'none'
-  contextTokenLimit = 8191 - 2000
 }) ->
   return unless Meteor.isServer
-
-  model ?= 'gpt-3.5-turbo'
-  openAI = setupOpenAIApi()
 
   handleStream = ({response, messageStubId}) ->
     done = false
@@ -45,11 +45,10 @@ export createChatBot = ({
     toolCalls = []
 
     addDelta = ({objectFromDeltas, delta}) ->
-      # console.log JSON.stringify {objectFromDeltas, delta}, null, 2
       for key of delta
         objectFromDeltas[key] = switch
           when key is 'tool_calls'
-            for toolCallChunk in delta.tool_calls
+            for toolCallChunk in delta.tool_calls # special handling of tool_calls
               if toolCalls.length <= toolCallChunk.index
                 toolCalls.push
                   id: ''
@@ -64,7 +63,6 @@ export createChatBot = ({
                 toolCall.function.name += toolCallChunk.function.name
               if toolCallChunk.function?.arguments?
                 toolCall.function.arguments += toolCallChunk.function.arguments
-                
           when delta[key] is null then null
           when typeof delta[key] is 'string'
             (objectFromDeltas?[key] ? '') + delta[key]
@@ -103,7 +101,6 @@ export createChatBot = ({
     new Promise (resolve) ->
       if done
         updateContent()
-        # console.log 'objectFromDeltas', JSON.stringify objectFromDeltas, null, 2
         Meteor.clearInterval interval
         resolve
           message:
@@ -152,7 +149,6 @@ export createChatBot = ({
       messages = [{content: system, role: 'system'}, croppedHistory..., additionalMessages...]
       try
         if tokenizer.isWithinTokenLimit messages, contextTokenLimit
-          # console.log 'buildHistory: tokenLimit not reached'
           messages
         else
           console.log 'buildHistory: tokenLimit reached, trying again with limit ', limit - 1
@@ -248,6 +244,7 @@ export createChatBot = ({
         messages: [{content: 'Hallo', role: 'user'}]
     ###
   call = ({sessionId, messageId, messages, allowFunctionCall = true}) ->
+    callFkt = if stream then chatClient.chatStream else chatClient.chat
     toolsWithRun = getTools({sessionId, messageId})
     tools = toolsWithRun.map (f) -> _.omit f, 'run'
     params = {
@@ -256,17 +253,14 @@ export createChatBot = ({
       tool_choice: if allowFunctionCall then toolChoice,
       # responseType: if options?.stream then 'stream'
     }
-    # console.log 'params', JSON.stringify params, null, 2
-    openAI.chat.completions.create params
+    callFkt params
     .then (response) ->
-      if options.stream
+      if stream
         handleStream {response, messageStubId: messageId}
       else
-        # console.log 'response.data', response?.data
         message: response.choices[0].message
         usage: response.usage
     .then (response) ->
-      # console.log 'response', JSON.stringify response, null, 2
       message = response.message
       prompt_tokens =
         if options?.stream
@@ -297,7 +291,7 @@ export createChatBot = ({
           return unless result?
           createSystemMessage {sessionId, text: JSON.stringify result}
           messagesWithResult = buildContext {sessionId}
-          call {sessionId, messageId: messageId, messages: messagesWithResult, allowFunctionCall: false}
+          call {sessionId, messageId: messageId, messages: messagesWithResult, allowFunctionCall: allowRecursiveToolCalls}
     .catch (error) ->
       createLogMessage {sessionId, error: error}
       throw error
