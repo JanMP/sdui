@@ -28,7 +28,21 @@ allowedRolesToOptions = (allowedRoles) ->
     .value()
   [globalOptions..., scopedOptions...]
 
-
+###*
+ * RoleSelect component for assigning roles to users. This component displays a multiselect dropdown
+ * that allows the selection of multiple roles for a user. The roles can be either global or scoped to specific areas.
+ * Upon selection, the new roles are updated for the user through a Meteor method call.
+ * This component leverages the uniforms package for React for form handling.
+ *
+ * @param {Object} props The component props.
+ * @param {Object} props.row The data row corresponding to the current user, containing ids and roles.
+ * @param {String} props.columnKey The key corresponding to the current column in the data table.
+ * @param {Object} props.schemaBridge An object provided by uniforms to bridge the schema.
+ * @param {Function} props.onChangeField A callback function to call when the field value changes.
+ * @param {Function} props.measure A function for measure calculations, not utilized in the current implementation.
+ * @param {Boolean} props.mayEdit A flag indicating if the current user can edit roles.
+ * @returns {React.Element} The RoleSelect component rendering a MultiSelect dropdown or a simple div based on the editing permissions.
+###
 export RoleSelect = ({row, columnKey, schemaBridge, onChangeField, measure, mayEdit}) ->
 
   [options, setOptions] = useState null
