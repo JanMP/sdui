@@ -31,5 +31,5 @@ export default connectFieldPlus ({
     minDate={minDate}
     onChange={(e) -> onChange e.value}
     value={value}
-    {(filterDOMProps props)...}
+    {props...}
   />

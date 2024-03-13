@@ -27,7 +27,7 @@ export default connectFieldPlus ({
             name={name}
             onChange={-> onChange item}
             value={item}
-            {(filterDOMProps props)...}
+            {props...}
           />
           <label htmlFor={idString}>{item}</label>
         </div>

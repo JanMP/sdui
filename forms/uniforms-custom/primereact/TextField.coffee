@@ -15,5 +15,5 @@ export default connectFieldPlus ({
     disabled={disabled}
     value={value ? ""}
     onChange={(e) -> onChange e.target.value}
-    {(filterDOMProps props)...}
+    {props...}
   />

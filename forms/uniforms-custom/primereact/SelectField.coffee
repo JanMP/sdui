@@ -21,7 +21,7 @@ Select = ({
     onChange={(e) -> onChange e.value}
     style={minWidh: '100%', maxWidth: '100%'}
     value={value}
-    {(filterDOMProps props)...}
+    {props...}
   />
 
 export default connectFieldPlus Select
