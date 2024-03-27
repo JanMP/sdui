@@ -1,6 +1,6 @@
 import {Meteor} from 'meteor/meteor'
 import {Mongo} from 'meteor/mongo'
-import SimpleSchema from 'simpl-schema'
+import SimpleSchema from 'meteor/aldeed:simple-schema'
 import {ValidatedMethod} from 'meteor/mdg:validated-method'
 import {createTableDataAPI, chatSchema} from 'meteor/janmp:sdui'
 import _ from 'lodash'

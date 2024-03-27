@@ -1,7 +1,7 @@
 import {Meteor} from 'meteor/meteor'
 import {Mongo} from 'meteor/mongo'
 import {ValidatedMethod} from 'meteor/mdg:validated-method'
-import SimpleSchema from 'simpl-schema'
+import SimpleSchema from 'meteor/aldeed:simple-schema'
 import {currentUserMustBeInRole, currentUserIsInRole} from '../common/roleChecks.coffee'
 
 import _ from 'lodash'

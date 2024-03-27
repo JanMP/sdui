@@ -1,6 +1,6 @@
 import React from 'react'
 import {Accounts} from 'meteor/accounts-base'
-import SimpleSchema from 'simpl-schema'
+import SimpleSchema from 'meteor/aldeed:simple-schema'
 import SimpleSchemaBridge from 'uniforms-bridge-simple-schema-2'
 import {AutoForm, SubmitField, PasswordField} from '../forms/uniforms-custom/select-implementation'
 

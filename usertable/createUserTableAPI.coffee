@@ -1,6 +1,6 @@
 import {Meteor} from 'meteor/meteor'
 import {Accounts} from 'meteor/accounts-base'
-import SimpleSchema from 'simpl-schema'
+import SimpleSchema from 'meteor/aldeed:simple-schema'
 import {createTableDataAPI} from '../api/createTableDataAPI.coffee'
 import {currentUserMustBeInRole} from '../common/roleChecks.coffee'
 import {ValidatedMethod} from 'meteor/mdg:validated-method'
@@ -10,6 +10,16 @@ import _ from 'lodash'
 
 SimpleSchema.extendOptions(['sdTable', 'uniforms'])
 
+###*
+ * createUserTableAPI function configures and exposes an API for user table manipulation, including CRUD operations,
+ * roles assignment, and user status tracking. It leverages Meteorjs, MongoDB, and SimpleSchema for data validation.
+ * 
+ * @param {Object} options - Configuration options for the user table API.
+ * @param {SimpleSchema} options.userProfileSchema - Schema for user profile information.
+ * @param {Function} options.getAllowedRoles - Function returning a list of allowed roles for users.
+ * @param {String} options.viewUserTableRole - Role required to view the user table. Defaults to 'admin'.
+ * @param {String} options.editUserRole - Role required to edit users. Defaults to 'admin'.
+### 
 export createUserTableAPI = ({userProfileSchema, getAllowedRoles, viewUserTableRole = 'admin'  , editUserRole = 'admin'}) ->
 
   getAllowedRoles ?= ->
