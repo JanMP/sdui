@@ -2,7 +2,7 @@ import {Meteor} from 'meteor/meteor'
 import {Mongo} from 'meteor/mongo'
 import {createTableDataAPI} from '../api/createTableDataAPI'
 import {currentUserMustBeInRole} from '../common/roleChecks'
-import SimpleSchema from 'simpl-schema'
+import SimpleSchema from 'meteor/aldeed:simple-schema'
 import pick from 'lodash/pick'
 import {meteorApply} from '../common/meteorApply'
 

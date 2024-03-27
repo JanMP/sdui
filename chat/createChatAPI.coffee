@@ -2,7 +2,7 @@ import {Meteor} from 'meteor/meteor'
 import {Mongo} from 'meteor/mongo'
 import {createChatMethods} from './createChatMethods'
 import {createChatPublications} from './createChatPublications'
-import SimpleSchema from 'simpl-schema'
+import SimpleSchema from 'meteor/aldeed:simple-schema'
 import {createChatSessionListAPI} from './createChatSessionListAPI'
 
 export chatSchema = new SimpleSchema
