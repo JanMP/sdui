@@ -36,6 +36,9 @@ export createChatBot = ({
 }) ->
   return unless Meteor.isServer
 
+  unless messageCollection?
+    throw new Meteor.Error 'createChatBot: messageCollection is required'
+
   handleStream = ({response, messageStubId}) ->
     done = false
     content = ''
