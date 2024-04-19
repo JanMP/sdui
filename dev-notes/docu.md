@@ -158,7 +158,7 @@ DELETE Request to `<server-url>/api/users/remove/<username>` with API-Key in `x-
 ## Methods
 ### setRole
 Switch between user roles `free-user` and `paying-user`with scope `falkemedia`.
-`Meteor.call('[sourceName].setRole, [{role: String}])`
+`Meteor.call('[sourceName].setRole, {role: String})`
 This message allows the client to switch between those two roles, if the user is not in either of those roles, the method will throw an error. 
 
 [^1]: as of 27.2.24 there is no built-in ui to manage users of a chat session, yet.
