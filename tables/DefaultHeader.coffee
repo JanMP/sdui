@@ -14,7 +14,7 @@ import * as types from '../typeDeclarations'
 export DefaultHeader = ({
   listSchemaBridge
   queryEditorSchemaBridge
-  loadedRowCount, totalRowCount
+  loadedRowCount
   canSearch, search, onChangeSearch
   canUseQueryEditor, queryUiObject, onChangeQueryUiObject
   canExport, mayExport, onExportTable,
@@ -56,8 +56,7 @@ export DefaultHeader = ({
           when width < 655 then "flex-order-1"
           else "flex-order-2"
 
-  startContent =
-    if totalRowCount then <span>{loadedRowCount}/{totalRowCount}</span>
+  startContent = -> null
 
   centerContent =
     <>

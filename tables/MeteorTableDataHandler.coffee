@@ -22,7 +22,7 @@ defaultQueryUiObject = null
 export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponents}) ->
   {
   sourceName, listSchemaBridge,
-  rowsCollection, rowCountCollection
+  rowsCollection
   initialSortColumn
   initialSortDirection
   perLoad
@@ -58,14 +58,12 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
   perLoad ?= 500
   query ?= defaultQuery
 
-  if usePubSub and not (rowsCollection? and rowCountCollection?)
-    throw new Error 'usePubSub is true but rowsCollection or rowCountCollection not given'
+  if usePubSub and not rowsCollection?
+    throw new Error 'usePubSub is true but rowsCollection not given'
 
   if sourceName?
     getRowMethodName = "#{sourceName}.getRows"
-    getRowCountMethodName = "#{sourceName}.getCount"
     rowPublicationName = "#{sourceName}.rows"
-    rowCountPublicationName = "#{sourceName}.count"
     submitMethodName = "#{sourceName}.submit"
     setValueMethodName = "#{sourceName}.setValue"
     fetchEditorDataMethodName = "#{sourceName}.fetchEditorData"
@@ -81,7 +79,6 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
   rejectRef = useRef ->
 
   [rows, setRows] = useState []
-  [totalRowCount, setTotalRowCount] = useState 0
   [limit, setLimit] = useState perLoad
 
   [isLoading, setIsLoading] = useState false
@@ -118,22 +115,6 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
       console.error error
       setIsLoading false
 
-  getTotalRowCount = ->
-    return unless showRowCount
-    return if usePubSub
-    meteorApply
-      method: getRowCountMethodName
-      data: {search, query, queryUiObject}
-    .then (result) ->
-      setTotalRowCount result?[0]?.count or 0
-    .catch console.error
-
-  useEffect ->
-    if query? # handle this
-      getTotalRowCount()
-    return
-  , [search, query, queryUiObject, sourceName]
-
   useEffect ->
     setLimit perLoad
     return
@@ -149,21 +130,7 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
   useEffect ->
     setIsLoading subLoading
   , [subLoading]
-  
-  countSubLoading = useTracker ->
-    return unless showRowCount
-    return unless usePubSub
-    handle = Meteor.subscribe rowCountPublicationName, {query, queryUiObject, search}
-    not handle.ready()
 
-  subRowCount = useTracker ->
-    return unless showRowCount
-    return unless usePubSub
-    rowCountCollection.findOne({})?.count or 0
-  
-  useEffect ->
-    setTotalRowCount subRowCount
-  , [subRowCount]
 
   subRows = useTracker ->
     return unless usePubSub
@@ -263,7 +230,7 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
           <DisplayComponent {{
             sourceName,
             listSchemaBridge, formSchemaBridge, queryEditorSchemaBridge,
-            rows, totalRowCount, loadMoreRows, onRowClick,
+            rows, loadMoreRows, onRowClick,
             canSort, sortColumn, sortDirection, onChangeSort
             canSearch, search, onChangeSearch
             canUseQueryEditor, queryUiObject, onChangeQueryUiObject

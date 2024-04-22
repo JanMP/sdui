@@ -11,7 +11,7 @@ export createTableDataMethods = ({
 viewTableRole, editRole, addRole, deleteRole, exportTableRole,
 sourceName, collection,
 useObjectIds,
-getRowsPipeline, getRowCountPipeline, getExportPipeline
+getRowsPipeline, getExportPipeline
 canEdit, canAdd, canDelete, canExport
 formSchema, makeFormDataFetchMethodRunFkt, makeSubmitMethodRunFkt, makeDeleteMethodRunFkt
 checkDisableDeleteForRow, checkDisableEditForRow}) ->
@@ -47,30 +47,6 @@ checkDisableDeleteForRow, checkDisableEditForRow}) ->
     makeDeleteMethodRunFkt?({collection, transformIdToMongo, transformIdToMiniMongo}) ?
     ({id}) ->
       await collection.removeAsync _id: transformIdToMongo id
-  
-
-  getCount = new ValidatedMethod
-    name: "#{sourceName}.getCount"
-    validate:
-      new SimpleSchema
-        search:
-          type: String
-          optional: true
-        query:
-          type: Object
-          blackbox: true
-        queryUiObject:
-          type: Object
-          blackbox: true
-      .validator()
-    run: ({search, query, queryUiObject}) ->
-      currentUserMustBeInRole viewTableRole
-      return unless Meteor.isServer
-      collection.rawCollection()
-      .aggregate getRowCountPipeline {search, query, queryUiObject}
-      .toArray()
-      .catch (error) ->
-        console.error "#{sourceName}.getCount", error
 
 
   getRows = new ValidatedMethod
@@ -213,4 +189,4 @@ checkDisableDeleteForRow, checkDisableEditForRow}) ->
         return unless Meteor.isServer
         deleteMethodRun {id}
 
-  {getCount, getRows}
+  {getRows}

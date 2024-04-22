@@ -20,7 +20,7 @@ export TableEditModalHandler = ({tableOptions, DisplayComponent}) ->
   {
     sourceName
     listSchemaBridge, formSchemaBridge, queryEditorSchemaBridge
-    rows, totalRowCount, loadMoreRows, onRowClick,
+    rows, loadMoreRows, onRowClick,
     canSort, sortColumn, sortDirection, onChangeSort
     canSearch, search, onChangeSearch
     canUseQueryEditor, queryUiObject, onChangeQueryUiObject,
@@ -111,7 +111,7 @@ export TableEditModalHandler = ({tableOptions, DisplayComponent}) ->
           sourceName
           listSchemaBridge,
           queryEditorSchemaBridge
-          rows, totalRowCount, loadMoreRows, onRowClick,
+          rows, loadMoreRows, onRowClick,
           canSort, sortColumn, sortDirection, onChangeSort
           canSearch, search, onChangeSearch
           canUseQueryEditor, queryUiObject, onChangeQueryUiObject

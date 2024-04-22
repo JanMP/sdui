@@ -24,7 +24,7 @@ export DataList = ({
   sourceName,
   listSchemaBridge,
   queryEditorSchemaBridge,
-  rows, limit, totalRowCount,
+  rows, limit,
   loadMoreRows = (args...) -> console.log "loadMoreRows default stump called with arguments:", args...
   canSort, sortColumn, sortDirection,
   onChangeSort = (args...) -> console.log "onChangeSort default stump called with arguments:", args...
@@ -117,7 +117,7 @@ export DataList = ({
         <Header {{
           listSchemaBridge
           queryEditorSchemaBridge
-          loadedRowCount: rows?.length, totalRowCount
+          loadedRowCount: rows?.length
           canSearch, search, onChangeSearch
           canUseQueryEditor, onChangeQueryUiObject, queryUiObject
           canExport, mayExport, onExportTable
@@ -130,7 +130,7 @@ export DataList = ({
         <InfiniteLoader
           isRowLoaded={isRowLoaded}
           loadMoreRows={loadMoreRows}
-          rowCount={totalRowCount}
+          rowCount={1000000}
         >
           {({onRowsRendered, registerChild}) ->
             registerChild tableRef

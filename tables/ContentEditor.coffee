@@ -28,7 +28,7 @@ export ContentEditor = ({tableOptions}) ->
   {
   sourceName
   listSchemaBridge, formSchemaBridge, queryEditorSchemaBridge
-  rows, totalRowCount, loadMoreRows, onRowClick,
+  rows, loadMoreRows, onRowClick,
   canSort, sortColumn, sortDirection, onChangeSort
   canSearch, search, onChangeSearch
   canUseQueryEditor, queryUiObject, onChangeQueryUiObject
@@ -176,7 +176,7 @@ export ContentEditor = ({tableOptions}) ->
             {{
               sourceName
               listSchemaBridge, queryEditorSchemaBridge,
-              rows, totalRowCount, loadMoreRows, onRowClick,
+              rows, loadMoreRows, onRowClick,
               canSort, sortColumn, sortDirection, onChangeSort
               canSearch, search, onChangeSearch
               canUseQueryEditor, queryUiObject, onChangeQueryUiObject

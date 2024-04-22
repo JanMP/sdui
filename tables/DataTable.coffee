@@ -112,7 +112,7 @@ export DataTable = ({
   sourceName,
   listSchemaBridge,
   queryEditorSchemaBridge
-  rows, limit, totalRowCount,
+  rows, limit,
   loadMoreRows = (args...) -> console.log "loadMoreRows default stump called with arguments:", args...
   canSort, sortColumn, sortDirection,
   onChangeSort = (args...) -> console.log "onChangeSort default stump called with arguments:", args...
@@ -254,7 +254,7 @@ export DataTable = ({
       <Header {{
         listSchemaBridge
         queryEditorSchemaBridge
-        loadedRowCount: rows?.length, totalRowCount
+        loadedRowCount: rows?.length
         canSearch, search, onChangeSearch
         canUseQueryEditor, queryUiObject, onChangeQueryUiObject
         canExport, mayExport, onExportTable,
@@ -268,7 +268,7 @@ export DataTable = ({
       <InfiniteLoader
         isRowLoaded={isRowLoaded}
         loadMoreRows={loadMoreRows}
-        rowCount={totalRowCount}
+        rowCount={1000000}
       >
         {({onRowsRendered, registerChild}) ->
           registerChild tableRef

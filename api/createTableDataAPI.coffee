@@ -28,7 +28,6 @@ export createTableDataAPI = ({
   setupNewItem
   onSubmit
   onDelete
-  showRowCount
   checkDisableEditForRow
   checkDisableDeleteForRow
 }) ->
@@ -90,13 +89,11 @@ export createTableDataAPI = ({
     else
       new SimpleSchema2Bridge(queryEditorSchema)
 
-  {defaultGetRowsPipeline
-  defaultGetRowCountPipeline
-  defaultGetExportPipeline} = createDefaultPipeline {getPreSelectPipeline, getProcessorPipeline, listSchema, queryEditorSchema}
+  {defaultGetRowsPipeline, defaultGetExportPipeline} =
+    createDefaultPipeline {getPreSelectPipeline, getProcessorPipeline, listSchema, queryEditorSchema}
 
 
   getRowsPipeline ?= defaultGetRowsPipeline
-  getRowCountPipeline ?= defaultGetRowCountPipeline
   getExportPipeline ?= defaultGetExportPipeline
 
   setupNewItem ?= -> {}
@@ -105,17 +102,16 @@ export createTableDataAPI = ({
 
   if Meteor.isClient # setup local collections for publications
     rowsCollection = new Mongo.Collection "#{sourceName}.rows"
-    rowCountCollection = new Mongo.Collection "#{sourceName}.count"
   
   publishTableData {
     viewTableRole, sourceName, collection,
-    getRowsPipeline, getRowCountPipeline,
+    getRowsPipeline,
     noAutomaticObserver, debounceDelay, observers
   }
 
   createTableDataMethods {
     viewTableRole, editRole, addRole, deleteRole, exportTableRole, sourceName, collection, useObjectIds,
-    getRowsPipeline, getRowCountPipeline, getExportPipeline
+    getRowsPipeline, getExportPipeline
     canEdit, canAdd, canDelete, canExport, formSchema,
     makeFormDataFetchMethodRunFkt, makeSubmitMethodRunFkt, makeDeleteMethodRunFkt
     checkDisableDeleteForRow, checkDisableEditForRow
@@ -125,7 +121,7 @@ export createTableDataAPI = ({
   #return props for the ui component
   {
     sourceName, listSchemaBridge, formSchemaBridge, queryEditorSchemaBridge,
-    rowsCollection, rowCountCollection
+    rowsCollection
     canEdit
     canSearch
     canSort
@@ -143,5 +139,4 @@ export createTableDataAPI = ({
     setupNewItem
     onSubmit
     onDelete
-    showRowCount
   }

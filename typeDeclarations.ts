@@ -88,7 +88,6 @@ export interface createTableDataAPIReturn {
   formSchemaBridge: SimpleSchema2Bridge
   queryEditorSchemaBridge: SimpleSchema2Bridge
   rowsCollection: Mongo.Collection<any>
-  rowCountCollection: Mongo.Collection<any>
   canEdit?: boolean
   canSearch?: boolean
   canUseQueryEditor?: boolean
@@ -130,7 +129,6 @@ export type DataTableOptions = createTableDataAPIReturn & additionalDataTableOpt
 
 export interface additionalDataTableDisplayOptions {
   rows: [any]
-  totalRowCount: number
   loadMoreRows: ({startIndex, stopIndex}: {startIndex: number, stopIndex: number}) => Promise<any>
   sortColumn: string
   sortDirection: 'ASC' | 'DESC'
@@ -158,7 +156,6 @@ export interface DataTableHeaderOptions {
   listSchemaBridge: SimpleSchema2Bridge
   queryEditorSchemaBridge: SimpleSchema2Bridge
   loadedRowCount: number
-  totalRowCount: number
   canSearch?: boolean
   search?: string
   onChangeSearch?: (searchString: string) => void
