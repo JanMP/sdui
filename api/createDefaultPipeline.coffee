@@ -1,9 +1,9 @@
 import {getColumnsToExport} from '../common/getColumnsToExport.coffee'
 import processSearchInput from '../common/processSearchInput.coffee'
 import queryUiObjectToQuery from '../query-editor/queryUiObjectToQuery.coffee'
-
-
 import _ from 'lodash'
+
+debugPipelines = Meteor.settings.debugPipelines ? false
 
 
 export createDefaultPipeline = ({getPreSelectPipeline, getProcessorPipeline, listSchema, queryEditorSchema}) ->
@@ -73,13 +73,13 @@ export createDefaultPipeline = ({getPreSelectPipeline, getProcessorPipeline, lis
       .value()
 
   defaultGetRowsPipeline = ({pub, search, query = {}, queryUiObject, sort = {_id: 1}, limit = 100, skip = 0}) ->
-    [
+    _.compact [
       getPreSelectPipeline({pub})...,
       {$match: query},
       getProcessorPipeline({pub})...,
       getQueryEditorPipeline({queryUiObject})...
       (searchPipeline {search})...,
-      projectStage, # This is super important. Dont delete it by mistake again...
+      projectStage unless debugPipelines, # This is super important. Dont delete it by mistake again...
      {$sort: sort}, {$skip: skip}, {$limit: limit}
     ]
 
