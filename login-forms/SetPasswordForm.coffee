@@ -5,7 +5,6 @@ import SimpleSchemaBridge from 'uniforms-bridge-simple-schema-2'
 import {AutoForm, SubmitField, PasswordField} from '../forms/uniforms-custom/select-implementation'
 
 
-# TODO [PrimeReact] switch to PrimeReact password input
 passwordSchema = new SimpleSchema
   password:
     type: String

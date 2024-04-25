@@ -18,7 +18,7 @@ export createTableDataAPI = ({
   getPreSelectPipeline
   getProcessorPipeline,
   # CHECK if they work or if we should get rid of the following:
-  getRowsPipeline, getRowCountPipeline, getExportPipeline
+  getRowsPipeline, getExportPipeline
   makeFormDataFetchMethodRunFkt, makeSubmitMethodRunFkt, makeDeleteMethodRunFkt
   noAutomaticObserver
   debounceDelay
@@ -27,7 +27,7 @@ export createTableDataAPI = ({
   perLoad,
   setupNewItem
   onSubmit
-  onDelete
+  onDelete # CHECK if we use this, and remove or add to type declaration
   checkDisableEditForRow
   checkDisableDeleteForRow
 }) ->
