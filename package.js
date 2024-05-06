@@ -17,7 +17,7 @@ Package.onUse(function(api) {
   api.use('typescript');
   api.use('zodern:types@1.0.9');
   api.use('reactive-var');
-  api.use('alanning:roles@3.4.0');
+  api.use('alanning:roles@3.6.2');
   api.use('mdg:validated-method@1.2.0');
   api.use('peerlibrary:reactive-publish@0.10.0');
   api.use('tunguska:reactive-aggregate@1.3.15');
