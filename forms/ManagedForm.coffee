@@ -6,7 +6,7 @@ import isEqual from 'lodash/isEqual'
 import {ErrorBoundary} from '../common/ErrorBoundary.coffee'
 import {useTranslation} from 'react-i18next'
 
-
+# TODO handle validation and error display differently
 export ManagedForm = ({schemaBridge, model, onChangeModel, onSubmit, disabled, children}) ->
 
   {t} = useTranslation()

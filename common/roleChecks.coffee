@@ -56,12 +56,12 @@ export useCurrentUserIsInRole = (role) -> useTracker -> currentUserIsInRole role
 
   In addition to roles defined via alanning:roles you can specify
   'any' and 'logged-in'
-  @param {Role} role - the alanning:role 
+  @param {Role} role - the alanning:role
   @throws {Meteor.Error} throws an error when user is not in role
   ###
 export currentUserMustBeInRole = (role) ->
   unless currentUserIsInRole role
-    throw new Meteor.Error "user must be in role #{role}"
+    throw new Meteor.Error "user must be in role #{JSON.stringify role}"
 
 ###*
   @param {string | Array<string>} role

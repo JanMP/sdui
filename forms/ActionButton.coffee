@@ -1,5 +1,4 @@
 import React, {useState, useRef} from 'react'
-
 import {meteorApply} from '../common/meteorApply.coffee'
 import {ProgressSpinner} from 'primereact/progressspinner'
 import {ConfirmationModal} from './ConfirmationModal'
@@ -46,9 +45,11 @@ buttonProps}) ->
   onError ?=
     (error) ->
       toast.curent?.show
+      toast.current?.show
         severity: 'error'
         summary: 'Fehler'
         detail: "#{errorMsg ? error.message}"
+        position: 'top-right'
 
   [isBusy, setIsBusy] = useState false
   [modalIsOpen, setModalIsOpen] = useState false
