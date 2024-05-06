@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react'
 import {MeteorTableDataHandler} from './MeteorTableDataHandler.coffee'
-import {connectField} from 'uniforms'
+import connectFieldPlus from '../forms/connectFieldPlus.coffee'
 import {Dropdown} from 'primereact/dropdown'
 import _ from 'lodash'
 
@@ -20,15 +20,15 @@ DisplayComponent = (value, onChange, selectOptions) -> (tableOptions) ->
 
   valueOption = (_.find options, {value}) ? if value? then {value, label: "[#{value}]"}
 
-  <div>
-    {<pre>{JSON.stringify options , null, 2}</pre> if false}
-    <Dropdown
-      value={valueOption}
-      onChange={(e) -> onChange e.value}
-      options={options}
-      onInputChange={tableOptions.onChangeSearch}
-    />
-  </div>
+
+  <Dropdown
+    value={valueOption}
+    onChange={(e) -> onChange e.value}
+    options={options}
+    onInputChange={tableOptions.onChangeSearch}
+    style={minWidh: '100%', maxWidth: '100%'}
+  />
+
 
 
 export SdDocumentSelect = ({value, onChange, dataOptions, selectOptions}) ->
@@ -37,4 +37,4 @@ export SdDocumentSelect = ({value, onChange, dataOptions, selectOptions}) ->
     DisplayComponent={DisplayComponent value, onChange, selectOptions}
   />
 
-export SdDocumentSelectField = connectField SdDocumentSelect, kind: 'leaf'
+export SdDocumentSelectField = connectFieldPlus SdDocumentSelect, kind: 'leaf'

@@ -23,7 +23,7 @@ SimpleSchema.extendOptions(['sdTable', 'uniforms'])
 export createUserTableAPI = ({userProfileSchema, getAllowedRoles, viewUserTableRole = 'admin'  , editUserRole = 'admin'}) ->
 
   getAllowedRoles ?= ->
-    global: ['admin', 'editor']
+    global: ['admin', 'registered- user']
   
   defaultUserProfileSchema = new SimpleSchema
     firstName:
@@ -91,7 +91,6 @@ export createUserTableAPI = ({userProfileSchema, getAllowedRoles, viewUserTableR
     roles:
       type: Array
       optional: true
-
     'roles.$':
       type: Object
       blackbox: true
@@ -111,10 +110,15 @@ export createUserTableAPI = ({userProfileSchema, getAllowedRoles, viewUserTableR
     roles:
       type: Array
       sdTable:
-        component: RoleSelect
+        component: RoleSelect allowedRoles: getAllowedRoles()
         overflow: true
     'roles.$':
       type: String
+
+  getPreSelectPipeline = -> [
+    $match:
+      'emails.0': $exists: true
+  ]
 
   getProcessorPipeline = -> [
     $lookup:
@@ -156,11 +160,11 @@ export createUserTableAPI = ({userProfileSchema, getAllowedRoles, viewUserTableR
   createRoles()
   seedUsers()
 
-  new ValidatedMethod
-    name: 'user.getAllowedRoles'
-    validate: ->
-    run: ->
-      if Meteor.isServer then getAllowedRoles()
+  # new ValidatedMethod
+  #   name: 'user.getAllowedRoles'
+  #   validate: ->
+  #   run: ->
+  #     if Meteor.isServer then getAllowedRoles()
 
 
   new ValidatedMethod
@@ -214,6 +218,7 @@ export createUserTableAPI = ({userProfileSchema, getAllowedRoles, viewUserTableR
     sourceSchema: userSchema
     listSchema: userListSchema
     collection: Meteor.users
+    getPreSelectPipeline: getPreSelectPipeline
     getProcessorPipeline: getProcessorPipeline
     canSearch: true
     canEdit: false
