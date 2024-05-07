@@ -1,12 +1,12 @@
 import React from 'react'
 import {Meteor} from 'meteor/meteor'
 import connectFieldPlus from './connectFieldPlus.coffee'
-import {Avatar} from 'primereact/Avatar'
+import {Avatar} from 'primereact/avatar'
 import gravatar from 'gravatar.js'
 import _ from 'lodash'
 
 ###*
-  Wrapper around primereact/Avatar that adds
+  Wrapper around primereact/avatar that adds
   email and defaultIcon as props and uses gravatar.js
   passes all other props unchanged to Avatar
   ###
