@@ -63,7 +63,7 @@ SignInForm = ->
  
   <AutoForm
     schema={loginSchemaBridge}
-    submitField={-> <Button label="Login" />}
+    submitField={-> <Button className="mt-4" label="Login" />}
     onSubmit={login}
   />
 
@@ -76,7 +76,7 @@ SignUpForm = ->
 
   <AutoForm
     schema={signupSchemaBridge}
-    submitField={-> <Button label="Account anlegen" />}
+    submitField={-> <Button className="mt-4" label="Account anlegen" />}
     onSubmit={signup}
   />
 
@@ -88,7 +88,7 @@ EmailForm = ->
 
   <AutoForm
     schema={emailSchemaBridge}
-    submitField={-> <Button label="Password zurücksetzen" />}
+    submitField={-> <Button className="mt-4" label="Password zurücksetzen" />}
     onSubmit={resetPassword}
   />
 
