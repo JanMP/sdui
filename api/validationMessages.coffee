@@ -56,6 +56,7 @@ export de =
   name_not_unique: 'Es gibt bereits eine Regel mit diesem Namen'
   codeList_not_unique: 'Es gibt bereits eine Code Liste mit diesem Namen'
   keyNotInSchema: '{{name}} wird vom Schema nicht erlaubt'
+  atLeastOneSeat: 'Sie müssen mindestens einen Platz buchen' # this should not go in the default messages in the long run
   regEx:
     ({label, regExp}) ->
       regExpMessage =
@@ -69,4 +70,5 @@ export de =
 
 
 export setDefaultValidationMessages = (initialLanguage = 'de',  messages = {de}) ->
+  console.log 'setDefaultValidationMessages', initialLanguage, messages
   SimpleSchema.setDefaultMessages {initialLanguage, messages}
