@@ -208,4 +208,131 @@ export createChatLogAPI = ({sourceName, messageCollection, viewTableRole}) ->
       .aggregate getMessagesForSessionPipeline {sourceName, sessionId}
       .toArray()
 
+  selectLastDays = ({forLastDays})  ->
+    lastDate =  new Date(new Date().getTime() - forLastDays * 24 * 60 * 60 * 1000)
+    $match:
+      $expr:
+        $gte: ['$createdAt', lastDate]
+
+  statisticsByDay = ({forLastDays})  ->
+    [
+      selectLastDays {forLastDays}
+    ,
+      $addFields:
+        userMessages: $cond: [ $eq: ['$chatRole', 'user'], 1, 0 ]
+        feedbackComment: '$feedback.comment'
+    ,
+      $group:
+        _id: $dateToString: format: '%Y-%m-%d', date: '$createdAt'
+        sessionIds: $addToSet: '$sessionId'
+        userMessages: $sum: '$userMessages'
+        users: $addToSet: '$userId'
+        thumbsUp:
+          $sum:
+            $cond: [ $eq: ['$feedback.thumbs', 'up'], 1, 0 ]
+        thumbsDown:
+          $sum:
+            $cond: [ $eq: ['$feedback.thumbs', 'down'], 1, 0 ]
+        feedbackComment:
+          $sum:
+            $cond: ['$feedbackComment', 1, 0]
+    ,
+      $addFields:
+        sessions: $size: '$sessionIds'
+        uniqueUsers: $size: '$users'
+        thumbCounts:
+          up: '$thumbsUp'
+          down: '$thumbsDown'
+    ,
+      $project:
+        sessionIds: 0
+        users: 0
+        thumbs: 0
+        thumbsUp: 0
+        thumbsDown: 0
+        textFeedback: 0
+    ,
+      $sort: _id: 1
+    ]
+
+  statisticsBySession = ({forLastDays})  ->
+    [
+      selectLastDays {forLastDays}
+    ,
+      $addFields:
+        userMessages: $cond: [ $eq: ['$chatRole', 'user'], 1, 0 ]
+    ,
+      $group:
+        _id: '$sessionId'
+        userMessages: $sum: '$userMessages'
+    ,
+      $group:
+        _id: '$userMessages'
+        sessions: $sum: 1
+    ,
+      $sort: _id: 1
+    ]
+
+  statisticTotals = ({forLastDays})  ->
+    [
+      selectLastDays {forLastDays}
+    ,
+      $addFields:
+        userMessages: $cond: [ $eq: ['$chatRole', 'user'], 1, 0 ]
+        feedbackComment: '$feedback.comment'
+    ,
+      $group:
+        _id: null
+        userMessages: $sum: '$userMessages'
+        users: $addToSet: '$userId'
+        thumbsUp:
+          $sum:
+            $cond: [ $eq: ['$feedback.thumbs', 'up'], 1, 0 ]
+        thumbsDown:
+          $sum:
+            $cond: [ $eq: ['$feedback.thumbs', 'down'], 1, 0 ]
+        feedbackComment:
+          $sum:
+            $cond: ['$feedbackComment', 1, 0]
+    ,
+      $addFields:
+        uniqueUsers: $size: '$users'
+        thumbCounts:
+          up: '$thumbsUp'
+          down: '$thumbsDown'
+    ,
+      $project:
+        users: 0
+        thumbs: 0
+        thumbsUp: 0
+        thumbsDown: 0
+        textFeedback: 0
+    ]
+
+  console.log 'getStatistics for', logSourceName, 'created.'
+  new ValidatedMethod
+    name: "#{sourceName}.getStatistics"
+    validate: new SimpleSchema
+      forLastDays: SimpleSchema.Integer
+    .validator()
+    run: ({forLastDays}) ->
+      return unless Meteor.isServer
+      byDay =
+        await messageCollection
+          .rawCollection()
+          .aggregate statisticsByDay {forLastDays}
+          .toArray()
+      bySession =
+        await messageCollection
+          .rawCollection()
+          .aggregate statisticsBySession {forLastDays}
+          .toArray()
+      totals =
+        await messageCollection
+          .rawCollection()
+          .aggregate statisticTotals {forLastDays}
+          .toArray()
+
+      {byDay, bySession, totals}
+
   dataOptions
