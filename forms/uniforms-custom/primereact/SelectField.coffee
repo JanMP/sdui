@@ -12,9 +12,13 @@ Select = ({
   readOnly
   value
   props...
-})->
+}) ->
 
-  props.options ?= allowedValues
+  optionsFromaAllowedValues = allowedValues?.map (v) ->
+    label: v
+    value: v
+    
+  props.options ?= optionsFromaAllowedValues
 
   <Dropdown
     disabled={disabled}
