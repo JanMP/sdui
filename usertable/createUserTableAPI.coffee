@@ -2,7 +2,7 @@ import {Meteor} from 'meteor/meteor'
 import {Accounts} from 'meteor/accounts-base'
 import SimpleSchema from 'meteor/aldeed:simple-schema'
 import {createTableDataAPI} from '../api/createTableDataAPI.coffee'
-import {currentUserMustBeInRole} from '../common/roleChecks.coffee'
+import {currentUserMustBeInRole, currentUserIsInRole} from '../common/roleChecks.coffee'
 import {ValidatedMethod} from 'meteor/mdg:validated-method'
 import {Roles} from 'meteor/alanning:roles'
 import {RoleSelect} from './RoleSelect'
@@ -13,13 +13,13 @@ SimpleSchema.extendOptions(['sdTable', 'uniforms'])
 ###*
  * createUserTableAPI function configures and exposes an API for user table manipulation, including CRUD operations,
  * roles assignment, and user status tracking. It leverages Meteorjs, MongoDB, and SimpleSchema for data validation.
- * 
+ *
  * @param {Object} options - Configuration options for the user table API.
  * @param {SimpleSchema} options.userProfileSchema - Schema for user profile information.
  * @param {Function} options.getAllowedRoles - Function returning a list of allowed roles for users.
  * @param {String} options.viewUserTableRole - Role required to view the user table. Defaults to 'admin'.
  * @param {String} options.editUserRole - Role required to edit users. Defaults to 'admin'.
-### 
+  ###
 export createUserTableAPI = ({userProfileSchema, getAllowedRoles, viewUserTableRole = 'admin'  , editUserRole = 'admin'}) ->
 
   getAllowedRoles ?= ->
@@ -139,66 +139,44 @@ export createUserTableAPI = ({userProfileSchema, getAllowedRoles, viewUserTableR
       roles: 1
   ]
 
-  createRoles = ->
-    if Meteor.isServer
-      allowedRoles = getAllowedRoles()
-      allowedRoles.global.forEach (role) ->
-        Roles.createRole role, unlessExists: true
-      if allowedRoles.scope?
-        _(allowedRoles.scope).keys().forEach (scope) ->
-          allowedRoles.scope[scope].forEach (role) ->
-            Roles.createRole role, unlessExists: true
+  # createRoles = ->
+  #   if Meteor.isServer
+  #     allowedRoles = getAllowedRoles()
+  #     for role in allowedRoles.global
+  #       Roles.createRoleAsync role, unlessExists: true
+  #     if allowedRoles.scope?
+  #       for scope in _(allowedRoles.scope).keys().value()
+  #         for role in allowedRoles.scope[scope]
+  #           Roles.createRole role, unlessExists: true
 
-  seedUsers = ->
-    if Meteor.isServer
-      Meteor.settings.seedUsers?.forEach ({email, username, password, roles}) ->
-        unless (await Meteor.users.findOneAsync('emails.0.address': email))?
-          if (id = Accounts.createUser {email, username, password})?
-            unless (await Meteor.roleAssignment.findOneAsync 'user._id': id)?
-              Roles.addUsersToRoles id, roles
+  # seedUsers = ->
+  #   if Meteor.isServer
+  #     Meteor.settings.seedUsers?.forEach ({email, username, password, roles}) ->
+  #       unless (await Meteor.users.findOneAsync('emails.0.address': email))?
+  #         if (id = await Accounts.createUserAsync {email, username, password})?
+  #           unless (await Meteor.roleAssignment.findOneAsync 'user._id': id)?
+  #             Roles.addUsersToRolesAsync id, roles
 
-  createRoles()
-  seedUsers()
-
-  # new ValidatedMethod
-  #   name: 'user.getAllowedRoles'
-  #   validate: ->
-  #   run: ->
-  #     if Meteor.isServer then getAllowedRoles()
-
+  # await createRoles()
+  # await seedUsers()
 
   new ValidatedMethod
-    name: 'user.createRoles'
+    name: 'user.getAllowedRoles'
     validate: ->
-    run: createRoles
+    run: ->
+      if Meteor.isServer then getAllowedRoles()
 
+  new ValidatedMethod
+    name: 'user.test'
+    validate: null
+    run: ->
+      console.log 'user.test'
 
   new ValidatedMethod
     name: 'user.onChangeRoles'
-    validate:
-      new SimpleSchema
-        id: String
-        value:
-          type: Array
-          optional: true
-        'value.$':
-          type: Object
-          blackbox: true
-      .validator()
-    run: ({id, value}) ->
-      currentUserMustBeInRole editUserRole
-      scopesForUser = Roles.getScopesForUser id
-      scopesForValue = _(value).map('scope').uniq().value()
-      if Meteor.isServer
-        # remove all roles for scopes that are not in the new value
-        _(scopesForUser).difference(scopesForValue).forEach (scope) ->
-          Roles.setUserRoles id, [], scope
-        # remove all roles for the global scope if global scope is not in the new value
-        if value.filter((role) -> not role.scope?).length is 0
-          Roles.setUserRoles id, []
-        # set roles for all scopes in the new value
-        _(value).groupBy('scope').forEach (rolesForScope, scope) ->
-          Roles.setUserRoles id, _(rolesForScope).map('role').value(), if scope is 'null' then null else scope
+    validate: null
+    run: ->
+      console.log 'user.onChangeRoles'
 
 
   if Meteor.isServer

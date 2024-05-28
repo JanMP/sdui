@@ -49,22 +49,22 @@ export RoleSelect = ({allowedRoles}) ->
   ###
   ({row, columnKey, schemaBridge, onChangeField, measure, mayEdit}) ->
 
-    onChange = (value) ->
-      console.log {value}
+    onChange = ({value}) ->
+      console.log 'onChange', value
       meteorApply
         method: 'user.onChangeRoles'
         data:
           id: row._id
           value: value
 
-    rolesList = 'Fnord'
+    rolesList = '# TODO implement text rendering of roles from row'
 
     if mayEdit
       if on
         <MultiSelect
           value={valueFromRow row}
           options={options}
-          onChange={(e) -> onChange e.value}
+          onChange={onChange}
           name="roles"
           style={maxWidth: '100%', minWidth: '100%'}
         />

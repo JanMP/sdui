@@ -30,9 +30,9 @@ export userWithIdIsInRole = ({role, id}) ->
       if role.forAnyScope
         (scopesForCurrentUserInRole role.role)?.length > 0
       else
-        Roles.userIsInRole id, role.role, role.scope
+        Roles.userIsInRoleAsync id, role.role, role.scope
     else
-      Roles.userIsInRole id, role
+      Roles.userIsInRoleAsync id, role
 
 ###*
   In addition to roles defined via alanning:roles you can specify
@@ -60,7 +60,7 @@ export useCurrentUserIsInRole = (role) -> useTracker -> currentUserIsInRole role
   @throws {Meteor.Error} throws an error when user is not in role
   ###
 export currentUserMustBeInRole = (role) ->
-  unless currentUserIsInRole role
+  unless await currentUserIsInRole role
     throw new Meteor.Error "user must be in role #{JSON.stringify role}"
 
 ###*
@@ -68,7 +68,7 @@ export currentUserMustBeInRole = (role) ->
   @return {Array}
   ###
 export scopesForCurrentUserInRole = (role) ->
-  Roles.getScopesForUser Meteor.userId(), role
+  Roles.getScopesForUserAsync Meteor.userId(), role
 
 ###*
   @param {string | Array<string>} role

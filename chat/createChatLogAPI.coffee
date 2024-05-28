@@ -309,7 +309,7 @@ export createChatLogAPI = ({sourceName, messageCollection, viewTableRole}) ->
         textFeedback: 0
     ]
 
-  console.log 'getStatistics for', logSourceName, 'created.'
+
   new ValidatedMethod
     name: "#{sourceName}.getStatistics"
     validate: new SimpleSchema

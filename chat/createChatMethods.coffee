@@ -2,7 +2,7 @@ import {Meteor} from 'meteor/meteor'
 import {Mongo} from 'meteor/mongo'
 import {ValidatedMethod} from 'meteor/mdg:validated-method'
 import SimpleSchema from 'meteor/aldeed:simple-schema'
-import {currentUserMustBeInRole, currentUserIsInRole} from '../common/roleChecks.coffee'
+import {currentUserMustBeInRole} from '../common/roleChecks.coffee'
 
 import _ from 'lodash'
 
@@ -81,7 +81,7 @@ export createChatMethods = ({
   addSession = ({title, userIds}) ->
     if await sessionsPerDayLimitReached()
       throw new Meteor.Error "Tut uns Leid, wir erlauben momentan nur #{getUsageLimits()?.maxSessionsPerDay} Chats pro Tag. Bitte versuche es morgen nochmal."
-    currentUserMustBeInRole addSessionRole
+    await currentUserMustBeInRole addSessionRole
     return unless Meteor.isServer
     title ?= '[no title]'
     userIds ?= [Meteor.userId()]
@@ -99,7 +99,7 @@ export createChatMethods = ({
           type: String
       .validator()
     run: ({text, sessionId}) ->
-      currentUserMustBeInRole viewChatRole
+      await currentUserMustBeInRole viewChatRole
       return unless Meteor.isServer
       unless userIsInSession {sessionId}
         throw new Meteor.Error 'user not in session'
@@ -134,7 +134,7 @@ export createChatMethods = ({
           type: String
       .validator()
     run: ({text, sessionId}) -> Promise.resolve "turned off because sanity"
-      # currentUserMustBeInRole viewChatRole
+      # await currentUserMustBeInRole viewChatRole
       # return unless Meteor.isServer
       # unless userIsInSession {sessionId}
       #   throw new Meteor.Error 'user not in session'
@@ -163,7 +163,7 @@ export createChatMethods = ({
           optional: true
       .validator()
     run: ({messageId, feedback}) ->
-      currentUserMustBeInRole viewChatRole
+      await currentUserMustBeInRole viewChatRole
       unless userIsInSessionOfMessage {messageId}
         throw new Meteor.Error 'user not in session of message'
       return unless Meteor.isServer
@@ -208,7 +208,7 @@ export createChatMethods = ({
           type: String
       .validator()
     run: ({id}) ->
-      currentUserMustBeInRole addSessionRole
+      await currentUserMustBeInRole addSessionRole
       return unless Meteor.isServer
       archiveSessionData {sessionId: id}
   
@@ -227,7 +227,7 @@ export createChatMethods = ({
     validate: null
     run: ->
       return unless Meteor.isServer
-      currentUserMustBeInRole addSessionRole
+      await currentUserMustBeInRole addSessionRole
       if (existingSession = await getExistingSession())?
         return existingSession._id
       addSession {}
@@ -236,7 +236,7 @@ export createChatMethods = ({
     name: "#{sourceName}.resetSingleSession"
     validate: null
     run: ->
-      currentUserMustBeInRole viewChatRole
+      await currentUserMustBeInRole viewChatRole
       return unless Meteor.isServer
       if (existingSession = await getExistingSession())?
         archiveSessionData {sessionId: existingSession._id}

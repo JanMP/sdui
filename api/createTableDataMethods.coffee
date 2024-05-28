@@ -71,7 +71,7 @@ checkDisableDeleteForRow, checkDisableEditForRow}) ->
         skip: Number
       .validator()
     run: ({search, query, queryUiObject, sort, limit, skip}) ->
-      currentUserMustBeInRole viewTableRole
+      await currentUserMustBeInRole viewTableRole
       return unless Meteor.isServer
       collection.rawCollection()
       .aggregate getRowsPipeline {search, query, queryUiObject, sort, limit, skip},
@@ -102,7 +102,7 @@ checkDisableDeleteForRow, checkDisableEditForRow}) ->
             blackbox: true
         .validator()
       run: ({search, query, queryUiObject, sort}) ->
-        currentUserMustBeInRole exportTableRole
+        await currentUserMustBeInRole exportTableRole
         return unless Meteor.isServer
         collection.rawCollection()
         .aggregate getExportPipeline {search, query, queryUiObject, sort},
@@ -139,10 +139,10 @@ checkDisableDeleteForRow, checkDisableEditForRow}) ->
       validate: (schemaWithId formSchema).validator()
       run: (model) ->
         if model._id?
-          currentUserMustBeInRole editRole
+          await currentUserMustBeInRole editRole
           await editRowMustNotBeDisabled id: model._id
         else
-          currentUserMustBeInRole addRole
+          await currentUserMustBeInRole addRole
         return unless Meteor.isServer
         submitMethodRun
           id: model._id
@@ -171,7 +171,7 @@ checkDisableDeleteForRow, checkDisableEditForRow}) ->
             blackbox: true
         .validator()
       run: ({_id, changeData}) ->
-        currentUserMustBeInRole editRole
+        await currentUserMustBeInRole editRole
         await editRowMustNotBeDisabled id: _id
         return unless Meteor.isServer
         await collection.updateAsync {_id}, $set: changeData
@@ -184,7 +184,7 @@ checkDisableDeleteForRow, checkDisableEditForRow}) ->
           id: String
         .validator()
       run: ({id}) ->
-        currentUserMustBeInRole deleteRole
+        await currentUserMustBeInRole deleteRole
         await deleteRowMustNotBeDisabled {id}
         return unless Meteor.isServer
         deleteMethodRun {id}

@@ -12,12 +12,13 @@ noAutomaticObserver = false, debounceDelay = 500, observers})  ->
       throw new Error 'no collection given'
 
     Meteor.publish "#{sourceName}.rows", ({search, query, queryUiObject, sort, limit, skip}) ->
-      return @ready() unless userWithIdIsInRole id: @userId, role: viewTableRole
-      @autorun (computation) ->
-        pipeline = getRowsPipeline {pub: this, search, query, queryUiObject, sort, limit, skip}
-        ReactiveAggregate this, collection,
-          pipeline,
-          clientCollection: "#{sourceName}.rows"
-          debounceDelay: debounceDelay
-          # noAutomaticObservers: observers?
-          observers: observers ? []
+      do Meteor.wrapAsync =>
+        return @ready() unless await userWithIdIsInRole id: @userId, role: viewTableRole
+        @autorun (computation) ->
+          pipeline = getRowsPipeline {pub: this, search, query, queryUiObject, sort, limit, skip}
+          ReactiveAggregate this, collection,
+            pipeline,
+            clientCollection: "#{sourceName}.rows"
+            debounceDelay: debounceDelay
+            # noAutomaticObservers: observers?
+            observers: observers ? []
