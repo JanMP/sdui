@@ -182,7 +182,6 @@ export createUserTableAPI = ({userProfileSchema, getAllowedRoles, viewUserTableR
           # set roles for all scopes in the new value
           await Promise.all(
             _(value).groupBy('scope').map (rolesForScope, scope) ->
-              console.log 'grouped', {rolesForScope, scope}
               Roles.setUserRolesAsync id, _(rolesForScope).map('role').value(), if scope is 'null' then null else scope
             .value()
           )
