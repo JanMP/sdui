@@ -7,13 +7,12 @@ import {useTracker} from 'meteor/react-meteor-data'
 export LoginPage =  ->
 
   isLoggedIn = useCurrentUserIsInRole 'logged-in'
-  isUser = useCurrentUserIsInRole 'user'
-
-
-
+  isUser = useCurrentUserIsInRole role: 'user', forAnyScope: true
+  
   user = useTracker -> Meteor.user()
 
-  if user?
+
+  if isLoggedIn
     return <div className="prose p-4">
       <p>Hallo {user?.emails?[0]?.address ? ''}!</p>
       {<p>
