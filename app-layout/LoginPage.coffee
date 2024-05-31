@@ -17,7 +17,8 @@ export LoginPage =  ->
     return <div className="prose p-4">
       <p>Hallo {user?.emails?[0]?.address ? ''}!</p>
       {<p>
-        You are logged in as a user, but we will have to manually approve your account, befor you can use it.
+        Sie sind als Benutzer eingeloggt, aber wir müssen Ihr Konto manuell für die entsprechenden Module freischalten.
+        Bitte geben Sie uns Bescheid, unter welchem Account sie sich angemeldet haben. Wir kümmern uns umgehend.
       </p> unless isUser}
       <ActionButton
         onAction={Meteor.logout}
