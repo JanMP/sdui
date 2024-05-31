@@ -50,7 +50,6 @@ export RoleSelect = ({allowedRoles}) ->
   ({row, columnKey, schemaBridge, onChangeField, measure, mayEdit}) ->
 
     onChange = ({value}) ->
-      console.log 'onChange', value
       meteorApply
         method: 'user.onChangeRoles'
         data:
