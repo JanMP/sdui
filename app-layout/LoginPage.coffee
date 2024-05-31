@@ -1,5 +1,5 @@
 import {Meteor} from 'meteor/meteor'
-import React from 'react'
+import React, {useEffect} from 'react'
 
 import {LoginForm, ActionButton, useCurrentUserIsInRole}  from 'meteor/janmp:sdui'
 import {useTracker} from 'meteor/react-meteor-data'
@@ -9,9 +9,11 @@ export LoginPage =  ->
   isLoggedIn = useCurrentUserIsInRole 'logged-in'
   isUser = useCurrentUserIsInRole 'user'
 
+
+
   user = useTracker -> Meteor.user()
 
-  if isLoggedIn
+  if user?
     return <div className="prose p-4">
       <p>Hallo {user?.emails?[0]?.address ? ''}!</p>
       {<p>

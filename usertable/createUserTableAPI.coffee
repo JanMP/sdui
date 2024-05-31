@@ -2,11 +2,12 @@ import {Meteor} from 'meteor/meteor'
 import {Accounts} from 'meteor/accounts-base'
 import SimpleSchema from 'meteor/aldeed:simple-schema'
 import {createTableDataAPI} from '../api/createTableDataAPI.coffee'
-import {currentUserMustBeInRole, currentUserIsInRole} from '../common/roleChecks.coffee'
+import {currentUserMustBeInRole} from '../common/roleChecks.coffee'
 import {ValidatedMethod} from 'meteor/mdg:validated-method'
 import {Roles} from 'meteor/alanning:roles'
 import {RoleSelect} from './RoleSelect'
 import _ from 'lodash'
+import {runTransaction} from '../common/runTransaction.coffee'
 
 SimpleSchema.extendOptions(['sdTable', 'uniforms'])
 
@@ -139,26 +140,8 @@ export createUserTableAPI = ({userProfileSchema, getAllowedRoles, viewUserTableR
       roles: 1
   ]
 
-  # createRoles = ->
-  #   if Meteor.isServer
-  #     allowedRoles = getAllowedRoles()
-  #     for role in allowedRoles.global
-  #       Roles.createRoleAsync role, unlessExists: true
-  #     if allowedRoles.scope?
-  #       for scope in _(allowedRoles.scope).keys().value()
-  #         for role in allowedRoles.scope[scope]
-  #           Roles.createRole role, unlessExists: true
+ 
 
-  # seedUsers = ->
-  #   if Meteor.isServer
-  #     Meteor.settings.seedUsers?.forEach ({email, username, password, roles}) ->
-  #       unless (await Meteor.users.findOneAsync('emails.0.address': email))?
-  #         if (id = await Accounts.createUserAsync {email, username, password})?
-  #           unless (await Meteor.roleAssignment.findOneAsync 'user._id': id)?
-  #             Roles.addUsersToRolesAsync id, roles
-
-  # await createRoles()
-  # await seedUsers()
 
   new ValidatedMethod
     name: 'user.getAllowedRoles'
@@ -174,10 +157,52 @@ export createUserTableAPI = ({userProfileSchema, getAllowedRoles, viewUserTableR
 
   new ValidatedMethod
     name: 'user.onChangeRoles'
-    validate: null
-    run: ->
-      console.log 'user.onChangeRoles'
+    validate:
+      new SimpleSchema
+        id: String
+        value:
+          type: Array
+          optional: true
+        'value.$':
+          type: Object
+          blackbox: true
+      .validator()
+    run: ({id, value}) ->
+      currentUserMustBeInRole editUserRole
+      if Meteor.isServer
+        scopesForUser = await Roles.getScopesForUserAsync id
+        scopesForValue = _(value).map('scope').uniq().value()
+        runTransaction ->
+          # remove all roles for scopes that are not in the new value
+          for scope in _(scopesForUser).difference(scopesForValue).value()
+            await Roles.setUserRolesAsync id, [], scope
+          # remove all roles for the global scope if global scope is not in the new value
+          if value.filter((role) -> not role.scope?).length is 0
+            await Roles.setUserRolesAsync id, []
+          # set roles for all scopes in the new value
+          await Promise.all(
+            _(value).groupBy('scope').map (rolesForScope, scope) ->
+              console.log 'grouped', {rolesForScope, scope}
+              Roles.setUserRolesAsync id, _(rolesForScope).map('role').value(), if scope is 'null' then null else scope
+            .value()
+          )
+          
+  if Meteor.isServer
+    do ->
+      console.log 'seeding allowed roles and users'
+      allowedRoles = getAllowedRoles()
+      for role in allowedRoles.global
+        Roles.createRoleAsync role, unlessExists: true
+      if allowedRoles.scope?
+        for scope in _(allowedRoles.scope).keys().value()
+          for role in allowedRoles.scope[scope]
+            Roles.createRoleAsync role, unlessExists: true
 
+      for {email, username, password, roles} in Meteor.settings.seedUsers ? []
+        unless (await Meteor.users.findOneAsync('emails.0.address': email))?
+          if (id = await Accounts.createUserAsync {email, username, password})?
+            unless (await Meteor.roleAssignment.findOneAsync 'user._id': id)?
+              Roles.addUsersToRolesAsync id, roles
 
   if Meteor.isServer
     Meteor.publish null, ->
@@ -186,7 +211,7 @@ export createUserTableAPI = ({userProfileSchema, getAllowedRoles, viewUserTableR
       else
         @ready()
 
-
+    console.log 'user collection',  typeof Meteor.users
   #returning the dataOptions
   createTableDataAPI
     viewTableRole: viewUserTableRole
@@ -205,3 +230,4 @@ export createUserTableAPI = ({userProfileSchema, getAllowedRoles, viewUserTableR
     canExport: true
     showRowCount: true
     observers: [Meteor.roleAssignment.find()]
+

@@ -3,8 +3,7 @@ import {ReactiveAggregate} from 'meteor/tunguska:reactive-aggregate'
 import {userWithIdIsInRole} from '../common/roleChecks.coffee'
 
 export publishTableData = ({viewTableRole, sourceName, collection,
-getRowsPipeline,
-noAutomaticObserver = false, debounceDelay = 500, observers})  ->
+getRowsPipeline, noAutomaticObserves = false, debounceDelay = 500, observers})  ->
   
   if Meteor.isServer
   
@@ -12,13 +11,11 @@ noAutomaticObserver = false, debounceDelay = 500, observers})  ->
       throw new Error 'no collection given'
 
     Meteor.publish "#{sourceName}.rows", ({search, query, queryUiObject, sort, limit, skip}) ->
-      do Meteor.wrapAsync =>
-        return @ready() unless await userWithIdIsInRole id: @userId, role: viewTableRole
-        @autorun (computation) ->
-          pipeline = getRowsPipeline {pub: this, search, query, queryUiObject, sort, limit, skip}
-          ReactiveAggregate this, collection,
-            pipeline,
-            clientCollection: "#{sourceName}.rows"
-            debounceDelay: debounceDelay
-            # noAutomaticObservers: observers?
-            observers: observers ? []
+      return @ready() unless await userWithIdIsInRole id: @userId, role: viewTableRole
+      pipeline = getRowsPipeline {pub: this, search, query, queryUiObject, sort, limit, skip}
+      ReactiveAggregate this, collection,
+        pipeline,
+        clientCollection: "#{sourceName}.rows"
+        debounceDelay: debounceDelay
+        noAutomaticObservers: noAutomaticObserves
+        observers: observers ? []

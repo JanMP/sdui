@@ -1,6 +1,7 @@
 import {Meteor} from 'meteor/meteor'
 import {Roles} from 'meteor/alanning:roles'
 import {useTracker} from 'meteor/react-meteor-data'
+import {useState} from'react'
 
 
 ###*
@@ -18,7 +19,7 @@ import {useTracker} from 'meteor/react-meteor-data'
   @param {{role: Role, id: string}} params
   @return {boolean}
   ###
-export userWithIdIsInRole = ({role, id}) ->
+userWithIdIsInRoleAsync = ({role, id}) ->
   switch
     when role is 'any'
       true
@@ -28,11 +29,33 @@ export userWithIdIsInRole = ({role, id}) ->
       role?(id) ? false
     when role?.role?
       if role.forAnyScope
-        (scopesForCurrentUserInRole role.role)?.length > 0
+        (await scopesForCurrentUserInRole role.role)?.length > 0
       else
         Roles.userIsInRoleAsync id, role.role, role.scope
     else
       Roles.userIsInRoleAsync id, role
+
+userWithIdIsInRoleSync = ({role, id}) ->
+  switch
+    when role is 'any'
+      true
+    when role is 'logged-in'
+      id?
+    when typeof role is 'function'
+      role?(id) ? false
+    when role?.role?
+      if role.forAnyScope
+        Roles.getScopesForUser(id, role.role).length > 0
+      else
+        Roles.userIsInRole id, role.role, role.scope
+    else
+      Roles.userIsInRole id, role
+
+export userWithIdIsInRole =
+  if Meteor.isServer
+    userWithIdIsInRoleAsync
+  else
+    userWithIdIsInRoleSync
 
 ###*
   In addition to roles defined via alanning:roles you can specify
@@ -74,4 +97,6 @@ export scopesForCurrentUserInRole = (role) ->
   @param {string | Array<string>} role
   @return {Array}
   ###
-export useScopesForCurrentUserInRole = (role) -> useTracker -> scopesForCurrentUserInRole role
+export useScopesForCurrentUserInRole =
+  (role) -> useTracker ->
+    Roles.getScopesForUser Meteor.userId(), role

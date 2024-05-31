@@ -54,7 +54,7 @@ export createUserManagementAPI = ({sourceName, path, apiKey, roleScope, adminRol
     try
       [username] = req.url.split('/').splice(1)
       user = await Meteor.users.findOne {username}
-      unless userWithIdIsInRole : id: user._id, role: {role: switchableRoles, scope: roleScope}
+      unless await userWithIdIsInRole : id: user._id, role: {role: switchableRoles, scope: roleScope}
         throw new Error "user #{username} not in roles #{JSON.stringify switchableRoles} in scope: #{roleScope}"
       currentRoles = await Roles.getRolesForUserAsync user._id, scope: roleScope
       await Roles.removeUsersFromRolesAsync user._id, currentRoles, roleScope
@@ -74,7 +74,7 @@ export createUserManagementAPI = ({sourceName, path, apiKey, roleScope, adminRol
       unless switchableRoles.includes role
         throw new Error "role #{role} not in #{JSON.stringify switchableRoles}"
       user = await Meteor.users.findOneAsync {username}
-      unless userWithIdIsInRole : id: user._id, role: {role: switchableRoles, scope: roleScope}
+      unless await userWithIdIsInRole : id: user._id, role: {role: switchableRoles, scope: roleScope}
         throw new Error "user #{username} not in roles #{JSON.stringify switchableRoles} in scope: #{roleScope}"
       await Roles.setUserRolesAsync user._id, role, roleScope
       res.writeHead 200
@@ -94,42 +94,3 @@ export createUserManagementAPI = ({sourceName, path, apiKey, roleScope, adminRol
     catch error
       res.writeHead 500
       res.end error.message
-  
-
-  # new ValidatedMethod
-  #   name: "#{sourceName}.addUser"
-  #   validate:
-  #     new SimpleSchema
-  #       username:
-  #         type: String
-  #       password:
-  #         type: String
-  #         optional: true
-  #     .validator()
-  #   run: ({username, password}) ->
-  #     currentUserMustBeInRole adminRole
-  #     return unless Meteor.isServer
-  #     password ?= Random.secret()
-  #     id = Accounts.createUser
-  #       username: username
-  #       password: password
-  #     Roles.addUsersToRoles id, userRole.role, userRole.scope
-  #     {id, username, password}
-
-  # new ValidatedMethod
-  #   name: "#{sourceName}.removeUser"
-  #   validate:
-  #     new SimpleSchema
-  #       username:
-  #         type: String
-  #     .validator()
-  #   run: ({username}) ->
-  #     currentUserMustBeInRole adminRole
-  #     return unless Meteor.isServer
-  #     user = Meteor.users.findOne {username}
-  #     unless userWithIdIsInRole : id: user._id, role: {role: switchableRoles, scope: roleScope}
-  #       throw new Error "user #{username} not in roles #{JSON.stringify switchableRoles} in scope: #{roleScope}"
-  #     unless user
-  #       throw new Meteor.Error 'user-not-found', "user #{username} not found"
-  #     Roles .removeUsersFromRoles user._id, userRole.role, userRole.scope
-  #     Meteor.users.remove user._id
