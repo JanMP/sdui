@@ -88,9 +88,10 @@ export createUserManagementAPI = ({sourceName, path, apiKey, roleScope, adminRol
     try
       [username] = req.url.split('/').splice(1)
       user = await Meteor.users.findOneAsync {username}
+      {createdAt} = user
       roles = await Roles.getRolesForUserAsync user._id, scope: roleScope
       res.writeHead 200
-      res.end JSON.stringify {username, roles}
+      res.end JSON.stringify {username, roles, createdAt}
     catch error
       res.writeHead 500
       res.end error.message
