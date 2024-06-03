@@ -46,6 +46,7 @@ export createChatBot = ({
     finishReason = null
     objectFromDeltas = {}
     toolCalls = []
+    usage = {}
 
     addDelta = ({objectFromDeltas, delta}) ->
       for key of delta
@@ -92,6 +93,7 @@ export createChatBot = ({
         finishReason = chunk?.choices?[0]?.finish_reason
         objectFromDeltas = addDelta {objectFromDeltas, delta}
         content = objectFromDeltas.content
+        usage = chunk?.usage ? {}
         # console.log 'delta', JSON.stringify delta, null, 2
         if finishReason
           done = true
@@ -110,10 +112,7 @@ export createChatBot = ({
             content: content
             role: 'assistant'
             tool_calls: toolCalls
-          usage:
-            model: model
-            prompt: 0
-            completion: 0
+          usage: usage
 
   ###*
     Build the context for the chatbot call
@@ -254,7 +253,7 @@ export createChatBot = ({
       model, messages, options...,
       tools: if allowFunctionCall then tools,
       tool_choice: if allowFunctionCall then toolChoice,
-      # responseType: if options?.stream then 'stream'
+      stream_options: if stream then include_usage: true
     }
     callFkt params
     .then (response) ->
