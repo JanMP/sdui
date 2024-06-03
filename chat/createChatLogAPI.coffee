@@ -13,6 +13,9 @@ TokenCosts = new Mongo.Collection 'tokenCosts'
 if Meteor.isServer
   do ->
     tokenCosts =
+      'gpt-4o':
+        prompt: 0.00002
+        completion: 0.00004
       'gpt-4-1106-preview':
         prompt: 0.00001
         completion: 0.00003
