@@ -140,9 +140,6 @@ export createUserTableAPI = ({userProfileSchema, getAllowedRoles, viewUserTableR
       roles: 1
   ]
 
- 
-
-
   new ValidatedMethod
     name: 'user.getAllowedRoles'
     validate: ->
