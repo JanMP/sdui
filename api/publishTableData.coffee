@@ -14,7 +14,7 @@ getRowsPipeline, noAutomaticObserves = false, debounceDelay = 500, observers})  
       return @ready() unless await userWithIdIsInRole id: @userId, role: viewTableRole
       pipeline = getRowsPipeline {pub: this, search, query, queryUiObject, sort, limit, skip}
       ReactiveAggregate this, collection,
-        pipeline,
+        await pipeline,
         clientCollection: "#{sourceName}.rows"
         debounceDelay: debounceDelay
         noAutomaticObservers: noAutomaticObserves

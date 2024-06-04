@@ -74,11 +74,11 @@ export createDefaultPipeline = ({getPreSelectPipeline, getProcessorPipeline, lis
 
   defaultGetRowsPipeline = ({pub, search, query = {}, queryUiObject, sort = {_id: 1}, limit = 100, skip = 0}) ->
     _.compact [
-      getPreSelectPipeline({pub})...,
+      (await getPreSelectPipeline {pub})...,
       {$match: query},
-      getProcessorPipeline({pub})...,
-      getQueryEditorPipeline({queryUiObject})...
-      (searchPipeline {search})...,
+      (await getProcessorPipeline {pub})...,
+      (await getQueryEditorPipeline {queryUiObject})...
+      (await searchPipeline {search})...,
       projectStage unless debugPipelines, # This is super important. Dont delete it by mistake again...
      {$sort: sort}, {$skip: skip}, {$limit: limit}
     ]
@@ -86,11 +86,11 @@ export createDefaultPipeline = ({getPreSelectPipeline, getProcessorPipeline, lis
 
   defaultGetExportPipeline = ({search, query = {}, queryUiObject,  sort = {_id: 1}}) ->
     [
-      getPreSelectPipeline()...,
+      (await getPreSelectPipeline())...,
       {$match: query},
-      getProcessorPipeline()...,
-      getQueryEditorPipeline({queryUiObject})...
-      (searchPipeline {search})...,
+      (await getProcessorPipeline())...,
+      (await getQueryEditorPipeline {queryUiObject})...
+      (await searchPipeline {search})...,
     {$sort: sort}, projectStage]
 
   {defaultGetRowsPipeline, defaultGetExportPipeline}
