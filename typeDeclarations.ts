@@ -78,7 +78,6 @@ export interface createTableDataAPIParams {
   observers?: Array<any>
   setupNewItem?: () => object
   onSubmit?: (object) => any
-  showRowCount?: boolean
   checkDisableEditForRow?: boolean
   checkDisableDeleteForRow?: boolean 
 }
@@ -108,7 +107,6 @@ export interface createTableDataAPIReturn {
   query?: object
   initialSortColumn?: string
   initialSortDirection?: 'ASC' | 'DESC'
-  showRowCount?: boolean
   perLoad: number
 }
 
