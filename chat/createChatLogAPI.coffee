@@ -14,23 +14,29 @@ if Meteor.isServer
   do ->
     tokenCosts =
       'gpt-4o':
-        prompt: 0.00002
-        completion: 0.00004
+        prompt: 5e-6
+        completion: 15e-6
+      'gpt-4-turbo':
+        prompt: 1e-5
+        completion: 3e-5
+      'gpt-3.5-turbo':
+        prompt: 5e-7
+        completion: 15e-7
       'gpt-4-1106-preview':
-        prompt: 0.00001
-        completion: 0.00003
+        prompt: 1e-5
+        completion: 3e-5
       'gpt-4-0125-preview':
-        prompt: 0.00001
-        completion: 0.00003
-      'gpt-3.5-turbo-1106':
-        prompt: 0.000001
-        completion: 0.000002
+        prompt: 1e-5
+        completion: 3e-5
       'gpt-3.5-turbo-0125':
-        prompt: 0.0000005
-        completion: 0.0000015
+        prompt: 5e-7
+        completion: 15e-7
+      'gpt-3.5-turbo-1106':
+        prompt: 1e-6
+        completion: 2e-6
       'gpt-4':
-        prompt: 0.00003
-        completion: 0.00006
+        prompt: 30e-6
+        completion: 60e-6
       'mistral-small':
         prompt: 0.0000006
         completion: 0.0000018
@@ -183,7 +189,6 @@ export createChatLogAPI = ({sourceName, messageCollection, viewTableRole}) ->
     queryEditorSchema: queryEditorSchema
     viewTableRole: viewTableRole
     canEdit: false
-    showRowCount: true
     getProcessorPipeline: getProcessorPipelineForSourceName {sourceName}
     canExport: true
     canUseQueryEditor: true
