@@ -1,6 +1,5 @@
 import React, {useState, useEffect, useRef} from 'react'
-import {SdTable, meteorApply, MarkdownDisplay} from 'meteor/janmp:sdui'
-
+import {SdTable, meteorApply, MarkdownDisplay, FormattedJSON} from 'meteor/janmp:sdui'
 import {Dialog} from 'primereact/dialog'
 import {Toast} from 'primereact/toast'
 
@@ -63,17 +62,17 @@ HistoryDisplay = ({sourceName, rowData}) ->
                   <span>Funktion: </span>
                   <span className="font-bold">{entry?.toolCall?.function?.name} </span>
                   <span>mit Argumenten: </span>
-                  <pre className="font-bold">{JSON.stringify entry?.toolCall?.function?.arguments, null, 2}</pre>
+                  <FormattedJSON data={entry?.toolCall?.function?.arguments} />
                 </div>
               else if entry?.error?
                 <div className="bg-red-100 px-3 py-1">
                   <span className="font-bold">Fehler: </span>
-                  <pre>{JSON.stringify entry?.error, null, 2}</pre>
+                  <FormattedJSON data={entry?.error} />
                 </div>
               else
                 <div className="surface-200 px-3 py-1">
                   <span className="font-bold">Unbekannter Eintrag</span>
-                  <pre>{JSON.stringify entry, null, 2}</pre>
+                  <FormattedJSON data={entry} />
                 </div>
             }
           </div>
