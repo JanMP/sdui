@@ -46,7 +46,6 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
   formDisabled
   formReadOnly
   viewTableRole, editRole, addRole, deleteRole, exportTableRole
-  showRowCount
   } = dataOptions
 
 
