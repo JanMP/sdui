@@ -19,8 +19,8 @@ Package.onUse(function(api) {
   api.use('reactive-var');
   api.use('alanning:roles@4.0.0-alpha.3');
   api.use('mdg:validated-method@1.2.0');
-  api.use('peerlibrary:reactive-publish@0.10.0');
-  api.use('tunguska:reactive-aggregate@1.3.15');
+  // api.use('peerlibrary:reactive-publish@0.10.0');
+  api.use('tunguska:reactive-aggregate@2.0.0');
   api.use('aldeed:simple-schema');
   // api.use('mizzao:user-status@1.0.1'); 
   api.mainModule('sdui-client-dynamic.coffee', 'client');
