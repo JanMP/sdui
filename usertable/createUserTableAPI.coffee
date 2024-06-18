@@ -5,7 +5,7 @@ import {createTableDataAPI} from '../api/createTableDataAPI.coffee'
 import {currentUserMustBeInRole} from '../common/roleChecks.coffee'
 import {ValidatedMethod} from 'meteor/mdg:validated-method'
 import {Roles} from 'meteor/alanning:roles'
-import {RoleSelect} from './RoleSelect'
+import {RoleSelect} from './RoleSelect.coffee'
 import _ from 'lodash'
 import {runTransaction} from '../common/runTransaction.coffee'
 
@@ -111,7 +111,7 @@ export createUserTableAPI = ({userProfileSchema, getAllowedRoles, viewUserTableR
     roles:
       type: Array
       sdTable:
-        component: RoleSelect allowedRoles: getAllowedRoles()
+        component: RoleSelect
         overflow: true
     'roles.$':
       type: String
@@ -182,7 +182,14 @@ export createUserTableAPI = ({userProfileSchema, getAllowedRoles, viewUserTableR
               Roles.setUserRolesAsync id, _(rolesForScope).map('role').value(), if scope is 'null' then null else scope
             .value()
           )
-          
+
+  new ValidatedMethod
+    name: 'users.getAllowedRoles'
+    validate: null
+    run: ->
+      return unless Meteor.isServer
+      getAllowedRoles()
+
   if Meteor.isServer
     do ->
       console.log 'seeding allowed roles and users'
