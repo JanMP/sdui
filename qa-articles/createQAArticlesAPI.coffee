@@ -58,7 +58,6 @@ export createQAArticlesAPI = ({sourceName, collection, viewTableRole, editRole, 
     canEdit: true
     canAdd: true
     canDelete: true
-    showRowCount: true
     initialSortColumn: 'question'
     initialSortDirection: 'ASC'
     makeSubmitMethodRunFkt: ({collection, transformIdToMongo, transformIdToMiniMongo}) ->

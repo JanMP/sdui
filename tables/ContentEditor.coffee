@@ -56,10 +56,6 @@ export ContentEditor = ({tableOptions}) ->
       />
     </div>
 
-  useEffect ->
-    console.log 'customComponents', customComponents
-  , [customComponents]
-
   onAdd ?= ->
     if hasChanged
       setIdForOverloadConfirmationModal null
@@ -131,7 +127,7 @@ export ContentEditor = ({tableOptions}) ->
 
 
   onConfirmOverload = ->
-    console.log id = idForOverloadConfirmationModal
+    id = idForOverloadConfirmationModal
     if id?
       setSelectedRowId id
       loadEditorData {id}

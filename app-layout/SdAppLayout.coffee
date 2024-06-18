@@ -37,7 +37,7 @@ MainMenu = ({sourceArray}) ->
       else
         item.command = -> navigate item.path
       item.className = classNameForPath item.path
-      item.disabled = item.disabled ? if item.role then not useCurrentUserIsInRole item.role else false
+      item.disabled = item.disabled or if item.role then not useCurrentUserIsInRole item.role else false
       item unless item.disabled and item.hideOnDisabled
     .compact()
     .value()

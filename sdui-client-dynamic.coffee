@@ -60,3 +60,4 @@ export SdChatLog = suspend lazy -> import('./chat/SdChatLog.coffee').then (m) ->
 export SdAppLayout = suspend lazy -> import('./app-layout/SdAppLayout.coffee').then (m) -> default: m.SdAppLayout
 export Gravatar = suspend lazy -> import('./forms/GravatarField.coffee').then (m) -> default: m.Gravatar
 export GravatarField = suspend lazy -> import('./forms/GravatarField.coffee').then (m) -> default: m.GravatarField
+export FormattedJSON = suspend lazy -> import('./misc-components/FormattedJSON.coffee').then (m) -> default: m.FormattedJSON

@@ -1,7 +1,7 @@
 import React from 'react'
 import connectFieldPlus from './connectFieldPlus.coffee'
 
-export Thumbs = ({value, onChange}) ->
+export Thumbs = ({value, onChange, fontSize = '1rem'}) ->
 
   upColor = if value is 'up' then 'green' else 'grey'
   downColor = if value is 'down' then 'red' else 'grey'
@@ -24,15 +24,15 @@ export Thumbs = ({value, onChange}) ->
 
 
   <>
-    <i className="pi pi-thumbs-up" style={color: upColor} onClick={onUpClick}></i>
-    <i className="ml-2 pi pi-thumbs-down" style={color: downColor} onClick={onDownClick}></i>
+    <i className="pi pi-thumbs-up cursor-pointer" style={{color: upColor, fontSize}} onClick={onUpClick}></i>
+    <i className="ml-2 pi pi-thumbs-down cursor-pointer" style={{color: downColor, fontSize}} onClick={onDownClick}></i>
   </>
 
 
 export ThumbsField = connectFieldPlus ({value, onChange}) ->
 
-  <div className="p-component p-card w-full p-4">
-    <Thumbs value={value} onChange={onChange}/>
+  <div className="w-full p-4 flex gap-4">
+    <Thumbs value={value} onChange={onChange} fontSize={"2rem"}/>
   </div>
 
 export ThumbsTableField = ({row, columnKey, schemaBridge, onChangeField, measure, mayEdit}) ->

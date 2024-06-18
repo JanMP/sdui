@@ -224,6 +224,5 @@ export createUserTableAPI = ({userProfileSchema, getAllowedRoles, viewUserTableR
     canAdd: false
     canDelete: true
     canExport: true
-    showRowCount: true
     observers: [Meteor.roleAssignment.find()]
 
