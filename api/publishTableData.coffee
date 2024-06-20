@@ -1,9 +1,9 @@
 import {Meteor} from 'meteor/meteor'
 import {ReactiveAggregate} from 'meteor/tunguska:reactive-aggregate'
-import {userWithIdIsInRole} from '../common/roleChecks.coffee'
+import {userWithIdIsInRole, currentUserIsInRole} from '../common/roleChecks.coffee'
 
 export publishTableData = ({viewTableRole, sourceName, collection,
-getRowsPipeline, noAutomaticObserves = false, debounceDelay = 500, observers})  ->
+getRowsPipeline, noAutomaticObserver = false, debounceDelay = 200, getObservers})  ->
   
   if Meteor.isServer
   
@@ -11,11 +11,11 @@ getRowsPipeline, noAutomaticObserves = false, debounceDelay = 500, observers})  
       throw new Error 'no collection given'
 
     Meteor.publish "#{sourceName}.rows", ({search, query, queryUiObject, sort, limit, skip}) ->
-      return @ready() unless await userWithIdIsInRole id: @userId, role: viewTableRole
-      pipeline = getRowsPipeline {pub: this, search, query, queryUiObject, sort, limit, skip}
+      return @ready() unless await currentUserIsInRole viewTableRole
+      pipeline = => getRowsPipeline {pub: this, search, query, queryUiObject, sort, limit, skip}
       ReactiveAggregate this, collection,
-        await pipeline,
+        pipeline,
         clientCollection: "#{sourceName}.rows"
         debounceDelay: debounceDelay
-        noAutomaticObservers: noAutomaticObserves
-        observers: observers ? []
+        noAutomaticObserver: noAutomaticObserver
+        observers: await getObservers?() ? []

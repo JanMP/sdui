@@ -1,8 +1,9 @@
 import {Meteor} from 'meteor/meteor'
 import {Roles} from 'meteor/alanning:roles'
 import {useTracker} from 'meteor/react-meteor-data'
-import {useState} from'react'
 
+isAsync = (fn) -> fn?.constructor.name is 'AsyncFunction'
+isPromise = (value) -> typeof value?.then is 'function'
 
 ###*
   @typedef {import("../interfaces").Role} Role
@@ -12,8 +13,7 @@ import {useState} from'react'
   For use in subscriptions, where Meteor.userId is unavailable.
   
   Think about the trustworthiness of the UserId before using this!
-  
-  In addition to roles defined via alanning:roles you can specify
+    In addition to roles defined via alanning:roles you can specify
   'any' and 'logged-in'
 
   @param {{role: Role, id: string}} params
@@ -42,7 +42,7 @@ userWithIdIsInRoleSync = ({role, id}) ->
     when role is 'logged-in'
       id?
     when typeof role is 'function'
-      role?(id) ? false
+      role?() ? false
     when role?.role?
       if role.forAnyScope
         Roles.getScopesForUser(id, role.role).length > 0
@@ -86,17 +86,22 @@ export currentUserMustBeInRole = (role) ->
   unless await currentUserIsInRole role
     throw new Meteor.Error "user must be in role #{JSON.stringify role}"
 
+export scopesForUserWithIdInRole =
+  if Meteor.isServer
+    ({role, id}) -> Roles.getScopesForUserAsync id, role
+  else
+    ({role, id}) -> Roles.getScopesForUser id, role
+
 ###*
   @param {string | Array<string>} role
   @return {Array}
   ###
 export scopesForCurrentUserInRole = (role) ->
-  Roles.getScopesForUserAsync Meteor.userId(), role
+  scopesForUserWithIdInRole id: Meteor.userId(), role: role
 
 ###*
   @param {string | Array<string>} role
   @return {Array}
   ###
 export useScopesForCurrentUserInRole =
-  (role) -> useTracker ->
-    Roles.getScopesForUser Meteor.userId(), role
+  (role) -> useTracker -> scopesForCurrentUserInRole role

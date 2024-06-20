@@ -9,7 +9,7 @@ suspend = (WrappedComponent) -> (props) ->
 export {
   userWithIdIsInRole, currentUserIsInRole,
   useCurrentUserIsInRole, currentUserMustBeInRole,
-  scopesForCurrentUserInRole, useScopesForCurrentUserInRole
+  scopesForUserWithIdInRole, scopesForCurrentUserInRole, useScopesForCurrentUserInRole
 } from './common/roleChecks.coffee'
 export {useSession} from './common/useSession.coffee'
 export {meteorApply} from './common/meteorApply.coffee'

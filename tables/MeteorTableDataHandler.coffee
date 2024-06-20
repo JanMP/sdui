@@ -1,6 +1,6 @@
 import {Meteor} from 'meteor/meteor'
 import {Mongo} from 'meteor/mongo'
-import React, {useState, useEffect, useRef} from 'react'
+import React, {useState, useEffect, useRef, Suspense} from 'react'
 import {meteorApply} from '../common/meteorApply.coffee'
 import {DataList} from './DataList.coffee'
 import {ErrorBoundary} from '../common/ErrorBoundary.coffee'
@@ -123,6 +123,7 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
 
   subLoading = useTracker ->
     return unless usePubSub
+    return unless mayView
     handle = Meteor.subscribe rowPublicationName, {search, query, queryUiObject, sort, skip, limit}
     not handle.ready()
   

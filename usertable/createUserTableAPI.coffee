@@ -214,7 +214,7 @@ export createUserTableAPI = ({userProfileSchema, getAllowedRoles, viewUserTableR
       else
         @ready()
 
-    console.log 'user collection',  typeof Meteor.users
+
   #returning the dataOptions
   createTableDataAPI
     viewTableRole: viewUserTableRole
@@ -231,5 +231,5 @@ export createUserTableAPI = ({userProfileSchema, getAllowedRoles, viewUserTableR
     canAdd: false
     canDelete: true
     canExport: true
-    observers: [Meteor.roleAssignment.find()]
+    getObservers: -> [Meteor.roleAssignment.find()]
 

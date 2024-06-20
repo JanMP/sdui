@@ -22,7 +22,7 @@ export createTableDataAPI = ({
   makeFormDataFetchMethodRunFkt, makeSubmitMethodRunFkt, makeDeleteMethodRunFkt
   noAutomaticObserver
   debounceDelay
-  observers
+  getObservers
   query, initialSortColumn, initialSortDirection
   perLoad,
   setupNewItem
@@ -100,13 +100,15 @@ export createTableDataAPI = ({
   checkDisableEditForRow ?= false
   checkDisableDeleteForRow ?= false
 
+  getObservers ?= -> []
+
   if Meteor.isClient # setup local collections for publications
     rowsCollection = new Mongo.Collection "#{sourceName}.rows"
   
   publishTableData {
     viewTableRole, sourceName, collection,
     getRowsPipeline,
-    noAutomaticObserver, debounceDelay, observers
+    noAutomaticObserver, debounceDelay, getObservers
   }
 
   createTableDataMethods {
