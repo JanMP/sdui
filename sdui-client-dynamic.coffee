@@ -9,7 +9,7 @@ suspend = (WrappedComponent) -> (props) ->
 export {
   userWithIdIsInRole, currentUserIsInRole,
   useCurrentUserIsInRole, currentUserMustBeInRole,
-  scopesForCurrentUserInRole, useScopesForCurrentUserInRole
+  scopesForUserWithIdInRole, scopesForCurrentUserInRole, useScopesForCurrentUserInRole
 } from './common/roleChecks.coffee'
 export {useSession} from './common/useSession.coffee'
 export {meteorApply} from './common/meteorApply.coffee'
@@ -61,3 +61,4 @@ export SdAppLayout = suspend lazy -> import('./app-layout/SdAppLayout.coffee').t
 export Gravatar = suspend lazy -> import('./forms/GravatarField.coffee').then (m) -> default: m.Gravatar
 export GravatarField = suspend lazy -> import('./forms/GravatarField.coffee').then (m) -> default: m.GravatarField
 export FormattedJSON = suspend lazy -> import('./misc-components/FormattedJSON.coffee').then (m) -> default: m.FormattedJSON
+export SdUserTable = suspend lazy -> import('./usertable/SdUserTable.coffee').then (m) -> default: m.SdUserTable

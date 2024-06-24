@@ -11,7 +11,7 @@ Package.describe({
 });
 
 Package.onUse(function(api) {
-  api.versionsFrom('2.10.0');
+  api.versionsFrom(['2.16', '3.0-rc.4']);
   api.use('ecmascript');
   api.use('coffeescript@2.7.0');
   api.use('typescript');
@@ -21,7 +21,7 @@ Package.onUse(function(api) {
   api.use('mdg:validated-method@1.2.0');
   // api.use('peerlibrary:reactive-publish@0.10.0');
   api.use('tunguska:reactive-aggregate@2.0.0');
-  api.use('aldeed:simple-schema');
+  api.use('aldeed:simple-schema@2.0.0-rc300.1');
   // api.use('mizzao:user-status@1.0.1'); 
   api.mainModule('sdui-client-dynamic.coffee', 'client');
   api.mainModule('sdui-server.coffee', 'server');

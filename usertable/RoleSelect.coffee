@@ -1,10 +1,11 @@
-import React, {useEffect, useState} from 'react'
-import { HTMLFieldProps, connectField, filterDOMProps } from 'uniforms'
+import React, {useState, useEffect, useContext} from 'react'
+import connectFieldPlus from '../forms/connectFieldPlus.coffee'
+import {UseTracker, useSubscribe} from 'meteor/react-meteor-data'
 import {MultiSelect} from 'primereact/multiselect'
 import {meteorApply} from '../common/meteorApply.coffee'
-import {UseTracker, useSubscribe} from 'meteor/react-meteor-data'
 import _ from 'lodash'
 
+import {AllowedRolesContext} from './AllowedRolesContext.coffee'
 
 selectOptionFor = ({role, scope}) ->
   value: {role, scope}
@@ -28,11 +29,7 @@ allowedRolesToOptions = (allowedRoles) ->
     .value()
   [globalOptions..., scopedOptions...]
 
-export RoleSelect = ({allowedRoles}) ->
-
-  options = allowedRolesToOptions allowedRoles
-
-  ###*
+###*
   * RoleSelect component for assigning roles to users. This component displays a multiselect dropdown
   * that allows the selection of multiple roles for a user. The roles can be either global or scoped to specific areas.
   * Upon selection, the new roles are updated for the user through a Meteor method call.
@@ -47,31 +44,47 @@ export RoleSelect = ({allowedRoles}) ->
   * @param {Boolean} props.mayEdit A flag indicating if the current user can edit roles.
   * @returns {React.Element} The RoleSelect component rendering a MultiSelect dropdown or a simple div based on the editing permissions.
   ###
-  ({row, columnKey, schemaBridge, onChangeField, measure, mayEdit}) ->
+export RoleSelect = ({row, columnKey, schemaBridge, onChangeField, measure, mayEdit}) ->
 
-    onChange = ({value}) ->
-      meteorApply
-        method: 'user.onChangeRoles'
-        data:
-          id: row._id
-          value: value
+  options = useContext AllowedRolesContext
 
-    rolesList = '# TODO implement text rendering of roles from row'
+  # useEffect ->
+  #   meteorApply
+  #     method: 'users.getAllowedRoles'
+  #     data: {}
+  #   .then allowedRolesToOptions
+  #   .then setOptions
+  #   .catch console.error
+  #   undefined
+  # , []
+  
+  # useEffect ->
+  #   console.log options
+  # , [options]
 
-    if mayEdit
-      if on
-        <MultiSelect
-          value={valueFromRow row}
-          options={options}
-          onChange={onChange}
-          name="roles"
-          style={maxWidth: '100%', minWidth: '100%'}
-        />
-      else
-        <div>
-          <pre>
-          {JSON.stringify {options, value: valueFromRow row}, null, 2}
-          </pre>
-        </div>
+  onChange = ({value}) ->
+    meteorApply
+      method: 'user.onChangeRoles'
+      data:
+        id: row._id
+        value: value
+
+  rolesList = '# TODO implement text rendering of roles from row'
+
+  if mayEdit or true
+    if on
+      <MultiSelect
+        value={valueFromRow row}
+        options={options}
+        onChange={onChange}
+        name="roles"
+        style={maxWidth: '100%', minWidth: '100%'}
+      />
     else
-      <div>{rolesList}</div>
+      <div>
+        <pre>
+        {JSON.stringify {options, value: valueFromRow row}, null, 2}
+        </pre>
+      </div>
+  else
+    <div>{rolesList}</div>

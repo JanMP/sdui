@@ -5,7 +5,7 @@
 export {
   userWithIdIsInRole, currentUserIsInRole,
   useCurrentUserIsInRole, currentUserMustBeInRole,
-  scopesForCurrentUserInRole, useScopesForCurrentUserInRole
+  scopesForUserWithIdInRole, scopesForCurrentUserInRole, useScopesForCurrentUserInRole
 } from './common/roleChecks.coffee'
 export {createTableDataAPI} from './api/createTableDataAPI.coffee'
 export {createUserTableAPI} from './usertable/createUserTableAPI.coffee'

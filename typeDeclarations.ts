@@ -35,8 +35,8 @@ export interface createTableDataAPIParams {
   initialSortColumn?: string
   initialSortDirection?: 'ASC' | 'DESC'
   perLoad?: number
-  getPreSelectPipeline?: ({pub}?: {pub: object}) => Array<Object>
-  getProcessorPipeline?: ({pub}?: {pub: object}) => Array<Object>
+  getPreSelectPipeline?: ({pub}?: {pub: object}) => Promise<Array<Object> | null>
+  getProcessorPipeline?: ({pub}?: {pub: object}) => Promise<Array<Object> | null>
   getRowsPipeline?:
     (_: {
         pub: object,
@@ -45,11 +45,6 @@ export interface createTableDataAPIParams {
         sort?: Mongo.SortSpecifier
         limit?: number
         skip?: number}) => Array<object>
-  getRowCountPipeline?:
-    (options: {
-      pub: object,
-      search: string,
-      query?: Mongo.Query<any>}) => Array<object>
   getExportPipeline?:
     (options: {
       search: string,
@@ -75,7 +70,7 @@ export interface createTableDataAPIParams {
     }) => (options: {id: string}) => void
   noAutomaticObserver?: boolean
   debounceDelay?: number
-  observers?: Array<any>
+  getObservers?:() => Array<any>
   setupNewItem?: () => object
   onSubmit?: (object) => any
   checkDisableEditForRow?: boolean
