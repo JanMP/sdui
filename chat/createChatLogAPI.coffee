@@ -170,6 +170,8 @@ getMessagesForSessionPipeline = ({sourceName, sessionId}) -> [
 ]
 
 ###@
+  Sets up the backeend for the chatLogs
+
   @param {Object} options
   @param {String} options.sourceName - the sourceName of the chat
   @param {String} options.messageCollection
