@@ -193,7 +193,7 @@ export createUserTableAPI = ({userProfileSchema, getAllowedRoles, viewUserTableR
   if Meteor.isServer
     do ->
       console.log 'seeding allowed roles and users'
-      allowedRoles = getAllowedRoles()
+      allowedRoles = await getAllowedRoles()
       for role in allowedRoles.global
         Roles.createRoleAsync role, unlessExists: true
       if allowedRoles.scope?
