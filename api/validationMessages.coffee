@@ -35,6 +35,9 @@ export regExpMessages_de = [
   ,
     exp: SimpleSchema.RegEx.Phone,
     msg: 'muss eine gültige Telefonnummer sein'
+  ,
+    exp: /^[a-z0-9-]+$/,
+    msg: 'darf nur Kleinbuchstaben, Zahlen und Bindestriche enthalten'
 ]
 
 export de =
