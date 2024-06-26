@@ -1,7 +1,6 @@
 import React, { Ref } from 'react';
 import { HTMLFieldProps, connectField, filterDOMProps } from 'uniforms';
 import setClassNamesForProps from './setClassNamesForProps';
-import {DateTime} from 'luxon'
 import TimePicker from 'react-time-picker'
 import {useTranslation} from 'react-i18next'
 
