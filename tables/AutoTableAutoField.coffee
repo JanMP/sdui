@@ -27,12 +27,15 @@ export AutoTableAutoField = ({row, columnKey, schemaBridge, onChangeField, measu
         when Date
           <span>
             {
-              params = {dateTimeDefaultParams..., (fieldSchema.sdTable ?  {})...}
-              DateTime
-                .fromJSDate row[columnKey]
-                ?.setLocale params.locale
-                ?.setZone params.zone
-                ?.toFormat params.format
+              if row[columnKey]?
+                params = {dateTimeDefaultParams..., (fieldSchema.sdTable ?  {})...}
+                DateTime
+                  .fromJSDate row[columnKey]
+                  ?.setLocale params.locale
+                  ?.setZone params.zone
+                  ?.toFormat params.format
+              else
+                ''
             }
           </span>
         when Boolean
