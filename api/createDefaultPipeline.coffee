@@ -91,6 +91,7 @@ export createDefaultPipeline = ({getPreSelectPipeline, getProcessorPipeline, lis
       (await getProcessorPipeline())...,
       (await getQueryEditorPipeline {queryUiObject})...
       (await searchPipeline {search})...,
-    {$sort: sort}, projectStage]
+      {$sort: sort}, projectStage
+    ]
 
   {defaultGetRowsPipeline, defaultGetExportPipeline}
