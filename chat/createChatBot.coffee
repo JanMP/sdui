@@ -1,6 +1,5 @@
 import {Meteor} from 'meteor/meteor'
 import {Mongo} from 'meteor/mongo'
-import {tokenizer} from 'meteor/janmp:sdui'
 import _ from 'lodash'
 
 countTokens = (messages) ->
@@ -134,10 +133,10 @@ export createChatBot = ({
       workInProgress: $ne: true
       chatRole: $ne: 'log'
     history =
-      messageCollection.find query,
+      (await messageCollection.find query,
         sort: {createdAt: -1}
         limit: initialLimit
-      .fetch()
+      .fetchAsync())
       .filter (message) -> message.text?
       .reverse()
       .map (message) ->
@@ -154,8 +153,7 @@ export createChatBot = ({
           messages
         else
           console.log 'buildHistory: tokenLimit reached, trying again with limit ', limit - 1
-          build limit - 1
-      catch error
+          build limit - 1      catch error
         console.error "The tokenizer is broken: #{error.message}"
         messages
 
@@ -292,7 +290,7 @@ export createChatBot = ({
         .then (result) ->
           return unless result?
           createSystemMessage {sessionId, text: JSON.stringify result}
-          messagesWithResult = buildContext {sessionId}
+          messagesWithResult = await buildContext {sessionId}
           call {sessionId, messageId: messageId, messages: messagesWithResult, allowFunctionCall: allowRecursiveToolCalls}
     .catch (error) ->
       createLogMessage {sessionId, error: error}
