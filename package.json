@@ -22,6 +22,7 @@
     "@types/mocha": "^10.0.1",
     "@types/node": "^20.5.9",
     "@types/simpl-schema": "^1.12.3",
+    "luxon": "^3.4.4",
     "react": "^18.2.0",
     "uniforms": "^4.0.0-alpha.5",
     "uniforms-bridge-simple-schema-2": "^4.0.0-alpha.5"
