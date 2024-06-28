@@ -143,7 +143,7 @@ export createChatBot = ({
         # console.log 'message', message
         role: message.chatRole
         content: message.text
-    build = (limit) ->
+    build = (limit) -> # TODO we don't have the tokenizer anymore, this whole aproach needs to be reworked
       if limit < 0
         throw new Meteor.Error 'buildHistory: limit must be >= 0'
       croppedHistory = history[0..limit]
@@ -153,7 +153,8 @@ export createChatBot = ({
           messages
         else
           console.log 'buildHistory: tokenLimit reached, trying again with limit ', limit - 1
-          build limit - 1      catch error
+          build limit - 1
+      catch error
         console.error "The tokenizer is broken: #{error.message}"
         messages
 
