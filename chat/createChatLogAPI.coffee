@@ -1,11 +1,9 @@
 import {Meteor} from 'meteor/meteor'
 import {Mongo} from 'meteor/mongo'
-import SimpleSchema from 'meteor/aldeed:simple-schema'
+import {SimpleSchema} from 'meteor/janmp:sdui'
 import {ValidatedMethod} from 'meteor/mdg:validated-method'
 import {createTableDataAPI, chatSchema} from 'meteor/janmp:sdui'
 import _ from 'lodash'
-
-SimpleSchema.extendOptions(['sdTable', 'uniforms'])
 
 # Add a mongo collection with tokencosts, so we can use it in the pipeline
 TokenCosts = new Mongo.Collection 'tokenCosts'

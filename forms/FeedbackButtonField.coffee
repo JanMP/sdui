@@ -2,13 +2,11 @@ import { Thumbs } from './ThumbsField.coffee'
 import React, {useState} from 'react'
 import {Button} from 'primereact/button'
 import {FormModal} from './FormModal.coffee'
-import SimpleSchema from 'meteor/aldeed:simple-schema'
+import {SimpleSchema} from 'meteor/janmp:sdui'
 import SimpleSchemaBridge from 'uniforms-bridge-simple-schema-2'
 import LongTextField from './uniforms-custom/primereact/LongTextField.coffee'
 import {ThumbsField} from './ThumbsField.coffee'
 import connectFieldPlus from './connectFieldPlus.coffee'
-
-SimpleSchema.extendOptions(['uniforms'])
 
 formSchema = new SimpleSchema
   thumbs:

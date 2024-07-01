@@ -7,6 +7,7 @@ export {
   useCurrentUserIsInRole, currentUserMustBeInRole,
   scopesForUserWithIdInRole, scopesForCurrentUserInRole, useScopesForCurrentUserInRole
 } from './common/roleChecks.coffee'
+export {SimpleSchema} from './api/setupSimpleSchema.coffee'
 export {createTableDataAPI} from './api/createTableDataAPI.coffee'
 export {createUserTableAPI} from './usertable/createUserTableAPI.coffee'
 export {createQAArticlesAPI} from './qa-articles/createQAArticlesAPI.coffee'

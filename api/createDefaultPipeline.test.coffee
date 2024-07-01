@@ -3,7 +3,7 @@ import deepEqualInAnyOrder from 'deep-equal-in-any-order'
 chai.use deepEqualInAnyOrder
 {expect} = chai
 
-import SimpleSchema from 'meteor/aldeed:simple-schema'
+import {SimpleSchema} from 'meteor/janmp:sdui'
 import _ from 'lodash'
 
 import {createDefaultPipeline} from './createDefaultPipeline.coffee'

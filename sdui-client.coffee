@@ -12,14 +12,13 @@ export {meteorApply} from './common/meteorApply.coffee'
 export {config, useConfig, Configurations} from './config/config.coffee'
 export {default as connectFieldWithLabel} from './forms/connectFieldWithLabel.coffee'
 export {default as connectFieldPlus} from './forms/connectFieldPlus.coffee'
-
+export {SimpleSchema} from './api/setupSimpleSchema.coffee'
 export {createTableDataAPI} from './api/createTableDataAPI.coffee'
 export {createUserTableAPI} from './usertable/createUserTableAPI.coffee'
 export {createQAArticlesAPI} from './qa-articles/createQAArticlesAPI.coffee'
 export {createChatAPI, chatSchema} from './chat/createChatAPI.coffee'
 export {createChatLogAPI, addCostsPipeline} from './chat/createChatLogAPI.coffee'
 export {createAppLayoutAPI} from './app-layout/createAppLayoutAPI.coffee'
-export {regExpMessages_de, de, setDefaultValidationMessages} from './api/validationMessages.coffee'
 
 export {default as queryUiObjectToQuery} from './query-editor/queryUiObjectToQuery.coffee'
 

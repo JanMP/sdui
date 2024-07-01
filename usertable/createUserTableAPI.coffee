@@ -1,6 +1,6 @@
 import {Meteor} from 'meteor/meteor'
 import {Accounts} from 'meteor/accounts-base'
-import SimpleSchema from 'meteor/aldeed:simple-schema'
+import {SimpleSchema} from 'meteor/janmp:sdui'
 import {createTableDataAPI} from '../api/createTableDataAPI.coffee'
 import {currentUserMustBeInRole} from '../common/roleChecks.coffee'
 import {ValidatedMethod} from 'meteor/mdg:validated-method'
@@ -8,8 +8,6 @@ import {Roles} from 'meteor/alanning:roles'
 import {RoleSelect} from './RoleSelect.coffee'
 import _ from 'lodash'
 import {runTransaction} from '../common/runTransaction.coffee'
-
-SimpleSchema.extendOptions(['sdTable', 'uniforms'])
 
 ###*
  * createUserTableAPI function configures and exposes an API for user table manipulation, including CRUD operations,
@@ -195,11 +193,11 @@ export createUserTableAPI = ({userProfileSchema, getAllowedRoles, viewUserTableR
       console.log 'seeding allowed roles and users'
       allowedRoles = await getAllowedRoles()
       for role in allowedRoles.global
-        Roles.createRoleAsync role, unlessExists: true
+        await Roles.createRoleAsync role, unlessExists: true
       if allowedRoles.scope?
         for scope in _(allowedRoles.scope).keys().value()
           for role in allowedRoles.scope[scope]
-            Roles.createRoleAsync role, unlessExists: true
+            await Roles.createRoleAsync role, unlessExists: true
 
       for {email, username, password, roles} in Meteor.settings.seedUsers ? []
         unless (await Meteor.users.findOneAsync('emails.0.address': email))?

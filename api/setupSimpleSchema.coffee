@@ -1,8 +1,8 @@
-import SimpleSchema from 'meteor/aldeed:simple-schema';
+import SimpleSchema from 'meteor/aldeed:simple-schema'
 import find from 'lodash/find';
 
 
-export regExpMessages_de = [
+regExpMessages_de = [
     exp: SimpleSchema.RegEx.Email,
     msg: 'muss eine gültige Adresse sein'
   ,
@@ -40,7 +40,7 @@ export regExpMessages_de = [
     msg: 'darf nur Kleinbuchstaben, Zahlen und Bindestriche enthalten'
 ]
 
-export de =
+de =
   required: '{{{label}}} wird benötigt'
   minString: '{{{label}}} muss mindestens {{min}} Zeichen lang sein'
   maxString: '{{{label}}} darf höchstens {{max}} Zeichen lang sein'
@@ -72,6 +72,7 @@ export de =
       "#{label} #{regExpMessage}"
 
 
-export setDefaultValidationMessages = (initialLanguage = 'de',  messages = {de}) ->
-  console.log 'setDefaultValidationMessages', initialLanguage, messages
-  SimpleSchema.setDefaultMessages {initialLanguage, messages}
+SimpleSchema.extendOptions ['sdContent', 'sdTable', 'uniforms', 'index', 'unique']
+SimpleSchema.setDefaultMessages {initialLanguage: 'de', messages: {de}}
+
+export {SimpleSchema}

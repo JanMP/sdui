@@ -1,6 +1,6 @@
 import {Meteor} from 'meteor/meteor'
 import {ValidatedMethod} from 'meteor/mdg:validated-method'
-import SimpleSchema from 'meteor/aldeed:simple-schema'
+import {SimpleSchema} from 'meteor/janmp:sdui'
 import {currentUserMustBeInRole, userWithIdIsInRole} from '../common/roleChecks.coffee'
 import {Accounts} from 'meteor/accounts-base'
 import {Roles} from 'meteor/alanning:roles'
