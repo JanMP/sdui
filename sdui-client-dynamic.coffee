@@ -23,6 +23,7 @@ export {createQAArticlesAPI} from './qa-articles/createQAArticlesAPI.coffee'
 export {createChatAPI, chatSchema} from './chat/createChatAPI.coffee'
 export {createChatLogAPI, addCostsPipeline} from './chat/createChatLogAPI.coffee'
 export {createAppLayoutAPI} from './app-layout/createAppLayoutAPI.coffee'
+export {ToastProvider, useToast} from './app-layout/ToastProvider.coffee'
 # export {createFilesAPI, filesAPISourceSchema} from './api/createFilesAPI.coffee'
 
 # server only (eventually)

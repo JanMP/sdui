@@ -3,7 +3,7 @@ import {meteorApply} from '../common/meteorApply.coffee'
 import {ProgressSpinner} from 'primereact/progressspinner'
 import {ConfirmationModal} from './ConfirmationModal'
 import {Button} from 'primereact/button'
-import {Toast} from 'primereact/toast'
+import {useToast} from 'meteor/janmp:sdui'
 import _ from 'lodash'
 
 
@@ -16,9 +16,9 @@ import _ from 'lodash'
   @param {string?} args.label - optional button label
   @param {string?} args.icon - optional PrimeIcon (placed before label if label is defined)
   @param {React.Component?} args.customTemplate - optional custom template to be rendered either before or instead of label and icon
-  @param {(result: any) => void} [args.onSuccess] - optional callback on successfull method/action, defaults to toast.sucess(successMsg) if successMsg is defined
+  @param {(result: any) => void} [args.onSuccess] - optional callback on successfull method/action, defaults to displaying toast if successMsg is defined
   @param {string?} args.successMsg - optional sucess message text
-  @param {(error: Error) => void} [args.onError] - optional callback on unsuccessfull method/action, defaults to toast.error(errorMsg ? error)
+  @param {(error: Error) => void} [args.onError] - optional callback on unsuccessfull method/action, defaults to displaying toast (with errorMsg if defined, or error.message otherwise)
   @param {string?} args.errorMsg - optional error message
   @param {string?} args.confirmation - if defined, a modal will be displayed with this text to request confirmation before method/action is executed
   @param {string?} args.className - applied to <button />
@@ -33,10 +33,13 @@ buttonProps}) ->
   options ?= {}
   label ?= unless icon? or customTemplate? then "run #{method}" else null
 
+  if not method? and not onAction?
+    throw new Error 'ActionButton: either method or onAction must be defined'
+
   onSuccess ?=
     (result) ->
       if successMsg?
-        toast.current?.show
+        toast.show
           severity: 'success'
           summary: 'Erfolg'
           detail: successMsg
@@ -44,8 +47,7 @@ buttonProps}) ->
   
   onError ?=
     (error) ->
-      toast.curent?.show
-      toast.current?.show
+      toast.show
         severity: 'error'
         summary: 'Fehler'
         detail: "#{errorMsg ? error.message}"
@@ -53,7 +55,7 @@ buttonProps}) ->
 
   [isBusy, setIsBusy] = useState false
   [modalIsOpen, setModalIsOpen] = useState false
-  toast = useRef null
+  toast = useToast()
 
   doIt = ->
     setModalIsOpen false
@@ -89,7 +91,6 @@ buttonProps}) ->
           onConfirm={doIt}
         />
     }
-    <Toast ref={toast}/>
     <Button
       className={className}
       disabled={disabled}

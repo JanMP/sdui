@@ -1,14 +1,13 @@
 import {Meteor} from 'meteor/meteor'
 import React, {useState, useEffect, useRef} from 'react'
 import {useTracker, useSubscribe} from 'meteor/react-meteor-data'
-import {meteorApply, ActionButton} from 'meteor/janmp:sdui'
+import {meteorApply, ActionButton, useToast} from 'meteor/janmp:sdui'
 import {InputText} from 'primereact/inputtext'
 import {ScrollPanel} from 'primereact/scrollpanel'
 import {DefaultMessage} from './DefaultMessage.coffee'
 import {SdList} from '../tables/SdList'
 import {SessionListItemContent} from './SessionListItemContent'
 import {DefaultListItem} from '../tables/DefaultListItem'
-import {Toast} from 'primereact/toast'
 import {DefaultMetaDataDisplay} from './DefaultMetaDataDisplay.coffee'
 import {SessionListHeader} from './SessionListHeader.coffee'
 import {Tooltip} from 'primereact/tooltip'
@@ -47,8 +46,7 @@ export SdChat = ({dataOptions, className = "", customComponents = {}, processMes
   [sessionId, setSessionId] = useState null
 
   scrollAreaRef = useRef null
-  toast = useRef null
-
+  toast = useToast()
   linkedMetaData = useRef new Set()
   addLinkedMetaData = (id) -> linkedMetaData.current.add id
   
@@ -108,7 +106,7 @@ export SdChat = ({dataOptions, className = "", customComponents = {}, processMes
   , [messages]
 
   handleError = (error) ->
-    toast.current.show
+    toast.show
       severity: 'error'
       summary: 'Fehler'
       detail: "#{error.message}"
@@ -118,7 +116,7 @@ export SdChat = ({dataOptions, className = "", customComponents = {}, processMes
     event.preventDefault()
     return if inputValue is ''
     if messageIsTooLong
-      toast.current.show
+      toast.show
         severity: 'error'
         summary: 'Fehler'
         detail: "Deine Nachricht ist zu lang. Bitte kürze sie auf #{maxMessageLength} Zeichen."
@@ -177,7 +175,6 @@ export SdChat = ({dataOptions, className = "", customComponents = {}, processMes
       else ''
 
   <div className="h-full w-full flex flex-row gap-4 #{className}">
-    <Toast ref={toast} />
     {
       unless isSingleSessionChat
         <div className="w-16rem flex-none">

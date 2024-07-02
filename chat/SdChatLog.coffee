@@ -1,13 +1,12 @@
 import React, {useState, useEffect, useRef} from 'react'
-import {SdTable, meteorApply, MarkdownDisplay, FormattedJSON} from 'meteor/janmp:sdui'
+import {SdTable, meteorApply, MarkdownDisplay, FormattedJSON, useToast} from 'meteor/janmp:sdui'
 import {Dialog} from 'primereact/dialog'
-import {Toast} from 'primereact/toast'
 
 
 HistoryDisplay = ({sourceName, rowData}) ->
 
   [messages, setMessages] = useState null
-  toast = useRef null
+  toast = useToast()
 
   useEffect ->
     if rowData?._id?
@@ -16,7 +15,7 @@ HistoryDisplay = ({sourceName, rowData}) ->
         data: sessionId: rowData._id
       .then setMessages
       .catch (error) ->
-        toast.current?.show
+        toast.show
           severity: 'error'
           summary: 'Fehler'
           detail: error.message
@@ -25,7 +24,6 @@ HistoryDisplay = ({sourceName, rowData}) ->
 
 
   <div className="p-3">
-    <Toast ref={toast} />
     {
       messages?.map (entry, index) ->
         <div className="mt-2" key={index}>
