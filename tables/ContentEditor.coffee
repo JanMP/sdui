@@ -49,12 +49,12 @@ export ContentEditor = ({tableOptions}) ->
   {Preview, RelatedDataPane} = customComponents ? {}
 
   Preview ?= ({content}) ->
-    <div className="overflow-scroll min-h-0 max-h-full">
+    <ScrollPanel className="h-full w-full p-2">
       <MarkdownDisplay
         markdown={content?[contentKey]}
         contentClass="prose"
       />
-    </div>
+    </ScrollPanel>
 
   onAdd ?= ->
     if hasChanged
@@ -149,7 +149,7 @@ export ContentEditor = ({tableOptions}) ->
           ?.then openEditor
 
   
-  <div className="p-component h-full w-full">
+  <div className="p-component h-full w-full overflow-hidden">
     <ErrorBoundary>
       <ConfirmationModal
         isOpen={overloadConfirmationModalOpen}
@@ -189,20 +189,20 @@ export ContentEditor = ({tableOptions}) ->
             }...}
           />
         </SplitterPanel>
-        <SplitterPanel className="flex">
+        <SplitterPanel className="h-full">
           {
             if mayEdit and editorOpen
-              <Splitter>
+              <Splitter className="h-full">
                 <SplitterPanel>
-                  <Splitter layout="vertical">
-                    <SplitterPanel>
+                  <Splitter layout="vertical"  className="h-full">
+                    <SplitterPanel size={20}>
                       <SdEditor
                         value={changedModel[contentKey]}
                         onChange={setContent}
                       />
                     </SplitterPanel>
-                    <SplitterPanel className ="flex-column min-h-0 max-h-full">
-                      <div className="p-2 overflow-scroll" style={height: "100%"}>
+                    <SplitterPanel className ="min-h-0">
+                      <ScrollPanel className="h-full w-full p-2" >
                         <AutoForm
                           schema={formSchemaBridge}
                           model={changedModel}
@@ -227,18 +227,18 @@ export ContentEditor = ({tableOptions}) ->
                             disabled={(not hasChanged) or (not isValid)}
                           />
                         </div>
-                      </div>
+                      </ScrollPanel>
                     </SplitterPanel>
                   </Splitter>
                 </SplitterPanel>
-                <SplitterPanel>
+                <SplitterPanel className="h-full max-h-full">
                   {
                     if RelatedDataPane?
-                      <Splitter layout="vertical">
-                        <SplitterPanel className="min-h-0 max-h-full">
+                      <Splitter layout="vertical" className="h-full">
+                        <SplitterPanel size={25}>
                           <Preview content={changedModel}/>
                         </SplitterPanel>
-                        <SplitterPanel className="min-h-0 max-h-full">
+                        <SplitterPanel>
                           <RelatedDataPane model={changedModel}/>
                         </SplitterPanel>
                       </Splitter>
