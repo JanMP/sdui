@@ -1,6 +1,6 @@
 import {Meteor} from 'meteor/meteor'
 import {Mongo} from 'meteor/mongo'
-import SimpleSchema from 'meteor/aldeed:simple-schema'
+import {SimpleSchema} from 'meteor/janmp:sdui'
 import {ValidatedMethod} from 'meteor/mdg:validated-method'
 # import {createTableDataAPI, currentUserMustBeInRole, LongTextField} from 'meteor/janmp:sdui'
 import {createTableDataAPI} from '../api/createTableDataAPI.coffee'
@@ -8,8 +8,6 @@ import {currentUserMustBeInRole} from '../common/roleChecks.coffee'
 import {LongTextField} from '../forms/uniforms-custom/select-implementation'
 
 import _ from 'lodash'
-
-SimpleSchema.extendOptions(['sdTable', 'uniforms'])
 
 sourceSchemaDefinition =
   question:

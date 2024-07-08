@@ -2,14 +2,12 @@ import {Meteor} from 'meteor/meteor'
 import {Accounts} from 'meteor/accounts-base'
 import React, {useState} from 'react'
 import {useTracker} from 'meteor/react-meteor-data'
-import SimpleSchema from 'meteor/aldeed:simple-schema'
+import {SimpleSchema} from 'meteor/janmp:sdui'
 import SimpleSchemaBridge from 'uniforms-bridge-simple-schema-2'
 import {AutoForm} from '../forms/uniforms-custom/select-implementation'
 import {Button} from 'primereact/button'
 import {PasswordField} from '../forms/uniforms-custom/select-implementation'
 
-
-SimpleSchema.extendOptions(['uniforms'])
 
 loginSchema = new SimpleSchema
   email:

@@ -1,4 +1,4 @@
-import SimpleSchema from 'meteor/aldeed:simple-schema'
+import {SimpleSchema} from 'meteor/janmp:sdui'
 import _ from 'lodash'
 
 idSchema =

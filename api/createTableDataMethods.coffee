@@ -1,7 +1,7 @@
 import {Meteor} from 'meteor/meteor'
 import {Mongo} from 'meteor/mongo'
 import {ValidatedMethod} from 'meteor/mdg:validated-method'
-import SimpleSchema from 'meteor/aldeed:simple-schema'
+import {SimpleSchema} from 'meteor/janmp:sdui'
 import {schemaWithId} from '../common/schemaWithId.coffee'
 import {currentUserMustBeInRole} from '../common/roleChecks.coffee'
 

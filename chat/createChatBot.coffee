@@ -1,6 +1,5 @@
 import {Meteor} from 'meteor/meteor'
 import {Mongo} from 'meteor/mongo'
-import {tokenizer} from 'meteor/janmp:sdui'
 import _ from 'lodash'
 
 countTokens = (messages) ->
@@ -134,17 +133,17 @@ export createChatBot = ({
       workInProgress: $ne: true
       chatRole: $ne: 'log'
     history =
-      messageCollection.find query,
+      (await messageCollection.find query,
         sort: {createdAt: -1}
         limit: initialLimit
-      .fetch()
+      .fetchAsync())
       .filter (message) -> message.text?
       .reverse()
       .map (message) ->
         # console.log 'message', message
         role: message.chatRole
         content: message.text
-    build = (limit) ->
+    build = (limit) -> # TODO we don't have the tokenizer anymore, this whole aproach needs to be reworked
       if limit < 0
         throw new Meteor.Error 'buildHistory: limit must be >= 0'
       croppedHistory = history[0..limit]
@@ -292,7 +291,7 @@ export createChatBot = ({
         .then (result) ->
           return unless result?
           createSystemMessage {sessionId, text: JSON.stringify result}
-          messagesWithResult = buildContext {sessionId}
+          messagesWithResult = await buildContext {sessionId}
           call {sessionId, messageId: messageId, messages: messagesWithResult, allowFunctionCall: allowRecursiveToolCalls}
     .catch (error) ->
       createLogMessage {sessionId, error: error}

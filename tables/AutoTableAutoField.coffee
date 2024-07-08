@@ -1,6 +1,13 @@
 import React from 'react'
 import {DynamicTableField} from './DynamicTableField'
+import {DateTime} from 'luxon'
 import _ from 'lodash'
+
+#TODO get locale from same mechanism as primereact
+dateTimeDefaultParams =
+  locale: 'de',
+  zone: 'gmt',
+  format: 'dd.MM.yyyy HH:mm:ss'
 
 export AutoTableAutoField = ({row, columnKey, schemaBridge, onChangeField, measure, mayEdit}) ->
   fieldSchema = schemaBridge.schema._schema[columnKey]
@@ -18,7 +25,19 @@ export AutoTableAutoField = ({row, columnKey, schemaBridge, onChangeField, measu
     else
       switch fieldType = fieldSchema.type.definitions[0].type
         when Date
-          <span>{row[columnKey]?.toLocaleString()}</span>
+          <span>
+            {
+              if row[columnKey]?
+                params = {dateTimeDefaultParams..., (fieldSchema.sdTable ?  {})...}
+                DateTime
+                  .fromJSDate row[columnKey]
+                  ?.setLocale params.locale
+                  ?.setZone params.zone
+                  ?.toFormat params.format
+              else
+                ''
+            }
+          </span>
         when Boolean
           if row[columnKey] then <i className="pi pi-check"/> else <i className="pi pi-times"/>
         when Array

@@ -5,12 +5,12 @@ import {meteorApply} from '../common/meteorApply.coffee'
 import {DataList} from './DataList.coffee'
 import {ErrorBoundary} from '../common/ErrorBoundary.coffee'
 import {useTracker} from 'meteor/react-meteor-data'
-import {Toast} from 'primereact/toast'
 import {useCurrentUserIsInRole} from '../common/roleChecks.coffee'
 import {getColumnsToExport} from '../common/getColumnsToExport.coffee'
 import Papa from 'papaparse'
 import {downloadAsFile} from '../common/downloadAsFile.coffee'
 import {useTranslation} from 'react-i18next'
+import {useToast} from 'meteor/janmp:sdui'
 import _ from 'lodash'
 import * as types from '../typeDeclarations'
 
@@ -88,7 +88,7 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
   [search, setSearch] = useState ''
 
   [queryUiObject, setQueryUiObject] = useState defaultQueryUiObject
-  toast = useRef null
+  toast = useToast()
 
   onChangeQueryUiObject = setQueryUiObject
 
@@ -166,7 +166,7 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
       getRows()
       results
     .catch (error) ->
-      toast.current.show
+      toast.show
         severity: 'error'
         summary: 'Fehler'
         detail: "#{error.message}"
@@ -188,7 +188,7 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
       method: deleteMethodName
       data: {id}
     .then ->
-      toast.current.show
+      toast.show
         severity: 'success'
         summary: 'Erfolg'
         detail: t "The entry has been deleted"
@@ -205,7 +205,7 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
         method: exportRowsMethodName
         data: {search, query, queryUiObject, sort}
       .then (rows) ->
-        toast.current.show
+        toast.show
           severity: 'success'
           summary: 'Erfolg'
           detail: t "Export data received from Server."
@@ -215,7 +215,7 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
           dataString: csvString
           fileName: (title ? sourceName) + '.csv'
       .catch (error) ->
-        toast.current.show
+        toast.show
           severity: 'error'
           summary: 'Fehler'
           detail: t "Unexpected Error (see console.log)"
@@ -226,7 +226,6 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
     {
       if mayView
         <>
-          <Toast ref={toast}/>
           <DisplayComponent {{
             sourceName,
             listSchemaBridge, formSchemaBridge, queryEditorSchemaBridge,
