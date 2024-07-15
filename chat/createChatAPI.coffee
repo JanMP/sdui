@@ -76,6 +76,10 @@ export createChatAPI = ({
   bots, reactToNewMessage, onNewSession
   messagesLimit = 100
   getUsageLimits = ->
+    maxMessageLength: 500,
+    maxMessagesPerDay: 1000,
+    maxMessagesPerSession: Infinity,
+    maxSessionsPerDay: Infinity
 }) ->
 
 
