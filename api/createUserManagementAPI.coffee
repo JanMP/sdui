@@ -53,7 +53,7 @@ export createUserManagementAPI = ({sourceName, path, apiKey, roleScope, adminRol
     return unless checkAuth req, res
     try
       [username] = req.url.split('/').splice(1)
-      user = await Meteor.users.findOne {username}
+      user = await Meteor.users.Async {username}
       unless await userWithIdIsInRole : id: user._id, role: {role: switchableRoles, scope: roleScope}
         throw new Error "user #{username} not in roles #{JSON.stringify switchableRoles} in scope: #{roleScope}"
       currentRoles = await Roles.getRolesForUserAsync user._id, scope: roleScope

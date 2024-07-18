@@ -180,4 +180,4 @@ export interface MeteorTableDataHandlerOptions {
   DisplayComponent: typeof DataTableDisplayComponent
   customComponents: customComponents
 }
-export declare function MeteorTableDataHandler(options: MeteorTableDataHandlerOptions): FC
+export declare function MeteorTableDataHandler(options: MeteorTableDataHandlerOptions): FC// Combined .d.ts file

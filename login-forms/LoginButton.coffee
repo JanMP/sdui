@@ -15,7 +15,8 @@ export LoginButton = ({onLoginClick, onUserClick}) ->
         onAction={onLoginClick}
       />
 
-  email = user?.emails[0].address
+
+  email = user?.emails?[0]?.address
   username = user?.username ? 'X'
 
   customTemplate =

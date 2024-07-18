@@ -32,7 +32,7 @@ export default ({queryUiObject, getList}) ->
           throw new Meteor.Error 'missing-sentence-part', 'Ein Satzteil fehlt.'
         if predicate in ['$in', '$nin']
           id = obj.content.object.value
-          object.value = getList {subject, predicate, object} #CodeListen.findOne(new Mongo.ObjectID id)?.regexs or []
+          object.value = getList {subject, predicate, object}
         result =
           "#{subject}":
             "#{predicate}": object.value

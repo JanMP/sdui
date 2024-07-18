@@ -14,6 +14,8 @@ export Gravatar = (props) ->
 
   {email, defaultIcon, customImage} = props
 
+  email ?= 'fnord@snafu.edu'
+
   url = customImage ? gravatar.url email,
     size: 200
     defaultIcon: defaultIcon ? 'identicon'

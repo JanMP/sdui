@@ -93,6 +93,10 @@ export ContentEditor = ({tableOptions}) ->
     onDelete {id}
     setEditorOpen false
 
+  useEffect ->
+    console.log {loadedModel, changedModel, hasChanged}
+  , [loadedModel, changedModel, hasChanged]
+
   handleOnDelete =
     unless canDelete
       -> console.error 'handleOnDelete has been called despite canDelete false'
@@ -166,8 +170,8 @@ export ContentEditor = ({tableOptions}) ->
             onConfirm={-> deleteAndCloseEditor id: idForDeleteConfirmationModal}
           />
       }
-      <Splitter className="h-full">
-        <SplitterPanel className="h-full" size={25}>
+      <Splitter gutterSize={8} className="h-full">
+        <SplitterPanel className="h-full select-none p-2" size={25}>
           <DataList
             {{
               sourceName
@@ -189,12 +193,12 @@ export ContentEditor = ({tableOptions}) ->
             }...}
           />
         </SplitterPanel>
-        <SplitterPanel className="h-full">
+        <SplitterPanel className="h-full select-none p-2">
           {
             if mayEdit and editorOpen
-              <Splitter className="h-full">
-                <SplitterPanel>
-                  <Splitter layout="vertical"  className="h-full">
+              <Splitter gutterSize={8} className="h-full select-none">
+                <SplitterPanel className="pr-2">
+                  <Splitter gutterSize={8} layout="vertical"  className="h-full">
                     <SplitterPanel size={20}>
                       <SdEditor
                         value={changedModel[contentKey]}
@@ -202,7 +206,7 @@ export ContentEditor = ({tableOptions}) ->
                       />
                     </SplitterPanel>
                     <SplitterPanel className ="min-h-0">
-                      <ScrollPanel className="h-full w-full p-2" >
+                      <ScrollPanel className="w-full p-2" >
                         <AutoForm
                           schema={formSchemaBridge}
                           model={changedModel}
@@ -231,10 +235,10 @@ export ContentEditor = ({tableOptions}) ->
                     </SplitterPanel>
                   </Splitter>
                 </SplitterPanel>
-                <SplitterPanel className="h-full max-h-full">
+                <SplitterPanel className="h-full p-2">
                   {
                     if RelatedDataPane?
-                      <Splitter layout="vertical" className="h-full">
+                      <Splitter gutterSize={8} layout="vertical" className="h-full">
                         <SplitterPanel size={25}>
                           <Preview content={changedModel}/>
                         </SplitterPanel>
@@ -252,4 +256,3 @@ export ContentEditor = ({tableOptions}) ->
       </Splitter>
     </ErrorBoundary>
   </div>
-  

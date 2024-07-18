@@ -31,8 +31,8 @@ export createChatPublications = ({
 
   Meteor.publish "#{sourceName}.messages", ({sessionId}) ->
     return @ready() unless sessionId?
-    return @ready() unless userWithIdIsInRole id: @userId, role: viewChatRole
-    return @ready() unless @userId in (sessionListCollection?.findOne(sessionId)?.userIds ? [])
+    return @ready() unless await userWithIdIsInRole id: @userId, role: viewChatRole
+    return @ready() unless @userId in ((await sessionListCollection?.findOneAsync sessionId)?.userIds ? [])
    
     query =
       sessionId: sessionId
@@ -44,8 +44,8 @@ export createChatPublications = ({
   Meteor.publish "#{sourceName}.metaData", ({sessionId}) ->
     return @ready() unless sessionId?
     return @ready() unless metaDataCollection?
-    return @ready() unless userWithIdIsInRole id: @userId, role: viewChatRole
-    return @ready() unless isSingleSessionChat or  @userId in (sessionListCollection?.findOne(sessionId)?.userIds ? [])
+    return @ready() unless await userWithIdIsInRole id: @userId, role: viewChatRole
+    return @ready() unless isSingleSessionChat or  @userId in ((await sessionListCollection?.findOneAsync sessionId)?.userIds ? [])
    
     metaDataCollection.find {sessionId},
       sort: {createdAt: -1}
@@ -63,7 +63,7 @@ export createChatPublications = ({
     maxMessagesPerSession = limits?.maxMessagesPerSession ? 20
     maxMessageLength = limits?.maxMessageLength ? 1000
 
-    unless await messageCollection.findOne userId: @userId
+    unless await messageCollection.findOneAsync userId: @userId
       @added "#{sourceName}.usageLimits", @userId, {
         _id: @userId
         sessionId, maxMessageLength, maxMessagesPerDay, maxSessionsPerDay, maxMessagesPerSession

@@ -167,7 +167,7 @@ export createChatMethods = ({
       unless userIsInSessionOfMessage {messageId}
         throw new Meteor.Error 'user not in session of message'
       return unless Meteor.isServer
-      messageCollection.update {_id: messageId},
+      messageCollection.updateAsync {_id: messageId},
         $set:
           feedback: feedback
 

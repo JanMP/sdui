@@ -210,7 +210,7 @@ export createUserTableAPI = ({userProfileSchema, getAllowedRoles, viewUserTableR
       if @userId
         Meteor.roleAssignment.find 'user._id': @userId
       else
-        @ready()
+        return @ready()
 
 
   #returning the dataOptions

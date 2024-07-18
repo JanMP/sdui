@@ -78,7 +78,7 @@ export createChatBot = ({
     updateContent = ->
       if oldContent isnt content
         oldContent = content
-        messageCollection.update messageStubId,
+        messageCollection.updateAsync messageStubId,
           $set:
             text: content
             createdAt: new Date()
