@@ -11,6 +11,9 @@ TokenCosts = new Mongo.Collection 'tokenCosts'
 if Meteor.isServer
   do ->
     tokenCosts =
+      'gpt-4o-mini':
+        prompt: 15e-8
+        completion: 6e-7
       'gpt-4o':
         prompt: 5e-6
         completion: 15e-6
