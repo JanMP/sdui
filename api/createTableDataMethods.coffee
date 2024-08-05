@@ -105,7 +105,7 @@ checkDisableDeleteForRow, checkDisableEditForRow}) ->
         await currentUserMustBeInRole exportTableRole
         return unless Meteor.isServer
         collection.rawCollection()
-        .aggregate getExportPipeline {search, query, queryUiObject, sort},
+        .aggregate await getExportPipeline {search, query, queryUiObject, sort},
           allowDiskUse: true
         .toArray()
         .catch (error) ->
