@@ -1,7 +1,7 @@
 import {Meteor} from 'meteor/meteor'
 import {createRestClient} from './RestClient'
 
-qdrantSettings = Meteor.settings.qdrant
+qdrantSettings = Meteor.settings?.qdrant
 
 qdrant = createRestClient qdrantSettings
 
