@@ -30,20 +30,20 @@ sourceSchema = new SimpleSchema sourceSchemaDefinition
 listSchema = new SimpleSchema _.pick sourceSchemaDefinition, ['question', 'answer']
 
 ###*
-# Creates and configures an API for managing Question and Answer articles,
-# including operations for viewing, adding, and editing entries. The API setup
-# includes database collection definitions, schema validation, and role-based
-# permissions for operations. Additionally, it involves embedding vectors for
-# questions to support features like semantic search or similarity matching.
-#
-# @param {Object} options - Configuration options for the API
-# @param {String} options.sourceName - Unique identifier for the source of the data
-# @param {Mongo.Collection} options.collection - The MongoDB collection to store QA articles
-# @param {String} options.viewTableRole - Role required to view the QA articles table
-# @param {String} options.editRole - Role required for editing QA articles
-# @param {Function} options.getEmbedding - Function to generate embedding vectors for questions
-# @return {Object} Configured API object for managing QA articles data
-###
+  # Creates and configures an API for managing Question and Answer articles,
+  # including operations for viewing, adding, and editing entries. The API setup
+  # includes database collection definitions, schema validation, and role-based
+  # permissions for operations. Additionally, it involves embedding vectors for
+  # questions to support features like semantic search or similarity matching.
+  #
+  # @param {Object} options - Configuration options for the API
+  # @param {String} options.sourceName - Unique identifier for the source of the data
+  # @param {Mongo.Collection} options.collection - The MongoDB collection to store QA articles
+  # @param {String} options.viewTableRole - Role required to view the QA articles table
+  # @param {String} options.editRole - Role required for editing QA articles
+  # @param {Function} options.getEmbedding - Function to generate embedding vectors for questions
+  # @return {Object} Configured API object for managing QA articles data
+  ###
 export createQAArticlesAPI = ({sourceName, collection, viewTableRole, editRole, getEmbedding}) ->
   createTableDataAPI
     sourceName: sourceName
@@ -56,6 +56,7 @@ export createQAArticlesAPI = ({sourceName, collection, viewTableRole, editRole, 
     canEdit: true
     canAdd: true
     canDelete: true
+    canExport: true
     initialSortColumn: 'question'
     initialSortDirection: 'ASC'
     makeSubmitMethodRunFkt: ({collection, transformIdToMongo, transformIdToMiniMongo}) ->
