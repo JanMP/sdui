@@ -1,8 +1,8 @@
 import React from 'react'
 import {Rating} from 'primereact/rating'
-import connectFielPlus from './connectFielPlus'
+import connectFieldPlus from './connectFieldPlus'
 
-export RatingField = connectFielPlus ({label, value, onChange, disabled, props...}) ->
+export RatingField = connectFieldPlus ({label, value, onChange, disabled, props...}) ->
   <Rating
     value={value}
     onChange={(e) -> onChange e.value}

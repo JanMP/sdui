@@ -1,13 +1,15 @@
+import {Meteor} from 'meteor/meteor'
 import {getColumnsToExport} from '../common/getColumnsToExport.coffee'
 import processSearchInput from '../common/processSearchInput.coffee'
 import queryUiObjectToQuery from '../query-editor/queryUiObjectToQuery.coffee'
 import _ from 'lodash'
 
-debugPipelines = Meteor.settings.debugPipelines ? false
 
+(debugPipelines = Meteor.settings?.debugPipelines ? false)
 
 export createDefaultPipeline = ({getPreSelectPipeline, getProcessorPipeline, listSchema, queryEditorSchema}) ->
 
+  
   getPreSelectPipeline ?= ({pub}) -> []
   getProcessorPipeline ?= ({pub}) -> []
 
