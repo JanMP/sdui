@@ -46,13 +46,13 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
   formDisabled
   formReadOnly
   viewTableRole, editRole, addRole, deleteRole, exportTableRole
+  usePubSub
   } = dataOptions
 
 
   {t} = useTranslation()
 
-  # we only support usePubSub = true atm
-  usePubSub = true
+  usePubSub ?= true
 
   perLoad ?= 500
   query ?= defaultQuery
@@ -101,12 +101,13 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
   if sortColumn? and sortDirection?
     sort = "#{sortColumn}": if sortDirection is 'ASC' then 1 else -1
 
-  getRows = ->
+  getRows = ({reload = false}) ->
     return if usePubSub
+    console.log 'getRows'
     setIsLoading true
     meteorApply
       method: getRowMethodName
-      data: {search, query, queryUiObject, sort, limit, skip}
+      data: {search, query, queryUiObject, sort, skip: 0, limit: if reload then perLoad else limit}
     .then (returnedRows) ->
       setRows returnedRows
       setIsLoading false
@@ -116,8 +117,14 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
 
   useEffect ->
     setLimit perLoad
+    getRows reload: true
     return
   , [search, query, queryUiObject, sortColumn, sortDirection, sourceName]
+
+  useEffect ->
+    getRows {}
+    return
+  , [limit]
 
   skip = 0
 
