@@ -75,6 +75,7 @@ export interface createTableDataAPIParams {
   onSubmit?: (object) => any
   checkDisableEditForRow?: boolean
   checkDisableDeleteForRow?: boolean 
+  usePubSub?: boolean
 }
 export interface createTableDataAPIReturn {
   sourceName: string
@@ -103,6 +104,7 @@ export interface createTableDataAPIReturn {
   initialSortColumn?: string
   initialSortDirection?: 'ASC' | 'DESC'
   perLoad: number
+  usePubSub: boolean
 }
 
 export declare function createTableDataAPI(options: createTableDataAPIParams): createTableDataAPIReturn

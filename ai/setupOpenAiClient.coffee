@@ -2,7 +2,7 @@ import {Meteor} from 'meteor/meteor'
 import {OpenAI} from 'openai'
 
 export setupOpenAiClient = ({settingName = 'openai'}) ->
-  unless (openAISettings = Meteor.settings[settingName])?
+  unless (openAISettings = Meteor.settings?[settingName])?
     throw new Meteor.Error 'no openai configuration in settings json'
   client = new OpenAI openAISettings
   #return

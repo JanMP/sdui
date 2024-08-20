@@ -2,7 +2,7 @@ import {Meteor} from 'meteor/meteor'
 import MistralClient from '@mistralai/mistralai'
 
 export setupMistralClient = ({settingName = 'mistral'}) ->
-  unless (settings = Meteor.settings[settingName])?
+  unless (settings = Meteor.settings?[settingName])?
     throw new Meteor.Error 'no mistral configuration in settings json'
   unless (apiKey = settings.apiKey)?
     throw new Meteor.Error 'no mistral.apiKey in settings json'

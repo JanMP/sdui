@@ -199,7 +199,7 @@ export createUserTableAPI = ({userProfileSchema, getAllowedRoles, viewUserTableR
           for role in allowedRoles.scope[scope]
             await Roles.createRoleAsync role, unlessExists: true
 
-      for {email, username, password, roles} in Meteor.settings.seedUsers ? []
+      for {email, username, password, roles} in Meteor.settings?.seedUsers ? []
         unless (await Meteor.users.findOneAsync('emails.0.address': email))?
           try
             console.log "creating user", {email, username, password, roles}

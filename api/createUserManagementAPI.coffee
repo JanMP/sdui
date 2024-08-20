@@ -1,7 +1,7 @@
 import {Meteor} from 'meteor/meteor'
 import {ValidatedMethod} from 'meteor/mdg:validated-method'
 import {SimpleSchema} from 'meteor/janmp:sdui'
-import {currentUserMustBeInRole, userWithIdIsInRole} from '../common/roleChecks.coffee'
+import {userWithIdIsInRole} from '../common/roleChecks.coffee'
 import {Accounts} from 'meteor/accounts-base'
 import {Roles} from 'meteor/alanning:roles'
 import {Random} from 'meteor/random'
@@ -36,24 +36,28 @@ export createUserManagementAPI = ({sourceName, path, apiKey, roleScope, adminRol
       return false
     true
 
-  WebApp.connectHandlers.use "#{path}/add", (req, res, next) ->
+  WebApp.handlers.use "#{path}/add/:username", (req, res, next) ->
     return unless checkAuth req, res
-    [username] = req.url.split('/').splice(1)
+    username = req.params.username
     password = Random.secret()
     try
       id = await Accounts.createUserAsync {username, password}
       await Roles.addUsersToRolesAsync id, initialUserRole, roleScope
-      res.writeHead 200
-      res.end JSON.stringify {username, password, id}
+      res
+        .send {username, password, id}
+        .status 200
+        .end()
     catch error
-      res.writeHead 500
-      res.end error.message
+      res
+        .status 500
+        .send error.message
+        .end()
 
-  WebApp.connectHandlers.use "#{path}/remove", (req, res, next) ->
+  WebApp.handlers.use "#{path}/remove/:username", (req, res, next) ->
     return unless checkAuth req, res
     try
-      [username] = req.url.split('/').splice(1)
-      user = await Meteor.users.Async {username}
+      username = req.params.username
+      user = await Meteor.users.findOneAsync {username}
       unless await userWithIdIsInRole : id: user._id, role: {role: switchableRoles, scope: roleScope}
         throw new Error "user #{username} not in roles #{JSON.stringify switchableRoles} in scope: #{roleScope}"
       currentRoles = await Roles.getRolesForUserAsync user._id, scope: roleScope
@@ -61,37 +65,50 @@ export createUserManagementAPI = ({sourceName, path, apiKey, roleScope, adminRol
       result = await Meteor.users.removeAsync user._id
       if result isnt 1
         throw new Error "user #{username} not removed"
-      res.writeHead 200
-      res.end JSON.stringify deletedUsers: result
+      res
+        .send deletedUsers: result
+        .status 200
+        .end()
     catch error
-      res.writeHead 500
-      res.end error.message
+      console.error error
+      res
+        .status 500
+        .send error.message
+        .end()
 
-  WebApp.connectHandlers.use "#{path}/role", (req, res, next) ->
+  WebApp.handlers.use "#{path}/role/:username/:role", (req, res, next) ->
     return unless checkAuth req, res
     try
-      [username, role] = req.url.split('/').splice(1)
+      {username, role} = req.params
       unless switchableRoles.includes role
         throw new Error "role #{role} not in #{JSON.stringify switchableRoles}"
       user = await Meteor.users.findOneAsync {username}
       unless await userWithIdIsInRole : id: user._id, role: {role: switchableRoles, scope: roleScope}
         throw new Error "user #{username} not in roles #{JSON.stringify switchableRoles} in scope: #{roleScope}"
       await Roles.setUserRolesAsync user._id, role, roleScope
-      res.writeHead 200
-      res.end JSON.stringify {username, role}
+      res
+        .status 200
+        .send {username, role}
+        .end()
     catch error
-      res.writeHead 500
-      res.end error.message
+      res
+        .status 500
+        .send error.message
+        .end()
   
-  WebApp.connectHandlers.use "#{path}/roles", (req, res, next) ->
+  WebApp.handlers.use "#{path}/roles/:username", (req, res, next) ->
     return unless checkAuth req, res
     try
-      [username] = req.url.split('/').splice(1)
+      username = req.params.username
       user = await Meteor.users.findOneAsync {username}
       {createdAt} = user
       roles = await Roles.getRolesForUserAsync user._id, scope: roleScope
-      res.writeHead 200
-      res.end JSON.stringify {username, roles, createdAt}
+      res
+        .status 200
+        .send {username, roles, createdAt}
+        .end()
     catch error
-      res.writeHead 500
-      res.end error.message
+      res
+        .status 500
+        .send error.message
+        .end()

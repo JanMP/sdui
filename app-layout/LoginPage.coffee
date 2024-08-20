@@ -16,8 +16,8 @@ export LoginPage =  ->
     return <div className="prose p-4">
       <p>Hallo {user?.emails?[0]?.address ? ''}!</p>
       {<p>
-        Sie sind als Benutzer eingeloggt, aber wir müssen Ihr Konto manuell für die entsprechenden Module freischalten.
-        Bitte geben Sie uns Bescheid, unter welchem Account sie sich angemeldet haben. Wir kümmern uns umgehend.
+        Sie sind als Benutzer eingeloggt. Falls sie auf bestimmte Funktionen nicht zugreifen können,
+        müssen sie sich u.U. mit einem anderen Account anmelden, der über die entsprechenden Rechte verfügt.
       </p> unless isUser}
       <ActionButton
         onAction={Meteor.logout}

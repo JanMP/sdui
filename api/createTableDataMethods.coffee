@@ -71,10 +71,11 @@ checkDisableDeleteForRow, checkDisableEditForRow}) ->
         skip: Number
       .validator()
     run: ({search, query, queryUiObject, sort, limit, skip}) ->
+      # console.log 'getRows', {search, query, queryUiObject, sort, limit, skip}
       await currentUserMustBeInRole viewTableRole
       return unless Meteor.isServer
       collection.rawCollection()
-      .aggregate getRowsPipeline {search, query, queryUiObject, sort, limit, skip},
+      .aggregate await getRowsPipeline {search, query, queryUiObject, sort, limit, skip},
         allowDiskUse: true
       .toArray()
       .catch (error) ->
@@ -105,7 +106,7 @@ checkDisableDeleteForRow, checkDisableEditForRow}) ->
         await currentUserMustBeInRole exportTableRole
         return unless Meteor.isServer
         collection.rawCollection()
-        .aggregate getExportPipeline {search, query, queryUiObject, sort},
+        .aggregate await getExportPipeline {search, query, queryUiObject, sort},
           allowDiskUse: true
         .toArray()
         .catch (error) ->
@@ -155,7 +156,7 @@ checkDisableDeleteForRow, checkDisableEditForRow}) ->
           id: String
         .validator()
       run: ({id}) ->
-        currentUserMustBeInRole editRole
+        await currentUserMustBeInRole editRole
         await editRowMustNotBeDisabled {id}
         if Meteor.isServer
           formDataFetchMethodRun {id}

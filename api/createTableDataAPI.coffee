@@ -30,6 +30,7 @@ export createTableDataAPI = ({
   onDelete # CHECK if we use this, and remove or add to type declaration
   checkDisableEditForRow
   checkDisableDeleteForRow
+  usePubSub
 }) ->
 
   # check required props and setup defaults for optional props
@@ -39,6 +40,7 @@ export createTableDataAPI = ({
   unless sourceSchema?
     throw new Error 'no sourceSchema given'
 
+  usePubSub ?= true
   canSearch ?= true
   canSort ?= true
   canUseQueryEditor ?= true
@@ -141,4 +143,5 @@ export createTableDataAPI = ({
     setupNewItem
     onSubmit
     onDelete
+    usePubSub
   }
