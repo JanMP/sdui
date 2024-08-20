@@ -206,6 +206,7 @@ export createChatLogAPI = ({sourceName, messageCollection, viewTableRole}) ->
         ]
     ]
     debounceDelay: 10000
+    usePubSub: false
 
   new ValidatedMethod
     name: "#{logSourceName}.getMessagesForSession"
