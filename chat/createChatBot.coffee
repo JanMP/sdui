@@ -13,7 +13,7 @@ countTokens = (messages) ->
 
 
 
-###
+###*
   @param {Object} options
   @param {Object} options.chatClient - the langchain for the chat client
   @param {Boolean} options.stream - if true, the bot will stream its response
@@ -48,9 +48,6 @@ export createChatBot = ({
       throw new Meteor.Error 'createChatBot: chatClient must be a ChatAnthropic or ChatOpenAI instance'
 
   return unless Meteor.isServer
-
-  # if model_type not in ['openai', 'anthropic']
-  #   throw new Meteor.Error 'createChatBot: model_type must be "openai" or "anthropic"'
 
   unless messageCollection?
     throw new Meteor.Error 'createChatBot: messageCollection is required'
@@ -166,9 +163,6 @@ export createChatBot = ({
               tool_calls: message.tools
           else
             throw new Meteor.Error 'buildContext: unknown chatRole' 
-            
-
-        msg
     build = (limit) -> # TODO we don't have the tokenizer anymore, this whole aproach needs to be reworked
       if limit < 0
         throw new Meteor.Error 'buildHistory: limit must be >= 0'
@@ -250,12 +244,8 @@ export createChatBot = ({
       usage: usage
 
 
-  
-
-
-
   ###*
-    Call the chatbot handle the response and functioncalls
+    Call the chatbot handle the response and function calls
     @param {Object} options
     @param {String} options.sessionId
     @param {String} options.messageId - the id of the message stub
@@ -290,11 +280,6 @@ export createChatBot = ({
     
     # for anthropic, we also must pass the tool definitions when we pass tool results.
     model_used = if allowFunctionCall or modelVendor is 'anthropic' then modelWithTools else chatClient
-
-    console.log "model_used", model_used
-
-
-    # console.log "model_used", model_used
 
     model_used.stream messages
     .then (response) ->
