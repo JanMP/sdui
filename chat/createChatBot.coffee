@@ -3,6 +3,9 @@ import {Mongo} from 'meteor/mongo'
 import _ from 'lodash'
 import { HumanMessage, AIMessage, SystemMessage, ToolMessage } from "@langchain/core/messages";
 import { concat } from "@langchain/core/utils/stream";
+import { ChatAnthropic } from '@langchain/anthropic'
+import { ChatOpenAI } from '@langchain/openai'
+
 countTokens = (messages) ->
   messages
   .map (m) -> tokenizer.encode m.content ? ''
@@ -12,8 +15,7 @@ countTokens = (messages) ->
 
 ###
   @param {Object} options
-  @param {Object} options.chatClient - the js chat clearInterval
-  @param {Object} options.chatClientLangChain - the language chain for the chat client
+  @param {Object} options.chatClient - the langchain for the chat client
   @param {Boolean} options.stream - if true, the bot will stream its response
   @param {String} options.model - the model name to use
   @param {String} options.getSystemPrompt - a function that returns the system message the bot will ALLWAYS recive as first message
@@ -26,8 +28,7 @@ countTokens = (messages) ->
   @param {Object} [options.botUserData] - the user data for the bot
   ###
 export createChatBot = ({
-  model_type,
-  chatClientLangChain,
+  chatClient,
   getSystemPrompt,
   getTools = ({sessionId = null}) -> []
   toolChoice,
@@ -37,6 +38,15 @@ export createChatBot = ({
   messageCollection,
   botUserData
 }) ->
+
+  modelVendor = switch chatClient.constructor.name
+    when 'ChatAnthropic'
+      'anthropic'
+    when 'ChatOpenAI'
+      'openai'
+    else
+      throw new Meteor.Error 'createChatBot: chatClient must be a ChatAnthropic or ChatOpenAI instance'
+
   return unless Meteor.isServer
 
   # if model_type not in ['openai', 'anthropic']
@@ -68,14 +78,14 @@ export createChatBot = ({
 
 
       # for anthropic
-      if model_type is 'anthropic'
+      if modelVendor is 'anthropic'
         finishReason = chunk?.additional_kwargs?.stop_reason
         usage = chunk?.additional_kwargs?.usage
         if chunk.content?[0]?.text?
           content = content + chunk.content[0].text
       
       # for openai
-      if model_type is 'openai'
+      if modelVendor is 'openai'
         finishReason = chunk?.response_metadata?.finish_reason      
         content = content + chunk.content
         usage = chunk.usage_metadata
@@ -87,10 +97,10 @@ export createChatBot = ({
           messageCollection.updateAsync messageStubId,
           $set:
             tools: gathered.tool_calls
-        if model_type is 'anthropic'
+        if modelVendor is 'anthropic'
           unless finishReason in ['tool_use', 'end_turn']
             throw new Meteor.Error "handleStream: finish_reason #{finishReason}"
-        else if model_type is 'openai'
+        else if modelVendor is 'openai'
           unless finishReason in ['tool_use', 'stop', 'tool_calls']
             throw new Meteor.Error "handleStream: finish_reason #{finishReason}"
             
@@ -136,7 +146,7 @@ export createChatBot = ({
           when message.chatRole is 'user'
             new HumanMessage message.text
           when message.chatRole is 'function'
-            if model_type is "anthropic"
+            if modelVendor is "anthropic"
               new HumanMessage
                 content: [
                   {
@@ -145,7 +155,7 @@ export createChatBot = ({
                     tool_use_id: message.tool_id #message.tool_use_id
                   }
                 ]
-            else if model_type is "openai"
+            else if modelVendor is "openai"
               new ToolMessage {
                 content: message.results
                 tool_call_id: message.tool_id
@@ -263,9 +273,9 @@ export createChatBot = ({
     tools = toolsWithRun.map (f) -> _.omit f, 'run'
 
 
-    if model_type is 'openai'
-      modelWithTools = chatClientLangChain.bindTools(tools)
-    else if model_type is 'anthropic'
+    if modelVendor is 'openai'
+      modelWithTools = chatClient.bindTools(tools)
+    else if modelVendor is 'anthropic'
 
       tools_anthropic = tools.map (t) ->
         t['input_schema'] = t["parameters"]
@@ -275,11 +285,14 @@ export createChatBot = ({
         t
 
 
-      modelWithTools = chatClientLangChain.bindTools(tools_anthropic)
+      modelWithTools = chatClient.bindTools(tools_anthropic)
 
     
     # for anthropic, we also must pass the tool definitions when we pass tool results.
-    model_used = if allowFunctionCall or model_type is 'anthropic' then modelWithTools else chatClientLangChain
+    model_used = if allowFunctionCall or modelVendor is 'anthropic' then modelWithTools else chatClient
+
+    console.log "model_used", model_used
+
 
     # console.log "model_used", model_used
 
@@ -294,9 +307,9 @@ export createChatBot = ({
       prompt_tokens = response.usage_metadata.input_tokens
       completion_tokens = response.usage_metadata.output_tokens
 
-      if model_type is "openai"
+      if modelVendor is "openai"
         content = response.content
-      else if model_type is "anthropic"
+      else if modelVendor is "anthropic"
         content = response.content[0].text 
 
 
