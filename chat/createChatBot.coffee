@@ -1,9 +1,6 @@
 import {Meteor} from 'meteor/meteor'
 import {Mongo} from 'meteor/mongo'
 import _ from 'lodash'
-# import { tool } from "@langchain/core/tools";
-# import { z } from "zod";
-# import { ChatPromptTemplate, PromptTemplate } from "@langchain/core/prompts";
 import { HumanMessage, AIMessage, SystemMessage, ToolMessage } from "@langchain/core/messages";
 import { concat } from "@langchain/core/utils/stream";
 countTokens = (messages) ->
@@ -123,6 +120,8 @@ export createChatBot = ({
       sessionId: sessionId
       workInProgress: $ne: true
       chatRole: $ne: 'log'
+
+    total_tokens = 0 
     history =
       (await messageCollection.find query,
         sort: {createdAt: -1}
@@ -163,9 +162,10 @@ export createChatBot = ({
     build = (limit) -> # TODO we don't have the tokenizer anymore, this whole aproach needs to be reworked
       if limit < 0
         throw new Meteor.Error 'buildHistory: limit must be >= 0'
-      croppedHistory = history[0..limit]
+      croppedHistory = history[1..limit]
       system_msg = new SystemMessage system
       messages = [system_msg, additionalMessages..., croppedHistory...]
+      # console.log(messages)
       try
         if tokenizer.isWithinTokenLimit messages, contextTokenLimit
           messages
@@ -240,17 +240,7 @@ export createChatBot = ({
       usage: usage
 
 
-  createFunctionMessage = ({sessionId, args, results, tool_id}) ->
-    # console.log("args", tool_id, args)
-    
-    messageCollection.insertAsync
-      userId: botUserData.id
-      sessionId: sessionId
-      chatRole: 'function'
-      createdAt: new Date()
-      workInProgress: false
-      results: results
-      tool_id: args
+  
 
 
 
@@ -291,7 +281,7 @@ export createChatBot = ({
     # for anthropic, we also must pass the tool definitions when we pass tool results.
     model_used = if allowFunctionCall or model_type is 'anthropic' then modelWithTools else chatClientLangChain
 
-    console.log "model_used", model_used
+    # console.log "model_used", model_used
 
     model_used.stream messages
     .then (response) ->
@@ -321,18 +311,32 @@ export createChatBot = ({
           # console.log tc
           return unless tc.args?
           
-          createLogMessage {sessionId, toolCall: tc, usage}
+          # createLogMessage {sessionId, toolCall: tc, usage}
           tool_selected = (toolsWithRun.find (t) -> t.function.name is tc.name)
           result = await tool_selected?.run tc.args
 
 
           finalizeMessageStub {messageId, text: content, usage}
 
-          await createFunctionMessage {sessionId, args: tc.id, results: JSON.stringify result, tool_id: tc.id}
+          createFunctionMessage = (sessionId, results) ->
+            
+            messageCollection.insertAsync
+              userId: botUserData.id
+              sessionId: sessionId
+              chatRole: 'function'
+              createdAt: new Date()
+              workInProgress: false
+              results: results
+              tool_id: tc.id
+              args: tc.args
+              function_name: tc.name
+
+          await createFunctionMessage sessionId, JSON.stringify result
           # anthropic doesnt allow for system messages in the middle.
           messagesWithResult = await buildContext {sessionId}
 
           
+          # create a new message for the answer of the chatbot to the function call result.
           newMessageId = await createMessageStub {sessionId, text: content}
           call {sessionId, messageId: newMessageId, messages: messagesWithResult, allowFunctionCall: allowRecursiveToolCalls}
     .catch (error) ->
