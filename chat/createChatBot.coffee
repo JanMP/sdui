@@ -1,15 +1,21 @@
 import {Meteor} from 'meteor/meteor'
 import {Mongo} from 'meteor/mongo'
 import _ from 'lodash'
+import { HumanMessage, AIMessage, SystemMessage, ToolMessage } from "@langchain/core/messages";
+import { concat } from "@langchain/core/utils/stream";
+import { ChatAnthropic } from '@langchain/anthropic'
+import { ChatOpenAI } from '@langchain/openai'
 
 countTokens = (messages) ->
   messages
   .map (m) -> tokenizer.encode m.content ? ''
   .reduce ((a, b) -> a + b.length), 0
 
+
+
 ###*
   @param {Object} options
-  @param {Object} options.chatClient - the js chat client
+  @param {Object} options.chatClient - the langchain for the chat client
   @param {Boolean} options.stream - if true, the bot will stream its response
   @param {String} options.model - the model name to use
   @param {String} options.getSystemPrompt - a function that returns the system message the bot will ALLWAYS recive as first message
@@ -23,8 +29,7 @@ countTokens = (messages) ->
   ###
 export createChatBot = ({
   chatClient,
-  stream = false,
-  model, getSystemPrompt,
+  getSystemPrompt,
   getTools = ({sessionId = null}) -> []
   toolChoice,
   options = {}
@@ -33,6 +38,15 @@ export createChatBot = ({
   messageCollection,
   botUserData
 }) ->
+
+  modelVendor = switch chatClient.constructor.name
+    when 'ChatAnthropic'
+      'anthropic'
+    when 'ChatOpenAI'
+      'openai'
+    else
+      throw new Meteor.Error 'createChatBot: chatClient must be a ChatAnthropic or ChatOpenAI instance'
+
   return unless Meteor.isServer
 
   unless messageCollection?
@@ -43,37 +57,7 @@ export createChatBot = ({
     content = ''
     oldContent = ''
     finishReason = null
-    objectFromDeltas = {}
-    toolCalls = []
     usage = {}
-
-    addDelta = ({objectFromDeltas, delta}) ->
-      for key of delta
-        objectFromDeltas[key] = switch
-          when key is 'tool_calls'
-            for toolCallChunk in delta.tool_calls # special handling of tool_calls
-              if toolCalls.length <= toolCallChunk.index
-                toolCalls.push
-                  id: ''
-                  type: 'function'
-                  function:
-                    name: ''
-                    arguments: ''
-              toolCall = toolCalls[toolCallChunk.index]
-              if toolCallChunk.id?
-                toolCall.id += toolCallChunk.id
-              if toolCallChunk.function?.name?
-                toolCall.function.name += toolCallChunk.function.name
-              if toolCallChunk.function?.arguments?
-                toolCall.function.arguments += toolCallChunk.function.arguments
-          when delta[key] is null then null
-          when typeof delta[key] is 'string'
-            (objectFromDeltas?[key] ? '') + delta[key]
-          when typeof delta[key] is 'object'
-            addDelta {objectFromDeltas: (objectFromDeltas?[key] ? {}), delta: delta[key]}
-          else
-            throw new Meteor.Error "handleStream: addDelta: unknown type #{typeof delta[key]}"
-      objectFromDeltas
 
     updateContent = ->
       if oldContent isnt content
@@ -87,31 +71,42 @@ export createChatBot = ({
     interval = Meteor.setInterval updateContent, 700
 
     for await chunk from response
-      try
-        delta = chunk?.choices?[0]?.delta
-        finishReason = chunk?.choices?[0]?.finish_reason
-        objectFromDeltas = addDelta {objectFromDeltas, delta}
-        content = objectFromDeltas.content
-        usage = chunk?.usage ? {}
-        # console.log 'delta', JSON.stringify delta, null, 2
-        if finishReason
-          done = true
-          unless finishReason in ['stop','tool_calls']
-            throw new Meteor.Error "handleStream: finish_reason #{finishReason}"
-      catch error
+      gathered = if gathered? then concat(gathered, chunk) else chunk
+
+
+      # for anthropic
+      if modelVendor is 'anthropic'
+        finishReason = chunk?.additional_kwargs?.stop_reason
+        usage = chunk?.additional_kwargs?.usage
+        if chunk.content?[0]?.text?
+          content = content + chunk.content[0].text
+      
+      # for openai
+      if modelVendor is 'openai'
+        finishReason = chunk?.response_metadata?.finish_reason      
+        content = content + chunk.content
+        usage = chunk.usage_metadata
+
+      
+      if finishReason
         done = true
-        throw new Meteor.Error "handleStream: #{error.message}"
+        if finishReason in ['tool_use', 'tool_calls']
+          messageCollection.updateAsync messageStubId,
+          $set:
+            tools: gathered.tool_calls
+        if modelVendor is 'anthropic'
+          unless finishReason in ['tool_use', 'end_turn']
+            throw new Meteor.Error "handleStream: finish_reason #{finishReason}"
+        else if modelVendor is 'openai'
+          unless finishReason in ['tool_use', 'stop', 'tool_calls']
+            throw new Meteor.Error "handleStream: finish_reason #{finishReason}"
+            
 
     new Promise (resolve) ->
       if done
         updateContent()
         Meteor.clearInterval interval
-        resolve
-          message:
-            content: content
-            role: 'assistant'
-            tool_calls: toolCalls
-          usage: usage
+        resolve gathered
 
   ###*
     Build the context for the chatbot call
@@ -132,22 +127,49 @@ export createChatBot = ({
       sessionId: sessionId
       workInProgress: $ne: true
       chatRole: $ne: 'log'
+
+    total_tokens = 0 
     history =
       (await messageCollection.find query,
         sort: {createdAt: -1}
         limit: initialLimit
       .fetchAsync())
-      .filter (message) -> message.text?
+      .filter (message) -> message.text? or message.results?
       .reverse()
       .map (message) ->
-        # console.log 'message', message
-        role: message.chatRole
-        content: message.text
+        msg = switch 
+          when message.chatRole is 'system'
+            new SystemMessage message.text
+          when message.chatRole is 'user'
+            new HumanMessage message.text
+          when message.chatRole is 'function'
+            if modelVendor is "anthropic"
+              new HumanMessage
+                content: [
+                  {
+                    type: 'tool_result',
+                    content: message.results
+                    tool_use_id: message.tool_id #message.tool_use_id
+                  }
+                ]
+            else if modelVendor is "openai"
+              new ToolMessage {
+                content: message.results
+                tool_call_id: message.tool_id
+              }
+          when message.chatRole is 'assistant'
+            new AIMessage
+              content: message.text
+              tool_calls: message.tools
+          else
+            throw new Meteor.Error 'buildContext: unknown chatRole' 
     build = (limit) -> # TODO we don't have the tokenizer anymore, this whole aproach needs to be reworked
       if limit < 0
         throw new Meteor.Error 'buildHistory: limit must be >= 0'
-      croppedHistory = history[0..limit]
-      messages = [{content: system, role: 'system'}, croppedHistory..., additionalMessages...]
+      croppedHistory = history[1..limit]
+      system_msg = new SystemMessage system
+      messages = [system_msg, additionalMessages..., croppedHistory...]
+      # console.log(messages)
       try
         if tokenizer.isWithinTokenLimit messages, contextTokenLimit
           messages
@@ -157,7 +179,6 @@ export createChatBot = ({
       catch error
         console.error "The tokenizer is broken: #{error.message}"
         messages
-
     build initialLimit
 
 
@@ -204,20 +225,11 @@ export createChatBot = ({
   finalizeMessageStub = ({messageId, text, usage}) ->
     messageCollection.updateAsync messageId,
       $set:
-        createdAt: new Date()
+        # createdAt: new Date()
         workInProgress: false
         text: text
         usage: usage
 
-  createSystemMessage = ({sessionId, text, usage = undefined}) ->
-    messageCollection.insertAsync
-      userId: botUserData.id
-      sessionId: sessionId
-      text: text
-      chatRole: 'system'
-      createdAt: new Date()
-      workInProgress: false
-      usage: usage
 
   createLogMessage = ({sessionId, text = undefined, toolCall = undefined, error = undefined, usage = undefined}) ->
     messageCollection.insertAsync
@@ -233,7 +245,7 @@ export createChatBot = ({
 
 
   ###*
-    Call the chatbot handle the response and functioncalls
+    Call the chatbot handle the response and function calls
     @param {Object} options
     @param {String} options.sessionId
     @param {String} options.messageId - the id of the message stub
@@ -245,54 +257,86 @@ export createChatBot = ({
         messages: [{content: 'Hallo', role: 'user'}]
     ###
   call = ({sessionId, messageId, messages, allowFunctionCall = true}) ->
-    callFkt = if stream then chatClient.chatStream else chatClient.chat
+
+    
     toolsWithRun = getTools({sessionId, messageId})
     tools = toolsWithRun.map (f) -> _.omit f, 'run'
-    params = {
-      model, messages, options...,
-      tools: if allowFunctionCall then tools,
-      tool_choice: if allowFunctionCall then toolChoice,
-      stream_options: if stream then include_usage: true
-    }
-    callFkt params
+
+
+    if modelVendor is 'openai'
+      modelWithTools = chatClient.bindTools(tools)
+    else if modelVendor is 'anthropic'
+
+      tools_anthropic = tools.map (t) ->
+        t['input_schema'] = t["parameters"]
+        delete t["parameters"]
+        tool_json = JSON.stringify t
+        t = JSON.parse(tool_json)
+        t
+
+
+      modelWithTools = chatClient.bindTools(tools_anthropic)
+
+    
+    # for anthropic, we also must pass the tool definitions when we pass tool results.
+    model_used = if allowFunctionCall or modelVendor is 'anthropic' then modelWithTools else chatClient
+
+    model_used.stream messages
     .then (response) ->
-      if stream
-        handleStream {response, messageStubId: messageId}
-      else
-        message: response.choices[0].message
-        usage: response.usage
+      handleStream {response, messageStubId: messageId}
+    .catch (error) ->
+      throw error
     .then (response) ->
-      message = response.message
-      prompt_tokens =
-        if options?.stream
-          countTokens messages
-        else
-          response?.usage.prompt_tokens ? 0
-      completion_tokens =
-        if options?.stream
-          countTokens [message]
-        else
-          response?.usage.completion_tokens ? 0
+
+      # console.log response
+      prompt_tokens = response.usage_metadata.input_tokens
+      completion_tokens = response.usage_metadata.output_tokens
+
+      if modelVendor is "openai"
+        content = response.content
+      else if modelVendor is "anthropic"
+        content = response.content[0].text 
+
+
       usage =
-        model: model
+        model: model_used.model
         prompt: prompt_tokens
         completion: completion_tokens
-      unless (toolCalls = message?.tool_calls)? and toolCalls.length
-        finalizeMessageStub {messageId, text: message?.content, usage}
+      unless (toolCalls = response?.tool_calls)? and toolCalls.length 
+        finalizeMessageStub {messageId, text: content, usage}
       else
         Promise.allSettled toolCalls.map (tc) ->
-          return unless tc.function?.arguments?
-          tc.function.arguments =
-            if typeof tc.function.arguments is 'string'
-              JSON.parse tc.function.arguments
-            else tc.function.arguments
-          createLogMessage {sessionId, toolCall: tc, usage}
-          (toolsWithRun.find (t) -> t.function.name is tc.function.name)?.run tc.function.arguments
-        .then (result) ->
-          return unless result?
-          createSystemMessage {sessionId, text: JSON.stringify result}
+          # console.log tc
+          return unless tc.args?
+          
+          # createLogMessage {sessionId, toolCall: tc, usage}
+          tool_selected = (toolsWithRun.find (t) -> t.function.name is tc.name)
+          result = await tool_selected?.run tc.args
+
+
+          finalizeMessageStub {messageId, text: content, usage}
+
+          createFunctionMessage = (sessionId, results) ->
+            
+            messageCollection.insertAsync
+              userId: botUserData.id
+              sessionId: sessionId
+              chatRole: 'function'
+              createdAt: new Date()
+              workInProgress: false
+              results: results
+              tool_id: tc.id
+              args: tc.args
+              function_name: tc.name
+
+          await createFunctionMessage sessionId, JSON.stringify result
+          # anthropic doesnt allow for system messages in the middle.
           messagesWithResult = await buildContext {sessionId}
-          call {sessionId, messageId: messageId, messages: messagesWithResult, allowFunctionCall: allowRecursiveToolCalls}
+
+          
+          # create a new message for the answer of the chatbot to the function call result.
+          newMessageId = await createMessageStub {sessionId, text: content}
+          call {sessionId, messageId: newMessageId, messages: messagesWithResult, allowFunctionCall: allowRecursiveToolCalls}
     .catch (error) ->
       createLogMessage {sessionId, error: error}
       throw error
