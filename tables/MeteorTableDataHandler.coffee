@@ -170,7 +170,7 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
       method: submitMethodName
       data: d
     .then (results) ->
-      getRows()
+      getRows {}
       results
     .catch (error) ->
       toast.show
