@@ -13,7 +13,7 @@ import _ from 'lodash'
 
 export DefaultMessage = ({message, hasPdfButton = true, onChangeFeedback}) ->
 
-  {_id, userId, text, username, email, chatRole, customImage, feedback} = message
+  {_id, userId, text, tools, username, email, chatRole, customImage, feedback} = message
 
 
   # TODO: make configurable
@@ -40,6 +40,26 @@ export DefaultMessage = ({message, hasPdfButton = true, onChangeFeedback}) ->
       <div>
         <MarkdownDisplay markdown={text} contentClass="chat-message"/>
       </div>
+      {
+        if tools?
+          <div className="">
+          {
+            tools.map (tool) ->
+              <div className="p-card p-2 surface-200 flex align-items-center gap-4 mt-2 mb-2 p-card-secondary chat-tool" key={tool.name}>
+                <i className="pi pi-cog ml-2" style={fontSize: "2rem"}></i>
+                <div>
+                  <div className="font-semibold">{tool.name}: </div>
+                  <div className="max-h-6rem overflow-y-auto">
+                    {
+                      _.keys tool.args
+                      .map (key) -> <div className="ml-2">{"#{key}: #{JSON.stringify tool.args[key]}"}</div>
+                    }
+                  </div>
+              </div>
+                </div>
+          }
+          </div>
+      }
     </div>
 
   </div>
