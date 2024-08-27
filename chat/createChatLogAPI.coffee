@@ -38,6 +38,9 @@ if Meteor.isServer
       'gpt-4':
         prompt: 30e-6
         completion: 60e-6
+      'claude-3-5-sonnet-20240620':
+        prompt: 3e-6
+        completion: 15e-6
       'mistral-small':
         prompt: 0.0000006
         completion: 0.0000018
