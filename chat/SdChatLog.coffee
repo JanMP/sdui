@@ -1,11 +1,15 @@
 import React, {useState, useEffect, useRef} from 'react'
 import {SdTable, meteorApply, MarkdownDisplay, FormattedJSON, useToast} from 'meteor/janmp:sdui'
 import {Dialog} from 'primereact/dialog'
+import {Checkbox} from 'primereact/checkbox'
+import _ from 'lodash'
 
 
 HistoryDisplay = ({sourceName, rowData}) ->
 
   [messages, setMessages] = useState null
+  [showRaw, setShowRaw] = useState false
+
   toast = useToast()
 
   useEffect ->
@@ -49,33 +53,49 @@ HistoryDisplay = ({sourceName, rowData}) ->
               </div>
           }
           <div className="ml-2">
-            {
+            {_.compact [
               if entry?.text?.length
                 <MarkdownDisplay
                   markdown={entry?.text}
                   contentClass="surface-100 px-3 py-1"
                 />
-              else if entry?.toolCall?
+              if isFunctionCall = entry?.tools?.length > 0
+                entry.tools.map (tool, index) ->
+                  <div className="bg-blue-200 p-3">
+                    <span>Funktion: </span>
+                    <span className="font-bold">{tool.name} </span>
+                    <span>mit Argumenten: </span>
+                    <FormattedJSON data={tool.args} />
+                  </div>
+              if isFunctionResult = entry?.chatRole is 'function' and entry?.result?.length > 0
                 <div className="bg-blue-100 p-3">
-                  <span>Funktion: </span>
-                  <span className="font-bold">{entry?.toolCall?.function?.name} </span>
-                  <span>mit Argumenten: </span>
-                  <FormattedJSON data={entry?.toolCall?.function?.arguments} />
+                 {entry?.results}
                 </div>
-              else if entry?.error?
+              if entry?.error?
                 <div className="bg-red-100 px-3 py-1">
                   <span className="font-bold">Fehler: </span>
                   <FormattedJSON data={entry?.error} />
                 </div>
-              else
-                <div className="surface-200 px-3 py-1">
-                  <span className="font-bold">Unbekannter Eintrag</span>
+              # else unless entry?.text?.length or isFunctionResult or entry?.error?
+              if showRaw
+                <div className="surface-200 px-3 py-1 text-sm">
                   <FormattedJSON data={entry} />
                 </div>
+            ]
             }
           </div>
         </div>
     }
+    <div className="flex justify-content-end">
+      <div className="mt-2 flex align-items-center">
+        <Checkbox
+          inputId="raw"
+          onChange={(e) -> setShowRaw e.checked}
+          checked={showRaw}
+        />
+        <label htmlFor="raw" className="ml-2">Rohdaten anzeigen</label>
+      </div>
+    </div>
   </div>
 
 

@@ -134,10 +134,9 @@ export createChatBot = ({
         sort: {createdAt: -1}
         limit: initialLimit
       .fetchAsync())
-      .filter (message) -> message.text? or message.results?
       .reverse()
       .map (message) ->
-        msg = switch 
+        msg = switch
           when message.chatRole is 'system'
             new SystemMessage message.text
           when message.chatRole is 'user'
@@ -148,13 +147,13 @@ export createChatBot = ({
                 content: [
                   {
                     type: 'tool_result',
-                    content: message.results
+                    content: message.text
                     tool_use_id: message.tool_id #message.tool_use_id
                   }
                 ]
             else if modelVendor is "openai"
               new ToolMessage {
-                content: message.results
+                content: message.text
                 tool_call_id: message.tool_id
               }
           when message.chatRole is 'assistant'
@@ -163,22 +162,14 @@ export createChatBot = ({
               tool_calls: message.tools
           else
             throw new Meteor.Error 'buildContext: unknown chatRole' 
+    
     build = (limit) -> # TODO we don't have the tokenizer anymore, this whole aproach needs to be reworked
       if limit < 0
         throw new Meteor.Error 'buildHistory: limit must be >= 0'
       croppedHistory = history[1..limit]
       system_msg = new SystemMessage system
-      messages = [system_msg, additionalMessages..., croppedHistory...]
-      # console.log(messages)
-      try
-        if tokenizer.isWithinTokenLimit messages, contextTokenLimit
-          messages
-        else
-          console.log 'buildHistory: tokenLimit reached, trying again with limit ', limit - 1
-          build limit - 1
-      catch error
-        console.error "The tokenizer is broken: #{error.message}"
-        messages
+      [system_msg, additionalMessages..., croppedHistory...]
+
     build initialLimit
 
 
@@ -200,7 +191,6 @@ export createChatBot = ({
       chatRole: 'assistant'
       createdAt: new Date()
       workInProgress: true
-
   ###*
     @description
     - sets createdAt to new Date()
@@ -211,7 +201,6 @@ export createChatBot = ({
       $set:
         text: text
         createdAt: new Date()
-
   ###*
     @description
     - sets createdAt to new Date()
@@ -223,9 +212,10 @@ export createChatBot = ({
     @returns {String} the id of the Message
     ###
   finalizeMessageStub = ({messageId, text, usage}) ->
+    usage?.model ?= chatClient.model
     messageCollection.updateAsync messageId,
       $set:
-        # createdAt: new Date()
+        createdAt: new Date()
         workInProgress: false
         text: text
         usage: usage
@@ -242,7 +232,6 @@ export createChatBot = ({
       createdAt: new Date()
       workInProgress: false
       usage: usage
-
 
   ###*
     Call the chatbot handle the response and function calls
@@ -302,40 +291,32 @@ export createChatBot = ({
         model: model_used.model
         prompt: prompt_tokens
         completion: completion_tokens
-      unless (toolCalls = response?.tool_calls)? and toolCalls.length 
-        finalizeMessageStub {messageId, text: content, usage}
-      else
+
+      toolCalls = response?.tool_calls
+      finalizeMessageStub {messageId, text: content, usage}
+      
+      if toolCalls? and toolCalls.length
         Promise.allSettled toolCalls.map (tc) ->
-          # console.log tc
           return unless tc.args?
           
           # createLogMessage {sessionId, toolCall: tc, usage}
           tool_selected = (toolsWithRun.find (t) -> t.function.name is tc.name)
           result = await tool_selected?.run tc.args
-
-
-          finalizeMessageStub {messageId, text: content, usage}
-
-          createFunctionMessage = (sessionId, results) ->
-            
-            messageCollection.insertAsync
-              userId: botUserData.id
-              sessionId: sessionId
-              chatRole: 'function'
-              createdAt: new Date()
-              workInProgress: false
-              results: results
-              tool_id: tc.id
-              args: tc.args
-              function_name: tc.name
-
-          await createFunctionMessage sessionId, JSON.stringify result
-          # anthropic doesnt allow for system messages in the middle.
+          await messageCollection.insertAsync
+            userId: botUserData.id
+            sessionId: sessionId
+            chatRole: 'function'
+            createdAt: new Date()
+            workInProgress: false
+            text: result
+            tool_id: tc.id
+            args: tc.args
+            function_name: tc.name
+          
           messagesWithResult = await buildContext {sessionId}
 
-          
           # create a new message for the answer of the chatbot to the function call result.
-          newMessageId = await createMessageStub {sessionId, text: content}
+          newMessageId = await createMessageStub {sessionId, text: ''}
           call {sessionId, messageId: newMessageId, messages: messagesWithResult, allowFunctionCall: allowRecursiveToolCalls}
     .catch (error) ->
       createLogMessage {sessionId, error: error}
