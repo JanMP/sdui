@@ -23,3 +23,4 @@ export {default as createQdrantCollection} from './ai/qdrant/createQdrantCollect
 export {createAppLayoutAPI} from './app-layout/createAppLayoutAPI.coffee'
 export {runTransaction} from './common/runTransaction.coffee'
 export {setupChatModel} from './ai/setupChatModel.coffee'
+export {createJobsTableDataAPI} from './jobstable/createJobsTableDataAPI.coffee'

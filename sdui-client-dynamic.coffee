@@ -24,6 +24,7 @@ export {createChatAPI, chatSchema} from './chat/createChatAPI.coffee'
 export {createChatLogAPI, addCostsPipeline} from './chat/createChatLogAPI.coffee'
 export {createAppLayoutAPI} from './app-layout/createAppLayoutAPI.coffee'
 export {ToastProvider, useToast} from './app-layout/ToastProvider.coffee'
+export {createJobsTableDataAPI} from './jobstable/createJobsTableDataAPI.coffee'
 # export {createFilesAPI, filesAPISourceSchema} from './api/createFilesAPI.coffee'
 
 # server only (eventually)
@@ -62,3 +63,4 @@ export Gravatar = suspend lazy -> import('./forms/GravatarField.coffee').then (m
 export GravatarField = suspend lazy -> import('./forms/GravatarField.coffee').then (m) -> default: m.GravatarField
 export FormattedJSON = suspend lazy -> import('./misc-components/FormattedJSON.coffee').then (m) -> default: m.FormattedJSON
 export SdUserTable = suspend lazy -> import('./usertable/SdUserTable.coffee').then (m) -> default: m.SdUserTable
+export SdJobsTable = suspend lazy -> import('./jobstable/SdJobsTable.coffee').then (m) -> default: m.SdJobsTable
