@@ -44,6 +44,8 @@ export createChatBot = ({
       'anthropic'
     when 'ChatOpenAI'
       'openai'
+    when 'ChatMistralAI'
+      'mistral'
     else
       throw new Meteor.Error 'createChatBot: chatClient must be a ChatAnthropic or ChatOpenAI instance'
 
@@ -73,6 +75,7 @@ export createChatBot = ({
     for await chunk from response
       gathered = if gathered? then concat(gathered, chunk) else chunk
 
+      # console.log chunk
 
       # for anthropic
       if modelVendor is 'anthropic'
@@ -83,10 +86,18 @@ export createChatBot = ({
       
       # for openai
       if modelVendor is 'openai'
-        finishReason = chunk?.response_metadata?.finish_reason      
+        finishReason = chunk?.response_metadata?.finish_reason
         content = content + chunk.content
         usage = chunk.usage_metadata
 
+      # for mistral, mistral does not have an explicit finish_reason, instead, the last chunk will contain a usage_metadata field.
+      if modelVendor is 'mistral'
+        content = content + chunk.content
+        usage = chunk.usage_metadata
+        if usage
+          finishReason = 'end_turn'
+        if chunk.tool_calls.length > 0
+          finishReason = 'tool_use'
       
       if finishReason
         done = true
@@ -99,6 +110,9 @@ export createChatBot = ({
             throw new Meteor.Error "handleStream: finish_reason #{finishReason}"
         else if modelVendor is 'openai'
           unless finishReason in ['tool_use', 'stop', 'tool_calls']
+            throw new Meteor.Error "handleStream: finish_reason #{finishReason}"
+        else if modelVendor is 'mistral'
+          unless finishReason in ['end_turn', 'tool_use']
             throw new Meteor.Error "handleStream: finish_reason #{finishReason}"
             
 
@@ -128,7 +142,7 @@ export createChatBot = ({
       workInProgress: $ne: true
       chatRole: $ne: 'log'
 
-    total_tokens = 0 
+    total_tokens = 0
     history =
       (await messageCollection.find query,
         sort: {createdAt: -1}
@@ -156,12 +170,17 @@ export createChatBot = ({
                 content: message.text
                 tool_call_id: message.tool_id
               }
+            else if modelVendor is "mistral"
+              new ToolMessage {
+                content: message.text
+                tool_call_id: message.tool_id
+              }
           when message.chatRole is 'assistant'
             new AIMessage
               content: message.text
               tool_calls: message.tools
           else
-            throw new Meteor.Error 'buildContext: unknown chatRole' 
+            throw new Meteor.Error 'buildContext: unknown chatRole'
     
     build = (limit) -> # TODO we don't have the tokenizer anymore, this whole aproach needs to be reworked
       if limit < 0
@@ -252,7 +271,7 @@ export createChatBot = ({
     tools = toolsWithRun.map (f) -> _.omit f, 'run'
 
 
-    if modelVendor is 'openai'
+    if modelVendor is 'openai' or modelVendor is 'mistral'
       modelWithTools = chatClient.bindTools(tools)
     else if modelVendor is 'anthropic'
 
@@ -262,13 +281,14 @@ export createChatBot = ({
         tool_json = JSON.stringify t
         t = JSON.parse(tool_json)
         t
-
-
       modelWithTools = chatClient.bindTools(tools_anthropic)
+
+
 
     
     # for anthropic, we also must pass the tool definitions when we pass tool results.
-    model_used = if allowFunctionCall or modelVendor is 'anthropic' then modelWithTools else chatClient
+    model_used = if allowFunctionCall or modelVendor is 'anthropic' or modelVendor is 'mistral' then modelWithTools else chatClient
+
 
     model_used.stream messages
     .then (response) ->
@@ -277,14 +297,14 @@ export createChatBot = ({
       throw error
     .then (response) ->
 
-      # console.log response
       prompt_tokens = response.usage_metadata.input_tokens
       completion_tokens = response.usage_metadata.output_tokens
 
-      if modelVendor is "openai"
+      # openai or mistral
+      if modelVendor is "openai" or modelVendor is "mistral"
         content = response.content
       else if modelVendor is "anthropic"
-        content = response.content[0].text 
+        content = response.content[0].text
 
 
       usage =
