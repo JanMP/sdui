@@ -1,16 +1,10 @@
 import {Meteor} from 'meteor/meteor'
 import {Mongo} from 'meteor/mongo'
+import {HumanMessage, AIMessage, SystemMessage, ToolMessage} from "@langchain/core/messages"
+import {concat} from "@langchain/core/utils/stream"
+import {ChatAnthropic} from '@langchain/anthropic'
+import {ChatOpenAI} from '@langchain/openai'
 import _ from 'lodash'
-import { HumanMessage, AIMessage, SystemMessage, ToolMessage } from "@langchain/core/messages";
-import { concat } from "@langchain/core/utils/stream";
-import { ChatAnthropic } from '@langchain/anthropic'
-import { ChatOpenAI } from '@langchain/openai'
-
-countTokens = (messages) ->
-  messages
-  .map (m) -> tokenizer.encode m.content ? ''
-  .reduce ((a, b) -> a + b.length), 0
-
 
 
 ###*
@@ -47,7 +41,7 @@ export createChatBot = ({
     when 'ChatMistralAI'
       'mistral'
     else
-      throw new Meteor.Error 'createChatBot: chatClient must be a ChatAnthropic or ChatOpenAI instance'
+      throw new Meteor.Error 'createChatBot: chatClient must be a ChatAnthropic or ChatOpenAI or ChatMistralAI instance'
 
   return unless Meteor.isServer
 
@@ -67,15 +61,13 @@ export createChatBot = ({
         messageCollection.updateAsync messageStubId,
           $set:
             text: content
-            createdAt: new Date()
             workInProgress: true
+            createdAt: new Date()
     
     interval = Meteor.setInterval updateContent, 700
 
     for await chunk from response
       gathered = if gathered? then concat(gathered, chunk) else chunk
-
-      # console.log chunk
 
       # for anthropic
       if modelVendor is 'anthropic'
@@ -103,8 +95,8 @@ export createChatBot = ({
         done = true
         if finishReason in ['tool_use', 'tool_calls']
           messageCollection.updateAsync messageStubId,
-          $set:
-            tools: gathered.tool_calls
+            $set:
+              tools: gathered.tool_calls
         if modelVendor is 'anthropic'
           unless finishReason in ['tool_use', 'end_turn']
             throw new Meteor.Error "handleStream: finish_reason #{finishReason}"
@@ -135,8 +127,11 @@ export createChatBot = ({
         initialLimit: 20
     ###
   buildContext =  ({sessionId, additionalMessages = [], initialLimit = 15}) ->
+    console.log 'buildContext', new Date()
     fetchedSystemPrompt = getSystemPrompt?()
-    system = if typeof fetchedSystemPrompt is 'string' then fetchedSystemPrompt else "Du bist ein freundlicher, hilfreicher Chatbot"
+    system = if typeof fetchedSystemPrompt is 'string'
+      fetchedSystemPrompt
+    else "Du bist ein freundlicher, hilfreicher Chatbot"
     query =
       sessionId: sessionId
       workInProgress: $ne: true
@@ -144,52 +139,46 @@ export createChatBot = ({
 
     total_tokens = 0
     history =
-      (await messageCollection.find query,
+      _(await messageCollection.find query,
         sort: {createdAt: -1}
         limit: initialLimit
       .fetchAsync())
       .reverse()
-      .map (message) ->
-        msg = switch
+      .map (message, i, messages) ->
+        console.log 'message', message
+        switch
           when message.chatRole is 'system'
             new SystemMessage message.text
           when message.chatRole is 'user'
             new HumanMessage message.text
           when message.chatRole is 'function'
-            if modelVendor is "anthropic"
-              new HumanMessage
-                content: [
-                  {
-                    type: 'tool_result',
-                    content: message.text
-                    tool_use_id: message.tool_id #message.tool_use_id
-                  }
-                ]
-            else if modelVendor is "openai"
-              new ToolMessage {
-                content: message.text
-                tool_call_id: message.tool_id
-              }
-            else if modelVendor is "mistral"
-              new ToolMessage {
-                content: message.text
-                tool_call_id: message.tool_id
-              }
+            switch modelVendor
+              when "anthropic"
+                new HumanMessage
+                  content: [
+                      type: 'tool_result'
+                      content: message.text
+                      tool_use_id: message.tool_id #message.tool_use_id
+                    ]
+              when "openai", "mistral"
+                new ToolMessage
+                  content: message.text
+                  tool_call_id: message.tool_id
+              else
+                throw new Error "Unsupported model vendor: #{modelVendor}"
           when message.chatRole is 'assistant'
+            return null if i is 0 # skip welcome (anthropic dies if user isnt first in history)
             new AIMessage
               content: message.text
               tool_calls: message.tools
           else
             throw new Meteor.Error 'buildContext: unknown chatRole'
-    
-    build = (limit) -> # TODO we don't have the tokenizer anymore, this whole aproach needs to be reworked
-      if limit < 0
-        throw new Meteor.Error 'buildHistory: limit must be >= 0'
-      croppedHistory = history[1..limit]
-      system_msg = new SystemMessage system
-      [system_msg, additionalMessages..., croppedHistory...]
+      .compact()
+      .value()
 
-    build initialLimit
+    system_msg = new SystemMessage system
+    console.log result = [system_msg, additionalMessages..., history...]
+    result
 
 
   ###*
@@ -210,10 +199,16 @@ export createChatBot = ({
       chatRole: 'assistant'
       createdAt: new Date()
       workInProgress: true
+  
+  
   ###*
     @description
     - sets createdAt to new Date()
     - sets text to the new text
+    @param {Object} options
+    @param {String} options.messageId
+    @param {String} options.text
+    @returns {String} the id of the Message
     ###
   updateMessageStub = ({messageId, text}) ->
     messageCollection.updateAsync messageId,
@@ -240,6 +235,16 @@ export createChatBot = ({
         usage: usage
 
 
+###*
+ * Creates and inserts a log message into the message collection.
+ * @param {Object} options - The options for creating the log message.
+ * @param {string} options.sessionId - The ID of the session.
+ * @param {string} [options.text] - The text content of the message.
+ * @param {Object} [options.toolCall] - Information about a tool call, if applicable.
+ * @param {Error} [options.error] - An error object, if an error occurred.
+ * @param {Object} [options.usage] - Usage statistics for the message.
+ * @returns {Promise<Object>} A promise that resolves with the inserted document.
+###
   createLogMessage = ({sessionId, text = undefined, toolCall = undefined, error = undefined, usage = undefined}) ->
     messageCollection.insertAsync
       userId: botUserData.id
