@@ -62,7 +62,7 @@ export createChatBot = ({
           $set:
             text: content
             workInProgress: true
-            createdAt: new Date()
+            # createdAt: new Date()
     
     interval = Meteor.setInterval updateContent, 700
 
@@ -106,7 +106,6 @@ export createChatBot = ({
         else if modelVendor is 'mistral'
           unless finishReason in ['end_turn', 'tool_use']
             throw new Meteor.Error "handleStream: finish_reason #{finishReason}"
-            
 
     new Promise (resolve) ->
       if done
@@ -127,15 +126,15 @@ export createChatBot = ({
         initialLimit: 20
     ###
   buildContext =  ({sessionId, additionalMessages = [], initialLimit = 15}) ->
-    console.log 'buildContext', new Date()
+    debugger
     fetchedSystemPrompt = getSystemPrompt?()
     system = if typeof fetchedSystemPrompt is 'string'
       fetchedSystemPrompt
     else "Du bist ein freundlicher, hilfreicher Chatbot"
     query =
       sessionId: sessionId
-      workInProgress: $ne: true
       chatRole: $ne: 'log'
+      # workInProgress: $ne: true
 
     total_tokens = 0
     history =
@@ -145,14 +144,14 @@ export createChatBot = ({
       .fetchAsync())
       .reverse()
       .map (message, i, messages) ->
-        console.log 'message', message
+        debugger
         switch
           when message.chatRole is 'system'
             new SystemMessage message.text
           when message.chatRole is 'user'
             new HumanMessage message.text
           when message.chatRole is 'function'
-            switch modelVendor
+            toolResult = switch modelVendor
               when "anthropic"
                 new HumanMessage
                   content: [
@@ -166,19 +165,32 @@ export createChatBot = ({
                   tool_call_id: message.tool_id
               else
                 throw new Error "Unsupported model vendor: #{modelVendor}"
+            # we return an array here because we might need to add a dummy message before the tool result
+            # we will flatten this out later
+            [
+              # check if the previous message was the tool call that triggered this function call
+              unless messages[i - 1]?.tools?.map((tool) -> tool.id).includes message.tool_id
+                # we generate a dummy assistant message with the tool call to make the context correct
+                previousTools = messages.find( (m) -> m.tool_id is message.tool_id)?.tools
+                new AIMessage
+                  content: 'You were about to call a function when you where interupted by the user'
+                  tool_calls: previousTools
+              toolResult
+            ]
           when message.chatRole is 'assistant'
             return null if i is 0 # skip welcome (anthropic dies if user isnt first in history)
+            return null if i is messages.length - 1 # last message may not be assistant message
             new AIMessage
               content: message.text
               tool_calls: message.tools
           else
-            throw new Meteor.Error 'buildContext: unknown chatRole'
+            throw new Meteor.Error 'buildContext: unknown chatRole: ' + message.chatRole
+      .flatten()
       .compact()
+      .filter (message) -> message.content?.length
       .value()
-
     system_msg = new SystemMessage system
-    console.log result = [system_msg, additionalMessages..., history...]
-    result
+    [system_msg, history...]
 
 
   ###*
@@ -214,7 +226,7 @@ export createChatBot = ({
     messageCollection.updateAsync messageId,
       $set:
         text: text
-        createdAt: new Date()
+        # createdAt: new Date()
   ###*
     @description
     - sets createdAt to new Date()
@@ -229,7 +241,7 @@ export createChatBot = ({
     usage?.model ?= chatClient.model
     messageCollection.updateAsync messageId,
       $set:
-        createdAt: new Date()
+        # createdAt: new Date()
         workInProgress: false
         text: text
         usage: usage
@@ -288,9 +300,6 @@ export createChatBot = ({
         t
       modelWithTools = chatClient.bindTools(tools_anthropic)
 
-
-
-    
     # for anthropic, we also must pass the tool definitions when we pass tool results.
     model_used = if allowFunctionCall or modelVendor is 'anthropic' or modelVendor is 'mistral' then modelWithTools else chatClient
 
