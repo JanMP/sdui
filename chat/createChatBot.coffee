@@ -123,14 +123,14 @@ export createChatBot = ({
             new HumanMessage message.text
           when message.chatRole is 'function'
             switch chatClientName
-              when "ChatAnthropic"
-                new HumanMessage
-                  content: [{
-                      type: 'tool_result'
-                      content: message.text
-                      tool_use_id: message.tool_id #message.tool_use_id
-                    }]
-              when "ChatOpenAI", "ChatMistralAI"
+              # when "ChatAnthropic"
+              #   new HumanMessage
+              #     content: [{
+              #         type: 'tool_result'
+              #         content: message.text
+              #         tool_use_id: message.tool_id #message.tool_use_id
+              #       }]
+              when "ChatOpenAI", "ChatMistralAI", "ChatAnthropic"
                 new ToolMessage
                   content: message.text
                   tool_call_id: message.tool_id
@@ -283,11 +283,13 @@ export createChatBot = ({
           # createLogMessage {sessionId, toolCall: tc, usage}
           tool_selected = (tools.find (t) -> t.function.name is tc.name)
           result = await tool_selected?.run tc.args
-          await messageCollection.insertAsync
+          toolCallMessage = await messageCollection.findOneAsync messageStubId
+          toolResultDate = new Date(toolCallMessage.createdAt.getTime() + 1)
+          toolResultMessageId = await messageCollection.insertAsync
             userId: botUserData.id
             sessionId: sessionId
             chatRole: 'function'
-            createdAt: new Date()
+            createdAt: toolResultDate
             workInProgress: false
             text: result
             tool_id: tc.id
