@@ -15,7 +15,6 @@ allowedChatClients = ['ChatAnthropic', 'ChatOpenAI', 'ChatMistralAI']
   @param {Object} options.chatClient - the langchain instance for the chat client
   @param {String} [options.getSystemPrompt=() => null] - an optional function that returns the system message the bot will recive as first message
   @param {Function} [options.getTools=({sessionId = null}) => []] - a function that returns an array of tools that can be called by the bot
-  @param {Boolean} [options.allowRecursiveToolCalls=false] - if true, the bot may call tools on 2nd call
   @param {Mongo.Collection} options.messageCollection
   @param {Object} [options.botUserData] - the user data for the bot
   ###
@@ -23,7 +22,6 @@ export createChatBot = ({
   chatClient,
   getSystemPrompt,
   getTools = ({sessionId = null}) -> []
-  allowRecursiveToolCalls = false
   messageCollection,
   botUserData
 }) ->
@@ -74,6 +72,7 @@ export createChatBot = ({
       
       if finishReason
         done = true
+        updateMessageStub {messageStubId, tools: gathered.tool_calls}
         switch chatClientName
           when 'ChatAnthropic', 'ChatMistralAI'
             unless finishReason in ['tool_use', 'end_turn']
@@ -139,7 +138,7 @@ export createChatBot = ({
                 throw new Error "Unsupported model vendor: #{chatClientName}"
           when message.chatRole is 'assistant'
             return null if i is 0 # skip welcome (anthropic dies if user isnt first in history)
-            return null if i is messages.length-1 # last message may not be assistant message
+            return null if i is messages.length - 1 and message.workInProgress
             new AIMessage
               content: message.text
               tool_calls: message.tools
@@ -147,7 +146,7 @@ export createChatBot = ({
             throw new Meteor.Error 'buildContext: unknown chatRole: ' + message.chatRole
       .flatten()
       .compact()
-      .filter (message) -> message.content?.length
+      # .filter (message) -> message.content?.length
       .value()
     [(new SystemMessage systemPrompt), contextBody...]
 
@@ -186,13 +185,16 @@ export createChatBot = ({
     - sets text to the new text
     @param {Object} options
     @param {String} options.messageStubId
-    @param {String} options.text
+    @param {String} [options.text]
+    @param {Object} [options.tools]
     @returns {Promise<void>} Resolves when the message is successfully sent
   ###
-  updateMessageStub = ({messageStubId, text}) ->
+  updateMessageStub = ({messageStubId, text, tools}) ->
     messageCollection.updateAsync messageStubId,
       $set:
         text: text
+        tools: tools
+
 
   
   ###*
@@ -202,14 +204,16 @@ export createChatBot = ({
     @param {Object} options
     @param {String} options.messageStubId
     @param {String} options.text
+    @param {Object} [options.tools]
     @param {Object} [options.usage]
     @returns {String} the id of the Message
     ###
-  finalizeMessageStub = ({messageStubId, text, usage}) ->
+  finalizeMessageStub = ({messageStubId, text, tools, usage}) ->
     usage?.model ?= chatClient.model
     messageCollection.updateAsync messageStubId,
       $set:
         text: text
+        tools: tools
         usage: usage
         workInProgress: false
 
@@ -246,7 +250,7 @@ export createChatBot = ({
     @returns {Promise<String>} the id of the final message
     ###
   call = ({sessionId, messageStubId, context}) ->
-    
+    console.log 'call', {sessionId, messageStubId, context}
     tools = getTools {sessionId, messageId: messageStubId}
     
     chatClient
@@ -270,42 +274,31 @@ export createChatBot = ({
         response.content[0].text
 
       toolCalls = response?.tool_calls
-      finalizeMessageStub {messageStubId, text, usage}
-      
-      console.log 'tools', tools
-      console.log 'toolCalls', toolCalls
+      finalizeMessageStub {messageStubId, text, tools: toolCalls, usage}
 
       if toolCalls? and toolCalls.length
-        toolResults = await Promise.allSettled toolCalls.map (tc) ->
-          toolForCall = (tools.find (t) -> t.function.name is tc.name)
-          await toolForCall?.run tc.args
-        
-        console.log 'toolResults', toolResults
-
-        # Filter out undefined results and concatenate
-        concatenatedResult =
-          toolResults
-          .filter (r) -> r.status is 'fulfilled' and r.value?
-          .map (r) -> r.value
-          .join('\n\n\n')
-        
-        console.log 'concatenatedResult', concatenatedResult
-        
-        # Insert a single message with all tool call results
-        await messageCollection.insertAsync
-          userId: botUserData.id
-          sessionId: sessionId
-          chatRole: 'function'
-          createdAt: new Date()
-          workInProgress: false
-          text: concatenatedResult
-          tools: toolCalls
+        await Promise.allSettled toolCalls.map (tc) ->
+          return unless tc.args?
+          
+          # createLogMessage {sessionId, toolCall: tc, usage}
+          tool_selected = (tools.find (t) -> t.function.name is tc.name)
+          result = await tool_selected?.run tc.args
+          await messageCollection.insertAsync
+            userId: botUserData.id
+            sessionId: sessionId
+            chatRole: 'function'
+            createdAt: new Date()
+            workInProgress: false
+            text: result
+            tool_id: tc.id
+            args: tc.args
+            function_name: tc.name
         
         contextWithResult = await buildContext {sessionId}
 
         # create a new message for the answer of the chatbot to the function call result.
-        newMessageId = await createMessageStub {sessionId, text: '...'}
-        call {sessionId, messageStubId: newMessageId, context: contextWithResult, allowFunctionCall: allowRecursiveToolCalls}
+        console.log 'newMessageId', newMessageId = await createMessageStub {sessionId, text: '...'}
+        call {sessionId, messageStubId: newMessageId, context: contextWithResult}
     .catch (error) ->
       createLogMessage {sessionId, error: error}
       throw error
