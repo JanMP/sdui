@@ -12,17 +12,17 @@ if Meteor.isServer
   do ->
     tokenCosts =
       'gpt-4o-mini':
-        prompt: 15e-8
-        completion: 6e-7
+        prompt: .15e-6
+        completion: .6e-6
       'gpt-4o':
         prompt: 5e-6
         completion: 15e-6
       'gpt-4-turbo':
-        prompt: 1e-5
-        completion: 3e-5
+        prompt: 10e-6
+        completion: 30e-6
       'gpt-3.5-turbo':
-        prompt: 5e-7
-        completion: 15e-7
+        prompt: 3e-6
+        completion: 6
       'gpt-4-1106-preview':
         prompt: 1e-5
         completion: 3e-5
@@ -41,12 +41,15 @@ if Meteor.isServer
       'claude-3-5-sonnet-20240620':
         prompt: 3e-6
         completion: 15e-6
-      'mistral-small':
-        prompt: 0.0000006
-        completion: 0.0000018
-      'mistral-medium':
-        prompt: 0.0000025
-        completion: 0.0000075
+      'mistral-small-2409':
+        prompt: .2e-6
+        completion: .6e-6
+      'open-mistral-nemo-2407':
+        prompt: .15e-6
+        completion: .15e-6
+      'mistral-large-latest':
+        prompt: 2e-6
+        completion: 6e-6
 
     await TokenCosts.removeAsync {}
     for model, usage of tokenCosts

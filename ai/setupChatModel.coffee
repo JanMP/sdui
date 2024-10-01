@@ -4,7 +4,6 @@ import {ChatOpenAI} from '@langchain/openai'
 import {ChatMistralAI} from '@langchain/mistralai'
 
 export setupChatModel = (settings) ->
-  # console.log 'Setting up chat model with settings:', JSON.stringify settings
   {vendor,options...} = settings
   constructor =
     switch vendor
