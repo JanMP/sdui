@@ -30,10 +30,7 @@ In addition to a standard chat interface with support for [gravatar](https://gra
 - its return `dataOptions` can be used as parameter for SdChat.
 
 
-## SdTable
 
-- this creates a customizable reactive data table. With the configuration options, the table can be made filterable, searchable, and editable.
-- Components such as `SdChatLog` use the `SdTable` under the hood.
 
 ## createAppLayoutAPI
 
@@ -43,3 +40,66 @@ In addition to a standard chat interface with support for [gravatar](https://gra
 - Additionally, each source can have itself items that will become nested paths.
 - note that the function only returns the `dataOptions` object.
 - this object then needs to be passed to `SdAppLayout` to create the actual routes.
+
+
+## createTableDataAPI
+
+- this function creates the backend methods and publications for updating data in a specific table.
+- it returns `dataOptions` that can be used as props in the UI components for displaying the data.
+- most importantly, we need to pass the schema object based on which the components and methods will be built.
+- we then also need to pass the MongoDB collection where we want to store the information and what the name of the source is.
+- Besides those parameters, there are many other parameters that control the behavior of the created component.
+
+
+- Example Usge. First a schema and a mongodb collection is created. Then we can create components based on that schema.
+```coffee
+sourceSchema = new SimpleSchema
+  markdown:
+    type: String
+    label: 'Markdown'
+    sdContent: isContent: true
+    uniforms: -> null
+  title:
+    type: String
+    label: 'Titel'
+  number:
+    type: Number
+    label: 'Eine Zahl'
+  array:
+    type: Array
+    label: 'Personen'
+  'array.$': Object
+  'array.$.name': String
+  'array.$.boolean':
+    type: Boolean
+    optional: true
+    label: 'ist zu Allem bereit.'
+
+ContentEditorTest = new Mongo.Collection 'content-editor-test'
+
+dataOptions = createTableDataAPI
+  sourceName: 'content-editor-test'
+  sourceSchema: sourceSchema
+  collection: ContentEditorTest
+  canEdit: true
+  canAdd: true
+  canDelete: true
+  canExport: true
+  canUseQueryEditor: true
+  canSort: true
+  canSearch: true
+
+export ContentEditor = ->
+    <SdContentEditor dataOptions={dataOptions} />
+
+export Table = ->
+    <SdContentEditor dataOptions={dataOptions} />
+
+export List = ->
+    <SdContentEditor dataOptions={dataOptions} />
+```
+
+- This will result in the following components on the frontend: 
+    - Content Editor: [ContentEditorExample](component-images/contentEditorExample.png)
+    - Table: [tableExample](component-images/tableExample.png)
+    - List: [listExample](component-images/listExample.png)
