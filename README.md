@@ -100,6 +100,6 @@ export List = ->
 ```
 
 - This will result in the following components on the frontend: 
-    - Content Editor: [ContentEditorExample](component-images/contentEditorExample.png)
-    - Table: [tableExample](component-images/tableExample.png)
-    - List: [listExample](component-images/listExample.png)
+    - Content Editor: ![ContentEditorExample](component-images/contentEditorExample.png)
+    - Table: ![tableExample](component-images/tableExample.png)
+    - List: ![listExample](component-images/listExample.png)
