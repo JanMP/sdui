@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react'
 import {SdTable, ActionButton} from 'meteor/janmp:sdui'
 import {Button} from 'primereact/button'
-import {Jobs} from 'meteor/67726e:jobs'
+import {Jobs} from 'meteor/msavin:sjobs'
 
 customComponents =
   rightButtonColumnWidth: 180

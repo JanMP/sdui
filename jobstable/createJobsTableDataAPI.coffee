@@ -4,7 +4,7 @@ import {SimpleSchema} from 'meteor/janmp:sdui'
 import {createTableDataAPI} from '../api/createTableDataAPI.coffee'
 import {currentUserMustBeInRole} from '../common/roleChecks.coffee'
 import {ValidatedMethod} from 'meteor/mdg:validated-method'
-import {Jobs} from 'meteor/67726e:jobs'
+import {Jobs} from 'meteor/msavin:sjobs'
 import _ from 'lodash'
 
 export createJobsTableDataAPI = ->
