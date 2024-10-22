@@ -107,8 +107,8 @@ export LoginForm = ({allowResetPassword = false}) ->
   <div className="p-component w-16rem">
     <Form />
     { <div className="text-center mt-4">
-      <a onClick={-> setFormToShow 'resetPassword'}>Ich habe mein Passwort vergessen</a>
-    </div> if allowResetPassword and formToShow isnt 'resetPassword'}
+      <a onClick={-> setFormToShow 'reset-password'}>Ich habe mein Passwort vergessen</a>
+    </div> if allowResetPassword and formToShow isnt 'reset-password'}
     {<div className="text-center mt-4">
       <a onClick={toggleLoginOrSignup}>{loginOrSignupLabel}</a>
     </div> if loginOrSignupLabel?}

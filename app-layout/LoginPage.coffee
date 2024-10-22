@@ -26,5 +26,5 @@ export LoginPage =  ->
     </div>
 
   <div className="w-full mt-4 flex justify-content-center" >
-    <LoginForm />
+    <LoginForm allowResetPassword={true}/>
   </div>
