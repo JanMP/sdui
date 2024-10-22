@@ -20,7 +20,7 @@ export LoginButton = ({onLoginClick, onUserClick}) ->
   username = user?.username ? 'X'
 
   customTemplate =
-      <Gravatar email={email} shape="circle"/>
+    <Gravatar email={email} shape="circle"/>
 
   <ActionButton
     customTemplate={customTemplate}
