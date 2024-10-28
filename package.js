@@ -23,7 +23,7 @@ Package.onUse(function(api) {
   api.use('tunguska:reactive-aggregate@2.0.0');
   api.use('aldeed:simple-schema@2.0.0-rc300.1');
   api.use('msavin:sjobs');
-  // api.use('mizzao:user-status@2.0.0-beta.0'); 
+  api.use('mizzao:user-status@2.0.0-rc.2'); 
   api.mainModule('sdui-client-dynamic.coffee', 'client');
   api.mainModule('sdui-server.coffee', 'server');
 });

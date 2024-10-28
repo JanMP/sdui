@@ -7,6 +7,7 @@ export {
   useCurrentUserIsInRole, currentUserMustBeInRole,
   scopesForUserWithIdInRole, scopesForCurrentUserInRole, useScopesForCurrentUserInRole
 } from './common/roleChecks.coffee'
+export {generateUUID} from './common/generateUUID.coffee'
 export {useSession} from './common/useSession.coffee'
 export {meteorApply} from './common/meteorApply.coffee'
 export {config, useConfig, Configurations} from './config/config.coffee'
