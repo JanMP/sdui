@@ -11,7 +11,7 @@ import _ from 'lodash'
 
 # FIXME: pdf and feedback buttons are not shown anymore
 
-export DefaultMessage = ({message, hasPdfButton = true, onChangeFeedback}) ->
+export DefaultMessage = ({message, hasPdfButton = true, onChangeFeedback, showTools = true}) ->
 
   {_id, userId, text, tools, username, email, chatRole, customImage, feedback} = message
 
@@ -41,7 +41,7 @@ export DefaultMessage = ({message, hasPdfButton = true, onChangeFeedback}) ->
         <MarkdownDisplay markdown={text} contentClass="chat-message"/>
       </div>
       {
-        if tools?
+        if tools? and showTools
           <div className="">
           {
             tools.map (tool) ->

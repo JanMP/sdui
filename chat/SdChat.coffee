@@ -31,7 +31,7 @@ defaultProcessMessageText = ({text, metaData, addLinkedMetaData}) ->
   ?.replace /\[(.+?)\]\(([^\)]+?)$/g, (match, title, url) -> "[#{title}]() ... <span class='pi pi-spin text-primary-200 pi-spinner'/>"
   
 
-export SdChat = ({dataOptions, className = "", customComponents = {}, processMessageText}) ->
+export SdChat = ({dataOptions, className = "", customComponents = {}, processMessageText, showTools = true}) ->
 
   {SessionListItem, Message, MetaDataDisplay} = customComponents
   SessionListItem ?= DefaultSessionListItem
@@ -221,6 +221,7 @@ export SdChat = ({dataOptions, className = "", customComponents = {}, processMes
                 message={message}
                 metaData={metaData}
                 onChangeFeedback={setFeedBackHandlerForMessage message._id}
+                showTools={showTools}
               />
           }
         </div>
