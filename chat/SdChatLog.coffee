@@ -57,7 +57,7 @@ HistoryDisplay = ({sourceName, rowData}) ->
               if entry?.text?.length
                 <MarkdownDisplay
                   markdown={entry?.text}
-                  contentClass="surface-100 px-3 py-1"
+                  contentClass="surface-100 px-3 py-1 | chat-message"
                 />
               if isFunctionCall = entry?.tools?.length > 0
                 entry.tools.map (tool, index) ->
