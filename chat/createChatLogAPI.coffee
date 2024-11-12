@@ -41,6 +41,12 @@ if Meteor.isServer
       'claude-3-5-sonnet-20240620':
         prompt: 3e-6
         completion: 15e-6
+      'claude-3-5-sonnet-20241022':
+        prompt: 3e-6
+        completion: 15e-6
+      'claude-3-5-haiku-20241022':
+        prompt: .25e-6
+        completion: 1.25e-6
       'mistral-small-2409':
         prompt: .2e-6
         completion: .6e-6
