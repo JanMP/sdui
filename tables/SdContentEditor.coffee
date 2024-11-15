@@ -18,9 +18,9 @@ DisplayComponent = (tableOptions) ->
 
 export SdContentEditor = ({dataOptions, customComponents = {}}) ->
 
-  useEffect ->
-    console.log 'SdContentEditor', dataOptions
-  , [dataOptions]
+  # useEffect ->
+  #   console.log 'SdContentEditor', dataOptions
+  # , [dataOptions]
 
   <MeteorTableDataHandler
     dataOptions={dataOptions}
