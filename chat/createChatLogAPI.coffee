@@ -115,8 +115,6 @@ listSchema = new Schema
       type: 'boolean'
       uniforms: label: 'Daumen runter'
 
-queryEditorSchema = listSchema.omit ['models']
-
 
 getAddSessionPipeline = ({sourceName}) -> [
   $lookup:
@@ -205,8 +203,6 @@ export createChatLogAPI = ({sourceName, messageCollection, viewTableRole}) ->
     viewTableRole: viewTableRole
     canEdit: false
     getProcessorPipeline: getProcessorPipelineForSourceName {sourceName}
-    canExport: true
-    canUseQueryEditor: true
     initialSortColumn: 'createdAt'
     initialSortDirection: 'DESC'
     noAutomaticObserver: true

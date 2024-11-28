@@ -15,7 +15,7 @@ import _ from 'lodash'
 import * as types from '../typeDeclarations'
 
 defaultQuery = {} # ensures equality between runs
-defaultQueryUiObject = null
+
 ###*
   @type {types.MeteorTableDataHandler}
   ###
@@ -32,7 +32,6 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
   formSchema,
   canSearch
   canSort
-  canUseQueryEditor
   query
   canAdd
   onAdd
@@ -137,7 +136,7 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
 
   subRows = useTracker ->
     return unless usePubSub
-    rowsCollection.find(query, {sort, limit}).fetch() # TODO prevent overfetching for queryUiObject
+    rowsCollection.find(query, {sort, limit}).fetch()
 
   useEffect ->
     unless _.isEqual subRows, rows
@@ -212,7 +211,7 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
           severity: 'success'
           summary: 'Erfolg'
           detail: t "Export data received from Server."
-        Papa.unparse rows, columns: getColumnsToExport schema: listSchemaBridge.schema
+        Papa.unparse rows, columns: getColumnsToExport schema: listSchema
       .then (csvString) ->
         downloadAsFile
           dataString: csvString
@@ -234,8 +233,7 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
             listSchema, formSchema,
             rows, loadMoreRows, onRowClick,
             canSort, sortColumn, sortDirection, onChangeSort
-            canSearch, search, onChangeSearch
-            canUseQueryEditor,
+            canSearch, search, onChangeSearch,
             canAdd, mayAdd, onAdd
             canDelete, mayDelete, onDelete
             canEdit, mayEdit, onSubmit

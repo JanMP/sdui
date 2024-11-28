@@ -18,10 +18,8 @@ export interface createTableDataAPIParams {
   useObjectIds?: boolean
   listSchema?: SimpleSchema
   formSchema?: SimpleSchema
-  queryEditorSchema?: SimpleSchema
   canEdit?: boolean
   canSearch?: boolean
-  canUseQueryEditor?: boolean
   canSort?: boolean
   canAdd?: boolean
   canDelete?: boolean
@@ -80,11 +78,9 @@ export interface createTableDataAPIReturn {
   sourceName: string
   listSchemaBridge: SimpleSchema2Bridge
   formSchemaBridge: SimpleSchema2Bridge
-  queryEditorSchemaBridge: SimpleSchema2Bridge
   rowsCollection: Mongo.Collection<any>
   canEdit?: boolean
   canSearch?: boolean
-  canUseQueryEditor?: boolean
   canSort?: boolean
   canAdd?: boolean
   canDelete?: boolean
@@ -115,7 +111,6 @@ export interface additionalDataTableOptions {
   formDisabled?: boolean
   formReadOnly?: boolean
   loadEditorData?: ({id}: {id: string}) => Promise<any>
-  queryUiObject?: object
 }
 
 export type DataTableOptions = createTableDataAPIReturn & additionalDataTableOptions
@@ -129,7 +124,6 @@ export interface additionalDataTableDisplayOptions {
   search: 'string'
   onChangeSearch: (searchString: string) => void
   onDelete: ({id}: {id: string}) => Promise<any>
-  onChangeQueryUiObject: (queryUiObject: object) => void 
   mayAdd?: boolean
   onAdd?: () => void
   mayDelete?: boolean
@@ -147,14 +141,10 @@ export declare function DataTableDisplayComponent(options: DataTableDisplayOptio
 
 export interface DataTableHeaderOptions {
   listSchemaBridge: SimpleSchema2Bridge
-  queryEditorSchemaBridge: SimpleSchema2Bridge
   loadedRowCount: number
   canSearch?: boolean
   search?: string
   onChangeSearch?: (searchString: string) => void
-  canUseQueryEditor?: boolean
-  queryUiObject?: object
-  onChangeQueryUiObject: (queryUiObject: object) => void
   canExport?: boolean
   mayExport?: boolean
   onExportTable?: () => void

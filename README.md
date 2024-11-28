@@ -85,7 +85,6 @@ dataOptions = createTableDataAPI
   canAdd: true
   canDelete: true
   canExport: true
-  canUseQueryEditor: true
   canSort: true
   canSearch: true
 

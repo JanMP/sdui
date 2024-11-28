@@ -23,7 +23,6 @@ export TableEditModalHandler = ({tableOptions, DisplayComponent}) ->
     rows, loadMoreRows, onRowClick,
     canSort, sortColumn, sortDirection, onChangeSort
     canSearch, search, onChangeSearch
-    canUseQueryEditor, queryUiObject, onChangeQueryUiObject,
     canAdd, mayAdd, onAdd
     canDelete, mayDelete, onDelete
     canEdit, mayEdit, onSubmit
@@ -113,7 +112,6 @@ export TableEditModalHandler = ({tableOptions, DisplayComponent}) ->
           rows, loadMoreRows, onRowClick,
           canSort, sortColumn, sortDirection, onChangeSort
           canSearch, search, onChangeSearch
-          canUseQueryEditor, queryUiObject, onChangeQueryUiObject
           canAdd, mayAdd, onAdd
           canDelete, mayDelete, onDelete: handleOnDelete
           canEdit, mayEdit

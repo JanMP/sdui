@@ -56,17 +56,16 @@ checkDisableDeleteForRow, checkDisableEditForRow}) ->
         properties:
           search: type: 'string'
           query: type: 'object'
-          queryUiObject: type: 'object'
           sort: type: 'object'
           limit: type: 'number'
           skip: type: 'number'
       .validator
-    run: ({search, query, queryUiObject, sort, limit, skip}) ->
-      # console.log 'getRows', {search, query, queryUiObject, sort, limit, skip}
+    run: ({search, query, sort, limit, skip}) ->
+      # console.log 'getRows', {search, query, sort, limit, skip}
       await currentUserMustBeInRole viewTableRole
       return unless Meteor.isServer
       collection.rawCollection()
-      .aggregate await getRowsPipeline {search, query, queryUiObject, sort, limit, skip},
+      .aggregate await getRowsPipeline {search, query, sort, limit, skip},
         allowDiskUse: true
       .toArray()
       .catch (error) ->
@@ -82,14 +81,13 @@ checkDisableDeleteForRow, checkDisableEditForRow}) ->
           properties:
             search: type: 'string'
             query: type: 'object'
-            queryUiObject: type: 'object'
             sort: type: 'object'
         .validator
-      run: ({search, query, queryUiObject, sort}) ->
+      run: ({search, query, sort}) ->
         await currentUserMustBeInRole exportTableRole
         return unless Meteor.isServer
         collection.rawCollection()
-        .aggregate await getExportPipeline {search, query, queryUiObject, sort},
+        .aggregate await getExportPipeline {search, query, sort},
           allowDiskUse: true
         .toArray()
         .catch (error) ->
