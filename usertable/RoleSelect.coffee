@@ -78,6 +78,7 @@ export RoleSelect = ({row, columnKey, schemaBridge, onChangeField, measure, mayE
         options={options}
         onChange={onChange}
         name="roles"
+        display="chip"
         style={maxWidth: '100%', minWidth: '100%'}
       />
     else

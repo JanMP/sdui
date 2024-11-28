@@ -1,6 +1,6 @@
 import {Meteor} from 'meteor/meteor'
 import {Accounts} from 'meteor/accounts-base'
-import {SimpleSchema} from 'meteor/janmp:sdui'
+import {Schema} from 'meteor/janmp:sdui'
 import {createTableDataAPI} from '../api/createTableDataAPI.coffee'
 import {currentUserMustBeInRole} from '../common/roleChecks.coffee'
 import {ValidatedMethod} from 'meteor/mdg:validated-method'

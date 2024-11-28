@@ -3,7 +3,7 @@ import {Mongo} from 'meteor/mongo'
 import {publishTableData} from './publishTableData.coffee'
 import {createTableDataMethods} from './createTableDataMethods.coffee'
 import {createDefaultPipeline} from './createDefaultPipeline.coffee'
-import SimpleSchema2Bridge from 'uniforms-bridge-simple-schema-2'
+import {Schema} from '../schema/Schema.coffee'
 import * as types from '../typeDeclarations'
 
 ###*
@@ -76,20 +76,8 @@ export createTableDataAPI = ({
   getProcessorPipeline ?= -> []
 
   listSchema ?= sourceSchema
-  formSchema ?= sourceSchema
-  queryEditorSchema ?= listSchema
+  formSchema ?= listSchema
 
-  listSchemaBridge = new SimpleSchema2Bridge(listSchema)
-  formSchemaBridge =
-    if listSchema is formSchema
-      listSchemaBridge
-    else
-      new SimpleSchema2Bridge(formSchema)
-  queryEditorSchemaBridge =
-    if listSchema is queryEditorSchema
-      listSchemaBridge
-    else
-      new SimpleSchema2Bridge(queryEditorSchema)
 
   {defaultGetRowsPipeline, defaultGetExportPipeline} =
     createDefaultPipeline {getPreSelectPipeline, getProcessorPipeline, listSchema}

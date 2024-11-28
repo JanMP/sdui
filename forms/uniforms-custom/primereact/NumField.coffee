@@ -11,13 +11,13 @@ export default connectFieldPlus ({
   value
   props...
 }) ->
-
+  console.log props
   if decimal
     props.minFractionDigits ?= 1
 
   <InputNumber
     value={value}
-    onChange={(e) -> onChange e.value}
+    onValueChange={(e) -> onChange e.value}
     useGrouping={useGrouping}
     {props...}
   />

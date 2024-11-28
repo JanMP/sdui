@@ -1,8 +1,7 @@
 import {Meteor} from 'meteor/meteor'
 import {Mongo} from 'meteor/mongo'
 import {ValidatedMethod} from 'meteor/mdg:validated-method'
-import {SimpleSchema} from 'meteor/janmp:sdui'
-import {schemaWithId} from '../common/schemaWithId.coffee'
+import {Schema} from 'meteor/janmp:sdui'
 import {currentUserMustBeInRole} from '../common/roleChecks.coffee'
 
 import _ from 'lodash'
@@ -41,7 +40,7 @@ checkDisableDeleteForRow, checkDisableEditForRow}) ->
   formDataFetchMethodRun =
     makeFormDataFetchMethodRunFkt?({collection, transformIdToMongo, transformIdToMiniMongo}) ?
     ({id}) ->
-      {(formSchema.clean (await collection.findOneAsync _id: transformIdToMongo id))..., _id: transformIdToMiniMongo id}
+      {((await collection.findOneAsync _id: transformIdToMongo id))..., _id: transformIdToMiniMongo id}
 
   deleteMethodRun =
     makeDeleteMethodRunFkt?({collection, transformIdToMongo, transformIdToMiniMongo}) ?
@@ -52,24 +51,16 @@ checkDisableDeleteForRow, checkDisableEditForRow}) ->
   getRows = new ValidatedMethod
     name: "#{sourceName}.getRows"
     validate:
-      new SimpleSchema
-        search:
-          type: String
-          optional: true
-        query:
-          type: Object
-          blackbox: true
-        queryUiObject:
-          type: Object
-          blackbox: true
-          optional: true
-        sort:
-          type: Object
-          required: false
-          blackbox: true
-        limit: Number
-        skip: Number
-      .validator()
+      new Schema
+        type: 'object'
+        properties:
+          search: type: 'string'
+          query: type: 'object'
+          queryUiObject: type: 'object'
+          sort: type: 'object'
+          limit: type: 'number'
+          skip: type: 'number'
+      .validator
     run: ({search, query, queryUiObject, sort, limit, skip}) ->
       # console.log 'getRows', {search, query, queryUiObject, sort, limit, skip}
       await currentUserMustBeInRole viewTableRole
@@ -86,22 +77,14 @@ checkDisableDeleteForRow, checkDisableEditForRow}) ->
     new ValidatedMethod
       name: "#{sourceName}.getExportRows"
       validate:
-        new SimpleSchema
-          search:
-            type: String
-            optional: true
-          query:
-            type: Object
-            blackbox: true
-          queryUiObject:
-            type: Object
-            blackbox: true
-            optional: true
-          sort:
-            type: Object
-            required: false
-            blackbox: true
-        .validator()
+        new Schema
+          type: 'object'
+          properties:
+            search: type: 'string'
+            query: type: 'object'
+            queryUiObject: type: 'object'
+            sort: type: 'object'
+        .validator
       run: ({search, query, queryUiObject, sort}) ->
         await currentUserMustBeInRole exportTableRole
         return unless Meteor.isServer
@@ -137,7 +120,7 @@ checkDisableDeleteForRow, checkDisableEditForRow}) ->
   if canEdit or canAdd
     new ValidatedMethod
       name: "#{sourceName}.submit"
-      validate: (schemaWithId formSchema).validator()
+      validate: formSchema.withId().validator
       run: (model) ->
         if model._id?
           await currentUserMustBeInRole editRole
@@ -152,9 +135,11 @@ checkDisableDeleteForRow, checkDisableEditForRow}) ->
     new ValidatedMethod
       name: "#{sourceName}.fetchEditorData"
       validate:
-        new SimpleSchema
-          id: String
-        .validator()
+        new Schema
+          type: 'object'
+          properties:
+            id: type: 'string'
+        .validator
       run: ({id}) ->
         await currentUserMustBeInRole editRole
         await editRowMustNotBeDisabled {id}
@@ -165,12 +150,13 @@ checkDisableDeleteForRow, checkDisableEditForRow}) ->
     new ValidatedMethod
       name: "#{sourceName}.setValue"
       validate:
-        new SimpleSchema
-          _id: String
-          changeData:
-            type: Object
-            blackbox: true
-        .validator()
+        new Schema
+          type: 'object'
+          properties:
+            _id: type: 'string'
+            changeData:
+              type: 'object'
+        .validator
       run: ({_id, changeData}) ->
         await currentUserMustBeInRole editRole
         await editRowMustNotBeDisabled id: _id
@@ -181,9 +167,11 @@ checkDisableDeleteForRow, checkDisableEditForRow}) ->
     new ValidatedMethod
       name: "#{sourceName}.delete"
       validate:
-        new SimpleSchema
-          id: String
-        .validator()
+        new Schema
+          type: 'object'
+          properties:
+            id: type: 'string'
+        .validator
       run: ({id}) ->
         await currentUserMustBeInRole deleteRole
         await deleteRowMustNotBeDisabled {id}

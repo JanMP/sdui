@@ -21,7 +21,7 @@ defaultQueryUiObject = null
   ###
 export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponents}) ->
   {
-  sourceName, listSchemaBridge,
+  sourceName, listSchema,
   rowsCollection
   initialSortColumn
   initialSortDirection
@@ -29,8 +29,7 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
   canEdit
   onSubmit
   onChangeField
-  formSchemaBridge
-  queryEditorSchemaBridge,
+  formSchema,
   canSearch
   canSort
   canUseQueryEditor
@@ -69,7 +68,7 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
     deleteMethodName = "#{sourceName}.delete"
     exportRowsMethodName = "#{sourceName}.getExportRows"
 
-  formSchemaBridge ?= listSchemaBridge
+  formSchema ?= listSchema
 
   if onRowClick and canEdit
     throw new Error 'both onRowClick and canEdit set to true'
@@ -87,10 +86,7 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
   
   [search, setSearch] = useState ''
 
-  [queryUiObject, setQueryUiObject] = useState defaultQueryUiObject
   toast = useToast()
-
-  onChangeQueryUiObject = setQueryUiObject
 
   mayView = useCurrentUserIsInRole viewTableRole
   mayEdit = useCurrentUserIsInRole editRole
@@ -107,7 +103,7 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
     setIsLoading true
     meteorApply
       method: getRowMethodName
-      data: {search, query, queryUiObject, sort, skip: 0, limit: if reload then perLoad else limit}
+      data: {search, query, sort, skip: 0, limit: if reload then perLoad else limit}
     .then (returnedRows) ->
       setRows returnedRows
       setIsLoading false
@@ -119,7 +115,7 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
     setLimit perLoad
     getRows reload: true
     return
-  , [search, query, queryUiObject, sortColumn, sortDirection, sourceName]
+  , [search, query, sortColumn, sortDirection, sourceName]
 
   useEffect ->
     getRows {}
@@ -131,7 +127,7 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
   subLoading = useTracker ->
     return unless usePubSub
     return unless mayView
-    handle = Meteor.subscribe rowPublicationName, {search, query, queryUiObject, sort, skip, limit}
+    handle = Meteor.subscribe rowPublicationName, {search, query, sort, skip, limit}
     not handle.ready()
   
   useEffect ->
@@ -210,7 +206,7 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
     if canExport
       meteorApply
         method: exportRowsMethodName
-        data: {search, query, queryUiObject, sort}
+        data: {search, query, sort}
       .then (rows) ->
         toast.show
           severity: 'success'
@@ -235,11 +231,11 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
         <>
           <DisplayComponent {{
             sourceName,
-            listSchemaBridge, formSchemaBridge, queryEditorSchemaBridge,
+            listSchema, formSchema,
             rows, loadMoreRows, onRowClick,
             canSort, sortColumn, sortDirection, onChangeSort
             canSearch, search, onChangeSearch
-            canUseQueryEditor, queryUiObject, onChangeQueryUiObject
+            canUseQueryEditor,
             canAdd, mayAdd, onAdd
             canDelete, mayDelete, onDelete
             canEdit, mayEdit, onSubmit

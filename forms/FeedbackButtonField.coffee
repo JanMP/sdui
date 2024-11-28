@@ -2,25 +2,24 @@ import { Thumbs } from './ThumbsField.coffee'
 import React, {useState} from 'react'
 import {Button} from 'primereact/button'
 import {FormModal} from './FormModal.coffee'
-import {SimpleSchema} from 'meteor/janmp:sdui'
-import SimpleSchemaBridge from 'uniforms-bridge-simple-schema-2'
+import {Schema} from 'meteor/janmp:sdui'
 import LongTextField from './uniforms-custom/primereact/LongTextField.coffee'
 import {ThumbsField} from './ThumbsField.coffee'
 import connectFieldPlus from './connectFieldPlus.coffee'
 
-formSchema = new SimpleSchema
-  thumbs:
-    type: String
-    optional: true
-    uniforms:
-      component: ThumbsField
-  comment:
-    type: String
-    optional: true
-    uniforms:
-      component: LongTextField
+formSchema = new Schema
+  type: 'object'
+  properties:
+    thumbs:
+      type: 'string'
+      uniforms:
+        component: ThumbsField
+    comment:
+      type: 'string'
+      uniforms:
+        component: LongTextField
 
-formSchemaBridge = new SimpleSchemaBridge formSchema
+formSchemaBridge = formSchema.bridge
 
 export FeedbackButton = ({value, onChange}) ->
 

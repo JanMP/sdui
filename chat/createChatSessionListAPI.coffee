@@ -2,37 +2,10 @@ import {Meteor} from 'meteor/meteor'
 import {Mongo} from 'meteor/mongo'
 import {createTableDataAPI} from '../api/createTableDataAPI'
 import {currentUserMustBeInRole} from '../common/roleChecks'
-import {SimpleSchema} from 'meteor/janmp:sdui'
+import {Schema} from 'meteor/janmp:sdui'
 import pick from 'lodash/pick'
 import {meteorApply} from '../common/meteorApply'
 
-sourceSchemaDefinition =
-  title:
-    type: String
-    optional: true
-  userIds:
-    type: Array
-    optional: true
-  'userIds.$':
-    type: String
-  createdAt:
-    type: Date
-    optional: true
-
-additionalListFieldsSchemaDefinition =
-  users:
-    type: Array
-    optional: true
-  'users.$':
-    type: Object
-    blackbox: true
-
-sourceSchema = new SimpleSchema sourceSchemaDefinition
-
-listSchema =
-  new SimpleSchema {sourceSchemaDefinition..., additionalListFieldsSchemaDefinition...}
-
-formSchema = new SimpleSchema pick sourceSchemaDefinition, ['title']
 
 ###*
   @description
@@ -44,7 +17,26 @@ formSchema = new SimpleSchema pick sourceSchemaDefinition, ['title']
   @param {String} options.addSessionRole
   ###
 export createChatSessionListAPI = ({sourceName, sessionListCollection, viewChatRole, addSessionRole}) ->
-  
+  sourceSchema = new Schema
+    type: 'object'
+    properties:
+      title:
+        type: 'string'
+      userIds:
+        type: 'array'
+        items: type: 'string'
+      createdAt:
+        instanceof: 'Date'
+
+
+  listSchema =
+    sourceSchema.addProperty
+      users:
+        type: 'array'
+        items: type: 'object'
+
+  formSchema = sourceSchema.pick ['title']
+
   getPreSelectPipeline = -> [
     $match:
       userIds: Meteor.userId()

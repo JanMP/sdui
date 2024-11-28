@@ -2,51 +2,49 @@ import {Meteor} from 'meteor/meteor'
 import {Mongo} from 'meteor/mongo'
 import {createChatMethods} from './createChatMethods'
 import {createChatPublications} from './createChatPublications'
-import {SimpleSchema} from 'meteor/janmp:sdui'
+import {Schema} from '../schema/Schema.coffee'
 import {createChatSessionListAPI} from './createChatSessionListAPI'
 
-export chatSchema = new SimpleSchema
-  userId:
-    type: String
-  sessionId:
-    type: String
-  createdAt:
-    type: Date
-  text:
-    type: String
-  chatRole:
-    type: String
-    allowedValues: ['user', 'assistant', 'system', 'log']
-  usage:
-    type: Object
-    optional: true
-  'usage.model':
-    type: String
-  'usage.prompt':
-    type: Number
-  'usage.completion':
-    type: Number
-  workInProgress:
-    type: Boolean
-    optional: true
-  feedback:
-    type: Object
-    optional: true
-  'feedback.thumbs':
-    type: String
-    allowedValues: ['up', 'down']
-    optional: true
-  'feedback.comment':
-    type: String
-    optional: true
+export chatSchema = new Schema
+  type: 'object'
+  properties:
+    userId:
+      type: 'string'
+    sessionId:
+      type: 'string'
+    createdAt:
+      instanceof: 'Date'
+    text:
+      type: 'string'
+    chatRole:
+      type: 'string'
+      enum: ['user', 'assistant', 'system', 'log']
+    usage:
+      type: 'object'
+      properties:
+        model:
+          type: 'string'
+        prompt:
+          type: 'number'
+        completion:
+          type: 'number'
+    workInProgress:
+      type: 'boolean'
+    feedback:
+      type: 'object'
+      properties:
+        thumbs:
+          type: 'string'
+          enum: ['up', 'down']
+        comment:
+          type: 'string'
 
-export chatMetaDataSchema = new SimpleSchema
-  sessionId: String
-  createdAt: Date
-  type: String
-  data:
-    type: Object
-    blackbox: true
+export chatMetaDataSchema = new Schema
+  type: 'object'
+  properties:
+    sessionId: type: 'string'
+    createdAt: instanceof: 'Date'
+    data: type: 'object'
 
 ###*
   @param {Object} options

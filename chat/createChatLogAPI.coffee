@@ -1,6 +1,6 @@
 import {Meteor} from 'meteor/meteor'
 import {Mongo} from 'meteor/mongo'
-import {SimpleSchema} from 'meteor/janmp:sdui'
+import {Schema} from '../schema/Schema.coffee'
 import {ValidatedMethod} from 'meteor/mdg:validated-method'
 import {createTableDataAPI, chatSchema} from 'meteor/janmp:sdui'
 import _ from 'lodash'
@@ -94,27 +94,28 @@ export addCostsPipeline = [
         ]
 ]
 
-listSchemaDefinition =
-  sessionId: String
-  userName: String
-  createdAt:
-    type: Date
-    label: 'Letzte Aktivität'
-  models:
-    type: Array
-    label: 'LLMs'
-  'models.$': String
-  promptTokens: SimpleSchema.Integer
-  completionTokens: SimpleSchema.Integer
-  costInUSD:
-    type: Number
-    label: 'Kosten in USD'
-  hasThumbsDown:
-    type: Boolean
-    label: 'Daumen runter'
+listSchema = new Schema
+  type: 'object'
+  properties:
+    sessionId: type: 'string'
+    userName: type: 'string'
+    models:
+      type: 'array'
+      items: type: 'string'
+      uniforms: label: 'LLMs'
+    createdAt:
+      instanceof: 'Date'
+      uniforms: label: 'Letzte Aktivität'
+    promptTokens: type: 'integer'
+    completionTokens: type: 'integer'
+    costInUSD:
+      type: 'number'
+      uniforms: label: 'Kosten in USD'
+    hasThumbsDown:
+      type: 'boolean'
+      uniforms: label: 'Daumen runter'
 
-listSchema = new SimpleSchema listSchemaDefinition
-queryEditorSchema = new SimpleSchema _.omit listSchemaDefinition, ['models', 'models.$']
+queryEditorSchema = listSchema.omit ['models']
 
 
 getAddSessionPipeline = ({sourceName}) -> [
@@ -201,7 +202,6 @@ export createChatLogAPI = ({sourceName, messageCollection, viewTableRole}) ->
     sourceSchema: chatSchema
     collection: messageCollection
     listSchema: listSchema
-    queryEditorSchema: queryEditorSchema
     viewTableRole: viewTableRole
     canEdit: false
     getProcessorPipeline: getProcessorPipelineForSourceName {sourceName}
@@ -222,9 +222,12 @@ export createChatLogAPI = ({sourceName, messageCollection, viewTableRole}) ->
 
   new ValidatedMethod
     name: "#{logSourceName}.getMessagesForSession"
-    validate: new SimpleSchema
-      sessionId: String
-    .validator()
+    validate:
+      new Schema
+        type: 'object'
+        properties:
+          sessionId: type: 'string'
+      .validator
     run: ({sessionId}) ->
       return unless Meteor.isServer
       messageCollection
@@ -336,9 +339,13 @@ export createChatLogAPI = ({sourceName, messageCollection, viewTableRole}) ->
 
   new ValidatedMethod
     name: "#{sourceName}.getStatistics"
-    validate: new SimpleSchema
-      forLastDays: SimpleSchema.Integer
-    .validator()
+    validate:
+      new Schema
+        type: 'object'
+        properties:
+          forLastDays: type: 'number'
+        required: ['forLastDays']
+      .validator
     run: ({forLastDays}) ->
       return unless Meteor.isServer
       byDay =

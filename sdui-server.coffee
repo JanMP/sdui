@@ -8,7 +8,8 @@ export {
   scopesForUserWithIdInRole, scopesForCurrentUserInRole, useScopesForCurrentUserInRole
 } from './common/roleChecks.coffee'
 export {generateUUID} from './common/generateUUID.coffee'
-export {SimpleSchema} from './api/setupSimpleSchema.coffee'
+# export {SimpleSchema} from './api/setupSimpleSchema.coffee'
+export {Schema} from './schema/Schema.coffee'
 export {createTableDataAPI} from './api/createTableDataAPI.coffee'
 export {createUserTableAPI} from './usertable/createUserTableAPI.coffee'
 export {createQAArticlesAPI} from './qa-articles/createQAArticlesAPI.coffee'

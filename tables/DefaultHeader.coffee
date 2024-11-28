@@ -1,7 +1,6 @@
 import React, {useEffect, useState, useRef} from 'react'
 import {SearchInput} from './SearchInput.coffee'
 import {SortSelect} from './SortSelect.coffee'
-import {QueryEditorModal} from '../query-editor/QueryEditorModal.coffee'
 import useSize from '@react-hook/size'
 import {Button} from 'primereact/button'
 import {Toolbar} from 'primereact/toolbar'
@@ -12,11 +11,9 @@ import * as types from '../typeDeclarations'
   @type {types.DefaultHeader}
   ###
 export DefaultHeader = ({
-  listSchemaBridge
-  queryEditorSchemaBridge
+  listSchema
   loadedRowCount
   canSearch, search, onChangeSearch
-  canUseQueryEditor, queryUiObject, onChangeQueryUiObject
   canExport, mayExport, onExportTable,
   canAdd, mayAdd, onAdd
   canSort, sortColumn, sortDirection, onChangeSort
@@ -24,22 +21,10 @@ export DefaultHeader = ({
   AdditionalHeaderButtonsRight = -> null
 }) ->
 
-
-  [showQueryEditor, setShowQueryEditor] = useState false
   
   # workaround until we can use container queries
   toolbarRef = useRef null
   [width, height] = useSize toolbarRef
-
-
-  toggleQueryEditor = -> setShowQueryEditor (x) -> not x
-
-  useEffect ->
-    unless queryUiObject?
-      onChangeQueryUiObject null
-  , [queryUiObject]
-
-  hasEffectiveQueryUiObject = queryUiObject?.content?.length > 0
 
   pt =
     start:
@@ -60,21 +45,12 @@ export DefaultHeader = ({
 
   centerContent =
     <>
-        {if canSort then <SortSelect {{listSchemaBridge,sortColumn, sortDirection, onChangeSort}...}/>}
+        {if canSort then <SortSelect {{listSchema,sortColumn, sortDirection, onChangeSort}...}/>}
         {if canSearch then <SearchInput value={search} onChange={onChangeSearch}/>}
     </>
     
   endContent =
     <>
-      {
-        if canUseQueryEditor
-          <Button
-            icon="pi pi-filter"
-            rounded text
-            severity={if hasEffectiveQueryUiObject then 'warning' else 'secondary'}
-            onClick={toggleQueryEditor} disabled={not true}
-          />
-        }
       <AdditionalHeaderButtonsLeft/>
       {
         if canExport
@@ -100,11 +76,4 @@ export DefaultHeader = ({
 
   <div ref={toolbarRef}>
     <Toolbar start={startContent} center={centerContent} end={endContent} pt={pt}/>
-    <QueryEditorModal
-      bridge={queryEditorSchemaBridge}
-      rule={queryUiObject}
-      onChangeRule={onChangeQueryUiObject}
-      isOpen={showQueryEditor}
-      setIsOpen={setShowQueryEditor}
-    />
   </div>

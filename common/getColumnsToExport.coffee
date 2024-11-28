@@ -1,7 +1,7 @@
 export getColumnsToExport = ({schema}) ->
-  schema._firstLevelSchemaKeys
+  schema.firstLevelSchemaKeys
   .filter (key) ->
-    options = schema._schema[key].sdTable ? {}
+    options = schema._schema.properties?[key].sdTable ? {}
     if key in ['id', '_id']
       not (options.dontExport ? true) # don't include ids by default
     else

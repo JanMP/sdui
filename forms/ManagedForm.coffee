@@ -13,7 +13,8 @@ export ManagedForm = ({schemaBridge, model, onChangeModel, onSubmit, disabled, c
 
   onChangeModel ?= ->
 
-  form = null
+  form = useRef null
+
   [changedModel, setChangedModel] = useState model
   [isValid, setIsValid] = useState false
 

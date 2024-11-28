@@ -1,20 +1,21 @@
 import React, {useState} from 'react'
 import {useParams} from 'react-router-dom'
-import SimpleSchemaBridge from 'uniforms-bridge-simple-schema-2'
-import {AutoForm, SubmitField, useToast, SimpleSchema} from 'meteor/janmp:sdui'
+import {AutoForm, SubmitField, useToast, Schema} from 'meteor/janmp:sdui'
 import {Accounts} from 'meteor/accounts-base'
 import {Button} from 'primereact/button'
 
-schema = new SimpleSchema
-  password:
-    type: String
-    label: 'Neues Passwort'
-    regEx: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/
-    max: 80
-    uniforms:
-      type: 'password'
+schema = new Schema
+  type: 'object'
+  properties:
+    password:
+      type: 'string'
+      # regEx: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/
+      maxLength: 80
+      uniforms:
+        label: 'Neues Passwort'
+        type: 'password'
 
-schemaBridge = new SimpleSchemaBridge schema
+schemaBridge = schema.bridge
 
 
 export ResetPasswordPage = ->

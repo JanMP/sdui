@@ -1,6 +1,6 @@
 import {Meteor} from 'meteor/meteor'
 import {ValidatedMethod} from 'meteor/mdg:validated-method'
-import {SimpleSchema} from 'meteor/janmp:sdui'
+import {Schema} from 'meteor/janmp:sdui'
 import {userWithIdIsInRole} from '../common/roleChecks.coffee'
 import {Accounts} from 'meteor/accounts-base'
 import {Roles} from 'meteor/alanning:roles'
@@ -9,7 +9,7 @@ import {WebApp} from 'meteor/webapp'
 
 ###@
   # createUserManagementAPI function configures and exposes an API for user management, including user creation and deletion.
-  # It leverages Meteorjs, MongoDB, and SimpleSchema for data validation.
+  # It leverages Meteorjs, MongoDB, and Schema for data validation.
   #
   # @param {Object} options - Configuration options for the user management API.
   # @param {String} options.sourceName - The name of the source for the user management API.
