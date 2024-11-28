@@ -12,7 +12,7 @@ export createDefaultPipeline = ({getPreSelectPipeline, getProcessorPipeline, lis
   getProcessorPipeline ?= ({pub}) -> []
 
   searchPipeline = ({search}) ->
-    unless search? or search is ''
+    if (not search?) or search is ''
       return []
 
     {isValidRegEx, flags, processedString} = processSearchInput search

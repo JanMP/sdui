@@ -2,7 +2,6 @@ escapeRegEx = (string) -> string.replace /[-\/\\^$*+?.()|[\]{}]/g, '\\$&'
 regExRegEx = /^\/(.*)\/([gimsuy]*)$/ # get body and flags
 
 export default (inputString) ->
-  regExRegEx
   [regExBody, flags] = (inputString.match regExRegEx)?[1..2] ? [null,null]
   regExBodyIsValid =
     try
