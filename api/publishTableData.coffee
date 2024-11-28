@@ -10,9 +10,9 @@ getRowsPipeline, noAutomaticObserver = false, debounceDelay = 200, getObservers}
     unless collection?
       throw new Error 'no collection given'
 
-    Meteor.publish "#{sourceName}.rows", ({search, query, queryUiObject, sort, limit, skip}) ->
+    Meteor.publish "#{sourceName}.rows", ({search, query, sort, limit, skip}) ->
       return @ready() unless await currentUserIsInRole viewTableRole
-      pipeline = => getRowsPipeline {pub: this, search, query, queryUiObject, sort, limit, skip}
+      pipeline = => getRowsPipeline {pub: this, search, query, sort, limit, skip}
       ReactiveAggregate this, collection,
         pipeline,
         clientCollection: "#{sourceName}.rows"
