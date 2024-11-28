@@ -51,9 +51,8 @@ resizableHeaderRenderer = ({onResizeRows, isLastOne}) ->
     </div>
 
 
-cellRenderer = ({listSchemaBridge, onChangeField, cache, mayEdit}) ->
+cellRenderer = ({listSchema, onChangeField, cache, mayEdit}) ->
   ({dataKey, parent, rowIndex, columnIndex, cellData, rowData}) ->
-    options = listSchemaBridge.schema._schema[dataKey].sdTable ? {}
     cache.clear {rowIndex, columnIndex}
     <CellMeasurer
       cache={cache}
@@ -66,7 +65,7 @@ cellRenderer = ({listSchemaBridge, onChangeField, cache, mayEdit}) ->
         <AutoTableAutoField
           row={rowData}
           columnKey={dataKey}
-          schemaBridge={listSchemaBridge}
+          schemaBridge={listSchema}
           onChangeField={onChangeField}
           measure={measure}
           mayEdit={mayEdit}
@@ -110,8 +109,7 @@ rowRenderer = ({canEdit, mayEdit}) ->
 
 export DataTable = ({
   sourceName,
-  listSchemaBridge,
-  queryEditorSchemaBridge
+  listSchema,
   rows, limit,
   loadMoreRows = (args...) -> console.log "loadMoreRows default stump called with arguments:", args...
   canSort, sortColumn, sortDirection,
@@ -141,8 +139,6 @@ export DataTable = ({
 
   rightButtonColumnWidth ?= 50
 
-  schema = listSchemaBridge.schema
-
   cacheRef = useRef newCache()
 
   headerContainerRef = useRef null
@@ -155,16 +151,16 @@ export DataTable = ({
   oldRows = useRef null
 
   columnKeys =
-    schema._firstLevelSchemaKeys
+    listSchema.firstLevelSchemaKeys
     .filter (key) ->
-      options = schema._schema[key].sdTable ? {}
+      options = listSchema._schema.properties[key].sdTable ? {}
       if key in ['id', '_id']
         not (options.hide ? true) # don't include ids by default
       else
         not (options.hide ? false)
 
   defaultColumnWidths = columnKeys.map (key, i, arr) ->
-    schema._schema[key].sdTable?.columnWidth ? 1 / (if arr.length then arr.length else 20)
+    listSchema._schema.properties[key].sdTable?.columnWidth ? 1 / (if arr.length then arr.length else 20)
 
   getColumnWidthsFromLocalStorage = ->
     if global.localStorage
@@ -232,7 +228,7 @@ export DataTable = ({
 
   columns =
     columnKeys.map (key, i, arr) ->
-      schemaForKey = schema._schema[key]
+      schemaForKey = listSchema._schema.properties[key]
       options = schemaForKey.sdTable ? {}
       isLastOne = i is arr.length - 1
       className = if options.overflow then 'overflow'
@@ -241,9 +237,9 @@ export DataTable = ({
         className={className}
         key={key}
         dataKey={key}
-        label={t key, schemaForKey.label}
+        label={t key, listSchema.bridge.getProps(key).label}
         width={columnWidths[i] * totalColumnsWidth}
-        cellRenderer={cellRenderer {listSchemaBridge, onChangeField, mayEdit, cache: cacheRef.current}}
+        cellRenderer={cellRenderer {listSchema, onChangeField, mayEdit, cache: cacheRef.current}}
         headerRenderer={headerRenderer}
       />
 
@@ -252,11 +248,9 @@ export DataTable = ({
   
     <div ref={headerContainerRef}>
       <Header {{
-        listSchemaBridge
-        queryEditorSchemaBridge
+        listSchema
         loadedRowCount: rows?.length
         canSearch, search, onChangeSearch
-        canUseQueryEditor, queryUiObject, onChangeQueryUiObject
         canExport, mayExport, onExportTable,
         canAdd, mayAdd, onAdd
         canSort, sortColumn, sortDirection, onChangeSort

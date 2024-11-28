@@ -3,7 +3,7 @@ import {Mongo} from 'meteor/mongo'
 import {publishTableData} from './publishTableData.coffee'
 import {createTableDataMethods} from './createTableDataMethods.coffee'
 import {createDefaultPipeline} from './createDefaultPipeline.coffee'
-import SimpleSchema2Bridge from 'uniforms-bridge-simple-schema-2'
+import {Schema} from '../schema/Schema.coffee'
 import * as types from '../typeDeclarations'
 
 ###*
@@ -12,7 +12,7 @@ import * as types from '../typeDeclarations'
 export createTableDataAPI = ({
   sourceName, sourceSchema, collection
   useObjectIds
-  listSchema, formSchema, queryEditorSchema
+  listSchema, formSchema
   canEdit, canSearch, canUseQueryEditor, canSort, canAdd, canDelete, canExport
   viewTableRole, editRole, addRole, deleteRole, exportTableRole
   getPreSelectPipeline
@@ -76,23 +76,11 @@ export createTableDataAPI = ({
   getProcessorPipeline ?= -> []
 
   listSchema ?= sourceSchema
-  formSchema ?= sourceSchema
-  queryEditorSchema ?= listSchema
+  formSchema ?= listSchema
 
-  listSchemaBridge = new SimpleSchema2Bridge(listSchema)
-  formSchemaBridge =
-    if listSchema is formSchema
-      listSchemaBridge
-    else
-      new SimpleSchema2Bridge(formSchema)
-  queryEditorSchemaBridge =
-    if listSchema is queryEditorSchema
-      listSchemaBridge
-    else
-      new SimpleSchema2Bridge(queryEditorSchema)
 
   {defaultGetRowsPipeline, defaultGetExportPipeline} =
-    createDefaultPipeline {getPreSelectPipeline, getProcessorPipeline, listSchema, queryEditorSchema}
+    createDefaultPipeline {getPreSelectPipeline, getProcessorPipeline, listSchema}
 
 
   getRowsPipeline ?= defaultGetRowsPipeline
@@ -124,7 +112,7 @@ export createTableDataAPI = ({
 
   #return props for the ui component
   {
-    sourceName, listSchemaBridge, formSchemaBridge, queryEditorSchemaBridge,
+    sourceName, listSchema, formSchema,
     rowsCollection
     canEdit
     canSearch

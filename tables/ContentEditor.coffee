@@ -32,11 +32,10 @@ PanelHeader = ({text}) ->
 export ContentEditor = ({tableOptions}) ->
   {
   sourceName
-  listSchemaBridge, formSchemaBridge, queryEditorSchemaBridge
+  listSchema, formSchema,
   rows, loadMoreRows, onRowClick,
   canSort, sortColumn, sortDirection, onChangeSort
   canSearch, search, onChangeSearch
-  canUseQueryEditor, queryUiObject, onChangeQueryUiObject
   canAdd, mayAdd, onAdd
   canDelete, mayDelete, onDelete, deleteConfirmation
   canEdit, mayEdit, onSubmit
@@ -89,8 +88,8 @@ export ContentEditor = ({tableOptions}) ->
   hasChanged = not _.isEqual changedModel, loadedModel
 
   contentKey =
-    formSchemaBridge.schema._firstLevelSchemaKeys
-    .find (key) -> formSchemaBridge.schema._schema[key]?.sdContent?.isContent
+    formSchema.firstLevelSchemaKeys
+    .find (key) -> formSchema._schema.properties[key]?.sdContent?.isContent
   
   setContent = (content) -> setChangedModel (previousModel) -> {previousModel..., [contentKey]: content}
 
@@ -160,7 +159,7 @@ export ContentEditor = ({tableOptions}) ->
   formPanelContent =
     <ScrollPanel className="p-2" >
       <AutoForm
-        schema={formSchemaBridge}
+        schema={formSchema.bridge}
         model={changedModel}
         onChangeModel={setChangedModel}
         onValidate={onValidate}
@@ -207,11 +206,10 @@ export ContentEditor = ({tableOptions}) ->
           <DataList
             {{
               sourceName
-              listSchemaBridge, queryEditorSchemaBridge,
+              listSchema,
               rows, loadMoreRows, onRowClick,
               canSort, sortColumn, sortDirection, onChangeSort
               canSearch, search, onChangeSearch
-              canUseQueryEditor, queryUiObject, onChangeQueryUiObject
               canAdd, mayAdd, onAdd
               canDelete, mayDelete, onDelete: handleOnDelete
               canEdit, mayEdit

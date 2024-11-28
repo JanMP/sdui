@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react'
 import {AutoForm, AutoField} from './uniforms-custom/select-implementation'
-import SimpleSchema2Bridge from 'uniforms-bridge-simple-schema-2'
+import JSONSchemaBridge from 'uniforms-bridge-json-schema'
 import _ from 'lodash'
 
 
@@ -12,7 +12,7 @@ export DynamicField = ({schemaBridge, fieldName, label, value, onChange, validat
   onChange ?= (value) -> console.log 'stub for onChange:', value
   className ?= 'dynamic-field'
 
-  schemaBridgeForFieldName = new SimpleSchema2Bridge schemaBridge.schema?.pick fieldName
+  schemaBridgeForFieldName = new JSONSchemaBridge schemaBridge.schema?.pick fieldName
 
   onClick = (e) ->
     e.stopPropagation()

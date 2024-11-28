@@ -3,7 +3,7 @@ import deepEqualInAnyOrder from 'deep-equal-in-any-order'
 chai.use deepEqualInAnyOrder
 {expect} = chai
 
-import {SimpleSchema} from 'meteor/janmp:sdui'
+import {Schema} from 'meteor/janmp:sdui'
 import _ from 'lodash'
 
 import {createDefaultPipeline} from './createDefaultPipeline.coffee'
@@ -13,11 +13,13 @@ import {createDefaultPipeline} from './createDefaultPipeline.coffee'
 
 #These Tests run on both client and server
 
-listSchema = new SimpleSchema
-  a: String
-  b: Number
-  c: [String]
-  d: [Number]
+listSchema = new Schema
+  type: 'object'
+  properties:
+    a: type: 'string'
+    b: type: 'number'
+    c: type: 'array', properties: type: 'string'
+    d: type: 'array', properties: type: 'number'
 
 describe "createDefaultPipeline", ->
 

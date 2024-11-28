@@ -1,7 +1,7 @@
 import {Meteor} from 'meteor/meteor'
 import {Mongo} from 'meteor/mongo'
 import {ValidatedMethod} from 'meteor/mdg:validated-method'
-import {SimpleSchema} from 'meteor/janmp:sdui'
+import {Schema} from '../schema/Schema.coffee'
 import {currentUserMustBeInRole} from '../common/roleChecks.coffee'
 
 import _ from 'lodash'
@@ -92,12 +92,14 @@ export createChatMethods = ({
   new ValidatedMethod
     name: "#{sourceName}.addMessage"
     validate:
-      new SimpleSchema
-        text:
-          type: String
-        sessionId:
-          type: String
-      .validator()
+      new Schema
+        type: 'object'
+        properties:
+          text:
+            type: 'string'
+          sessionId:
+            type: 'string'
+      .validator
     run: ({text, sessionId}) ->
       await currentUserMustBeInRole viewChatRole
       return unless Meteor.isServer
@@ -127,12 +129,14 @@ export createChatMethods = ({
   new ValidatedMethod
     name: "#{sourceName}.addLogMessage"
     validate:
-      new SimpleSchema
-        text:
-          type: String
-        sessionId:
-          type: String
-      .validator()
+      new Schema
+        type: 'object'
+        properties:
+          text:
+            type: 'string'
+          sessionId:
+            type: 'string'
+      .validator
     run: ({text, sessionId}) -> Promise.resolve "turned off because sanity"
       # await currentUserMustBeInRole viewChatRole
       # return unless Meteor.isServer
@@ -148,20 +152,20 @@ export createChatMethods = ({
   new ValidatedMethod
     name: "#{sourceName}.setFeedBackForMessage"
     validate:
-      new SimpleSchema
-        messageId:
-          type: String
-        feedback:
-          type: Object
-          optional: true
-        'feedback.thumbs':
-          type: String
-          allowedValues: ['up', 'down']
-          optional: true
-        'feedback.comment':
-          type: String
-          optional: true
-      .validator()
+      new Schema
+        type: 'object'
+        properties:
+          messageId:
+            type: 'string'
+          feedback:
+            type: 'object'
+            properties:
+              thumbs:
+                type: 'string'
+                enum: ['up', 'down']
+              comment:
+                type: 'string'
+      .validator
     run: ({messageId, feedback}) ->
       await currentUserMustBeInRole viewChatRole
       unless userIsInSessionOfMessage {messageId}
@@ -174,16 +178,15 @@ export createChatMethods = ({
   new ValidatedMethod
     name: "#{sourceName}.addSession"
     validate:
-      new SimpleSchema
-        title:
-          type: String
-          optional: true
-        userIds:
-          type: Array
-          optional: true
-        'userIds.$':
-          type: String
-      .validator()
+      new Schema
+        type: 'object'
+        properties:
+          title:
+            type: 'string'
+          userIds:
+            type: 'array'
+            items: type: 'string'
+      .validator
     run: addSession
 
   archiveSessionData = ({sessionId}) ->
@@ -203,10 +206,11 @@ export createChatMethods = ({
   new ValidatedMethod
     name: "#{sourceName}.deleteSession"
     validate:
-      new SimpleSchema
-        id:
-          type: String
-      .validator()
+      new Schema
+        type: 'object'
+        properties:
+          id: type: 'string'
+      .validator
     run: ({id}) ->
       await currentUserMustBeInRole addSessionRole
       return unless Meteor.isServer

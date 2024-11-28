@@ -1,6 +1,6 @@
 import {Meteor} from 'meteor/meteor'
 import {Accounts} from 'meteor/accounts-base'
-import {SimpleSchema} from 'meteor/janmp:sdui'
+import {Schema} from 'meteor/janmp:sdui'
 import {createTableDataAPI} from '../api/createTableDataAPI.coffee'
 import {currentUserMustBeInRole} from '../common/roleChecks.coffee'
 import {ValidatedMethod} from 'meteor/mdg:validated-method'
@@ -24,95 +24,72 @@ export createUserTableAPI = ({userProfileSchema, getAllowedRoles, viewUserTableR
   getAllowedRoles ?= ->
     global: ['admin', 'registered- user']
   
-  defaultUserProfileSchema = new SimpleSchema
-    firstName:
-      type: String
-      optional: true
-    lastName:
-      type: String
-      optional: true
+  defaultUserProfileSchema =
+    type: 'object'
+    properties:
+      firstName:
+        type: 'string'
+      lastName:
+        type: 'string'
 
-  userStatusSchema = new SimpleSchema
-    lastlogin:
-      type: Object
-      optional: true
-    'lastlogin.date':
-      type: Date
-      optional: true
-    'lastlogin.ipAddr':
-      type: String
-      optional:true
-    userAgent:
-      type: String
-      optional: true
-    lastActivity:
-      type: Date
-      optional: true
-    online:
-      type: Boolean
-      optional: true
+  userStatusSchema =
+    type: 'object'
+    properties:
+      lastlogin:
+        type: 'object'
+        properties:
+          date: instanceof: 'Date'
+          ipAddr: type: 'string'
+      userAgent:
+        type: 'string'
+      lastActivity: instanceof: 'Date'
+      online: type: 'boolean'
 
-  userSchema = new SimpleSchema
-    _id:
-      type: String
-      optional: true
-    username:
-      type: String
-      optional: true
-    emails:
-      type: Array
-      optional: true
-    "emails.$":
-      type: Object
-    "emails.$.address":
-      type: String
-      regEx: SimpleSchema.RegEx.Email
-    "emails.$.verified":
-      type: Boolean
-    registered_emails:
-      type: Array
-      optional: true
-    'registered_emails.$':
-      type: Object
-      blackbox: true
-    createdAt:
-      type: Date
-    profile:
-      type: userProfileSchema ? defaultUserProfileSchema
-      optional: true
-    status:
-      type: userStatusSchema
-      optional: true
-    services:
-      type: Object
-      optional: true
-      blackbox: true
-    roles:
-      type: Array
-      optional: true
-    'roles.$':
-      type: Object
-      blackbox: true
-    heartbeat:
-      type: Date
-      optional: true
+  userSchema = new Schema
+    type: 'object'
+    properties:
+      _id: type: 'string'
+      username: type: 'string'
+      emails:
+        type: 'array'
+        items:
+          type: 'object'
+          properties:
+            address: type: 'string'
+            verified: type: 'boolean'
+      registered_emails:
+        type: 'array'
+        items:
+          type: 'object'
+          properties:
+            address: type: 'string'
+            verified: type: 'boolean'
+      createdAt: instanceof: 'Date'
+      profile: userProfileSchema ? defaultUserProfileSchema
+      status: userStatusSchema
+      services: type: 'object'
+      roles:
+        type: 'array'
+        items: type: 'object'
+      heartbeat: instanceof: 'Date'
+      
 
-  userListSchema = new SimpleSchema
-    email:
-      type: String
-    username:
-      type: String
-    verified:
-      type: Boolean
-    online:
-      type: Boolean
-    roles:
-      type: Array
-      sdTable:
-        component: RoleSelect
-        overflow: true
-    'roles.$':
-      type: String
+  userListSchema = new Schema
+    type: 'object'
+    properties:
+      email:
+        type: 'string'
+      username:
+        type: 'string'
+      verified:
+        type: 'boolean'
+      online:
+        type: 'boolean'
+      roles:
+        type: 'array'
+        sdTable:
+          component: RoleSelect
+          overflow: true
 
   getPreSelectPipeline = -> [
     $match:
@@ -153,15 +130,15 @@ export createUserTableAPI = ({userProfileSchema, getAllowedRoles, viewUserTableR
   new ValidatedMethod
     name: 'user.onChangeRoles'
     validate:
-      new SimpleSchema
-        id: String
-        value:
-          type: Array
-          optional: true
-        'value.$':
-          type: Object
-          blackbox: true
-      .validator()
+      new Schema
+        type: 'object'
+        properties:
+          id: type: 'string'
+          value:
+            type: 'array'
+            items:
+              type: 'object'
+      .validator
     run: ({id, value}) ->
       currentUserMustBeInRole editUserRole
       if Meteor.isServer

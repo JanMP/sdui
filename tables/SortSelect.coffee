@@ -7,15 +7,21 @@ sortDirectionIcons =
   DESC: 'pi pi-sort-up'
 
 
-export SortSelect = ({listSchemaBridge, sortColumn, sortDirection, onChangeSort}) ->
+export SortSelect = ({listSchema, sortColumn, sortDirection, onChangeSort}) ->
 
-  schema = listSchemaBridge?.schema
-  columnKeys = schema._firstLevelSchemaKeys
+  columnKeys = listSchema.firstLevelSchemaKeys
 
   sortColumnOptions =
     columnKeys.map (key) ->
       value: key
-      label: schema._schema[key]?.label
+      label: listSchema?.bridge?.getProps?(key)?.label
+
+  useEffect ->
+    if not sortColumn
+      onChangeSort
+        sortColumn: columnKeys?[0]
+        sortDirection: sortDirection ? 'ASC'
+  , []
 
   changeValue = ({value}) ->
     onChangeSort

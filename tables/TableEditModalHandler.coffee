@@ -19,7 +19,7 @@ import {FormModal} from '../forms/FormModal.coffee'
 export TableEditModalHandler = ({tableOptions, DisplayComponent}) ->
   {
     sourceName
-    listSchemaBridge, formSchemaBridge, queryEditorSchemaBridge
+    listSchema, formSchema
     rows, loadMoreRows, onRowClick,
     canSort, sortColumn, sortDirection, onChangeSort
     canSearch, search, onChangeSearch
@@ -76,7 +76,7 @@ export TableEditModalHandler = ({tableOptions, DisplayComponent}) ->
     onRowClick =
       ({rowData, index}) ->
         return if rowData._disableEditForRow
-        if formSchemaBridge is listSchemaBridge
+        if formSchema is listSchema
           openModal rows[index]
         else
           loadEditorData id: rowData._id
@@ -86,7 +86,7 @@ export TableEditModalHandler = ({tableOptions, DisplayComponent}) ->
     {
       if mayEdit
         <FormModal
-          schemaBridge={formSchemaBridge}
+          schemaBridge={formSchema.bridge}
           onSubmit={submitAndClose}
           model={model}
           isOpen={modalOpen}
@@ -109,8 +109,7 @@ export TableEditModalHandler = ({tableOptions, DisplayComponent}) ->
       <DisplayComponent
         {{
           sourceName
-          listSchemaBridge,
-          queryEditorSchemaBridge
+          listSchema,
           rows, loadMoreRows, onRowClick,
           canSort, sortColumn, sortDirection, onChangeSort
           canSearch, search, onChangeSearch

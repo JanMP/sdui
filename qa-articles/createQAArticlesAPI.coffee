@@ -1,33 +1,13 @@
 import {Meteor} from 'meteor/meteor'
 import {Mongo} from 'meteor/mongo'
-import {SimpleSchema} from 'meteor/janmp:sdui'
+import {Schema} from '../schema/Schema.coffee'
 import {ValidatedMethod} from 'meteor/mdg:validated-method'
-# import {createTableDataAPI, currentUserMustBeInRole, LongTextField} from 'meteor/janmp:sdui'
 import {createTableDataAPI} from '../api/createTableDataAPI.coffee'
 import {currentUserMustBeInRole} from '../common/roleChecks.coffee'
 import {LongTextField} from '../forms/uniforms-custom/select-implementation'
 
 import _ from 'lodash'
 
-sourceSchemaDefinition =
-  question:
-    type: String
-    label: 'Frage'
-    uniforms: LongTextField
-    optional: false
-  answer:
-    type: String
-    label: 'Antwort'
-    uniforms: LongTextField
-    optional: false
-  vector:
-    type: Array
-    label: 'Vector'
-  'vector.$':
-    type: Number
-
-sourceSchema = new SimpleSchema sourceSchemaDefinition
-listSchema = new SimpleSchema _.pick sourceSchemaDefinition, ['question', 'answer']
 
 ###*
   # Creates and configures an API for managing Question and Answer articles,
@@ -45,12 +25,32 @@ listSchema = new SimpleSchema _.pick sourceSchemaDefinition, ['question', 'answe
   # @return {Object} Configured API object for managing QA articles data
   ###
 export createQAArticlesAPI = ({sourceName, collection, viewTableRole, editRole, getEmbedding}) ->
+  
+  sourceSchema = new Schema
+    type: 'object'
+    properties:
+      question:
+        type: 'string'
+        uniforms:
+          label: 'Frage'
+          component: LongTextField
+      answer:
+        type: 'string'
+        uniforms:
+          label: 'Antwort'
+          component: LongTextField
+      vector:
+        type: 'array'
+        items: type: 'number'
+    required: ['question', 'answer']
+
+  listSchema = sourceSchema.omit ['vector']
+
   createTableDataAPI
     sourceName: sourceName
     collection: collection
     sourceSchema: sourceSchema
     listSchema: listSchema
-    formSchema: listSchema
     viewTableRole: viewTableRole
     editRole: editRole
     canEdit: true

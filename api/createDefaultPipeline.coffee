@@ -1,19 +1,16 @@
 import {Meteor} from 'meteor/meteor'
 import {getColumnsToExport} from '../common/getColumnsToExport.coffee'
 import processSearchInput from '../common/processSearchInput.coffee'
-import queryUiObjectToQuery from '../query-editor/queryUiObjectToQuery.coffee'
 import _ from 'lodash'
 
 
 (debugPipelines = Meteor.settings?.debugPipelines ? false)
 
-export createDefaultPipeline = ({getPreSelectPipeline, getProcessorPipeline, listSchema, queryEditorSchema}) ->
+export createDefaultPipeline = ({getPreSelectPipeline, getProcessorPipeline, listSchema}) ->
 
-  
   getPreSelectPipeline ?= ({pub}) -> []
   getProcessorPipeline ?= ({pub}) -> []
 
-  queryEditorSchema ?= listSchema
   searchPipeline = ({search}) ->
     unless search? or search is ''
       return []
@@ -29,9 +26,9 @@ export createDefaultPipeline = ({getPreSelectPipeline, getProcessorPipeline, lis
         $and: parts.map op
       else op processedString
 
-    keys = queryEditorSchema._firstLevelSchemaKeys.filter (key) -> not queryEditorSchema._schema[key].sdTable?.hide
+    keys = listSchema.firstLevelSchemaKeys.filter (key) -> not listSchema._schema.properties[key].sdTable?.hide
     fieldSearches = keys.map (key) ->
-      switch queryEditorSchema.getQuickTypeForKey key
+      switch listSchema.getQuickTypeForKey key
         when 'string', 'stringArray'
           generateQueryPart (part) ->
             "#{key}":
@@ -65,8 +62,6 @@ export createDefaultPipeline = ({getPreSelectPipeline, getProcessorPipeline, lis
     [$match: $or: _.compact fieldSearches]
 
 
-  getQueryEditorPipeline = ({queryUiObject}) -> [$match: queryUiObjectToQuery {queryUiObject}]
-
   projectStage =
     $project:
       _(getColumnsToExport schema: listSchema)
@@ -74,24 +69,22 @@ export createDefaultPipeline = ({getPreSelectPipeline, getProcessorPipeline, lis
       .mapValues -> 1
       .value()
 
-  defaultGetRowsPipeline = ({pub, search, query = {}, queryUiObject, sort = {_id: 1}, limit = 100, skip = 0}) ->
+  defaultGetRowsPipeline = ({pub, search, query = {}, sort = {_id: 1}, limit = 100, skip = 0}) ->
     _.compact [
       (await getPreSelectPipeline {pub})...,
       {$match: query},
       (await getProcessorPipeline {pub})...,
-      (await getQueryEditorPipeline {queryUiObject})...
       (await searchPipeline {search})...,
       projectStage unless debugPipelines, # This is super important. Dont delete it by mistake again...
      {$sort: sort}, {$skip: skip}, {$limit: limit}
     ]
 
 
-  defaultGetExportPipeline = ({search, query = {}, queryUiObject,  sort = {_id: 1}}) ->
+  defaultGetExportPipeline = ({search, query = {},  sort = {_id: 1}}) ->
     [
       (await getPreSelectPipeline())...,
       {$match: query},
       (await getProcessorPipeline())...,
-      (await getQueryEditorPipeline {queryUiObject})...
       (await searchPipeline {search})...,
       {$sort: sort}, projectStage
     ]

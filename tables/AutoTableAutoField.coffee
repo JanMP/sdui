@@ -10,7 +10,7 @@ dateTimeDefaultParams =
   format: 'dd.MM.yyyy HH:mm:ss'
 
 export AutoTableAutoField = ({row, columnKey, schemaBridge, onChangeField, measure, mayEdit}) ->
-  fieldSchema = schemaBridge.schema._schema[columnKey]
+  fieldSchema = schemaBridge._schema.properties[columnKey]
   inner =
     if (component = fieldSchema.sdTable?.component)?
       try
@@ -23,8 +23,8 @@ export AutoTableAutoField = ({row, columnKey, schemaBridge, onChangeField, measu
     else if fieldSchema.sdTable?.markup
       <div dangerouslySetInnerHTML={__html: row[columnKey]} />
     else
-      switch fieldType = fieldSchema.type.definitions[0].type
-        when Date
+      switch fieldSchema.type
+        when 'date-time'
           <span>
             {
               if row[columnKey]?
@@ -38,9 +38,9 @@ export AutoTableAutoField = ({row, columnKey, schemaBridge, onChangeField, measu
                 ''
             }
           </span>
-        when Boolean
+        when 'boolean'
           if row[columnKey] then <i className="pi pi-check"/> else <i className="pi pi-times"/>
-        when Array
+        when 'array'
           row[columnKey]?.map (entry, i) ->
             if _.isObject entry
               <pre>{JSON.stringify row[columnKey][i]}</pre>

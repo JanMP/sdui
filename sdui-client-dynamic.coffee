@@ -16,7 +16,8 @@ export {meteorApply} from './common/meteorApply.coffee'
 export {config, useConfig, Configurations} from './config/config.coffee'
 export {default as connectFieldWithLabel} from './forms/connectFieldWithLabel.coffee'
 export {default as connectFieldPlus} from './forms/connectFieldPlus.coffee'
-export {SimpleSchema} from './api/setupSimpleSchema.coffee'
+# export {SimpleSchema} from './api/setupSimpleSchema.coffee'
+export {Schema} from './schema/Schema.coffee'
 export {createTableDataAPI} from './api/createTableDataAPI.coffee'
 export {createUserTableAPI} from './usertable/createUserTableAPI.coffee'
 export {createQAArticlesAPI} from './qa-articles/createQAArticlesAPI.coffee'
@@ -29,7 +30,6 @@ export {generateUUID} from './common/generateUUID.coffee'
 # export {createFilesAPI, filesAPISourceSchema} from './api/createFilesAPI.coffee'
 
 # server only (eventually)
-export {default as queryUiObjectToQuery} from './query-editor/queryUiObjectToQuery.coffee'
 
 export ActionButton = suspend lazy -> import('./forms/ActionButton.coffee').then (m) -> default: m.ActionButton
 export SdList = suspend lazy -> import('./tables/SdList.coffee').then (m) -> default: m.SdList
@@ -53,8 +53,6 @@ export LoginButton = suspend lazy -> import('./login-forms/LoginButton.coffee').
 export FeedbackButton = suspend lazy -> import('./forms/FeedbackButtonField.coffee').then (m) -> default: m.FeedbackButton
 export FeedbackButtonField = suspend lazy -> import('./forms/FeedbackButtonField.coffee').then (m) -> default: m.FeedbackButtonField
 export FeedbackButtonTableField = suspend lazy -> import('./forms/FeedbackButtonField.coffee').then (m) -> default: m.FeedbackButtonTableField
-export QueryEditor = suspend lazy -> import('./query-editor/QueryEditor.coffee').then (m) -> default: m.QueryEditor
-export QueryEditorField = suspend lazy -> import('./query-editor/QueryEditorField.coffee').then (m) -> default: m.QueryEditorField
 export SdDocumentSelect = suspend lazy -> import('./tables/SdDocumentSelect.coffee').then (m) -> default: m.SdDocumentSelect
 export SdDocumentSelectField = suspend lazy -> import('./tables/SdDocumentSelect.coffee').then (m) -> default: m.SdDocumentSelectField
 export SdChat = suspend lazy -> import('./chat/SdChat.coffee').then (m) -> default: m.SdChat
