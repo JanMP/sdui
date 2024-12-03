@@ -11,7 +11,7 @@ export createDefaultPipeline = ({getPreSelectPipeline, getProcessorPipeline, lis
   getPreSelectPipeline ?= ({pub}) -> []
   getProcessorPipeline ?= ({pub}) -> []
 
-  searchPipeline = ({search}) ->
+  textSearchPipeline = ({search}) ->
     if (not search?) or search is ''
       return []
 
@@ -74,7 +74,7 @@ export createDefaultPipeline = ({getPreSelectPipeline, getProcessorPipeline, lis
       (await getPreSelectPipeline {pub})...,
       {$match: query},
       (await getProcessorPipeline {pub})...,
-      (await searchPipeline {search})...,
+      (await textSearchPipeline {search})...,
       projectStage unless debugPipelines, # This is super important. Dont delete it by mistake again...
      {$sort: sort}, {$skip: skip}, {$limit: limit}
     ]
@@ -85,7 +85,7 @@ export createDefaultPipeline = ({getPreSelectPipeline, getProcessorPipeline, lis
       (await getPreSelectPipeline())...,
       {$match: query},
       (await getProcessorPipeline())...,
-      (await searchPipeline {search})...,
+      (await textSearchPipeline {search})...,
       {$sort: sort}, projectStage
     ]
 

@@ -15,9 +15,7 @@ export createTableDataAPI = ({
   listSchema, formSchema
   canEdit, canSearch, canSort, canAdd, canDelete, canExport
   viewTableRole, editRole, addRole, deleteRole, exportTableRole
-  getPreSelectPipeline
-  getProcessorPipeline,
-  # CHECK if they work or if we should get rid of the following:
+  getPreSelectPipeline, getProcessorPipeline,
   getRowsPipeline, getExportPipeline
   makeFormDataFetchMethodRunFkt, makeSubmitMethodRunFkt, makeDeleteMethodRunFkt
   noAutomaticObserver
@@ -31,6 +29,8 @@ export createTableDataAPI = ({
   checkDisableEditForRow
   checkDisableDeleteForRow
   usePubSub
+  embeddingModelSettings
+  getEmbeddingText
 }) ->
 
   # check required props and setup defaults for optional props
@@ -40,7 +40,13 @@ export createTableDataAPI = ({
   unless sourceSchema?
     throw new Error 'no sourceSchema given'
 
-  usePubSub ?= true
+  if embeddingModelSettings? and not getEmbeddingText?
+    throw new Error 'no getEmbeddingText given'
+
+  if getEmbeddingText? and not embeddingModelSettings?
+    throw new Error 'no embeddingModelSettings given'
+  
+  usePubSub ?= false
   canSearch ?= true
   canSort ?= true
 

@@ -1,6 +1,5 @@
-import SimpleSchema2Bridge from 'uniforms-bridge-simple-schema-2'
 import {Mongo} from 'meteor/mongo'
-import {SimpleSchema} from 'meteor/janmp:sdui'
+import {Schema} from 'meteor/janmp:sdui'
 import {FC} from 'react'
 
 export interface RoleObject {
@@ -13,11 +12,11 @@ export type Role = string | Array<string> | RoleObject | ((id: string) => boolea
 
 export interface createTableDataAPIParams {
   sourceName: string
-  sourceSchema: SimpleSchema
+  sourceSchema: Schema
   collection: Mongo.Collection<object>
   useObjectIds?: boolean
-  listSchema?: SimpleSchema
-  formSchema?: SimpleSchema
+  listSchema?: Schema
+  formSchema?: Schema
   canEdit?: boolean
   canSearch?: boolean
   canSort?: boolean
@@ -77,8 +76,8 @@ export interface createTableDataAPIParams {
 }
 export interface createTableDataAPIReturn {
   sourceName: string
-  listSchemaBridge: SimpleSchema2Bridge
-  formSchemaBridge: SimpleSchema2Bridge
+  listSchema: Schema
+  formSchema: Schema
   rowsCollection: Mongo.Collection<any>
   canEdit?: boolean
   canSearch?: boolean
@@ -142,7 +141,7 @@ export type DataTableDisplayOptions = DataTableOptions & additionalDataTableDisp
 export declare function DataTableDisplayComponent(options: DataTableDisplayOptions): FC
 
 export interface DataTableHeaderOptions {
-  listSchemaBridge: SimpleSchema2Bridge
+  listSchema: Schema
   loadedRowCount: number
   canSearch?: boolean
   search?: string

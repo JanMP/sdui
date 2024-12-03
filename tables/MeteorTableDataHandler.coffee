@@ -59,7 +59,7 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
     throw new Error 'usePubSub is true but rowsCollection not given'
 
   if sourceName?
-    getRowMethodName = "#{sourceName}.getRows"
+    getRowsMethodName = "#{sourceName}.getRows"
     rowPublicationName = "#{sourceName}.rows"
     submitMethodName = "#{sourceName}.submit"
     setValueMethodName = "#{sourceName}.setValue"
@@ -98,10 +98,9 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
 
   getRows = ({reload = false}) ->
     return if usePubSub
-    console.log 'getRows'
     setIsLoading true
     meteorApply
-      method: getRowMethodName
+      method: getRowsMethodName
       data: {search, query, sort, skip: 0, limit: if reload then perLoad else limit}
     .then (returnedRows) ->
       setRows returnedRows
