@@ -2,54 +2,66 @@ import {Meteor} from 'meteor/meteor'
 import {Accounts} from 'meteor/accounts-base'
 import React, {useState} from 'react'
 import {useTracker} from 'meteor/react-meteor-data'
-import {SimpleSchema} from 'meteor/janmp:sdui'
+import {Schema} from 'meteor/janmp:sdui'
 import SimpleSchemaBridge from 'uniforms-bridge-simple-schema-2'
 import {AutoForm} from '../forms/uniforms-custom/select-implementation'
 import {Button} from 'primereact/button'
 import {PasswordField} from '../forms/uniforms-custom/select-implementation'
 
 
-loginSchema = new SimpleSchema
-  email:
-    type: String,
-    label: 'E-Mail'
-  password:
-    type: String,
-    label: 'Passwort'
-    uniforms: PasswordField
+loginSchema = new Schema
+  type: 'object'
+  properties:
+    email:
+      type: 'string'
+      uniforms:
+        label: 'E-Mail'
+    password:
+      type: 'string',
+      uniforms:
+        label: 'Passwort'
+        component: PasswordField
+  required: ['email', 'password']
 
-signupSchema = new SimpleSchema
-  email:
-    type: String
-    label: 'E-Mail'
-    regEx: SimpleSchema.RegEx.EmailWithTLD
-  username:
-    type: String
-    label: 'Benutzername'
-    min: 3
-    max: 80
-  password:
-    type: String
-    label: 'Passwort'
-    regEx: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/
-    max: 80
-    uniforms: PasswordField
-  passwordRepeat:
-    type: String
-    label: 'Password wdh.'
-    custom: ->
-      if @value isnt @field('password').value then 'password mismatch'
-    uniforms: PasswordField
+signupSchema = new Schema
+  type: 'object'
+  properties:
+    email:
+      type: 'string'
+      format: "email"
+      uniforms:
+        label: 'E-Mail'
+    username:
+      type: 'string'
+      minLength: 3
+      maxLength: 80
+      uniforms:
+        label: 'Benutzername'
+    password:
+      type: 'string'
+      maxLength: 80
+      uniforms:
+        component: PasswordField
+        label: 'Passwort'
+    passwordRepeat:
+      type: 'string'
+      uniforms:
+        component: PasswordField
+        label: 'Passwort wiederholen'
+,
+  modelValidator: (model) ->
+    if model.passwordRepeat isnt model.password
+      'Die Passwörter müssen übereinstimmen.'
 
-emailSchema = new SimpleSchema
-  email:
-    type: String
-    label: 'E-Mail'
-    regEx: SimpleSchema.RegEx.EmailWithTLD
-
-loginSchemaBridge = new SimpleSchemaBridge loginSchema
-signupSchemaBridge = new SimpleSchemaBridge signupSchema
-emailSchemaBridge = new SimpleSchemaBridge emailSchema
+emailSchema = new Schema
+  type: 'object'
+  properties:
+    email:
+      type: 'string'
+      format: 'email'
+      uniforms:
+        label: 'E-Mail'
+  required: ['email']
 
 
 SignInForm = ->
@@ -60,7 +72,7 @@ SignInForm = ->
         alert 'Login fehlgeschlagen: ' + error
  
   <AutoForm
-    schema={loginSchemaBridge}
+    schema={loginSchema.bridge}
     submitField={-> <Button className="mt-4" label="Login" />}
     onSubmit={login}
   />
@@ -73,7 +85,7 @@ SignUpForm = ->
         alert 'User Account konnte nicht angelegt werden: ' + error?.message
 
   <AutoForm
-    schema={signupSchemaBridge}
+    schema={signupSchema.bridge}
     submitField={-> <Button className="mt-4" label="Account anlegen" />}
     onSubmit={signup}
   />
@@ -85,7 +97,7 @@ EmailForm = ->
         alert 'Fehler beim Zurücksetzen des Passowrds' + error?.message
 
   <AutoForm
-    schema={emailSchemaBridge}
+    schema={emailSchema.bridge}
     submitField={-> <Button className="mt-4" label="Password zurücksetzen" />}
     onSubmit={resetPassword}
   />

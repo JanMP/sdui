@@ -10,6 +10,11 @@ export interface RoleObject {
 
 export type Role = string | Array<string> | RoleObject | ((id: string) => boolean)
 
+export interface SdAiSettings {
+  embeddingModelSettings: object
+  getEmbeddingContext: (params: {document: object}) => string
+}
+
 export interface createTableDataAPIParams {
   sourceName: string
   sourceSchema: Schema
@@ -73,6 +78,7 @@ export interface createTableDataAPIParams {
   checkDisableEditForRow?: boolean
   checkDisableDeleteForRow?: boolean 
   usePubSub?: boolean
+  sdAiSettings?: SdAiSettings
 }
 export interface createTableDataAPIReturn {
   sourceName: string

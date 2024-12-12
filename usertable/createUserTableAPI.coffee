@@ -22,7 +22,7 @@ import {runTransaction} from '../common/runTransaction.coffee'
 export createUserTableAPI = ({userProfileSchema, getAllowedRoles, viewUserTableRole = 'admin'  , editUserRole = 'admin'}) ->
 
   getAllowedRoles ?= ->
-    global: ['admin', 'registered- user']
+    global: ['admin', 'user']
   
   defaultUserProfileSchema =
     type: 'object'
@@ -93,7 +93,7 @@ export createUserTableAPI = ({userProfileSchema, getAllowedRoles, viewUserTableR
 
   getPreSelectPipeline = -> [
     $match:
-      'emails.0': $exists: true
+      'emails.0.address': $exists: true
   ]
 
   getProcessorPipeline = -> [
