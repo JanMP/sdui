@@ -7,7 +7,7 @@ import {ErrorBoundary} from '../common/ErrorBoundary.coffee'
 import {useTranslation} from 'react-i18next'
 
 # TODO handle validation and error display differently
-export ManagedForm = ({schemaBridge, model, onChangeModel, onSubmit, disabled, children, showResetButton = true}) ->
+export ManagedForm = ({schemaBridge, model, onChangeModel, onSubmit, disabled, children, actionLabel = 'Speichern'}) ->
 
   {t} = useTranslation()
 
@@ -55,7 +55,7 @@ export ManagedForm = ({schemaBridge, model, onChangeModel, onSubmit, disabled, c
         <ActionButton
           onAction={onAction}
           className="p-button-primary"
-          label={t 'sdui:save', 'Speichern'}
+          label={t 'sdui:save', actionLabel}
           disabled={(not hasChanged) or (not isValid)}
         />
       </div>

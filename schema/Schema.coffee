@@ -16,26 +16,41 @@ defaultAjvOptions =
 export class Schema
   constructor: (@_schema, @options) ->
     try
+      if @options? then console.log 'options', @options
       ajvOptions = @options?.ajv ? defaultAjvOptions
       @ajv = new Ajv ajvOptions
+      @modelValidator = @options?.modelValidator
       addFormats @ajv
       addKeywords @ajv
       @validate = @ajv.compile @_schema
       @validator = (model) =>
         @validate model
         if @validate.errors?.length
-          details: @validate.errors
+          return details: @validate.errors
+        @modelValidator?(model)
 
       @bridge = new JSONSchemaBridge @_schema, @validator
       @firstLevelSchemaKeys = (key for key of @_schema.properties)
     catch error
       throw new Meteor.Error error.message
   
-  addProperty:
-    (property) ->
-      s = {@_schema...}
-      s.properties = {s.properties..., property...}
-      new Schema s, @options
+  addProperty: (property) ->
+    s = {@_schema...}
+    s.properties = {s.properties..., property...}
+    new Schema s, @options
+  
+  withId: -> @addProperty '_id': type: 'string'
+  
+  pick: (keys) ->
+    s = {@_schema...}
+    s.properties = _.pick @_schema.properties, keys
+    new Schema s, @options
+  
+  omit: (keys) ->
+    s = {@_schema...}
+    s.properties = _.omit @_schema.properties, keys
+    new Schema s, @options
+
   getQuickTypeForKey: (key) ->
     switch @_schema.properties[key].type
       when 'string' then 'string'
@@ -46,14 +61,3 @@ export class Schema
           when 'number', 'integer' then 'numberArray'
           else 'unhandled'
       else 'unhandled'
-            
-      
-  withId: -> @addProperty '_id': type: 'string'
-  pick: (keys) ->
-    s = {@_schema...}
-    s.properties = _.pick @_schema.properties, keys
-    new Schema s, @options
-  omit: (keys) ->
-    s = {@_schema...}
-    s.properties = _.omit @_schema.properties, keys
-    new Schema s, @options

@@ -9,7 +9,6 @@ import {usePDF} from 'react-to-pdf'
 import {FeedbackButton} from '../forms/FeedbackButtonField'
 import _ from 'lodash'
 
-# FIXME: pdf and feedback buttons are not shown anymore
 
 export DefaultMessage = ({message, hasPdfButton = true, onChangeFeedback, showTools = true}) ->
 

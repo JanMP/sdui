@@ -189,6 +189,7 @@ export createChatMethods = ({
       .validator
     run: addSession
 
+  # TODO delete for good unless session has user messages
   archiveSessionData = ({sessionId}) ->
     if (existingSession = await sessionListCollection?.findOneAsync sessionId)?
       messageCollection.updateAsync {sessionId},
@@ -236,6 +237,7 @@ export createChatMethods = ({
         return existingSession._id
       addSession {}
 
+  # TODO: verhindern dass Neon uns weiter die DB zumüllt
   new ValidatedMethod
     name: "#{sourceName}.resetSingleSession"
     validate: null

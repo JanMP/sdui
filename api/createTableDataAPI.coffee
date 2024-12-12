@@ -5,33 +5,35 @@ import {createTableDataMethods} from './createTableDataMethods.coffee'
 import {createDefaultPipeline} from './createDefaultPipeline.coffee'
 import {Schema} from '../schema/Schema.coffee'
 import * as types from '../typeDeclarations'
+import {SdAi} from '../ai/SdAi.coffee'
+
 
 ###*
   @type {types.createTableDataAPI}
   ###
-export createTableDataAPI = ({
-  sourceName, sourceSchema, collection
-  useObjectIds
-  listSchema, formSchema
-  canEdit, canSearch, canSort, canAdd, canDelete, canExport
-  viewTableRole, editRole, addRole, deleteRole, exportTableRole
-  getPreSelectPipeline, getProcessorPipeline,
-  getRowsPipeline, getExportPipeline
-  makeFormDataFetchMethodRunFkt, makeSubmitMethodRunFkt, makeDeleteMethodRunFkt
-  noAutomaticObserver
-  debounceDelay
-  getObservers
-  query, initialSortColumn, initialSortDirection
-  perLoad,
-  setupNewItem
-  onSubmit
-  onDelete # CHECK if we use this, and remove or add to type declaration
-  checkDisableEditForRow
-  checkDisableDeleteForRow
-  usePubSub
-  embeddingModelSettings
-  getEmbeddingText
-}) ->
+export createTableDataAPI = (params) ->
+  {
+    sourceName, sourceSchema, collection
+    useObjectIds
+    listSchema, formSchema
+    canEdit, canSearch, canSort, canAdd, canDelete, canExport
+    viewTableRole, editRole, addRole, deleteRole, exportTableRole
+    getPreSelectPipeline, getProcessorPipeline,
+    getRowsPipeline, getExportPipeline
+    makeFormDataFetchMethodRunFkt, makeSubmitMethodRunFkt, makeDeleteMethodRunFkt
+    noAutomaticObserver
+    debounceDelay
+    getObservers
+    query, initialSortColumn, initialSortDirection
+    perLoad,
+    setupNewItem
+    onSubmit
+    onDelete # CHECK if we use this, and remove or add to type declaration
+    checkDisableEditForRow
+    checkDisableDeleteForRow
+    usePubSub
+    sdAiSettings
+  } = params
 
   # check required props and setup defaults for optional props
   unless sourceName?
@@ -40,11 +42,8 @@ export createTableDataAPI = ({
   unless sourceSchema?
     throw new Error 'no sourceSchema given'
 
-  if embeddingModelSettings? and not getEmbeddingText?
-    throw new Error 'no getEmbeddingText given'
-
-  if getEmbeddingText? and not embeddingModelSettings?
-    throw new Error 'no embeddingModelSettings given'
+  sdai = if sdAiSettings?
+    new SdAi {sdAiSettings..., sourceName, collection}
   
   usePubSub ?= false
   canSearch ?= true
@@ -104,6 +103,7 @@ export createTableDataAPI = ({
     viewTableRole, sourceName, collection,
     getRowsPipeline,
     noAutomaticObserver, debounceDelay, getObservers
+    sdai
   }
 
   createTableDataMethods {
@@ -112,6 +112,7 @@ export createTableDataAPI = ({
     canEdit, canAdd, canDelete, canExport, formSchema,
     makeFormDataFetchMethodRunFkt, makeSubmitMethodRunFkt, makeDeleteMethodRunFkt
     checkDisableDeleteForRow, checkDisableEditForRow
+    sdai
   }
 
 
@@ -136,4 +137,5 @@ export createTableDataAPI = ({
     onSubmit
     onDelete
     usePubSub
+    sdai: if Meteor.isServer then sdai
   }
