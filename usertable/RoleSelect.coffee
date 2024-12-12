@@ -7,27 +7,11 @@ import _ from 'lodash'
 
 import {AllowedRolesContext} from './AllowedRolesContext.coffee'
 
-selectOptionFor = ({role, scope}) ->
-  value: {role, scope}
-  label: "#{scope ? 'GLOBAL'}: #{role}"
-
 valueFromRow = (row) ->
   row.roles.map (rolesRow) ->
     {role, scope} = rolesRow
     {role: role._id, scope}
 
-allowedRolesToOptions = (allowedRoles) ->
-  globalOptions = allowedRoles.global.map (role) -> selectOptionFor {role, scope: null}
-  scopedOptions =
-    _(allowedRoles.scope)
-    .keys()
-    .sortBy()
-    .map (scope) ->
-      allowedRoles.scope[scope].map (role) ->
-        selectOptionFor {role, scope}
-    .flatten()
-    .value()
-  [globalOptions..., scopedOptions...]
 
 ###*
   * RoleSelect component for assigning roles to users. This component displays a multiselect dropdown
@@ -48,20 +32,6 @@ export RoleSelect = ({row, columnKey, schemaBridge, onChangeField, measure, mayE
 
   options = useContext AllowedRolesContext
 
-  # useEffect ->
-  #   meteorApply
-  #     method: 'users.getAllowedRoles'
-  #     data: {}
-  #   .then allowedRolesToOptions
-  #   .then setOptions
-  #   .catch console.error
-  #   undefined
-  # , []
-  
-  # useEffect ->
-  #   console.log options
-  # , [options]
-
   onChange = ({value}) ->
     meteorApply
       method: 'user.onChangeRoles'
@@ -78,7 +48,6 @@ export RoleSelect = ({row, columnKey, schemaBridge, onChangeField, measure, mayE
         options={options}
         onChange={onChange}
         name="roles"
-        display="chip"
         style={maxWidth: '100%', minWidth: '100%'}
       />
     else
