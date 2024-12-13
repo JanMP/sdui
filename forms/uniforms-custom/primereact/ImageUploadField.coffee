@@ -50,13 +50,6 @@ export default connectFieldPlus ({
             </div>
         else
           <Button 
-            style={{
-              cursor: 'pointer',
-              padding: '8px 16px',
-              background: '#f0f0f0',
-              border: '1px solid #ccc',
-              borderRadius: '4px'
-            }}
             label="Choose your photos"
             onClick={(e) -> 
               e.preventDefault()

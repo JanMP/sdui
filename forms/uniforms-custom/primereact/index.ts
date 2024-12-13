@@ -23,4 +23,4 @@ export { default as ValidatedForm } from './ValidatedForm';
 export { default as ValidatedQuickForm } from './ValidatedQuickForm';
 export { default as MultiSelectField } from './MultiSelectField';
 export { default as PasswordField } from './PasswordField';
-export { default as MultiFileField } from './MultiFileField';
+export { default as ImageUploadField } from './ImageUploadField';
