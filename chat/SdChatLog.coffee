@@ -61,18 +61,18 @@ HistoryDisplay = ({sourceName, rowData}) ->
                 />
               if isFunctionCall = entry?.tools?.length > 0
                 entry.tools.map (tool, index) ->
-                  <div className="bg-blue-200 p-3">
+                  <div className="text-blue-200 p-3">
                     <span>Funktion: </span>
                     <span className="font-bold">{tool.name} </span>
                     <span>mit Argumenten: </span>
                     <FormattedJSON data={tool.args} />
                   </div>
               if isFunctionResult = entry?.chatRole is 'function' and entry?.result?.length > 0
-                <div className="bg-blue-100 p-3">
+                <div className="text-blue-100 p-3">
                  {entry?.results}
                 </div>
               if entry?.error?
-                <div className="bg-red-100 px-3 py-1">
+                <div className="text-red-200 px-3 py-1">
                   <span className="font-bold">Fehler: </span>
                   <FormattedJSON data={entry?.error} />
                 </div>
