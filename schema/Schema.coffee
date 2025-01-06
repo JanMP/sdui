@@ -1,3 +1,4 @@
+import {Meteor} from 'meteor/meteor'
 import {JSONSchemaBridge} from 'uniforms-bridge-json-schema'
 import Ajv from 'ajv'
 import addFormats from 'ajv-formats'
