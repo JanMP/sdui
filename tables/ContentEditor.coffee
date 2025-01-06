@@ -157,7 +157,7 @@ export ContentEditor = ({tableOptions}) ->
           ?.then openEditor
 
   formPanelContent =
-    <ScrollPanel className="p-2" >
+    <ScrollPanel className="h-full p-2" >
       <AutoForm
         schema={formSchema.bridge}
         model={changedModel}
@@ -201,7 +201,7 @@ export ContentEditor = ({tableOptions}) ->
             onConfirm={-> deleteAndCloseEditor id: idForDeleteConfirmationModal}
           />
       }
-      <Splitter gutterSize={8} className="h-full">
+      <Splitter gutterSize={8} className="h-full max-h-full">
         <SplitterPanel className="h-full select-none p-2" size={10}>
           <DataList
             {{
@@ -228,10 +228,12 @@ export ContentEditor = ({tableOptions}) ->
             if mayEdit and editorOpen
               <Splitter gutterSize={8} className="h-full select-none">
                 <SplitterPanel className="pr-2">
-                  <Splitter gutterSize={8} layout="vertical"  className="h-full">
-                    <SplitterPanel className="flex flex-column">
-                      <PanelHeader text="Preview" />
-                      <Preview content={changedModel}/>
+                  <Splitter gutterSize={8} layout="vertical"  className="min-h-0 max-h-full">
+                    <SplitterPanel className="min-h-0 max-h-full pb-2">
+                      <div className="h-full w-full flex flex-column overflow-hidden">
+                        <PanelHeader text="Preview" />
+                        <Preview content={changedModel}/>
+                      </div>
                     </SplitterPanel>
                     <SplitterPanel className ="min-h-0">
                       <PanelHeader text="Markdown/HTML" />
@@ -242,15 +244,15 @@ export ContentEditor = ({tableOptions}) ->
                     </SplitterPanel>
                   </Splitter>
                 </SplitterPanel>
-                <SplitterPanel className="h-full flex flex-column">
+                <SplitterPanel className="max-h-full h-full flex flex-column">
                   <PanelHeader text="Data" />
                   {
                     if RelatedDataPane?
                       <Splitter gutterSize={8} layout="vertical" className="h-full">
-                        <SplitterPanel className="flex flex-column">
+                        <SplitterPanel className="min-h-0 max-h-full">
                           <RelatedDataPane model={changedModel}/>
                         </SplitterPanel>
-                        <SplitterPanel>
+                        <SplitterPanel className="min-h-0 max-h-full">
                           {formPanelContent}
                         </SplitterPanel>
                       </Splitter>
