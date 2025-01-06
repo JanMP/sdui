@@ -97,20 +97,21 @@ export addCostsPipeline = [
 listSchema = new Schema
   type: 'object'
   properties:
-    sessionId: type: 'string'
+    # sessionId: type: 'string'
     userName: type: 'string'
-    models:
-      type: 'array'
-      items: type: 'string'
-      uniforms: label: 'LLMs'
+    # models:
+    #   type: 'array'
+    #   items: type: 'string'
+    #   uniforms: label: 'LLMs'
     createdAt:
+      type: 'object'
       instanceof: 'Date'
       uniforms: label: 'Letzte Aktivität'
-    promptTokens: type: 'integer'
-    completionTokens: type: 'integer'
-    costInUSD:
-      type: 'number'
-      uniforms: label: 'Kosten in USD'
+    # promptTokens: type: 'integer'
+    # completionTokens: type: 'integer'
+    # costInUSD:
+    #   type: 'number'
+    #   uniforms: label: 'Kosten in USD'
     hasThumbsDown:
       type: 'boolean'
       uniforms: label: 'Daumen runter'
@@ -136,14 +137,14 @@ summaryPipeline = [
     sessionId: $first: '$sessionId'
     userId: $first: $arrayElemAt: ['$session.userIds', 0]
     createdAt: $last: '$createdAt'
-    models: $addToSet: '$usage.model'
-    promptTokens: $sum: '$usage.prompt'
-    completionTokens: $sum: '$usage.completion'
-    costInUSD: $sum: '$costInUSD'
+    # models: $addToSet: '$usage.model'
+    # promptTokens: $sum: '$usage.prompt'
+    # completionTokens: $sum: '$usage.completion'
+    # costInUSD: $sum: '$costInUSD'
     thumbs: $addToSet: '$feedback.thumbs'
 ,
   $addFields:
-    costInUSD: $round: ['$costInUSD', 3]
+    # costInUSD: $round: ['$costInUSD', 3]
     hasThumbsDown: $in: ['down', '$thumbs']
 ]
 
@@ -161,8 +162,16 @@ addUsernamePipeline = [
     user: 0
 ]
 
+getPreSelectPipeline = -> [
+    $match:
+      $or: [
+        chatRole: 'user'
+      , feedback: $exists: true
+      ]
+  ]
+
 getProcessorPipelineForSourceName = ({sourceName}) -> -> [
-  addCostsPipeline...
+  # addCostsPipeline...
   (getAddSessionPipeline {sourceName})...
   summaryPipeline...
   addUsernamePipeline...
@@ -202,6 +211,7 @@ export createChatLogAPI = ({sourceName, messageCollection, viewTableRole}) ->
     listSchema: listSchema
     viewTableRole: viewTableRole
     canEdit: false
+    getPreSelectPipeline: getPreSelectPipeline
     getProcessorPipeline: getProcessorPipelineForSourceName {sourceName}
     initialSortColumn: 'createdAt'
     initialSortDirection: 'DESC'
