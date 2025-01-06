@@ -17,11 +17,10 @@ Package.onUse(function(api) {
   api.use('typescript');
   api.use('zodern:types@1.0.9');
   api.use('reactive-var');
-  api.use('alanning:roles@4.0.0-alpha.3');
+  api.use('alanning:roles@4.0.0');
   api.use('mdg:validated-method@1.2.0');
   // api.use('peerlibrary:reactive-publish@0.10.0');
   api.use('tunguska:reactive-aggregate@2.0.1');
-  api.use('aldeed:simple-schema@2.0.0-rc300.1');
   api.use('msavin:sjobs');
   api.use('mizzao:user-status@2.0.0-rc.2'); 
   api.mainModule('sdui-client-dynamic.coffee', 'client');
