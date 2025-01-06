@@ -24,20 +24,23 @@ export AutoTableAutoField = ({row, columnKey, schemaBridge, onChangeField, measu
       <div dangerouslySetInnerHTML={__html: row[columnKey]} />
     else
       switch fieldSchema.type
-        when 'date-time'
-          <span>
-            {
-              if row[columnKey]?
-                params = {dateTimeDefaultParams..., (fieldSchema.sdTable ?  {})...}
-                DateTime
-                  .fromJSDate row[columnKey]
-                  ?.setLocale params.locale
-                  ?.setZone params.zone
-                  ?.toFormat params.format
-              else
-                ''
-            }
-          </span>
+        when 'object'
+          if _.isDate row[columnKey]
+            <span>
+              {
+                if row[columnKey]?
+                  params = {dateTimeDefaultParams..., (fieldSchema.sdTable ?  {})...}
+                  DateTime
+                    .fromJSDate row[columnKey]
+                    ?.setLocale params.locale
+                    ?.setZone params.zone
+                    ?.toFormat params.format
+                else
+                  ''
+              }
+            </span>
+          else
+            <pre>{JSON.stringify row[columnKey], null, 2}</pre>
         when 'boolean'
           if row[columnKey] then <i className="pi pi-check"/> else <i className="pi pi-times"/>
         when 'array'
