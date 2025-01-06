@@ -5,7 +5,8 @@ import {createTableDataAPI} from '../api/createTableDataAPI.coffee'
 import {currentUserMustBeInRole} from '../common/roleChecks.coffee'
 import {ValidatedMethod} from 'meteor/mdg:validated-method'
 import {Roles} from 'meteor/alanning:roles'
-import {RoleSelect} from './RoleSelect.coffee'
+import {RolesDisplay} from './RolesDisplay.coffee'
+import {RoleSelectField} from './RoleSelect.coffee'
 import _ from 'lodash'
 import {runTransaction} from '../common/runTransaction.coffee'
 
@@ -79,17 +80,24 @@ export createUserTableAPI = ({userProfileSchema, getAllowedRoles, viewUserTableR
     properties:
       email:
         type: 'string'
+        uniforms: disabled: true
       username:
         type: 'string'
+        uniforms: disabled: true
       verified:
         type: 'boolean'
+        uniforms: disabled: true
       online:
         type: 'boolean'
+        uniforms: disabled: true
       roles:
         type: 'array'
+        items: type: 'object'
         sdTable:
-          component: RoleSelect
-          overflow: true
+          component: RolesDisplay
+        uniforms:
+          component: RoleSelectField
+        #   overflow: true
 
   getPreSelectPipeline = -> [
     $match:
@@ -115,6 +123,27 @@ export createUserTableAPI = ({userProfileSchema, getAllowedRoles, viewUserTableR
       roles: 1
   ]
 
+  makeSubmitMehodRunFkt = ({collection, transformIdToMongo, transformIdToMiniMongo}) ->
+    ({id, data}) ->
+      {roles} = data
+      id = transformIdToMongo id
+      currentUserMustBeInRole editUserRole
+      if Meteor.isServer
+        scopesForUser = await Roles.getScopesForUserAsync id
+        scopesForValue = _(roles).map('scope').uniq().value()
+        runTransaction ->
+          # remove all roles for scopes that are not in the new value
+          for scope in _(scopesForUser).difference(scopesForValue).value()
+            await Roles.setUserRolesAsync id, [], scope
+          # remove all roles for the global scope if global scope is not in the new value
+          if roles.filter((role) -> not role.scope?).length is 0
+            await Roles.setUserRolesAsync id, []
+          # set roles for all scopes in the new value
+          await Promise.all(
+            _(roles).groupBy('scope').map (rolesForScope, scope) ->
+              Roles.setUserRolesAsync id, _(rolesForScope).map('role').value(), if scope is 'null' then null else scope
+            .value()
+          )
   new ValidatedMethod
     name: 'user.getAllowedRoles'
     validate: ->
@@ -206,9 +235,9 @@ export createUserTableAPI = ({userProfileSchema, getAllowedRoles, viewUserTableR
     getPreSelectPipeline: getPreSelectPipeline
     getProcessorPipeline: getProcessorPipeline
     canSearch: true
-    canEdit: false
+    canEdit: true
     canAdd: false
     canDelete: true
     canExport: true
-    getObservers: -> [Meteor.roleAssignment.find()]
+    makeSubmitMethodRunFkt: makeSubmitMehodRunFkt
 
