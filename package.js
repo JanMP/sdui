@@ -18,7 +18,8 @@ Package.onUse(function(api) {
   api.use('zodern:types@1.0.9');
   api.use('reactive-var');
   api.use('alanning:roles@4.0.0');
-  api.use('mdg:validated-method@1.2.0');
+  api.use('mdg:validated-method@1.3.0');
+  api.use('mdg:validation-error');
   // api.use('peerlibrary:reactive-publish@0.10.0');
   api.use('tunguska:reactive-aggregate@2.0.1');
   api.use('msavin:sjobs');

@@ -99,7 +99,8 @@ export createChatMethods = ({
             type: 'string'
           sessionId:
             type: 'string'
-      .validator
+        required: ['text', 'sessionId']
+      .methodValidator
     run: ({text, sessionId}) ->
       await currentUserMustBeInRole viewChatRole
       return unless Meteor.isServer
@@ -136,7 +137,8 @@ export createChatMethods = ({
             type: 'string'
           sessionId:
             type: 'string'
-      .validator
+        required: ['text', 'sessionId']
+      .methodValidator
     run: ({text, sessionId}) -> Promise.resolve "turned off because sanity"
       # await currentUserMustBeInRole viewChatRole
       # return unless Meteor.isServer
@@ -165,7 +167,9 @@ export createChatMethods = ({
                 enum: ['up', 'down']
               comment:
                 type: 'string'
-      .validator
+            required: ['thumbs']
+        required: ['messageId', 'feedback']
+      .methodValidator
     run: ({messageId, feedback}) ->
       await currentUserMustBeInRole viewChatRole
       unless userIsInSessionOfMessage {messageId}
@@ -186,7 +190,8 @@ export createChatMethods = ({
           userIds:
             type: 'array'
             items: type: 'string'
-      .validator
+        required: ['title', 'userIds']
+      .methodValidator
     run: addSession
 
   # TODO delete for good unless session has user messages
@@ -211,7 +216,8 @@ export createChatMethods = ({
         type: 'object'
         properties:
           id: type: 'string'
-      .validator
+        required: ['id']
+      .methodValidator
     run: ({id}) ->
       await currentUserMustBeInRole addSessionRole
       return unless Meteor.isServer

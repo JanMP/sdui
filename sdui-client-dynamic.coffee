@@ -27,6 +27,7 @@ export {createAppLayoutAPI} from './app-layout/createAppLayoutAPI.coffee'
 export {ToastProvider, useToast} from './app-layout/ToastProvider.coffee'
 export {createJobsTableDataAPI} from './jobstable/createJobsTableDataAPI.coffee'
 export {generateUUID} from './common/generateUUID.coffee'
+export {ErrorBoundary} from './common/ErrorBoundary.coffee'
 # export {createFilesAPI, filesAPISourceSchema} from './api/createFilesAPI.coffee'
 
 # server only (eventually)

@@ -14,6 +14,7 @@ schema = new Schema
       uniforms:
         label: 'Neues Passwort'
         type: 'password'
+  required: ['password']
 
 schemaBridge = schema.bridge
 

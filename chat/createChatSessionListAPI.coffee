@@ -26,8 +26,8 @@ export createChatSessionListAPI = ({sourceName, sessionListCollection, viewChatR
         type: 'array'
         items: type: 'string'
       createdAt:
+        type: 'object'
         instanceof: 'Date'
-
 
   listSchema =
     sourceSchema.addProperty

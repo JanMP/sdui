@@ -167,7 +167,8 @@ export createUserTableAPI = ({userProfileSchema, getAllowedRoles, viewUserTableR
             type: 'array'
             items:
               type: 'object'
-      .validator
+        required: ['id', 'value']
+      .methodValidator
     run: ({id, value}) ->
       currentUserMustBeInRole editUserRole
       if Meteor.isServer

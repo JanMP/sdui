@@ -233,7 +233,8 @@ export createChatLogAPI = ({sourceName, messageCollection, viewTableRole}) ->
         type: 'object'
         properties:
           sessionId: type: 'string'
-      .validator
+        required: ['sessionId']
+      .methodValidator
     run: ({sessionId}) ->
       return unless Meteor.isServer
       messageCollection
@@ -351,7 +352,7 @@ export createChatLogAPI = ({sourceName, messageCollection, viewTableRole}) ->
         properties:
           forLastDays: type: 'number'
         required: ['forLastDays']
-      .validator
+      .methodValidator
     run: ({forLastDays}) ->
       return unless Meteor.isServer
       byDay =

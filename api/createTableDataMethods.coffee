@@ -60,7 +60,7 @@ sdai}) ->
           sort: type: 'object'
           limit: type: 'number'
           skip: type: 'number'
-      .validator
+      .methodValidator
     run: ({search, query, sort, limit, skip}) ->
       # console.log 'getRows', {search, query, sort, limit, skip}
       await currentUserMustBeInRole viewTableRole
@@ -83,7 +83,7 @@ sdai}) ->
             search: type: 'string'
             query: type: 'object'
             sort: type: 'object'
-        .validator
+        .methodValidator
       run: ({search, query, sort}) ->
         await currentUserMustBeInRole exportTableRole
         return unless Meteor.isServer
@@ -119,7 +119,7 @@ sdai}) ->
   if canEdit or canAdd
     new ValidatedMethod
       name: "#{sourceName}.submit"
-      validate: formSchema.withId().validator
+      validate: formSchema.withId().methodValidator
       run: (model) ->
         if model._id?
           await currentUserMustBeInRole editRole
@@ -138,7 +138,8 @@ sdai}) ->
           type: 'object'
           properties:
             id: type: 'string'
-        .validator
+          required: ['id']
+        .methodValidator
       run: ({id}) ->
         await currentUserMustBeInRole editRole
         await editRowMustNotBeDisabled {id}
@@ -155,7 +156,8 @@ sdai}) ->
             _id: type: 'string'
             changeData:
               type: 'object'
-        .validator
+          required: ['_id', 'changeData']
+        .methodValidator
       run: ({_id, changeData}) ->
         await currentUserMustBeInRole editRole
         await editRowMustNotBeDisabled id: _id
@@ -170,7 +172,8 @@ sdai}) ->
           type: 'object'
           properties:
             id: type: 'string'
-        .validator
+          required: ['id']
+        .methodValidator
       run: ({id}) ->
         await currentUserMustBeInRole deleteRole
         await deleteRowMustNotBeDisabled {id}

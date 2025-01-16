@@ -21,7 +21,7 @@ export createJobsTableDataAPI = ->
 
   new ValidatedMethod
     name: 'jobs.stop'
-    validate: sourceSchema.validator()
+    validate: sourceSchema.methodValidator()
     run: (job) ->
       currentUserMustBeInRole 'admin'
       console.log 'Jobs: ', Jobs.jobs
@@ -29,7 +29,7 @@ export createJobsTableDataAPI = ->
 
   new ValidatedMethod
     name: 'jobs.execute'
-    validate: sourceSchema.validator()
+    validate: sourceSchema.methodValidator()
     run: (job) ->
       currentUserMustBeInRole 'admin'
       console.log 'Jobs: ', Jobs.jobs
@@ -37,7 +37,7 @@ export createJobsTableDataAPI = ->
 
   new ValidatedMethod
     name: 'jobs.remove'
-    validate: sourceSchema.validator()
+    validate: sourceSchema.methodValidator()
     run: (job) ->
       currentUserMustBeInRole 'admin'
       console.log 'Jobs: ', Jobs.jobs

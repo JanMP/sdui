@@ -1,6 +1,8 @@
 import {Meteor} from 'meteor/meteor'
 import {JSONSchemaBridge} from 'uniforms-bridge-json-schema'
 import Ajv from 'ajv'
+import localize from 'ajv-i18n'
+import addErrors from 'ajv-errors'
 import addFormats from 'ajv-formats'
 import addKeywords from 'ajv-keywords'
 import _ from 'lodash'
@@ -12,6 +14,7 @@ defaultAjvOptions =
   allErrors: true
   useDefaults: false
   coerceTypes: false
+  keepErrors: false
   keywords: ['uniforms', 'sdTable', 'sdContent']
 
 export class Schema
@@ -20,15 +23,35 @@ export class Schema
       if @options? then console.log 'options', @options
       ajvOptions = @options?.ajv ? defaultAjvOptions
       @ajv = new Ajv ajvOptions
-      @modelValidator = @options?.modelValidator
-      addFormats @ajv
+      @modelValidator = @options?.modelValidator ? ->
       addKeywords @ajv
+      addFormats @ajv
+      addErrors @ajv
       @validate = @ajv.compile @_schema
       @validator = (model) =>
         @validate model
         if @validate.errors?.length
-          return details: @validate.errors
-        @modelValidator?(model)
+          localize.de @validate.errors.filter (e) -> e.keyword isnt 'errorMessage'
+          console.log @validate.errors
+          details: @validate.errors
+        else if (message = @modelValidator model)?
+          details: [{
+            instancePath: ''
+            schemaPath: 'model'
+            keyword: 'model'
+            params: {}
+            message
+          }]
+      @methodValidator = (model) =>
+        @validate model
+        if @validate.errors?.length
+          localize.de @validate.errors.filter (e) -> e.keyword isnt 'errorMessage'
+          translatedError = @validate.errors.map (error) ->
+            name: error.instancePath.replace '/', ''
+            type: error.message
+          throw new ValidationError translatedError
+        else if (message = @modelValidator model)?
+          throw new ValidationError [{name: 'model', type: message}]
 
       @bridge = new JSONSchemaBridge @_schema, @validator
       @firstLevelSchemaKeys = (key for key of @_schema.properties)

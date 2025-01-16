@@ -18,6 +18,7 @@ formSchema = new Schema
       type: 'string'
       uniforms:
         component: LongTextField
+  required: ['thumbs']
 
 formSchemaBridge = formSchema.bridge
 
