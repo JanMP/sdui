@@ -160,10 +160,12 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
     setSortDirection d.sortDirection
 
   onSubmit ?= (d) ->
+    console.log 'onSubmit', d
     meteorApply
       method: submitMethodName
       data: d
     .then (results) ->
+      console.log 'results', results
       getRows {}
       results
     .catch (error) ->
@@ -189,6 +191,7 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
       method: deleteMethodName
       data: {id}
     .then ->
+      getRows {}
       toast.show
         severity: 'success'
         summary: 'Erfolg'
