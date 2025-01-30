@@ -93,7 +93,7 @@ buttonProps}) ->
     }
     <Button
       className={className}
-      disabled={disabled}
+      disabled={disabled or isBusy}
       onClick={handleClick}
       {buttonProps...}
     >
