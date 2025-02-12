@@ -52,6 +52,18 @@ export createQAArticlesAPI = ({sourceName, collection, viewTableRole, editRole, 
     getEmbeddingContext: ({document}) -> document.question
 
 
+  # if false and Meteor.isServer and not Meteor.isDevelopment
+  #   await collection.find().forEachAsync (document) ->
+  #     console.log "update vector for #{sourceName}, #{document.question}"
+  #     vector =
+  #       try
+  #         await getEmbedding text: document.question
+  #       catch error
+  #         console.error error
+  #         throw new Meteor.Error "[#{sourceName} #{document.question}] Could not get embedding"
+  #     collection.updateAsync document._id, $set: vector: vector
+    
+
   createTableDataAPI
     sourceName: sourceName
     collection: collection
