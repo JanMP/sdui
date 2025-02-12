@@ -119,7 +119,7 @@ export createTableDataAPI = (params) ->
   #return props for the ui component
   {
     sourceName, listSchema, formSchema,
-    rowsCollection
+    collection, rowsCollection
     canEdit
     canSearch
     canSort
