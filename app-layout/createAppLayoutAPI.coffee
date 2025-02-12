@@ -2,11 +2,11 @@ import {Meteor} from 'meteor/meteor'
 
 
 ###*
-  @param {object} dataOptions
-  @param {string} dataOptions.sourceName
-  @param {[object]} dataOptions.sourceArray
-  @param {function} dataOptions.toolbarStart
-  @returns {object} {dataOptions}
+  @param {Object} dataOptions
+  @param {String} dataOptions.sourceName
+  @param {[Object]} dataOptions.sourceArray
+  @param {Function} dataOptions.toolbarStart
+  @returns {Object} {dataOptions}
   ###
 export createAppLayoutAPI = ({
   sourceName, sourceArray, toolbarStart = -> null
