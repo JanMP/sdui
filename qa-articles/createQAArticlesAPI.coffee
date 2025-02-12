@@ -46,6 +46,12 @@ export createQAArticlesAPI = ({sourceName, collection, viewTableRole, editRole, 
 
   listSchema = sourceSchema.omit ['vector']
 
+  # TODO make sdai availble to makeSubmitMethodRunFkt internally in createTableDataAPI
+  sdAiSettings =
+    embeddingModelSettings: Meteor.settings.embeddingCP
+    getEmbeddingContext: ({document}) -> document.question
+
+
   createTableDataAPI
     sourceName: sourceName
     collection: collection
@@ -59,6 +65,7 @@ export createQAArticlesAPI = ({sourceName, collection, viewTableRole, editRole, 
     canExport: true
     initialSortColumn: 'question'
     initialSortDirection: 'ASC'
+    sdAiSettings: sdAiSettings
     makeSubmitMethodRunFkt: ({collection, transformIdToMongo, transformIdToMiniMongo}) ->
       ({data, id}) ->
         vector =
