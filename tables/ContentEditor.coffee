@@ -157,7 +157,7 @@ export ContentEditor = ({tableOptions}) ->
           ?.then openEditor
 
   formPanelContent =
-    <ScrollPanel className="h-full p-2" >
+    <ScrollPanel className="max-h-full p-2" >
       <AutoForm
         schema={formSchema.bridge}
         model={changedModel}
@@ -202,7 +202,7 @@ export ContentEditor = ({tableOptions}) ->
           />
       }
       <Splitter gutterSize={8} className="h-full max-h-full">
-        <SplitterPanel className="h-full select-none p-2" size={10}>
+        <SplitterPanel className="max-h-full h-full select-none p-2" size={10}>
           <DataList
             {{
               sourceName
@@ -223,41 +223,46 @@ export ContentEditor = ({tableOptions}) ->
             }...}
           />
         </SplitterPanel>
-        <SplitterPanel className="h-full select-none p-2">
+        <SplitterPanel className="max-h-full h-full select-none p-2">
           {
             if mayEdit and editorOpen
-              <Splitter gutterSize={8} className="h-full select-none">
+              <Splitter gutterSize={8} className="select-none">
                 <SplitterPanel className="pr-2">
                   <Splitter gutterSize={8} layout="vertical"  className="min-h-0 max-h-full">
-                    <SplitterPanel className="min-h-0 max-h-full pb-2">
+                    <SplitterPanel size={20} className="min-h-0 max-h-full pb-2">
                       <div className="h-full w-full flex flex-column overflow-hidden">
-                        <PanelHeader text="Preview" />
-                        <Preview content={changedModel}/>
+                        <PanelHeader text="Markdown/HTML" />
+                        <SdEditor
+                          value={changedModel[contentKey]}
+                          onChange={setContent}
+                        />
                       </div>
                     </SplitterPanel>
-                    <SplitterPanel className ="min-h-0">
-                      <PanelHeader text="Markdown/HTML" />
-                      <SdEditor
-                        value={changedModel[contentKey]}
-                        onChange={setContent}
-                      />
+                    <SplitterPanel size={80} className ="min-h-0">
+                      {formPanelContent}
                     </SplitterPanel>
                   </Splitter>
                 </SplitterPanel>
-                <SplitterPanel className="max-h-full h-full flex flex-column">
-                  <PanelHeader text="Data" />
+                <SplitterPanel className="flex flex-column">
                   {
                     if RelatedDataPane?
                       <Splitter gutterSize={8} layout="vertical" className="h-full">
                         <SplitterPanel className="min-h-0 max-h-full">
-                          <RelatedDataPane model={changedModel}/>
+                          <PanelHeader text="Preview" />
+                          <Preview content={changedModel}/>
                         </SplitterPanel>
                         <SplitterPanel className="min-h-0 max-h-full">
-                          {formPanelContent}
+                          <div className="h-full w-full flex flex-column overflow-hidden">
+                            <PanelHeader text="Data" />
+                            <RelatedDataPane model={changedModel}/>
+                          </div>
                         </SplitterPanel>
                       </Splitter>
                     else
-                      formPanelContent
+                      <div className="h-full w-full flex flex-column overflow-hidden">
+                        <PanelHeader text="Preview" />
+                        <Preview content={changedModel}/>
+                      </div>
                   }
                 </SplitterPanel>
               </Splitter>
