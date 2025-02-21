@@ -26,7 +26,7 @@ export createDefaultPipeline = ({getPreSelectPipeline, getProcessorPipeline, lis
         $and: parts.map op
       else op processedString
 
-    keys = listSchema.firstLevelSchemaKeys.filter (key) -> not listSchema._schema.properties[key].sdTable?.hide
+    keys = listSchema.firstLevelSchemaKeys #.filter (key) -> not listSchema._schema.properties[key].sdTable?.hide
     fieldSearches = keys.map (key) ->
       switch listSchema.getQuickTypeForKey key
         when 'string', 'stringArray'
