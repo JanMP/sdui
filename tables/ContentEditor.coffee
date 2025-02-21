@@ -97,6 +97,10 @@ export ContentEditor = ({tableOptions}) ->
     onDelete {id}
     setEditorOpen false
 
+  setAndLogChangedModel = (model) ->
+    setChangedModel model
+    console.log {model}
+    
   useEffect ->
     console.log {loadedModel, changedModel, hasChanged}
   , [loadedModel, changedModel, hasChanged]
@@ -157,7 +161,7 @@ export ContentEditor = ({tableOptions}) ->
           ?.then openEditor
 
   formPanelContent =
-    <ScrollPanel className="max-h-full p-2" >
+    <ScrollPanel className="p-2 w-full overflow-none" >
       <AutoForm
         schema={formSchema.bridge}
         model={changedModel}
@@ -226,10 +230,10 @@ export ContentEditor = ({tableOptions}) ->
         <SplitterPanel className="max-h-full h-full select-none p-2">
           {
             if mayEdit and editorOpen
-              <Splitter gutterSize={8} className="select-none">
-                <SplitterPanel className="pr-2">
-                  <Splitter gutterSize={8} layout="vertical"  className="min-h-0 max-h-full">
-                    <SplitterPanel size={20} className="min-h-0 max-h-full pb-2">
+              <Splitter gutterSize={8} className="select-none h-full">
+                <SplitterPanel className="pr-2 max-h-full h-full">
+                  <Splitter gutterSize={8} layout="vertical"  className="min-h-0 max-h-full h-full">
+                    <SplitterPanel size={20} className="min-h-0 h-full max-h-full pb-2">
                       <div className="h-full w-full flex flex-column overflow-hidden">
                         <PanelHeader text="Markdown/HTML" />
                         <SdEditor
@@ -238,7 +242,7 @@ export ContentEditor = ({tableOptions}) ->
                         />
                       </div>
                     </SplitterPanel>
-                    <SplitterPanel size={80} className ="min-h-0">
+                    <SplitterPanel size={80} className ="min-h-0 max-h-full h-full w-full">
                       {formPanelContent}
                     </SplitterPanel>
                   </Splitter>
