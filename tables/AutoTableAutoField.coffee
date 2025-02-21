@@ -1,13 +1,11 @@
 import React from 'react'
 import {DynamicTableField} from './DynamicTableField'
-import {DateTime} from 'luxon'
+import {DateDisplayTableComponent} from './DateDisplayTableComponent.coffee'
+
 import _ from 'lodash'
 
 #TODO get locale from same mechanism as primereact
-dateTimeDefaultParams =
-  locale: 'de',
-  zone: 'gmt',
-  format: 'dd.MM.yyyy HH:mm:ss'
+
 
 export AutoTableAutoField = ({row, columnKey, schemaBridge, onChangeField, measure, mayEdit}) ->
   fieldSchema = schemaBridge._schema.properties[columnKey]
@@ -26,19 +24,7 @@ export AutoTableAutoField = ({row, columnKey, schemaBridge, onChangeField, measu
       switch fieldSchema.type
         when 'object'
           if _.isDate row[columnKey]
-            <span>
-              {
-                if row[columnKey]?
-                  params = {dateTimeDefaultParams..., (fieldSchema.sdTable ?  {})...}
-                  DateTime
-                    .fromJSDate row[columnKey]
-                    ?.setLocale params.locale
-                    ?.setZone params.zone
-                    ?.toFormat params.format
-                else
-                  ''
-              }
-            </span>
+            <DateDisplayTableComponent row={row} columnKey={columnKey} schemaBridge={schemaBridge} />
           else
             <pre>{JSON.stringify row[columnKey], null, 2}</pre>
         when 'boolean'
