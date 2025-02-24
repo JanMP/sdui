@@ -12,7 +12,7 @@ import {downloadAsFile} from '../common/downloadAsFile.coffee'
 import {useTranslation} from 'react-i18next'
 import {useToast} from 'meteor/janmp:sdui'
 import _ from 'lodash'
-import * as types from '../typeDeclarations'
+import * as types from '../customTypes.ts'
 
 defaultQuery = {} # ensures equality between runs
 

@@ -10,7 +10,7 @@ import {MarkdownDisplay} from '../markdown/MarkdownDisplay.coffee'
 import {ActionButton} from '../forms/ActionButton.coffee'
 import useSize from '@react-hook/size'
 import _ from 'lodash'
-import * as types from '../typeDeclarations'
+import * as types from '../customTypes.ts'
 
 
 PanelHeader = ({text}) ->

@@ -4,7 +4,7 @@ import {SortSelect} from './SortSelect.coffee'
 import useSize from '@react-hook/size'
 import {Button} from 'primereact/button'
 import {Toolbar} from 'primereact/toolbar'
-import * as types from '../typeDeclarations'
+import * as types from '../customTypes.ts'
 
 
 ###*

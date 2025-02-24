@@ -1,180 +1,321 @@
-import {Mongo} from 'meteor/mongo'
-import {Schema} from 'meteor/janmp:sdui'
-import {FC} from 'react'
+// Content from: coffee-compiled/tables/DynamicTableField.d.ts
+export * from './coffee-compiled/tables/DynamicTableField'
 
-export interface RoleObject {
-  role:  string | Array<string>
-  scope?: string
-  forAnyScope?: boolean
-}
+// Content from: coffee-compiled/tables/SdDocumentSelect.d.ts
+export * from './coffee-compiled/tables/SdDocumentSelect'
 
-export type Role = string | Array<string> | RoleObject | ((id: string) => boolean)
+// Content from: coffee-compiled/tables/DateDisplayTableComponent.d.ts
+export * from './coffee-compiled/tables/DateDisplayTableComponent'
 
-export interface SdAiSettings {
-  embeddingModelSettings: object
-  getEmbeddingContext: (params: {document: object}) => string
-}
+// Content from: coffee-compiled/tables/SortSelect.d.ts
+export * from './coffee-compiled/tables/SortSelect'
 
-export interface createTableDataAPIParams {
-  sourceName: string
-  sourceSchema: Schema
-  collection: Mongo.Collection<object>
-  useObjectIds?: boolean
-  listSchema?: Schema
-  formSchema?: Schema
-  canEdit?: boolean
-  canSearch?: boolean
-  canSort?: boolean
-  canAdd?: boolean
-  canDelete?: boolean
-  canExport?: boolean
-  viewTableRole?: Role
-  editRole?: Role
-  addRole?: Role
-  deleteRole?: Role
-  exportTableRole?: Role
-  query?: object
-  initialSortColumn?: string
-  initialSortDirection?: 'ASC' | 'DESC'
-  perLoad?: number
-  getPreSelectPipeline?: ({pub}?: {pub: object}) => Promise<Array<Object> | null>
-  getProcessorPipeline?: ({pub}?: {pub: object}) => Promise<Array<Object> | null>
-  getRowsPipeline?:
-    (_: {
-        pub: object,
-        search: string,
-        query?: Mongo.Query<any>,
-        sort?: Mongo.SortSpecifier
-        limit?: number
-        skip?: number}) => Array<object>
-  getExportPipeline?:
-    (options: {
-      search: string,
-      query?: Mongo.Query<any>,
-      sort?: Mongo.SortSpecifier}) => Array<object>
-  makeFormDataFetchMethodRunFkt?:
-    (options: {
-      collection: Mongo.Collection<any>
-      transFormIdToMongo: (id: any) => any
-      transFormIdToMiniMongo: (id: any) => any
-    }) => (options: {id: string}) => Mongo.Cursor<any>
-  makeSubmitMethodRunFkt?:
-    (options: {
-      collection: Mongo.Collection<any>
-      transFormIdToMongo: (id: any) => any
-      transFormIdToMiniMongo: (id: any) => any
-    }) => (options: {data: object, id: string}) => void
-  makeDeleteMethodRunFkt?:
-    (options: {
-      collection: Mongo.Collection<any>
-      transFormIdToMongo: (id: any) => any
-      transFormIdToMiniMongo: (id: any) => any
-    }) => (options: {id: string}) => void
-  noAutomaticObserver?: boolean
-  debounceDelay?: number
-  getObservers?:() => Array<any>
-  setupNewItem?: () => object
-  onSubmit?: (object) => any
-  checkDisableEditForRow?: boolean
-  checkDisableDeleteForRow?: boolean 
-  usePubSub?: boolean
-  sdAiSettings?: SdAiSettings
-}
-export interface createTableDataAPIReturn {
-  sourceName: string
-  listSchema: Schema
-  formSchema: Schema
-  rowsCollection: Mongo.Collection<any>
-  canEdit?: boolean
-  canSearch?: boolean
-  canSort?: boolean
-  canAdd?: boolean
-  canDelete?: boolean
-  deleteConfirmation?: string
-  canExport?: boolean
-  viewTableRole?: string | Array<string>
-  editRole?: string | Array<string>
-  addRole?: string | Array<string>
-  deleteRole?: string | Array<string>
-  exportTableRole?: string | Array<string>
-  setupNewItem?: () => object
-  onSubmit?: (object) => any
-  onDelete?: ({id}: {id: string}) => Promise<any>
-  onChangeField?: ({_id, changeData}: {_id: string, changeData: object}) => any
-  query?: object
-  initialSortColumn?: string
-  initialSortDirection?: 'ASC' | 'DESC'
-  perLoad: number
-  usePubSub: boolean
-}
+// Content from: coffee-compiled/tables/DefaultListItem.d.ts
+export * from './coffee-compiled/tables/DefaultListItem'
 
-export declare function createTableDataAPI(options: createTableDataAPIParams): createTableDataAPIReturn
+// Content from: coffee-compiled/tables/ContentEditor.d.ts
+export * from './coffee-compiled/tables/ContentEditor'
 
+// Content from: coffee-compiled/tables/SearchInput.d.ts
+export * from './coffee-compiled/tables/SearchInput'
 
-// This is for additional options we can shove into our Components
-export interface additionalDataTableOptions {
-  onRowClick?: ({rowData, index}: {rowData: any, index: number}) => void
-  autoFormChildren?: [any]
-  formDisabled?: boolean
-  formReadOnly?: boolean
-  loadEditorData?: ({id}: {id: string}) => Promise<any>
-}
+// Content from: coffee-compiled/tables/MeteorTableDataHandler.d.ts
+export * from './coffee-compiled/tables/MeteorTableDataHandler'
 
-export type DataTableOptions = createTableDataAPIReturn & additionalDataTableOptions
+// Content from: coffee-compiled/tables/SdTable.d.ts
+export * from './coffee-compiled/tables/SdTable'
 
-export interface additionalDataTableDisplayOptions {
-  rows: [any]
-  loadMoreRows: ({startIndex, stopIndex}: {startIndex: number, stopIndex: number}) => Promise<any>
-  sortColumn: string
-  sortDirection: 'ASC' | 'DESC'
-  onChangeSort: ({sortColumn, sortDirection}: {sortColumn: string, sortDirection: 'ASC' | 'DESC'}) => void
-  search: 'string'
-  onChangeSearch: (searchString: string) => void
-  onDelete: ({id}: {id: string}) => Promise<any>
-  mayAdd?: boolean
-  onAdd?: () => void
-  mayDelete?: boolean
-  mayEdit?: boolean
-  mayExport?: boolean
-  onExportTable?: () => void
-  isLoading?: boolean
-  overscanRowCount?: number
-  customComponents: customComponents
-}
+// Content from: coffee-compiled/tables/SdList.d.ts
+export * from './coffee-compiled/tables/SdList'
 
-export type DataTableDisplayOptions = DataTableOptions & additionalDataTableDisplayOptions
+// Content from: coffee-compiled/tables/DefaultHeader.d.ts
+export * from './coffee-compiled/tables/DefaultHeader'
 
-export declare function DataTableDisplayComponent(options: DataTableDisplayOptions): FC
+// Content from: coffee-compiled/tables/SdContentEditor.d.ts
+export * from './coffee-compiled/tables/SdContentEditor'
 
-export interface DataTableHeaderOptions {
-  listSchema: Schema
-  loadedRowCount: number
-  canSearch?: boolean
-  search?: string
-  onChangeSearch?: (searchString: string) => void
-  canExport?: boolean
-  mayExport?: boolean
-  onExportTable?: () => void
-  canAdd?: boolean
-  mayAdd?: boolean
-  onAdd?: () => void
-  canSort?: boolean
-  sortColumn?: string
-  sortDirection?: 'ASC' | 'DESC'
-  onChangeSort:  ({sortColumn, sortDirection}: {sortColumn: string, sortDirection: 'ASC' | 'DESC'}) => void
-  AdditionalHeaderButtonsLeft?: FC
-  AdditionalHeaderButtonsRight?: FC
-  // query?: object
-  // onChangeQuery?: (query: object) => void
-}
-export declare function DefaultHeader(options: DataTableHeaderOptions): FC
+// Content from: coffee-compiled/tables/TableEditModalHandler.d.ts
+export * from './coffee-compiled/tables/TableEditModalHandler'
 
-// TODO [TS] gather types of all implemented customComponent props
-export type customComponents = {[key: string]: FC}
+// Content from: coffee-compiled/tables/DataTable.d.ts
+export * from './coffee-compiled/tables/DataTable'
 
-export interface MeteorTableDataHandlerOptions {
-  dataOptions: DataTableOptions
-  DisplayComponent: typeof DataTableDisplayComponent
-  customComponents: customComponents
-}
-export declare function MeteorTableDataHandler(options: MeteorTableDataHandlerOptions): FC// Combined .d.ts file
+// Content from: coffee-compiled/tables/AutoTableAutoField.d.ts
+export * from './coffee-compiled/tables/AutoTableAutoField'
+
+// Content from: coffee-compiled/tables/DataList.d.ts
+export * from './coffee-compiled/tables/DataList'
+
+// Content from: coffee-compiled/forms/ActionButton.d.ts
+export * from './coffee-compiled/forms/ActionButton'
+
+// Content from: coffee-compiled/forms/ManagedForm.d.ts
+export * from './coffee-compiled/forms/ManagedForm'
+
+// Content from: coffee-compiled/forms/RatingField.d.ts
+export * from './coffee-compiled/forms/RatingField'
+
+// Content from: coffee-compiled/forms/DynamicField.d.ts
+export * from './coffee-compiled/forms/DynamicField'
+
+// Content from: coffee-compiled/forms/connectFieldWithLabel.d.ts
+export * from './coffee-compiled/forms/connectFieldWithLabel'
+
+// Content from: coffee-compiled/forms/ThumbsField.d.ts
+export * from './coffee-compiled/forms/ThumbsField'
+
+// Content from: coffee-compiled/forms/FeedbackButtonField.d.ts
+export * from './coffee-compiled/forms/FeedbackButtonField'
+
+// Content from: coffee-compiled/forms/FormModal.d.ts
+export * from './coffee-compiled/forms/FormModal'
+
+// Content from: coffee-compiled/forms/GravatarField.d.ts
+export * from './coffee-compiled/forms/GravatarField'
+
+// Content from: coffee-compiled/forms/ConfirmationModal.d.ts
+export * from './coffee-compiled/forms/ConfirmationModal'
+
+// Content from: coffee-compiled/forms/uniforms-custom/primereact/LongTextField.d.ts
+export * from './coffee-compiled/forms/uniforms-custom/primereact/LongTextField'
+
+// Content from: coffee-compiled/forms/uniforms-custom/primereact/MultiSelectField.d.ts
+export * from './coffee-compiled/forms/uniforms-custom/primereact/MultiSelectField'
+
+// Content from: coffee-compiled/forms/uniforms-custom/primereact/SelectField.d.ts
+export * from './coffee-compiled/forms/uniforms-custom/primereact/SelectField'
+
+// Content from: coffee-compiled/forms/uniforms-custom/primereact/RadioField.d.ts
+export * from './coffee-compiled/forms/uniforms-custom/primereact/RadioField'
+
+// Content from: coffee-compiled/forms/uniforms-custom/primereact/TextField.d.ts
+export * from './coffee-compiled/forms/uniforms-custom/primereact/TextField'
+
+// Content from: coffee-compiled/forms/uniforms-custom/primereact/PasswordField.d.ts
+export * from './coffee-compiled/forms/uniforms-custom/primereact/PasswordField'
+
+// Content from: coffee-compiled/forms/uniforms-custom/primereact/NumField.d.ts
+export * from './coffee-compiled/forms/uniforms-custom/primereact/NumField'
+
+// Content from: coffee-compiled/forms/uniforms-custom/primereact/DateField.d.ts
+export * from './coffee-compiled/forms/uniforms-custom/primereact/DateField'
+
+// Content from: coffee-compiled/forms/uniforms-custom/primereact/ImageUploadField.d.ts
+export * from './coffee-compiled/forms/uniforms-custom/primereact/ImageUploadField'
+
+// Content from: coffee-compiled/forms/uniforms-custom/primereact/BoolField.d.ts
+export * from './coffee-compiled/forms/uniforms-custom/primereact/BoolField'
+
+// Content from: coffee-compiled/forms/uniforms-custom/primereact/AutoField.d.ts
+export * from './coffee-compiled/forms/uniforms-custom/primereact/AutoField'
+
+// Content from: coffee-compiled/forms/LinkField.d.ts
+export * from './coffee-compiled/forms/LinkField'
+
+// Content from: coffee-compiled/forms/connectFieldPlus.d.ts
+export * from './coffee-compiled/forms/connectFieldPlus'
+
+// Content from: coffee-compiled/forms/ColorPicker.d.ts
+export * from './coffee-compiled/forms/ColorPicker'
+
+// Content from: coffee-compiled/chat/createChatPublications.d.ts
+export * from './coffee-compiled/chat/createChatPublications'
+
+// Content from: coffee-compiled/chat/DefaultMetaDataDisplay.d.ts
+export * from './coffee-compiled/chat/DefaultMetaDataDisplay'
+
+// Content from: coffee-compiled/chat/createChatAPI.d.ts
+export * from './coffee-compiled/chat/createChatAPI'
+
+// Content from: coffee-compiled/chat/SessionListHeader.d.ts
+export * from './coffee-compiled/chat/SessionListHeader'
+
+// Content from: coffee-compiled/chat/createChatBot.d.ts
+export * from './coffee-compiled/chat/createChatBot'
+
+// Content from: coffee-compiled/chat/SessionListItemContent.d.ts
+export * from './coffee-compiled/chat/SessionListItemContent'
+
+// Content from: coffee-compiled/chat/createChatMethods.d.ts
+export * from './coffee-compiled/chat/createChatMethods'
+
+// Content from: coffee-compiled/chat/createChatSessionListAPI.d.ts
+export * from './coffee-compiled/chat/createChatSessionListAPI'
+
+// Content from: coffee-compiled/chat/SdChatLog.d.ts
+export * from './coffee-compiled/chat/SdChatLog'
+
+// Content from: coffee-compiled/chat/createChatLogAPI.d.ts
+export * from './coffee-compiled/chat/createChatLogAPI'
+
+// Content from: coffee-compiled/chat/SdChat.d.ts
+export * from './coffee-compiled/chat/SdChat'
+
+// Content from: coffee-compiled/chat/DefaultMessage.d.ts
+export * from './coffee-compiled/chat/DefaultMessage'
+
+// Content from: coffee-compiled/sdui-client-dynamic.d.ts
+export * from './coffee-compiled/sdui-client-dynamic'
+
+// Content from: coffee-compiled/qa-articles/createQAArticlesAPI.d.ts
+export * from './coffee-compiled/qa-articles/createQAArticlesAPI'
+
+// Content from: coffee-compiled/config/config.d.ts
+export * from './coffee-compiled/config/config'
+
+// Content from: coffee-compiled/config/addLocales-primereact.d.ts
+export * from './coffee-compiled/config/addLocales-primereact'
+
+// Content from: coffee-compiled/markdown/MarkdownDisplay.d.ts
+export * from './coffee-compiled/markdown/MarkdownDisplay'
+
+// Content from: coffee-compiled/login-forms/LoginForm.d.ts
+export * from './coffee-compiled/login-forms/LoginForm'
+
+// Content from: coffee-compiled/login-forms/EmailVerification.d.ts
+export * from './coffee-compiled/login-forms/EmailVerification'
+
+// Content from: coffee-compiled/login-forms/LoginButton.d.ts
+export * from './coffee-compiled/login-forms/LoginButton'
+
+// Content from: coffee-compiled/login-forms/SetPasswordForm.d.ts
+export * from './coffee-compiled/login-forms/SetPasswordForm'
+
+// Content from: coffee-compiled/sdui-client.d.ts
+export * from './coffee-compiled/sdui-client'
+
+// Content from: coffee-compiled/schema/Schema.d.ts
+export * from './coffee-compiled/schema/Schema'
+
+// Content from: coffee-compiled/sdui-server.d.ts
+export * from './coffee-compiled/sdui-server'
+
+// Content from: coffee-compiled/common/toStringWithUnitPrefix.d.ts
+export * from './coffee-compiled/common/toStringWithUnitPrefix'
+
+// Content from: coffee-compiled/common/ErrorBoundary.d.ts
+export * from './coffee-compiled/common/ErrorBoundary'
+
+// Content from: coffee-compiled/common/roleChecks.d.ts
+export * from './coffee-compiled/common/roleChecks'
+
+// Content from: coffee-compiled/common/getColumnsToExport.d.ts
+export * from './coffee-compiled/common/getColumnsToExport'
+
+// Content from: coffee-compiled/common/runTransaction.d.ts
+export * from './coffee-compiled/common/runTransaction'
+
+// Content from: coffee-compiled/common/generateUUID.d.ts
+export * from './coffee-compiled/common/generateUUID'
+
+// Content from: coffee-compiled/common/processSearchInput.d.ts
+export * from './coffee-compiled/common/processSearchInput'
+
+// Content from: coffee-compiled/common/meteorApply.d.ts
+export * from './coffee-compiled/common/meteorApply'
+
+// Content from: coffee-compiled/common/useSession.d.ts
+export * from './coffee-compiled/common/useSession'
+
+// Content from: coffee-compiled/common/downloadAsFile.d.ts
+export * from './coffee-compiled/common/downloadAsFile'
+
+// Content from: coffee-compiled/jobstable/SdJobsTable.d.ts
+export * from './coffee-compiled/jobstable/SdJobsTable'
+
+// Content from: coffee-compiled/jobstable/createJobsTableDataAPI.d.ts
+export * from './coffee-compiled/jobstable/createJobsTableDataAPI'
+
+// Content from: coffee-compiled/app-layout/RoleGuard.d.ts
+export * from './coffee-compiled/app-layout/RoleGuard'
+
+// Content from: coffee-compiled/app-layout/LoginPage.d.ts
+export * from './coffee-compiled/app-layout/LoginPage'
+
+// Content from: coffee-compiled/app-layout/PathNotFound.d.ts
+export * from './coffee-compiled/app-layout/PathNotFound'
+
+// Content from: coffee-compiled/app-layout/createAppLayoutAPI.d.ts
+export * from './coffee-compiled/app-layout/createAppLayoutAPI'
+
+// Content from: coffee-compiled/app-layout/VerifyEmailPage.d.ts
+export * from './coffee-compiled/app-layout/VerifyEmailPage'
+
+// Content from: coffee-compiled/app-layout/ToastProvider.d.ts
+export * from './coffee-compiled/app-layout/ToastProvider'
+
+// Content from: coffee-compiled/app-layout/AppToolbar.d.ts
+export * from './coffee-compiled/app-layout/AppToolbar'
+
+// Content from: coffee-compiled/app-layout/ResetPasswordPage.d.ts
+export * from './coffee-compiled/app-layout/ResetPasswordPage'
+
+// Content from: coffee-compiled/app-layout/SdAppLayout.d.ts
+export * from './coffee-compiled/app-layout/SdAppLayout'
+
+// Content from: coffee-compiled/ai/setupOpenAiClient.d.ts
+export * from './coffee-compiled/ai/setupOpenAiClient'
+
+// Content from: coffee-compiled/ai/TextEmbeddingModel.d.ts
+export * from './coffee-compiled/ai/TextEmbeddingModel'
+
+// Content from: coffee-compiled/ai/SdAi.d.ts
+export * from './coffee-compiled/ai/SdAi'
+
+// Content from: coffee-compiled/ai/getMultimodalEmbedding.d.ts
+export * from './coffee-compiled/ai/getMultimodalEmbedding'
+
+// Content from: coffee-compiled/ai/setupChatModel.d.ts
+export * from './coffee-compiled/ai/setupChatModel'
+
+// Content from: coffee-compiled/ai/qdrant/RestClient.d.ts
+export * from './coffee-compiled/ai/qdrant/RestClient'
+
+// Content from: coffee-compiled/ai/qdrant/createQdrantCollection.d.ts
+export * from './coffee-compiled/ai/qdrant/createQdrantCollection'
+
+// Content from: coffee-compiled/ai/qdrant/qdrant.d.ts
+export * from './coffee-compiled/ai/qdrant/qdrant'
+
+// Content from: coffee-compiled/api/createDefaultPipeline.d.ts
+export * from './coffee-compiled/api/createDefaultPipeline'
+
+// Content from: coffee-compiled/api/createUserManagementAPI.d.ts
+export * from './coffee-compiled/api/createUserManagementAPI'
+
+// Content from: coffee-compiled/api/createDefaultPipeline.test.d.ts
+export * from './coffee-compiled/api/createDefaultPipeline.test'
+
+// Content from: coffee-compiled/api/createTableDataAPI.d.ts
+export * from './coffee-compiled/api/createTableDataAPI'
+
+// Content from: coffee-compiled/api/createTableDataMethods.d.ts
+export * from './coffee-compiled/api/createTableDataMethods'
+
+// Content from: coffee-compiled/api/publishTableData.d.ts
+export * from './coffee-compiled/api/publishTableData'
+
+// Content from: coffee-compiled/misc-components/FormattedJSON.d.ts
+export * from './coffee-compiled/misc-components/FormattedJSON'
+
+// Content from: coffee-compiled/editor/SdEditor.d.ts
+export * from './coffee-compiled/editor/SdEditor'
+
+// Content from: coffee-compiled/usertable/AllowedRolesContext.d.ts
+export * from './coffee-compiled/usertable/AllowedRolesContext'
+
+// Content from: coffee-compiled/usertable/RoleSelect.d.ts
+export * from './coffee-compiled/usertable/RoleSelect'
+
+// Content from: coffee-compiled/usertable/RoleSelectReactive.d.ts
+export * from './coffee-compiled/usertable/RoleSelectReactive'
+
+// Content from: coffee-compiled/usertable/createUserTableAPI.d.ts
+export * from './coffee-compiled/usertable/createUserTableAPI'
+
+// Content from: coffee-compiled/usertable/RolesDisplay.d.ts
+export * from './coffee-compiled/usertable/RolesDisplay'
+
+// Content from: coffee-compiled/usertable/SdUserTable.d.ts
+export * from './coffee-compiled/usertable/SdUserTable'
+

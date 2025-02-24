@@ -4,7 +4,7 @@ import {publishTableData} from './publishTableData.coffee'
 import {createTableDataMethods} from './createTableDataMethods.coffee'
 import {createDefaultPipeline} from './createDefaultPipeline.coffee'
 import {Schema} from '../schema/Schema.coffee'
-import * as types from '../typeDeclarations'
+import * as types from '../customTypes.ts'
 import {SdAi} from '../ai/SdAi.coffee'
 
 
