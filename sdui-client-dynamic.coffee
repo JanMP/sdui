@@ -26,6 +26,7 @@ export {createChatLogAPI, addCostsPipeline} from './chat/createChatLogAPI.coffee
 export {createAppLayoutAPI} from './app-layout/createAppLayoutAPI.coffee'
 export {ToastProvider, useToast} from './app-layout/ToastProvider.coffee'
 export {createJobsTableDataAPI} from './jobstable/createJobsTableDataAPI.coffee'
+export {AppStatusPage, appIsOn} from './app-status/AppStatusPage.coffee'
 export {generateUUID} from './common/generateUUID.coffee'
 export {ErrorBoundary} from './common/ErrorBoundary.coffee'
 # export {createFilesAPI, filesAPISourceSchema} from './api/createFilesAPI.coffee'
