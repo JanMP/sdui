@@ -19,17 +19,11 @@ PanelHeader = ({text}) ->
   </div>
 
 ###*
-  @typedef {import("../interfaces").DataTableDisplayOptions} DataTableDisplayOptions
+  @param {Object} props
+  @param {Object} props.tableOptions
+  @param {String} [props.displaySingleItemId]
   ###
-###*
-  @type {
-    (options: {
-      tableOptions: DataTableDisplayOptions
-      DisplayComponent: {(options: DataTableDisplayOptions): React.FC}
-    }) => React.FC
-  }
-  ###
-export ContentEditor = ({tableOptions}) ->
+export ContentEditor = ({tableOptions, displaySingleItemId}) ->
   {
   sourceName
   listSchema, formSchema,
@@ -77,7 +71,7 @@ export ContentEditor = ({tableOptions}) ->
   [loadedModel, setLoadedModel] = useState {}
   [changedModel, setChangedModel] = useState {}
   [isValid, setIsValid] = useState false
-  [selectedRowId, setSelectedRowId] = useState "fnord"
+  [selectedRowId, setSelectedRowId] = useState displaySingleItemId
 
   [deleteConfirmationModalOpen, setDeleteConfirmationModalOpen] = useState false
   [idForDeleteConfirmationModal, setIdForDeleteConfirmationModal] = useState ''
@@ -188,6 +182,51 @@ export ContentEditor = ({tableOptions}) ->
       </div>
     </ScrollPanel>
 
+  editorPanelContent  =
+    if mayEdit and (editorOpen or displaySingleItemId)
+      <>
+        <Splitter gutterSize={8} className="select-none h-full">
+          <SplitterPanel className="pr-2 max-h-full h-full">
+            <Splitter gutterSize={8} layout="vertical"  className="min-h-0 max-h-full h-full">
+              <SplitterPanel size={20} className="min-h-0 h-full max-h-full pb-2">
+                <div className="h-full w-full flex flex-column overflow-hidden">
+                  <PanelHeader text="Markdown/HTML" />
+                  <SdEditor
+                    value={changedModel[contentKey]}
+                    onChange={setContent}
+                  />
+                </div>
+              </SplitterPanel>
+              <SplitterPanel size={80} className ="min-h-0 max-h-full h-full w-full">
+                {formPanelContent}
+              </SplitterPanel>
+            </Splitter>
+          </SplitterPanel>
+          <SplitterPanel className="flex flex-column">
+            {
+              if RelatedDataPane?
+                <Splitter gutterSize={8} layout="vertical" className="h-full">
+                  <SplitterPanel className="min-h-0 max-h-full">
+                    <PanelHeader text="Preview" />
+                    <Preview content={changedModel}/>
+                  </SplitterPanel>
+                  <SplitterPanel className="min-h-0 max-h-full">
+                    <div className="h-full w-full flex flex-column overflow-hidden">
+                      <PanelHeader text="Data" />
+                      <RelatedDataPane model={changedModel}/>
+                    </div>
+                  </SplitterPanel>
+                </Splitter>
+              else
+                <div className="h-full w-full flex flex-column overflow-hidden">
+                  <PanelHeader text="Preview" />
+                  <Preview content={changedModel}/>
+                </div>
+            }
+          </SplitterPanel>
+        </Splitter>
+      </>
+
   <div className="p-component h-full w-full overflow-hidden">
     <ErrorBoundary>
       <ConfirmationModal
@@ -205,73 +244,36 @@ export ContentEditor = ({tableOptions}) ->
             onConfirm={-> deleteAndCloseEditor id: idForDeleteConfirmationModal}
           />
       }
-      <Splitter gutterSize={8} className="h-full max-h-full">
-        <SplitterPanel className="max-h-full h-full select-none p-2" size={10}>
-          <DataList
-            {{
-              sourceName
-              listSchema,
-              rows, loadMoreRows, onRowClick,
-              canSort, sortColumn, sortDirection, onChangeSort
-              canSearch, search, onChangeSearch
-              canAdd, mayAdd, onAdd
-              canDelete, mayDelete, onDelete: handleOnDelete
-              canEdit, mayEdit
-              onChangeField,
-              canExport, onExportTable
-              mayExport
-              isLoading
-              overscanRowCount
-              customComponents
-              selectedRowId
-            }...}
-          />
-        </SplitterPanel>
-        <SplitterPanel className="max-h-full h-full select-none p-2">
-          {
-            if mayEdit and editorOpen
-              <Splitter gutterSize={8} className="select-none h-full">
-                <SplitterPanel className="pr-2 max-h-full h-full">
-                  <Splitter gutterSize={8} layout="vertical"  className="min-h-0 max-h-full h-full">
-                    <SplitterPanel size={20} className="min-h-0 h-full max-h-full pb-2">
-                      <div className="h-full w-full flex flex-column overflow-hidden">
-                        <PanelHeader text="Markdown/HTML" />
-                        <SdEditor
-                          value={changedModel[contentKey]}
-                          onChange={setContent}
-                        />
-                      </div>
-                    </SplitterPanel>
-                    <SplitterPanel size={80} className ="min-h-0 max-h-full h-full w-full">
-                      {formPanelContent}
-                    </SplitterPanel>
-                  </Splitter>
-                </SplitterPanel>
-                <SplitterPanel className="flex flex-column">
-                  {
-                    if RelatedDataPane?
-                      <Splitter gutterSize={8} layout="vertical" className="h-full">
-                        <SplitterPanel className="min-h-0 max-h-full">
-                          <PanelHeader text="Preview" />
-                          <Preview content={changedModel}/>
-                        </SplitterPanel>
-                        <SplitterPanel className="min-h-0 max-h-full">
-                          <div className="h-full w-full flex flex-column overflow-hidden">
-                            <PanelHeader text="Data" />
-                            <RelatedDataPane model={changedModel}/>
-                          </div>
-                        </SplitterPanel>
-                      </Splitter>
-                    else
-                      <div className="h-full w-full flex flex-column overflow-hidden">
-                        <PanelHeader text="Preview" />
-                        <Preview content={changedModel}/>
-                      </div>
-                  }
-                </SplitterPanel>
-              </Splitter>
-          }
-        </SplitterPanel>
-      </Splitter>
+      {
+        if displaySingleItemId?
+          editorPanelContent
+        else
+          <Splitter gutterSize={8} className="h-full max-h-full">
+            <SplitterPanel className="max-h-full h-full select-none p-2" size={10}>
+              <DataList
+                {{
+                  sourceName
+                  listSchema,
+                  rows, loadMoreRows, onRowClick,
+                  canSort, sortColumn, sortDirection, onChangeSort
+                  canSearch, search, onChangeSearch
+                  canAdd, mayAdd, onAdd
+                  canDelete, mayDelete, onDelete: handleOnDelete
+                  canEdit, mayEdit
+                  onChangeField,
+                  canExport, onExportTable
+                  mayExport
+                  isLoading
+                  overscanRowCount
+                  customComponents
+                  selectedRowId
+                }...}
+              />
+            </SplitterPanel>
+            <SplitterPanel className="max-h-full h-full select-none p-2">
+              {editorPanelContent}
+            </SplitterPanel>
+          </Splitter>
+      }
     </ErrorBoundary>
   </div>
