@@ -7,7 +7,7 @@ dateTimeDefaultParams =
   zone: 'gmt',
   format: 'dd.MM.yyyy HH:mm:ss'
 
-export DateDisplayTableComponent = ({row, columnKey, schemaBridge, onChangeField, mayEdit}) ->
+export DateDisplayTableComponentWithNullString = (nullString) -> ({row, columnKey, schemaBridge, onChangeField, mayEdit}) ->
   fieldSchema = schemaBridge._schema.properties[columnKey]
 
   <span>
@@ -20,6 +20,8 @@ export DateDisplayTableComponent = ({row, columnKey, schemaBridge, onChangeField
           ?.setZone params.zone
           ?.toFormat params.format
       else
-        ''
+        nullString
     }
   </span>
+
+export DateDisplayTableComponent = DateDisplayTableComponentWithNullString ''
