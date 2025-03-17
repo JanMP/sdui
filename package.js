@@ -13,7 +13,7 @@ Package.describe({
 Package.onUse(function(api) {
   api.versionsFrom(['2.16', '3.0-rc.4']);
   api.use('ecmascript');
-  api.use('coffeescript@2.7.0');
+  api.use('coffeescript@2.7.1-rc300.0');
   api.use('typescript');
   api.use('zodern:types@1.0.13');
   api.use('reactive-var');
@@ -30,6 +30,8 @@ Package.onUse(function(api) {
 
 Package.onTest(function(api) {
   api.use('ecmascript');
+  api.use('coffeescript@2.7.1-rc300.0');
+  api.use('react-meteor-data');
   api.use('tinytest');
   api.use('janmp:sdui');
   api.mainModule('sdui-tests.js');

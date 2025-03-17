@@ -13,7 +13,7 @@
   ],
   "author": "JanMP",
   "license": "ISC",
-  "types": "./typeDeclarations.ts",
+  "types": "./typeDeclarations.d.ts",
   "bugs": {
     "url": "https://github.com/JanMP/sdui/issues"
   },
@@ -22,6 +22,7 @@
     "@langchain/anthropic": "^0.2.6",
     "@langchain/community": "^0.2.19",
     "@langchain/core": "^0.2.17",
+    "@langchain/langgraph-sdk": "^0.0.50",
     "@langchain/mistralai": "^0.0.29",
     "@langchain/mongodb": "^0.0.4",
     "@types/mocha": "^10.0.1",
