@@ -37,6 +37,7 @@ export ActionButton = suspend lazy -> import('./forms/ActionButton.coffee').then
 export SdList = suspend lazy -> import('./tables/SdList.coffee').then (m) -> default: m.SdList
 export SdTable = suspend lazy -> import('./tables/SdTable.coffee').then (m) -> default: m.SdTable
 export DateDisplayTableComponent = suspend lazy -> import('./tables/DateDisplayTableComponent.coffee').then (m) -> default: m.DateDisplayTableComponent
+export {DateDisplayTableComponentWithNullString} from './tables/DateDisplayTableComponent.coffee'
 export SdContentEditor = suspend lazy -> import('./tables/SdContentEditor.coffee').then (m) -> default: m.SdContentEditor
 export SdEditor = suspend lazy -> import('./editor/SdEditor.coffee').then (m) -> default: m. SdEditor
 export MarkdownDisplay = suspend lazy -> import('./markdown/MarkdownDisplay.coffee').then (m) -> default: m.MarkdownDisplay
