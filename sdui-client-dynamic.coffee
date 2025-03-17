@@ -67,3 +67,4 @@ export GravatarField = suspend lazy -> import('./forms/GravatarField.coffee').th
 export FormattedJSON = suspend lazy -> import('./misc-components/FormattedJSON.coffee').then (m) -> default: m.FormattedJSON
 export SdUserTable = suspend lazy -> import('./usertable/SdUserTable.coffee').then (m) -> default: m.SdUserTable
 export SdJobsTable = suspend lazy -> import('./jobstable/SdJobsTable.coffee').then (m) -> default: m.SdJobsTable
+export {runTests} from './runTests.coffee'

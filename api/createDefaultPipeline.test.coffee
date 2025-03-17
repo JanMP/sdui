@@ -18,8 +18,12 @@ listSchema = new Schema
   properties:
     a: type: 'string'
     b: type: 'number'
-    c: type: 'array', properties: type: 'string'
-    d: type: 'array', properties: type: 'number'
+    c:
+      type: 'array'
+      items: type: 'string'
+    d:
+      type: 'array'
+      items: type: 'number'
 
 describe "createDefaultPipeline", ->
 
