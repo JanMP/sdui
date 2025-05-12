@@ -2,3 +2,4 @@ jsconfig.json
 .deploy/
 **/.DS_Store
 coffee-compiled
+node_modules

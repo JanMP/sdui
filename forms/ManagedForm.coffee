@@ -1,6 +1,5 @@
 import React, {useRef, useState, useEffect} from 'react'
 import {AutoForm} from './uniforms-custom/select-implementation'
-import {useForm} from 'uniforms'
 import {ActionButton} from './ActionButton.coffee'
 import isEqual from 'lodash/isEqual'
 import {ErrorBoundary} from '../common/ErrorBoundary.coffee'
