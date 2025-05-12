@@ -23,7 +23,7 @@ export DefaultMessage = ({message, hasPdfButton = true, onChangeFeedback, showTo
       className: 'flex-shrink-0'
 
   <div
-    className={"relative p-3 pr-6 mb-2 flex gap-4 p-card p-card-secondary chat-message"}
+    className={"relative p-3 pr-6 mb-2 flex gap-4 p-card p-card-secondary overflow-hidden whitespace-normal chat-message"}
     ref={targetRef}
   >
 
