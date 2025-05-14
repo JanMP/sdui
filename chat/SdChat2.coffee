@@ -87,7 +87,7 @@ export SdChat2 = ({dataOptions, className = "", customComponents = {}, processMe
 
   messages =
     useTracker ->
-      dataOptions.messageCollection.find {sessionId, chatRole: $ne: 'system'},
+      dataOptions.messageCollection.find {sessionId},
         sort: createdAt: -1
         limit: 100
       .fetch()

@@ -36,7 +36,7 @@ export createChatPublications = ({
    
     query =
       sessionId: sessionId
-      chatRole: $in: ['user', 'assistant']
+      chatRole: $in: ['user', 'assistant', 'log']
     messageCollection.find query,
       sort: {createdAt: -1}
       limit: messagesLimit

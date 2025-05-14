@@ -97,14 +97,22 @@ export class LangGraphChatBot
         tools: tools
         workInProgress: false
 
-
-  createLogMessage: ({sessionId, text = undefined, toolCall = undefined, error = undefined, usage = undefined}) ->
+  ###*
+    @param {Object} options
+    @param {String} options.sessionId
+    @param {String} [options.text]
+    @param {Object} [options.toolCall]
+    @param {Object} [options.error]
+    @param {Object} [options.usage]
+    @returns {Promise<void>}
+    ###
+  createLogMessage: ({sessionId, text, toolCall, error, usage}) ->
     @messageCollection.insertAsync
       userId: @botUserData.id
       sessionId: sessionId
       text: text
       toolCall: toolCall
-      error: if error? then "#{error}" else undefined
+      error: error
       chatRole: 'log'
       createdAt: new Date()
       workInProgress: false
@@ -138,9 +146,14 @@ export class LangGraphChatBot
                 #   console.log "#{"#".repeat 20} chunk #{"#".repeat 20}"
                 #   console.log JSON.stringify {chunk, id, metadata}, null, 2
                 await @updateMetaDataItem {sessionId, itemId: id, data: dataItem}
+          when "error"
+            console.error "Error in stream:", chunk
+            await @createLogMessage {sessionId, text: "Error in stream", error: chunk.data}
           else
-            console.log "#{"#".repeat 20} unknown chunk #{"#".repeat 20}"
-            console.log JSON.stringify chunk, null, 2
+            unless Meteor.isDevelopment
+              console.log "LangGraph Stream: unhandled event type:", chunk.event
+            # console.log "#{"#".repeat 20} unknown chunk #{"#".repeat 20}"
+            # console.log JSON.stringify chunk, null, 2
     catch error
       console.error "Stream handling error:", error
       throw error

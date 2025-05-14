@@ -12,6 +12,12 @@ import _ from 'lodash'
 
 export DefaultMessage = ({message, hasPdfButton = true, onChangeFeedback, showTools = true}) ->
 
+  if message.error?
+    return <div className="p-3 pr-6 mb-2 p-card p-card-secondary border-1 border-red-500 overflow-hidden whitespace-normal chat-message">
+        <div className="font-bold text-xl text-red-500">{message.error.error}</div>
+        <div className="text">{message.error.message}</div>
+    </div>
+
   {_id, userId, text, tools, username, email, chatRole, customImage, feedback} = message
 
 
