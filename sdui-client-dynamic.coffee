@@ -29,6 +29,7 @@ export {createJobsTableDataAPI} from './jobstable/createJobsTableDataAPI.coffee'
 export {AppStatusPage, appIsOn} from './app-status/AppStatusPage.coffee'
 export {generateUUID} from './common/generateUUID.coffee'
 export {ErrorBoundary} from './common/ErrorBoundary.coffee'
+export {FilesTableApi} from './files/FilesTableApi.coffee'
 # export {createFilesAPI, filesAPISourceSchema} from './api/createFilesAPI.coffee'
 
 # server only (eventually)

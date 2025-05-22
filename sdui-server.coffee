@@ -32,3 +32,4 @@ export {DateDisplayTableComponentWithNullString} from './tables/DateDisplayTable
 export {runTests} from './runTests.coffee'
 export {LangGraphChatBot} from './ai/LangGraphChatBot.coffee'
 export {invokeLangGraphAgent} from './ai/invokeLangGraphAgent.coffee'
+export {FilesTableApi} from './files/FilesTableApi.coffee'
