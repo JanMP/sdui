@@ -28,6 +28,12 @@
 			"titleBar.inactiveForeground": "#15202b99",
 			"commandCenter.border": "#15202b99"
 		},
+		"coffeelint2.defaultRules": false,
+		"coffeelint2.findConfig": true,
+		"coffeelint2.lintOnSave": true,
+		"coffeelint2.useLintOnSave": true,
+		"coffeelint2.configPath": "./coffeelint.json",
+		"coffeelint.enable": false,
 		"peacock.color": "silver"
 	}
 }
