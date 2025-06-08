@@ -21,9 +21,9 @@ Package.onUse(function(api) {
   api.use('mdg:validated-method@1.3.0');
   api.use('mdg:validation-error');
   // api.use('peerlibrary:reactive-publish@0.10.0');
-  api.use('tunguska:reactive-aggregate@2.0.1');
+  api.use('tunguska:reactive-aggregate@2.0.2');
   api.use('msavin:sjobs');
-  api.use('mizzao:user-status@2.0.0-rc.2'); 
+  api.use('mizzao:user-status@2.0.0-rc.2');
   api.mainModule('sdui-client-dynamic.coffee', 'client');
   api.mainModule('sdui-server.coffee', 'server');
 });

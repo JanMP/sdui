@@ -4,9 +4,9 @@ import {userWithIdIsInRole, currentUserIsInRole} from '../common/roleChecks.coff
 
 export publishTableData = ({viewTableRole, sourceName, collection,
 getRowsPipeline, noAutomaticObserver = false, debounceDelay = 200, getObservers})  ->
-  
+
   if Meteor.isServer
-  
+
     unless collection?
       throw new Error 'no collection given'
 

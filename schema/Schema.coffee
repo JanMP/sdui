@@ -57,19 +57,25 @@ export class Schema
       @firstLevelSchemaKeys = (key for key of @_schema.properties)
     catch error
       throw new Meteor.Error error.message
-  
+
+  idType =
+    oneOf: [
+      type: 'string'
+    , type: 'object'
+    ]
+
   addProperty: (property) ->
     s = {@_schema...}
     s.properties = {s.properties..., property...}
     new Schema s, @options
-  
-  withId: -> @addProperty '_id': type: 'string'
-  
+
+  withId: -> @addProperty '_id': {title: 'ID', idType...}
+
   pick: (keys) ->
     s = {@_schema...}
     s.properties = _.pick @_schema.properties, keys
     new Schema s, @options
-  
+
   omit: (keys) ->
     s = {@_schema...}
     s.properties = _.omit @_schema.properties, keys

@@ -11,7 +11,6 @@ export default connectFieldPlus ({
   value
   props...
 }) ->
-  console.log props
   if decimal
     props.minFractionDigits ?= 1
 

@@ -22,12 +22,12 @@ allowUnchangedSubmit = false}) ->
   hasChanged = not isEqual changedModel, model
 
   onAction = -> onSubmit changedModel
-  
+
   onValidate = (model, error) ->
-    console.log 'onValidate', {model, error}
+    # console.log 'onValidate', {model, error}
     setIsValid not error?
     error
-  
+
   handleChange = (newModel) ->
     setChangedModel newModel
     onChangeModel newModel
