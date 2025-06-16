@@ -20,6 +20,7 @@ export interface createTableDataAPIParams {
   formSchema?: Schema
   canEdit?: boolean
   canSearch?: boolean
+  canKnnSearch?: boolean
   canSort?: boolean
   canAdd?: boolean
   canDelete?: boolean
@@ -33,6 +34,7 @@ export interface createTableDataAPIParams {
   initialSortColumn?: string
   initialSortDirection?: 'ASC' | 'DESC'
   perLoad?: number
+  usePubSub?: boolean
   getPreSelectPipeline?: ({pub}?: {pub: object}) => Promise<Array<Object> | null>
   getProcessorPipeline?: ({pub}?: {pub: object}) => Promise<Array<Object> | null>
   getRowsPipeline?:
@@ -72,15 +74,16 @@ export interface createTableDataAPIParams {
   setupNewItem?: () => object
   onSubmit?: (object) => any
   checkDisableEditForRow?: boolean
-  checkDisableDeleteForRow?: boolean 
+  checkDisableDeleteForRow?: boolean
 }
 export interface createTableDataAPIReturn {
   sourceName: string
-  listSchemaBridge: Schema2Bridge
-  formSchemaBridge: Schema2Bridge
+  listSchema: Schema
+  formSchema: Schema
   rowsCollection: Mongo.Collection<any>
   canEdit?: boolean
   canSearch?: boolean
+  canKnnSearch?: boolean
   canSort?: boolean
   canAdd?: boolean
   canDelete?: boolean
@@ -99,6 +102,11 @@ export interface createTableDataAPIReturn {
   initialSortColumn?: string
   initialSortDirection?: 'ASC' | 'DESC'
   perLoad: number
+  usePubSub: boolean
+  sdAiSettings?: {
+    embeddingModelSettings: object
+    getEmbeddingContext: ({document}: {document: object}) => string
+  }
 }
 
 export declare function createTableDataAPI(options: createTableDataAPIParams): createTableDataAPIReturn

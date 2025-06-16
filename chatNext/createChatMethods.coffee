@@ -69,7 +69,7 @@ export createChatMethods = ({
     text.length > getUsageLimits().maxMessageLength
 
   userIsInSession = ({sessionId}) ->
-    Meteor.userId() in (await sessionListCollection?.findOneAsync(sessionId)?.userIds ? [])
+    (await Meteor.userId()) in (await sessionListCollection?.findOneAsync(sessionId)?.userIds ? [])
 
   userIsInSessionOfMessage = ({messageId}) ->
     sessionId = (await messageCollection?.findOneAsync(messageId))?.sessionId
@@ -208,6 +208,12 @@ export createChatMethods = ({
       sessionListCollection.updateAsync {_id: sessionId},
         $set:
           archived: true
+
+  deleteSessionData = ({sessionId}) ->
+    if (existingSession = await sessionListCollection?.findOneAsync sessionId)?
+      messageCollection.removeAsync {sessionId}
+      metaDataCollection.removeAsync {sessionId}
+      sessionListCollection.removeAsync {_id: sessionId}
 
   new ValidatedMethod
     name: "#{sourceName}.deleteSession"

@@ -19,6 +19,7 @@ DefaultSessionListItem  = ({sessionId}) ->
 
 
 defaultProcessMessageText = ({text, metaData, addLinkedMetaData}) ->
+  return '' unless typeof text is 'string'
   replacer = (match, title, url) ->
     metaDataItem = metaData?.find((m) -> m.data?.url is url)
     if metaDataItem?
@@ -30,9 +31,9 @@ defaultProcessMessageText = ({text, metaData, addLinkedMetaData}) ->
   text
   ?.replace /\[(.+?)\]\((.+?)\)/g, replacer
   ?.replace /\[(.+?)\]\(([^\)]+?)$/g, (match, title, url) -> "[#{title}]() ... <span class='pi pi-spin text-primary-200 pi-spinner'/>"
-  
 
-export SdChat2 = ({dataOptions, className = "", customComponents = {}, processMessageText, showTools = true}) ->
+
+export SdChat = ({dataOptions, className = "", customComponents = {}, processMessageText, showTools = true}) ->
 
   {SessionListItem, Message, MetaDataDisplay} = customComponents
   SessionListItem ?= DefaultSessionListItem
@@ -40,7 +41,7 @@ export SdChat2 = ({dataOptions, className = "", customComponents = {}, processMe
   MetaDataDisplay ?= DefaultMetaDataDisplay
 
   displayMetaData = true
-  
+
   processMessageText ?= defaultProcessMessageText
 
   {bots, sourceName, sessionListDataOptions, isSingleSessionChat, metaDataCollection} = dataOptions
@@ -52,7 +53,7 @@ export SdChat2 = ({dataOptions, className = "", customComponents = {}, processMe
   toast = useToast()
   linkedMetaData = useRef new Set()
   addLinkedMetaData = (id) -> linkedMetaData.current.add id
-  
+
   {t} = useTranslation()
 
   messagesAreLoading = useSubscribe "#{sourceName}.messages", {sessionId}
@@ -151,7 +152,7 @@ export SdChat2 = ({dataOptions, className = "", customComponents = {}, processMe
 
   # SessionList hook
   deleteSession = ({id}) ->
-    if sessionId is id then setSessionId ''
+    if sessionId is id then setSessionId null
     meteorApply
       method: "#{sourceName}.deleteSession"
       data: {id}
@@ -206,7 +207,7 @@ export SdChat2 = ({dataOptions, className = "", customComponents = {}, processMe
    <div
      style={
        gridArea: 'sidebar'
-       width: 'var(--sidebar-width, 16rem)'
+       width: '100%'
        height: '100%'
        overflowY: 'none'
      }
@@ -233,10 +234,10 @@ export SdChat2 = ({dataOptions, className = "", customComponents = {}, processMe
         columns: '1fr'
     else
       if displayMetaData
-        areas: "'sidebar' 'content' 'metadata'"
-        columns: '1fr 2fr 1fr'
+        areas: "'sidebar content metadata'"
+        columns: '16rem 2fr 1fr'
       else
-        areas: "'sidebar' 'content'"
+        areas: "'sidebar content'"
         columns: '1fr 3fr'
 
   # CSS Grid layout with variables
@@ -285,7 +286,7 @@ export SdChat2 = ({dataOptions, className = "", customComponents = {}, processMe
     }
     <div style={contentStyle}>
       {header}
-      
+
       <div className="relative" style={messagesStyle}>
         <div className="absolute top-0 left-0 right-0 bottom-0 overflow-y-auto" ref={scrollAreaRef}>
           {
@@ -300,7 +301,7 @@ export SdChat2 = ({dataOptions, className = "", customComponents = {}, processMe
           }
         </div>
       </div>
-      
+
       <form onSubmit={addMessage} className="p-card" style={inputFormStyle}>
         <div className="p-inputgroup">
           <InputText

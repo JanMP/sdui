@@ -22,6 +22,8 @@ export {createTableDataAPI} from './api/createTableDataAPI.coffee'
 export {createUserTableAPI} from './usertable/createUserTableAPI.coffee'
 export {createQAArticlesAPI} from './qa-articles/createQAArticlesAPI.coffee'
 export {createChatAPI, chatSchema} from './chat/createChatAPI.coffee'
+export {createChatAPI as createChatAPINext} from './chatNext/createChatAPI.coffee'
+export {chatSchema as chatSchemaNext} from './chatNext/createChatAPI.coffee'
 export {createChatLogAPI, addCostsPipeline} from './chat/createChatLogAPI.coffee'
 export {createAppLayoutAPI} from './app-layout/createAppLayoutAPI.coffee'
 export {ToastProvider, useToast} from './app-layout/ToastProvider.coffee'
@@ -60,7 +62,7 @@ export FeedbackButtonTableField = suspend lazy -> import('./forms/FeedbackButton
 export SdDocumentSelect = suspend lazy -> import('./tables/SdDocumentSelect.coffee').then (m) -> default: m.SdDocumentSelect
 export SdDocumentSelectField = suspend lazy -> import('./tables/SdDocumentSelect.coffee').then (m) -> default: m.SdDocumentSelectField
 export SdChat = suspend lazy -> import('./chat/SdChat.coffee').then (m) -> default: m.SdChat
-export SdChat2 = suspend lazy -> import('./chat/SdChat2.coffee').then (m) -> default: m.SdChat2
+export SdChatNext = suspend lazy -> import('./chatNext/SdChat.coffee').then (m) -> default: m.SdChat
 export SdChatLog = suspend lazy -> import('./chat/SdChatLog.coffee').then (m) -> default: m.SdChatLog
 export SdAppLayout = suspend lazy -> import('./app-layout/SdAppLayout.coffee').then (m) -> default: m.SdAppLayout
 export Gravatar = suspend lazy -> import('./forms/GravatarField.coffee').then (m) -> default: m.Gravatar
