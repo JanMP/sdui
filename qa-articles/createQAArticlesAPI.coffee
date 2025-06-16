@@ -25,7 +25,7 @@ import _ from 'lodash'
   # @return {Object} Configured API object for managing QA articles data
   ###
 export createQAArticlesAPI = ({sourceName, collection, viewTableRole, editRole, getEmbedding}) ->
-  
+
   sourceSchema = new Schema
     type: 'object'
     properties:
@@ -62,7 +62,7 @@ export createQAArticlesAPI = ({sourceName, collection, viewTableRole, editRole, 
   #         console.error error
   #         throw new Meteor.Error "[#{sourceName} #{document.question}] Could not get embedding"
   #     collection.updateAsync document._id, $set: vector: vector
-    
+
 
   createTableDataAPI
     sourceName: sourceName
@@ -75,6 +75,7 @@ export createQAArticlesAPI = ({sourceName, collection, viewTableRole, editRole, 
     canAdd: true
     canDelete: true
     canExport: true
+    canKnnSearch: true
     initialSortColumn: 'question'
     initialSortDirection: 'ASC'
     sdAiSettings: sdAiSettings

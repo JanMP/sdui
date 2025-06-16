@@ -20,14 +20,14 @@ newCache = -> new CellMeasurerCache
 
 resizableHeaderRenderer = ({onResizeRows, isLastOne}) ->
   ({columnData, dataKey, disableSort, label, sortBy, sortDirection}) ->
-  
+
     onDrag = (e, {deltaX}) ->
       onResizeRows {dataKey, deltaX}
-    
+
     <div className={"content #{if isLastOne then 'last-column' else ''}"} key={dataKey}>
       <div className="squishy sort-click-target">
         <div className="label sort-click-target">{label}</div>
-        <div className="sort-icon sort-click-target">
+        {<div className="sort-icon sort-click-target">
           {
             if sortBy is dataKey
               if sortDirection is 'ASC'
@@ -37,7 +37,7 @@ resizableHeaderRenderer = ({onResizeRows, isLastOne}) ->
             else
               <i className="sort-click-target pi pi-sort"/>
           }
-        </div>
+        </div> if not disableSort}
       </div>
       {<Draggable
         axis="x"
@@ -116,6 +116,7 @@ export DataTable = ({
   onChangeSort = (args...) -> console.log "onChangeSort default stump called with arguments:", args...
   canSearch, search,
   onChangeSearch = (args...) -> console.log "onChangeSearch default stump called with arguments:", args...
+  isKnnSearch, canKnnSearch, onSetIsKnnSearch
   isLoading
   canAdd, mayAdd, onAdd = (args...) -> console.log "onAdd default stump called with arguments:", args...
   canDelete, mayDelete, onDelete = (args...) -> console.log "onDelete default stump called with arguments:", args...
@@ -133,7 +134,7 @@ export DataTable = ({
   {Header, AdditionalButtonsRight, rightButtonColumnWidth, AdditionalHeaderButtonsLeft, AdditionalHeaderButtonsRight} = customComponents
   if Header? and (AdditionalHeaderButtonsLeft? or AdditionalHeaderButtonsRight?)
     console.warn "both Header and AdditionalHeaderButtons are declared"
-  
+
   Header ?= DefaultHeader
 
   rightButtonColumnWidth ?= 50
@@ -240,23 +241,25 @@ export DataTable = ({
         width={columnWidths[i] * totalColumnsWidth}
         cellRenderer={cellRenderer {listSchema, onChangeField, mayEdit, cache: cacheRef.current}}
         headerRenderer={headerRenderer}
+        disableSort={not canSort or isKnnSearch}
       />
 
 
   <div ref={contentContainerRef} className="p-component h-full">
-  
+
     <div ref={headerContainerRef}>
       <Header {{
         listSchema
         loadedRowCount: rows?.length
         canSearch, search, onChangeSearch
+        canKnnSearch, isKnnSearch, onSetIsKnnSearch
         canExport, mayExport, onExportTable,
         canAdd, mayAdd, onAdd
         canSort, sortColumn, sortDirection, onChangeSort
         AdditionalHeaderButtonsLeft, AdditionalHeaderButtonsRight
       }...}/>
     </div>
-   
+
     <div className="absolute">
       <InfiniteLoader
         isRowLoaded={isRowLoaded}
@@ -296,5 +299,5 @@ export DataTable = ({
         }
       </InfiniteLoader>
     </div>
-    
+
   </div>

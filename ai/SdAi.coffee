@@ -55,10 +55,10 @@ export class SdAi
         # Create fields definition including both vector and filter flags
         fields = [
           type: 'vector'
-        path: 'sdai.vector'
-          numDimensions: 1024 # TODO: make numDimensions configurable
-          similarity: 'cosine'
-          quantization: 'none'
+          path: 'sdai.vector'
+            numDimensions: 1024 # TODO: make numDimensions configurable
+            similarity: 'cosine'
+            quantization: 'none'
         ]
 
         # Add filter flag fields to the index definition
@@ -139,6 +139,7 @@ export class SdAi
     @return {Promise<Object[]>} Array of matching documents with similarity scores
     ###
   knnFindDocuments: ({vector, filterFlags, limit = 10}) ->
+    console.log '[knnFindDocuments] vector:', vector.length, 'filterFlags:', filterFlags, 'limit:', limit
     @collection.rawCollection().aggregate [
       $vectorSearch:
         index: 'sdaiVectorSearchIndex'

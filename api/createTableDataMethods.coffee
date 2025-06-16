@@ -57,6 +57,11 @@ sdai}) ->
     , type: 'object'
     ]
 
+  transformRowIdsToMiniMongo = (rows) ->
+    return rows unless useObjectIds
+    rows.map (row) ->
+      {row..., _id: transformIdToMiniMongo(row._id)}
+
   getRows = new ValidatedMethod
     name: "#{sourceName}.getRows"
     validate:
@@ -77,12 +82,34 @@ sdai}) ->
       .aggregate await getRowsPipeline {search, query, sort, limit, skip},
         allowDiskUse: true
       .toArray()
-      .then (rows) ->
-        rows.map (row) ->
-          {row..., _id: transformIdToMiniMongo(row._id)}
+      .then transformRowIdsToMiniMongo
       .catch (error) ->
         console.error "#{sourceName}.getRows", error
 
+  new ValidatedMethod
+    name: "#{sourceName}.getRowsKnn"
+    validate:
+      new Schema
+        type: 'object'
+        properties:
+          search: type: 'string'
+          limit: type: 'number'
+          skip: type: 'number'
+      .methodValidator
+    run: ({search, limit}) ->
+      return unless Meteor.isServer
+      console.log "#{sourceName}.getRowsKnn", {search, limit}
+      vector = await sdai.embeddingFromContext context: search
+      sdai.knnFindDocuments {vector, limit}
+      .then (rows) ->
+        if rows?.length
+          console.log "#{sourceName}.getRowsKnn found #{rows.length} rows"
+        else
+          console.log "#{sourceName}.getRowsKnn found no rows"
+        return rows
+      .then transformRowIdsToMiniMongo
+      .catch (error) ->
+        console.error "#{sourceName}.getRowsKnn", error
 
   if canExport
     new ValidatedMethod

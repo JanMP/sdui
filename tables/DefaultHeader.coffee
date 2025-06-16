@@ -14,6 +14,7 @@ export DefaultHeader = ({
   listSchema
   loadedRowCount
   canSearch, search, onChangeSearch
+  canKnnSearch, isKnnSearch, onSetIsKnnSearch
   canExport, mayExport, onExportTable,
   canAdd, mayAdd, onAdd
   canSort, sortColumn, sortDirection, onChangeSort
@@ -21,7 +22,7 @@ export DefaultHeader = ({
   AdditionalHeaderButtonsRight = -> null
 }) ->
 
-  
+
   # workaround until we can use container queries
   toolbarRef = useRef null
   [width, height] = useSize toolbarRef
@@ -45,10 +46,19 @@ export DefaultHeader = ({
 
   centerContent =
     <>
-        {if canSort then <SortSelect {{listSchema,sortColumn, sortDirection, onChangeSort}...}/>}
-        {if canSearch then <SearchInput value={search} onChange={onChangeSearch}/>}
+        {if canSort and not isKnnSearch then <SortSelect {{listSchema,sortColumn, sortDirection, onChangeSort}...}/>}
+        {
+          if canSearch
+            <SearchInput
+              value={search}
+              onChange={onChangeSearch}
+              canKnnSearch={canKnnSearch}
+              isKnnSearch={isKnnSearch}
+              onSetIsKnnSearch={onSetIsKnnSearch}
+            />
+        }
     </>
-    
+
   endContent =
     <>
       <AdditionalHeaderButtonsLeft/>
