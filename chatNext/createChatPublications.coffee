@@ -53,8 +53,6 @@ export createChatPublications = ({
 
   Meteor.publish "#{sourceName}.usageLimits", ({sessionId}) ->
 
-    console.log "createChatPublications.usageLimits", {sessionId, userId: @userId}
-
     return @ready() unless sessionId?
     return @ready() unless getUsageLimits?()?
     return @ready() unless userWithIdIsInRole id: @userId, role: viewChatRole
@@ -120,3 +118,6 @@ export createChatPublications = ({
         debounceDelay: 200
         noAutomaticObserver: true
         observers: [messageCollection.find {userId: @userId}]
+      .catch (error) ->
+        console.error "Error in ReactiveAggregate for #{sourceName}.usageLimits", error
+        return @ready()

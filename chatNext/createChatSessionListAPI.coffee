@@ -30,6 +30,17 @@ export createChatSessionListAPI = ({sourceName, sessionListCollection, viewChatR
         instanceof: 'Date'
       threadId:
         type: 'string'
+      model:
+        type: 'string'
+        enum: [
+          "anthropic/claude-3-5-haiku-latest",
+          "anthropic/claude-sonnet-4-20250514",
+          "google_genai/gemini-2.5-flash-preview-04-17",
+          "mistralai/mistral-small-latest",
+          "mistralai/magistral-medium-2506",
+          "openai/gpt-4.1",
+        ]
+    required: ['title', 'model']
 
   listSchema =
     sourceSchema.addProperty
@@ -37,17 +48,18 @@ export createChatSessionListAPI = ({sourceName, sessionListCollection, viewChatR
         type: 'array'
         items: type: 'object'
 
-  formSchema = sourceSchema.pick ['title']
+  formSchema = sourceSchema.pick ['title', 'model']
 
-  getPreSelectPipeline = ({pub}) -> [
-    $match:
-      $or: [
-        archived: $exists: false
-      ,
-        archived: false
-      ]
-      userIds: pup?.userId() ? Meteor.userId()
-  ]
+  getPreSelectPipeline = ({pub}) ->
+    [
+      $match:
+        $or: [
+          archived: $exists: false
+        ,
+          archived: false
+        ]
+        userIds: pub?.userId ? Meteor.userId()
+    ]
 
   getSessionListProcessorPipeline = -> [
     $unwind: '$userIds'
@@ -68,6 +80,7 @@ export createChatSessionListAPI = ({sourceName, sessionListCollection, viewChatR
     $group:
       _id: '$_id'
       title: $first: '$title'
+      model: $first: '$model'
       createdAt: $first: '$createdAt'
       userIds: $push: '$userIds'
       users: $push:
@@ -92,6 +105,5 @@ export createChatSessionListAPI = ({sourceName, sessionListCollection, viewChatR
     usePubSub: true
     initialSortColumn: 'createdAt'
     initialSortDirection: 'DESC'
-
     getPreSelectPipeline: getPreSelectPipeline
     getProcessorPipeline: getSessionListProcessorPipeline

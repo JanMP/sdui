@@ -1,5 +1,5 @@
 import {Meteor} from 'meteor/meteor'
-import React, {useState, useEffect, useRef} from 'react'
+import React, {useState, useEffect, useRef, memo} from 'react'
 import {useTracker, useSubscribe} from 'meteor/react-meteor-data'
 import {meteorApply, ActionButton, useToast} from 'meteor/janmp:sdui'
 import {InputText} from 'primereact/inputtext'
@@ -40,7 +40,6 @@ export SdChat = ({dataOptions, className = "", customComponents = {}, processMes
   Message ?= DefaultMessage
   MetaDataDisplay ?= DefaultMetaDataDisplay
 
-  displayMetaData = true
 
   processMessageText ?= defaultProcessMessageText
 
@@ -48,6 +47,12 @@ export SdChat = ({dataOptions, className = "", customComponents = {}, processMes
 
   [inputValue, setInputValue] = useState ''
   [sessionId, setSessionId] = useState null
+
+  [sessionListIsOpen, setSessionListIsOpen] = useState true
+  onToggleSessionList = -> setSessionListIsOpen (x) -> not x
+
+  [metaDataIsOpen, setMetaDataIsOpen] = useState true
+  onToggleMetaData = -> setMetaDataIsOpen (x) -> not x
 
   scrollAreaRef = useRef null
   toast = useToast()
@@ -194,6 +199,12 @@ export SdChat = ({dataOptions, className = "", customComponents = {}, processMes
             onAction={resetSingleSession}
             disabled={noMoreSessionsToday}
           />
+        else
+          <ActionButton
+            icon="pi pi-fw pi-bars"
+            className="p-button-text p-button-primary"
+            onAction={onToggleSessionList}
+          />
       }
       <div className="p-2 text-sm">
         Noch übrig:
@@ -201,17 +212,22 @@ export SdChat = ({dataOptions, className = "", customComponents = {}, processMes
         <span className={setClassForLimit currentLimits?.messagesPerSessionLeft}> {currentLimits?.messagesPerSessionLeft} Msgs/Chat,</span>
         <span className={setClassForLimit currentLimits?.sessionsPerDayLeft}> {currentLimits?.sessionsPerDayLeft} Chats/Tag</span>
       </div>
+      <ActionButton
+        icon="pi pi-fw pi-bars"
+        className="p-button-text p-button-primary"
+        onAction={onToggleMetaData}
+      />
     </div>
 
   sessionListDisplay =
-   <div
-     style={
-       gridArea: 'sidebar'
-       width: '100%'
-       height: '100%'
-       overflowY: 'none'
-     }
-   >
+    <div
+      style={
+        gridArea: 'sidebar'
+        width: '100%'
+        height: '100%'
+        overflowY: 'none'
+      }
+    >
       <SdList
         dataOptions={{
           sessionListDataOptions...,
@@ -226,19 +242,27 @@ export SdChat = ({dataOptions, className = "", customComponents = {}, processMes
 
   {areas, columns} =
     if isSingleSessionChat
-      if displayMetaData
+      if metaDataIsOpen
         areas: "'content metadata'"
         columns: '2fr 1fr'
       else
         areas: "'content'"
         columns: '1fr'
     else
-      if displayMetaData
-        areas: "'sidebar content metadata'"
-        columns: '16rem 2fr 1fr'
+      if sessionListIsOpen
+        if metaDataIsOpen
+          areas: "'sidebar content metadata'"
+          columns: '16rem 2fr 1fr'
+        else
+          areas: "'sidebar content'"
+          columns: '16rem 3fr'
       else
-        areas: "'sidebar content'"
-        columns: '1fr 3fr'
+        if metaDataIsOpen
+          areas: "'content metadata'"
+          columns: '3fr 1fr'
+        else
+          areas: "'content'"
+          columns: '3fr'
 
   # CSS Grid layout with variables
   containerStyle =
@@ -281,12 +305,11 @@ export SdChat = ({dataOptions, className = "", customComponents = {}, processMes
   # return
   <div className={className} style={containerStyle}>
     {
-      unless isSingleSessionChat
+      unless isSingleSessionChat or not sessionListIsOpen
         sessionListDisplay
     }
     <div style={contentStyle}>
       {header}
-
       <div className="relative" style={messagesStyle}>
         <div className="absolute top-0 left-0 right-0 bottom-0 overflow-y-auto" ref={scrollAreaRef}>
           {
@@ -331,7 +354,7 @@ export SdChat = ({dataOptions, className = "", customComponents = {}, processMes
     </div>
 
     {
-      if displayMetaData
+      if metaDataIsOpen
         <div style={metaDataStyle}>
           <MetaDataDisplay metaData={metaData}/>
         </div>

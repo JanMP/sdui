@@ -1,10 +1,9 @@
 import React from 'react'
 import {ActionButton} from '../forms/ActionButton'
-import {Toolbar} from 'primereact/toolbar'
 
 export SessionListHeader = ({onAdd}) ->
 
-  endContent =
+  <div className="py-3">
     <ActionButton
       icon="pi pi-plus"
       label="Neuer Chat"
@@ -15,5 +14,4 @@ export SessionListHeader = ({onAdd}) ->
         rounded: true
       }
     />
-
-  <Toolbar center={endContent} />
+  </div>

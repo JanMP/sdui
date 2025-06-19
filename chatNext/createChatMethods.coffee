@@ -69,7 +69,7 @@ export createChatMethods = ({
     text.length > getUsageLimits().maxMessageLength
 
   userIsInSession = ({sessionId}) ->
-    (await Meteor.userId()) in (await sessionListCollection?.findOneAsync(sessionId)?.userIds ? [])
+    Meteor.userId() in (await sessionListCollection?.findOneAsync(sessionId)?.userIds ? [])
 
   userIsInSessionOfMessage = ({messageId}) ->
     sessionId = (await messageCollection?.findOneAsync(messageId))?.sessionId
@@ -78,14 +78,14 @@ export createChatMethods = ({
       return false
     userIsInSession {sessionId}
 
-  addSession = ({title, userIds}) ->
+  addSession = ({title, userIds, model}) ->
     if await sessionsPerDayLimitReached()
       throw new Meteor.Error "Tut uns Leid, wir erlauben momentan nur #{getUsageLimits()?.maxSessionsPerDay} Chats pro Tag. Bitte versuche es morgen nochmal."
     await currentUserMustBeInRole addSessionRole
     return unless Meteor.isServer
     title ?= '[no title]'
     userIds ?= [Meteor.userId()]
-    sessionId = await sessionListCollection.insertAsync {title, userIds, createdAt: new Date()}
+    sessionId = await sessionListCollection.insertAsync {title, userIds, model, createdAt: new Date()}
     onNewSession {sessionId}
     sessionId
 
