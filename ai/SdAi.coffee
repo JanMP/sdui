@@ -139,7 +139,7 @@ export class SdAi
     @return {Promise<Object[]>} Array of matching documents with similarity scores
     ###
   knnFindDocuments: ({vector, filterFlags, limit = 10}) ->
-    console.log '[knnFindDocuments] vector:', vector.length, 'filterFlags:', filterFlags, 'limit:', limit
+    # console.log '[knnFindDocuments] vector:', vector.length, 'filterFlags:', filterFlags, 'limit:', limit
     @collection.rawCollection().aggregate [
       $vectorSearch:
         index: 'sdaiVectorSearchIndex'
