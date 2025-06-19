@@ -36,14 +36,16 @@ export class LangGraphChatBot
     @botUserData = botUserData
 
 
-  upsertThreadId: ({sessionId}) ->
-    savedThreadId = (await @sessionCollection.findOneAsync sessionId)?.threadId
+  getCallParams: ({sessionId}) ->
+    unless (session = await @sessionCollection.findOneAsync sessionId)?
+      throw new Meteor.Error 'LangGraphChatBot: session not found'
+    savedThreadId = session.threadId
     threadId = savedThreadId ? (await @client.threads.create())?.thread_id
     if not savedThreadId?
       @sessionCollection.updateAsync sessionId,
         $set:
           threadId: threadId
-    threadId
+    {threadId, model: session.model ? 'openai/gpt-4.1'}
 
 
   createMessageStub: ({sessionId, text = '', followMessageId = undefined, followDelay = 1}) ->
@@ -161,11 +163,13 @@ export class LangGraphChatBot
 
   call: ({sessionId, messageStubId, text}) ->
     try
-      threadId = await @upsertThreadId {sessionId}
+      {threadId, model} = await @getCallParams {sessionId}
       # console.log "call", {sessionId, messageStubId, text, threadId}
       response = @client.runs.stream threadId, @graphName,
         input:
           messages: text
+        config:
+          configurable: {model}
         streamMode: "messages"
 
       @processStream {sessionId, response, messageStubId}
