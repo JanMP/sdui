@@ -9,19 +9,31 @@ import _ from 'lodash'
 
 export createJobsTableDataAPI = ->
 
-  sourceSchemaDefinition =
-    _id: String
-    name: String
-    created: Date
-    due: Date
-    state: String
-    priority: SimpleSchema.Integer
-
-  sourceSchema = new SimpleSchema sourceSchemaDefinition
+  sourceSchema = new Schema
+    type: 'object'
+    properties:
+      name:
+        title: 'Name'
+        type: 'string'
+      created:
+        title: 'Created'
+        instanceof: 'Date'
+      due:
+        title: 'Fällig'
+        instanceof: 'Date'
+      state:
+        title: 'Status'
+        type: 'string'
+        enum: ['waiting', 'running', 'done', 'error']
+      priority:
+        title: 'Priorität'
+        type: 'integer'
+        minimum: 0
+        maximum: 10
 
   new ValidatedMethod
     name: 'jobs.stop'
-    validate: sourceSchema.methodValidator()
+    validate: sourceSchema.methodValidator
     run: (job) ->
       currentUserMustBeInRole 'admin'
       console.log 'Jobs: ', Jobs.jobs
@@ -29,7 +41,7 @@ export createJobsTableDataAPI = ->
 
   new ValidatedMethod
     name: 'jobs.execute'
-    validate: sourceSchema.methodValidator()
+    validate: sourceSchema.methodValidator
     run: (job) ->
       currentUserMustBeInRole 'admin'
       console.log 'Jobs: ', Jobs.jobs
@@ -37,7 +49,7 @@ export createJobsTableDataAPI = ->
 
   new ValidatedMethod
     name: 'jobs.remove'
-    validate: sourceSchema.methodValidator()
+    validate: sourceSchema.methodValidator
     run: (job) ->
       currentUserMustBeInRole 'admin'
       console.log 'Jobs: ', Jobs.jobs

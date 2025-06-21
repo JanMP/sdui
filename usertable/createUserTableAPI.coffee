@@ -12,10 +12,10 @@ import {runTransaction} from '../common/runTransaction.coffee'
 
 ###*
  * createUserTableAPI function configures and exposes an API for user table manipulation, including CRUD operations,
- * roles assignment, and user status tracking. It leverages Meteorjs, MongoDB, and SimpleSchema for data validation.
+ * roles assignment, and user status tracking. It leverages Meteorjs, MongoDB, and Schema for data validation.
  *
  * @param {Object} options - Configuration options for the user table API.
- * @param {SimpleSchema} options.userProfileSchema - Schema for user profile information.
+ * @param {Schema} options.userProfileSchema - Schema for user profile information.
  * @param {Function} options.getAllowedRoles - Function returning a list of allowed roles for users.
  * @param {String} options.viewUserTableRole - Role required to view the user table. Defaults to 'admin'.
  * @param {String} options.editUserRole - Role required to edit users. Defaults to 'admin'.
@@ -24,7 +24,7 @@ export createUserTableAPI = ({userProfileSchema, getAllowedRoles, viewUserTableR
 
   getAllowedRoles ?= ->
     global: ['admin', 'user']
-  
+
   defaultUserProfileSchema =
     type: 'object'
     properties:
@@ -73,7 +73,7 @@ export createUserTableAPI = ({userProfileSchema, getAllowedRoles, viewUserTableR
         type: 'array'
         items: type: 'object'
       heartbeat: instanceof: 'Date'
-      
+
 
   userListSchema = new Schema
     type: 'object'

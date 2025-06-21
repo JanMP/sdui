@@ -1,34 +1,12 @@
 /**
  * Combined TypeScript declarations
- * Generated on Mon Mar  3 11:37:49 CET 2025
+ * Generated on Sat Jun 21 08:45:11 CEST 2025
  */
 
 declare namespace SduiComponents {
 
-  // ====== From: coffee-compiled/ai/ChatAgent.d.ts ======
-  // File: ChatAgent
-  {};
-
   // ====== From: coffee-compiled/ai/ChatAgent.test.d.ts ======
   // File: ChatAgent.test
-
-  // ====== From: coffee-compiled/ai/SdAi.d.ts ======
-  // File: SdAi
-  const SdAi: any;
-
-  // ====== From: coffee-compiled/ai/TextEmbeddingModel.d.ts ======
-  // File: TextEmbeddingModel
-  const TextEmbeddingModel: {
-      new (settings: object): {
-          settings: any;
-          create({ context }: {
-              context: any;
-          }): any;
-      };
-  };
-
-  // ====== From: coffee-compiled/ai/TextEmbeddingModel.test.d.ts ======
-  // File: TextEmbeddingModel.test
   {};
 
   // ====== From: coffee-compiled/ai/getMultimodalEmbedding.d.ts ======
@@ -38,26 +16,97 @@ declare namespace SduiComponents {
       settings: any;
   }): Promise<any>;
 
-  // ====== From: coffee-compiled/ai/qdrant/RestClient.d.ts ======
-  // File: RestClient
-  function createRestClient(settings: any): {
-      get: ({ path }: {
-          path: any;
-      }) => any;
-      post: ({ path, data }: {
-          path: any;
-          data: any;
-      }) => any;
-      put: ({ path, data }: {
-          path: any;
-          data: any;
-      }) => any;
-      delete: ({ path }: {
-          path: any;
-      }) => any;
-      head: ({ path }: {
-          path: any;
-      }) => any;
+  // ====== From: coffee-compiled/ai/invokeLangGraphAgent.d.ts ======
+  // File: invokeLangGraphAgent
+  function invokeLangGraphAgent({ settings, agent, input }: {
+      settings: object;
+      agent: string;
+      input: object;
+  }): Promise<any>;
+
+  // ====== From: coffee-compiled/ai/LangGraphChatBot.d.ts ======
+  // File: LangGraphChatBot
+  const LangGraphChatBot: {
+      new ({ settings, graphName, messageCollection, sessionListCollection, metaDataCollection, botUserData }: {
+          settings: any;
+          graphName: any;
+          messageCollection: any;
+          sessionListCollection: any;
+          metaDataCollection: any;
+          botUserData: any;
+      }): {
+          client: any;
+          graphName: any;
+          messageCollection: any;
+          metaDataCollection: any;
+          sessionCollection: any;
+          botUserData: any;
+          getCallParams({ sessionId }: {
+              sessionId: any;
+          }): Promise<{
+              threadId: any;
+              model: any;
+          }>;
+          createMessageStub({ sessionId, text, followMessageId, followDelay }: {
+              sessionId: any;
+              text?: string;
+              followMessageId?: any;
+              followDelay?: number;
+          }): Promise<any>;
+          /**
+          @param {Object} options
+          @param {String} options.sessionId
+          @param {String} options.itemId
+          @param {Object} options.metadata
+          @returns {Promise<void>}
+          */
+          createMetaDataItem({ sessionId, itemId, metadata }: {
+              sessionId: string;
+              itemId: string;
+              metadata: any;
+          }): Promise<void>;
+          updateMetaDataItem({ sessionId, itemId, data }: {
+              sessionId: any;
+              itemId: any;
+              data: any;
+          }): any;
+          updateMessageStub({ messageStubId, text, tools }: {
+              messageStubId: any;
+              text: any;
+              tools?: any;
+          }): any;
+          finalizeMessageStub({ messageStubId, text, tools }: {
+              messageStubId: any;
+              text: any;
+              tools: any;
+          }): any;
+          /**
+          @param {Object} options
+          @param {String} options.sessionId
+          @param {String} [options.text]
+          @param {Object} [options.toolCall]
+          @param {Object} [options.error]
+          @param {Object} [options.usage]
+          @returns {Promise<void>}
+          */
+          createLogMessage({ sessionId, text, toolCall, error, usage }: {
+              sessionId: string;
+              text?: string;
+              toolCall?: any;
+              error?: any;
+              usage?: any;
+          }): Promise<void>;
+          processStream({ sessionId, response, messageStubId }: {
+              sessionId: any;
+              response: any;
+              messageStubId: any;
+          }): Promise<any[]>;
+          call({ sessionId, messageStubId, text }: {
+              sessionId: any;
+              messageStubId: any;
+              text: any;
+          }): Promise<void | any[]>;
+      };
   };
 
   // ====== From: coffee-compiled/ai/qdrant/createQdrantCollection.d.ts ======
@@ -118,9 +167,37 @@ declare namespace SduiComponents {
       limit?: number;
   }): any;
 
+  // ====== From: coffee-compiled/ai/qdrant/RestClient.d.ts ======
+  // File: RestClient
+  function createRestClient(settings: any): {
+      get: ({ path }: {
+          path: any;
+      }) => any;
+      post: ({ path, data }: {
+          path: any;
+          data: any;
+      }) => any;
+      put: ({ path, data }: {
+          path: any;
+          data: any;
+      }) => any;
+      delete: ({ path }: {
+          path: any;
+      }) => any;
+      head: ({ path }: {
+          path: any;
+      }) => any;
+  };
+
+  // ====== From: coffee-compiled/ai/SdAi.d.ts ======
+  // File: SdAi
+  const SdAi: any;
+
   // ====== From: coffee-compiled/ai/setupChatModel.d.ts ======
   // File: setupChatModel
-  function setupChatModel(settings: any): any;
+  function setupChatModel(settings: {
+      vendor: ("openai" | "anthropic" | "mistral");
+  }): ChatOpenAI | ChatAnthropic | ChatMistralAI;
 
   // ====== From: coffee-compiled/ai/setupOpenAiClient.d.ts ======
   // File: setupOpenAiClient
@@ -131,6 +208,21 @@ declare namespace SduiComponents {
       chatStream: (props: any) => any;
       embeddings: (props: any) => any;
   };
+
+  // ====== From: coffee-compiled/ai/TextEmbeddingModel.d.ts ======
+  // File: TextEmbeddingModel
+  const TextEmbeddingModel: {
+      new (settings: object): {
+          settings: any;
+          create({ context }: {
+              context: any;
+          }): any;
+      };
+  };
+
+  // ====== From: coffee-compiled/ai/TextEmbeddingModel.test.d.ts ======
+  // File: TextEmbeddingModel.test
+  {};
 
   // ====== From: coffee-compiled/api/createDefaultPipeline.d.ts ======
   // File: createDefaultPipeline
@@ -221,12 +313,45 @@ declare namespace SduiComponents {
       getObservers: any;
   }): any;
 
+  // ====== From: coffee-compiled/api/SdMethod.d.ts ======
+  // File: SdMethod
+  const SdMethod: {
+      new (options: {
+          name: string;
+          schema: Schema;
+          role: string;
+          tool?: {
+              name?: string;
+              agentRole: string;
+          };
+          run: Function;
+      }): {
+          call(args: any): any;
+          name: string;
+          schema: Schema;
+          role: string;
+          run: Function;
+          toolName: string;
+          agentRole: string;
+          _method: any;
+          _tool: any;
+      };
+  };
+
   // ====== From: coffee-compiled/app-layout/AppToolbar.d.ts ======
   // File: AppToolbar
   function AppToolbar({ toolbarStart, isMobile, onToggleSidebar }: {
       toolbarStart: any;
       isMobile: any;
       onToggleSidebar: any;
+  }): any;
+
+  // ====== From: coffee-compiled/app-layout/createAppLayoutAPI.d.ts ======
+  // File: createAppLayoutAPI
+  function createAppLayoutAPI({ sourceName, sourceArray, toolbarStart, routerLess }: {
+      sourceName: string;
+      sourceArray: [any];
+      toolbarStart: Function;
   }): any;
 
   // ====== From: coffee-compiled/app-layout/LoginPage.d.ts ======
@@ -265,62 +390,10 @@ declare namespace SduiComponents {
   // File: VerifyEmailPage
   function VerifyEmailPage(): any;
 
-  // ====== From: coffee-compiled/app-layout/createAppLayoutAPI.d.ts ======
-  // File: createAppLayoutAPI
-  function createAppLayoutAPI({ sourceName, sourceArray, toolbarStart, routerLess }: {
-      sourceName: string;
-      sourceArray: [any];
-      toolbarStart: Function;
-  }): any;
-
   // ====== From: coffee-compiled/app-status/AppStatusPage.d.ts ======
   // File: AppStatusPage
   const appIsOn: any;
   function AppStatusPage(): any;
-
-  // ====== From: coffee-compiled/chat/DefaultMessage.d.ts ======
-  // File: DefaultMessage
-  function DefaultMessage({ message, hasPdfButton, onChangeFeedback, showTools }: {
-      message: any;
-      hasPdfButton?: boolean;
-      onChangeFeedback: any;
-      showTools?: boolean;
-  }): any;
-
-  // ====== From: coffee-compiled/chat/DefaultMetaDataDisplay.d.ts ======
-  // File: DefaultMetaDataDisplay
-  function DefaultMetaDataDisplay({ metaData, linkedItems }: {
-      metaData: any;
-      linkedItems: any;
-  }): any;
-
-  // ====== From: coffee-compiled/chat/SdChat.d.ts ======
-  // File: SdChat
-  function SdChat({ dataOptions, className, customComponents, processMessageText, showTools }: {
-      dataOptions: any;
-      className?: string;
-      customComponents?: {};
-      processMessageText: any;
-      showTools?: boolean;
-  }): any;
-
-  // ====== From: coffee-compiled/chat/SdChatLog.d.ts ======
-  // File: SdChatLog
-  function SdChatLog({ dataOptions }: {
-      dataOptions: any;
-  }): any;
-
-  // ====== From: coffee-compiled/chat/SessionListHeader.d.ts ======
-  // File: SessionListHeader
-  function SessionListHeader({ onAdd }: {
-      onAdd: any;
-  }): any;
-
-  // ====== From: coffee-compiled/chat/SessionListItemContent.d.ts ======
-  // File: SessionListItemContent
-  function SessionListItemContent({ rowData }: {
-      rowData: any;
-  }): any;
 
   // ====== From: coffee-compiled/chat/createChatAPI.d.ts ======
   // File: createChatAPI
@@ -481,6 +554,157 @@ declare namespace SduiComponents {
       addSessionRole: string;
   }): any;
 
+  // ====== From: coffee-compiled/chat/DefaultMessage.d.ts ======
+  // File: DefaultMessage
+  function DefaultMessage({ message, hasPdfButton, onChangeFeedback, showTools }: {
+      message: any;
+      hasPdfButton?: boolean;
+      onChangeFeedback: any;
+      showTools?: boolean;
+  }): any;
+
+  // ====== From: coffee-compiled/chat/DefaultMetaDataDisplay.d.ts ======
+  // File: DefaultMetaDataDisplay
+  function DefaultMetaDataDisplay({ metaData, linkedItems }: {
+      metaData: any;
+      linkedItems: any;
+  }): any;
+
+  // ====== From: coffee-compiled/chat/SdChat.d.ts ======
+  // File: SdChat
+  function SdChat({ dataOptions, className, customComponents, processMessageText, showTools }: {
+      dataOptions: any;
+      className?: string;
+      customComponents?: {};
+      processMessageText: any;
+      showTools?: boolean;
+  }): any;
+
+  // ====== From: coffee-compiled/chat/SdChatLog.d.ts ======
+  // File: SdChatLog
+  function SdChatLog({ dataOptions }: {
+      dataOptions: any;
+  }): any;
+
+  // ====== From: coffee-compiled/chat/SessionListHeader.d.ts ======
+  // File: SessionListHeader
+  function SessionListHeader({ onAdd }: {
+      onAdd: any;
+  }): any;
+
+  // ====== From: coffee-compiled/chat/SessionListItemContent.d.ts ======
+  // File: SessionListItemContent
+  function SessionListItemContent({ rowData }: {
+      rowData: any;
+  }): any;
+
+  // ====== From: coffee-compiled/chatNext/createChatAPI.d.ts ======
+  // File: createChatAPI
+  const chatSchema: any;
+  const chatMetaDataSchema: any;
+  function createChatAPI({ sourceName, messageCollection, sessionListCollection, metaDataCollection, usageLimitCollection, isSingleSessionChat, viewChatRole, addSessionRole, bots, reactToNewMessage, onNewSession, messagesLimit, getUsageLimits }: {
+      sourceName: string;
+      messageCollection: Mongo.Collection;
+      sessionListCollection: Mongo.Collection;
+      metaDataCollection?: Mongo.Collection;
+      usageLimitCollection?: Mongo.Collection;
+      isSingleSessionChat?: boolean;
+      viewChatRole?: any;
+      addSessionRole?: any;
+      bots?: any[];
+      reactToNewMessage?: Function;
+      getUsageLimits?: () => {
+          maxMessagesPerDay?: number;
+          maxSessionsPerDay?: number;
+          maxMessagesPerSession?: number;
+          maxMessageLength?: number;
+      } | void;
+      onNewSession?: Function;
+      messagesLimit?: number;
+  }): any;
+
+  // ====== From: coffee-compiled/chatNext/createChatMethods.d.ts ======
+  // File: createChatMethods
+  function createChatMethods({ sourceName, messageCollection, sessionListCollection, metaDataCollection, isSingleSessionChat, viewChatRole, addSessionRole, reactToNewMessage, onNewSession, getUsageLimits }: {
+      sourceName: string;
+      messageCollection: Mongo.Collection;
+      sessionListCollection: Mongo.Collection;
+      metaDataCollection?: Mongo.Collection;
+      isSingleSessionChat?: boolean;
+      viewChatRole?: string;
+      addSessionRole?: string;
+      reactToNewMessage?: Function;
+      onNewSession?: Function;
+      getUsageLimits?: Function;
+  }): any;
+
+  // ====== From: coffee-compiled/chatNext/createChatPublications.d.ts ======
+  // File: createChatPublications
+  function createChatPublications({ sourceName, messageCollection, sessionListCollection, metaDataCollection, isSingleSessionChat, viewChatRole, getUsageLimits, messagesLimit }: {
+      sourceName: string;
+      messageCollection: Mongo.Collection;
+      sessionListCollection: Mongo.Collection;
+      metaDataCollection?: Mongo.Collection;
+      isSingleSessionChat?: boolean;
+      viewChatRole?: string;
+      getUsageLimits?: Function;
+      messagesLimit?: number;
+  }): any;
+
+  // ====== From: coffee-compiled/chatNext/createChatSessionListAPI.d.ts ======
+  // File: createChatSessionListAPI
+  function createChatSessionListAPI({ sourceName, sessionListCollection, viewChatRole, addSessionRole }: {
+      sourceName: string;
+      sessionListCollection: Mongo.Collection;
+      viewChatRole: string;
+      addSessionRole: string;
+  }): any;
+
+  // ====== From: coffee-compiled/chatNext/DefaultMessage.d.ts ======
+  // File: DefaultMessage
+  function DefaultMessage({ message, hasPdfButton, onChangeFeedback, showTools }: {
+      message: any;
+      hasPdfButton?: boolean;
+      onChangeFeedback: any;
+      showTools?: boolean;
+  }): any;
+
+  // ====== From: coffee-compiled/chatNext/DefaultMetaDataDisplay2.d.ts ======
+  // File: DefaultMetaDataDisplay2
+  function DefaultMetaDataDisplay({ metaData }: {
+      metaData: any;
+  }): any;
+
+  // ====== From: coffee-compiled/chatNext/SdChat.d.ts ======
+  // File: SdChat
+  function SdChat({ dataOptions, className, customComponents, processMessageText, showTools }: {
+      dataOptions: any;
+      className?: string;
+      customComponents?: {};
+      processMessageText: any;
+      showTools?: boolean;
+  }): any;
+
+  // ====== From: coffee-compiled/chatNext/SessionListHeader.d.ts ======
+  // File: SessionListHeader
+  function SessionListHeader({ onAdd }: {
+      onAdd: any;
+  }): any;
+
+  // ====== From: coffee-compiled/chatNext/SessionListItemContent.d.ts ======
+  // File: SessionListItemContent
+  function SessionListItemContent({ rowData }: {
+      rowData: any;
+  }): any;
+
+  // ====== From: coffee-compiled/common/downloadAsFile.d.ts ======
+  // File: downloadAsFile
+  function downloadAsFile({ dataString, mimeType, fileName }: {
+      dataString: any;
+      mimeType: any;
+      fileName: any;
+  }): void;
+
   // ====== From: coffee-compiled/common/ErrorBoundary.d.ts ======
   // File: ErrorBoundary
   const ErrorBoundary: {
@@ -494,14 +718,6 @@ declare namespace SduiComponents {
           render(): any;
       };
   };
-
-  // ====== From: coffee-compiled/common/downloadAsFile.d.ts ======
-  // File: downloadAsFile
-  function downloadAsFile({ dataString, mimeType, fileName }: {
-      dataString: any;
-      mimeType: any;
-      fileName: any;
-  }): void;
 
   // ====== From: coffee-compiled/common/generateUUID.d.ts ======
   // File: generateUUID
@@ -540,9 +756,9 @@ declare namespace SduiComponents {
       role: any;
       id: any;
   }): any;
-  function currentUserIsInRole(role: any): boolean;
-  function useCurrentUserIsInRole(role: any): boolean;
-  function currentUserMustBeInRole(role: any): Promise<void>;
+  function currentUserIsInRole(role: Role): boolean;
+  function useCurrentUserIsInRole(role: Role): boolean;
+  function currentUserMustBeInRole(role: Role): Promise<void>;
   function scopesForUserWithIdInRole({ role, id }: {
       role: any;
       id: any;
@@ -597,7 +813,7 @@ declare namespace SduiComponents {
       onAction?: () => void;
       label: string | null;
       icon: string | null;
-      customTemplate: React.Component;
+      customTemplate: React.Component | null;
       onSuccess?: (result: any) => void;
       successMsg: string | null;
       onError?: (error: Error) => void;
@@ -634,6 +850,16 @@ declare namespace SduiComponents {
       isOpen: boolean;
       setIsOpen: (newValue: boolean) => void;
   }): any;
+
+  // ====== From: coffee-compiled/forms/connectFieldPlus.d.ts ======
+  // File: connectFieldPlus
+  declare function _default(Component: any): any;
+  _default;
+
+  // ====== From: coffee-compiled/forms/connectFieldWithLabel.d.ts ======
+  // File: connectFieldWithLabel
+  declare function _default(Component: any): any;
+  _default;
 
   // ====== From: coffee-compiled/forms/DynamicField.d.ts ======
   // File: DynamicField
@@ -731,16 +957,6 @@ declare namespace SduiComponents {
       mayEdit: any;
   }): any;
 
-  // ====== From: coffee-compiled/forms/connectFieldPlus.d.ts ======
-  // File: connectFieldPlus
-  declare function _default(Component: any): any;
-  _default;
-
-  // ====== From: coffee-compiled/forms/connectFieldWithLabel.d.ts ======
-  // File: connectFieldWithLabel
-  declare function _default(Component: any): any;
-  _default;
-
   // ====== From: coffee-compiled/forms/uniforms-custom/primereact/AutoField.d.ts ======
   // File: AutoField
   declare const _default: any;
@@ -796,15 +1012,15 @@ declare namespace SduiComponents {
   declare const _default: any;
   _default;
 
+  // ====== From: coffee-compiled/jobstable/createJobsTableDataAPI.d.ts ======
+  // File: createJobsTableDataAPI
+  function createJobsTableDataAPI(): any;
+
   // ====== From: coffee-compiled/jobstable/SdJobsTable.d.ts ======
   // File: SdJobsTable
   function SdJobsTable({ dataOptions }: {
       dataOptions: any;
   }): any;
-
-  // ====== From: coffee-compiled/jobstable/createJobsTableDataAPI.d.ts ======
-  // File: createJobsTableDataAPI
-  function createJobsTableDataAPI(): any;
 
   // ====== From: coffee-compiled/login-forms/EmailVerification.d.ts ======
   // File: EmailVerification
@@ -845,7 +1061,7 @@ declare namespace SduiComponents {
 
   // ====== From: coffee-compiled/qa-articles/createQAArticlesAPI.d.ts ======
   // File: createQAArticlesAPI
-  function createQAArticlesAPI({ sourceName, collection, viewTableRole, editRole, getEmbedding }: {
+  function createQAArticlesAPI({ sourceName, collection, viewTableRole, editRole, embeddingModelSettings }: {
       sourceName: string;
       collection: Mongo.Collection;
       viewTableRole: string;
@@ -859,26 +1075,7 @@ declare namespace SduiComponents {
 
   // ====== From: coffee-compiled/schema/Schema.d.ts ======
   // File: Schema
-  const Schema: {
-      new (_schema: any, options: any): {
-          _schema: any;
-          options: any;
-          ajv: any;
-          modelValidator: any;
-          validate: any;
-          validator: (model: any) => {
-              details: any;
-          };
-          methodValidator: (model: any) => void;
-          bridge: any;
-          firstLevelSchemaKeys: any;
-          addProperty(property: any): any;
-          withId(): any;
-          pick(keys: any): any;
-          omit(keys: any): any;
-          getQuickTypeForKey(key: any): "string" | "stringArray" | "number" | "numberArray" | "unhandled";
-      };
-  };
+  const Schema: any;
 
   // ====== From: coffee-compiled/sdui-client-dynamic.d.ts ======
   // File: sdui-client-dynamic
@@ -907,6 +1104,7 @@ declare namespace SduiComponents {
   function SdDocumentSelect(props: any): any;
   function SdDocumentSelectField(props: any): any;
   function SdChat(props: any): any;
+  function SdChatNext(props: any): any;
   function SdChatLog(props: any): any;
   function SdAppLayout(props: any): any;
   function Gravatar(props: any): any;
@@ -943,7 +1141,7 @@ declare namespace SduiComponents {
 
   // ====== From: coffee-compiled/tables/DataList.d.ts ======
   // File: DataList
-  function DataList({ sourceName, listSchema, rows, limit, loadMoreRows, canSort, sortColumn, sortDirection, onChangeSort, canSearch, search, onChangeSearch, isLoading, canAdd, mayAdd, onAdd, canDelete, mayDelete, onDelete, canEdit, mayEdit, onChangeField, onRowClick, canExport, mayExport, onExportTable, overscanRowCount, customComponents, selectedRowId }: {
+  function DataList({ sourceName, listSchema, rows, limit, loadMoreRows, canSort, sortColumn, sortDirection, onChangeSort, canSearch, search, onChangeSearch, canKnnSearch, isKnnSearch, onSetIsKnnSearch, isLoading, canAdd, mayAdd, onAdd, canDelete, mayDelete, onDelete, canEdit, mayEdit, onChangeField, onRowClick, canExport, mayExport, onExportTable, overscanRowCount, customComponents, selectedRowId }: {
       sourceName: any;
       listSchema: any;
       rows: any;
@@ -956,6 +1154,9 @@ declare namespace SduiComponents {
       canSearch: any;
       search: any;
       onChangeSearch?: (...args: any[]) => void;
+      canKnnSearch: any;
+      isKnnSearch: any;
+      onSetIsKnnSearch: any;
       isLoading: any;
       canAdd: any;
       mayAdd: any;
@@ -977,7 +1178,7 @@ declare namespace SduiComponents {
 
   // ====== From: coffee-compiled/tables/DataTable.d.ts ======
   // File: DataTable
-  function DataTable({ sourceName, listSchema, rows, limit, loadMoreRows, canSort, sortColumn, sortDirection, onChangeSort, canSearch, search, onChangeSearch, isLoading, canAdd, mayAdd, onAdd, canDelete, mayDelete, onDelete, canEdit, mayEdit, onChangeField, onRowClick, canExport, onExportTable, mayExport, overscanRowCount, customComponents }: {
+  function DataTable({ sourceName, listSchema, rows, limit, loadMoreRows, canSort, sortColumn, sortDirection, onChangeSort, canSearch, search, onChangeSearch, isKnnSearch, canKnnSearch, onSetIsKnnSearch, isLoading, canAdd, mayAdd, onAdd, canDelete, mayDelete, onDelete, canEdit, mayEdit, onChangeField, onRowClick, canExport, onExportTable, mayExport, overscanRowCount, customComponents }: {
       sourceName: any;
       listSchema: any;
       rows: any;
@@ -990,6 +1191,9 @@ declare namespace SduiComponents {
       canSearch: any;
       search: any;
       onChangeSearch?: (...args: any[]) => void;
+      isKnnSearch: any;
+      canKnnSearch: any;
+      onSetIsKnnSearch: any;
       isLoading: any;
       canAdd: any;
       mayAdd: any;
@@ -1097,16 +1301,19 @@ declare namespace SduiComponents {
   @type {({dataOptions, customComponents}: {dataOptions: DataTableOptions, customComponents: any}) => React.FC }
   */
   const SdTable: ({ dataOptions, customComponents }: {
-      dataOptions: any;
+      dataOptions: DataTableOptions;
       customComponents: any;
   }) => React.FC;
   type DataTableOptions = any;
 
   // ====== From: coffee-compiled/tables/SearchInput.d.ts ======
   // File: SearchInput
-  function SearchInput({ value, onChange, className }: {
+  function SearchInput({ value, onChange, canKnnSearch, isKnnSearch, onSetIsKnnSearch, className }: {
       value: any;
       onChange: any;
+      canKnnSearch: any;
+      isKnnSearch: any;
+      onSetIsKnnSearch: any;
       className?: string;
   }): any;
 
@@ -1133,14 +1340,32 @@ declare namespace SduiComponents {
 
   */
   const TableEditModalHandler: (options: {
-      tableOptions: any;
-      DisplayComponent: (options: any) => React.FC;
+      tableOptions: DataTableDisplayOptions;
+      DisplayComponent: {
+          (options: DataTableDisplayOptions): React.FC;
+      };
   }) => React.FC;
   type DataTableDisplayOptions = any;
 
   // ====== From: coffee-compiled/usertable/AllowedRolesContext.d.ts ======
   // File: AllowedRolesContext
   const AllowedRolesContext: any;
+
+  // ====== From: coffee-compiled/usertable/createUserTableAPI.d.ts ======
+  // File: createUserTableAPI
+  function createUserTableAPI({ userProfileSchema, getAllowedRoles, viewUserTableRole, editUserRole }: {
+      userProfileSchema: Schema;
+      getAllowedRoles: Function;
+      viewUserTableRole: string;
+      editUserRole: string;
+  }): any;
+
+  // ====== From: coffee-compiled/usertable/RolesDisplay.d.ts ======
+  // File: RolesDisplay
+  function RolesDisplay({ row, measure }: {
+      row: any;
+      measure: any;
+  }): any;
 
   // ====== From: coffee-compiled/usertable/RoleSelect.d.ts ======
   // File: RoleSelect
@@ -1157,26 +1382,10 @@ declare namespace SduiComponents {
       mayEdit: boolean;
   }): React.Element;
 
-  // ====== From: coffee-compiled/usertable/RolesDisplay.d.ts ======
-  // File: RolesDisplay
-  function RolesDisplay({ row, measure }: {
-      row: any;
-      measure: any;
-  }): any;
-
   // ====== From: coffee-compiled/usertable/SdUserTable.d.ts ======
   // File: SdUserTable
   function SdUserTable({ dataOptions }: {
       dataOptions: any;
-  }): any;
-
-  // ====== From: coffee-compiled/usertable/createUserTableAPI.d.ts ======
-  // File: createUserTableAPI
-  function createUserTableAPI({ userProfileSchema, getAllowedRoles, viewUserTableRole, editUserRole }: {
-      userProfileSchema: SimpleSchema;
-      getAllowedRoles: Function;
-      viewUserTableRole: string;
-      editUserRole: string;
   }): any;
 
 }

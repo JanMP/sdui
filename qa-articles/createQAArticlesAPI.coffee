@@ -24,20 +24,20 @@ import _ from 'lodash'
   # @param {Function} options.getEmbedding - Function to generate embedding vectors for questions
   # @return {Object} Configured API object for managing QA articles data
   ###
-export createQAArticlesAPI = ({sourceName, collection, viewTableRole, editRole, getEmbedding}) ->
+export createQAArticlesAPI = ({sourceName, collection, viewTableRole, editRole, embeddingModelSettings}) ->
 
   sourceSchema = new Schema
     type: 'object'
     properties:
       question:
+        title: 'Frage'
         type: 'string'
         uniforms:
-          label: 'Frage'
           component: LongTextField
       answer:
+        title: 'Antwort'
         type: 'string'
         uniforms:
-          label: 'Antwort'
           component: LongTextField
       vector:
         type: 'array'
@@ -48,20 +48,8 @@ export createQAArticlesAPI = ({sourceName, collection, viewTableRole, editRole, 
 
   # TODO make sdai availble to makeSubmitMethodRunFkt internally in createTableDataAPI
   sdAiSettings =
-    embeddingModelSettings: Meteor.settings.embeddingCP
+    embeddingModelSettings: embeddingModelSettings
     getEmbeddingContext: ({document}) -> document.question
-
-
-  # if false and Meteor.isServer and not Meteor.isDevelopment
-  #   await collection.find().forEachAsync (document) ->
-  #     console.log "update vector for #{sourceName}, #{document.question}"
-  #     vector =
-  #       try
-  #         await getEmbedding text: document.question
-  #       catch error
-  #         console.error error
-  #         throw new Meteor.Error "[#{sourceName} #{document.question}] Could not get embedding"
-  #     collection.updateAsync document._id, $set: vector: vector
 
 
   createTableDataAPI
