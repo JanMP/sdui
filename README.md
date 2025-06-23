@@ -53,27 +53,34 @@ In addition to a standard chat interface with support for [gravatar](https://gra
 
 - Example Usge. First a schema and a mongodb collection is created. Then we can create components based on that schema.
 ```coffee
-sourceSchema = new SimpleSchema
-  markdown:
-    type: String
-    label: 'Markdown'
-    sdContent: isContent: true
-    uniforms: -> null
-  title:
-    type: String
-    label: 'Titel'
-  number:
-    type: Number
-    label: 'Eine Zahl'
-  array:
-    type: Array
-    label: 'Personen'
-  'array.$': Object
-  'array.$.name': String
-  'array.$.boolean':
-    type: Boolean
-    optional: true
-    label: 'ist zu Allem bereit.'
+sourceSchema = new Schema
+  type: 'object'
+  properties:
+    markdown:
+      title: 'Markdown'
+      type: 'string'
+      sdContent: isContent: true
+      uniforms: -> null
+    title:
+      title: 'Titel'
+      type: 'string'
+    number:
+      title: 'Eine Zahl'
+      type: 'number'
+    array:
+      title: 'Personen'
+      type: 'array'
+      items:
+        type: 'object'
+        properties:
+          name:
+            title: 'Name'
+            type: 'string'
+          boolean:
+            title: 'ist zu Allem bereit.'
+            type: 'boolean'
+        required: ['name']
+    required: ['markdown', 'title', 'number', 'array']
 
 ContentEditorTest = new Mongo.Collection 'content-editor-test'
 
@@ -98,7 +105,7 @@ export List = ->
     <SdContentEditor dataOptions={dataOptions} />
 ```
 
-- This will result in the following components on the frontend: 
+- This will result in the following components on the frontend:
     - Content Editor: ![ContentEditorExample](component-images/contentEditorExample.png)
     - Table: ![tableExample](component-images/tableExample.png)
     - List: ![listExample](component-images/listExample.png)

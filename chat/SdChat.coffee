@@ -29,7 +29,7 @@ defaultProcessMessageText = ({text, metaData, addLinkedMetaData}) ->
   text
   ?.replace /\[(.+?)\]\((.+?)\)/g, replacer
   ?.replace /\[(.+?)\]\(([^\)]+?)$/g, (match, title, url) -> "[#{title}]() ... <span class='pi pi-spin text-primary-200 pi-spinner'/>"
-  
+
 
 export SdChat = ({dataOptions, className = "", customComponents = {}, processMessageText, showTools = true}) ->
 
@@ -37,7 +37,7 @@ export SdChat = ({dataOptions, className = "", customComponents = {}, processMes
   SessionListItem ?= DefaultSessionListItem
   Message ?= DefaultMessage
   MetaDataDisplay ?= DefaultMetaDataDisplay
-  
+
   processMessageText ?= defaultProcessMessageText
 
   {bots, sourceName, sessionListDataOptions, isSingleSessionChat, metaDataCollection} = dataOptions
@@ -49,7 +49,7 @@ export SdChat = ({dataOptions, className = "", customComponents = {}, processMes
   toast = useToast()
   linkedMetaData = useRef new Set()
   addLinkedMetaData = (id) -> linkedMetaData.current.add id
-  
+
   {t} = useTranslation()
 
   messagesAreLoading = useSubscribe "#{sourceName}.messages", {sessionId}

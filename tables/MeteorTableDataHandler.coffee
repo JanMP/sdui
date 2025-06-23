@@ -1,6 +1,6 @@
 import {Meteor} from 'meteor/meteor'
 import {Mongo} from 'meteor/mongo'
-import React, {useState, useEffect, useRef, Suspense} from 'react'
+import React, {useState, useEffect, useRef} from 'react'
 import {meteorApply} from '../common/meteorApply.coffee'
 import {DataList} from './DataList.coffee'
 import {ErrorBoundary} from '../common/ErrorBoundary.coffee'
@@ -31,6 +31,7 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
   onChangeField
   formSchema,
   canSearch
+  canKnnSearch
   canSort
   query
   canAdd
@@ -50,7 +51,7 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
 
   {t} = useTranslation()
 
-  usePubSub ?= true
+  usePubSub ?= false
 
   perLoad ?= 500
   query ?= defaultQuery
@@ -60,6 +61,7 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
 
   if sourceName?
     getRowsMethodName = "#{sourceName}.getRows"
+    getRowsKnnMethodName = "#{sourceName}.getRowsKnn"
     rowPublicationName = "#{sourceName}.rows"
     submitMethodName = "#{sourceName}.submit"
     setValueMethodName = "#{sourceName}.setValue"
@@ -82,8 +84,9 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
 
   [sortColumn, setSortColumn] = useState initialSortColumn
   [sortDirection, setSortDirection] = useState initialSortDirection
-  
+
   [search, setSearch] = useState ''
+  [isKnnSearch, setIsKnnSearch] = useState false
 
   toast = useToast()
 
@@ -99,9 +102,16 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
   getRows = ({reload = false}) ->
     return if usePubSub
     setIsLoading true
-    meteorApply
-      method: getRowsMethodName
-      data: {search, query, sort, skip: 0, limit: if reload then perLoad else limit}
+    (
+      if isKnnSearch and search?.length > 5
+        meteorApply
+          method: getRowsKnnMethodName
+          data:  {search, limit: if reload then perLoad else limit}
+      else
+        meteorApply
+          method: getRowsMethodName
+          data: {search, query, sort, skip: 0, limit: if reload then perLoad else limit}
+    )
     .then (returnedRows) ->
       setRows returnedRows
       setIsLoading false
@@ -127,7 +137,7 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
     return unless mayView
     handle = Meteor.subscribe rowPublicationName, {search, query, sort, skip, limit}
     not handle.ready()
-  
+
   useEffect ->
     setIsLoading subLoading
   , [subLoading]
@@ -186,6 +196,10 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
   onChangeSearch = (d) ->
     setSearch d
 
+  onSetIsKnnSearch = (d) ->
+    console.log 'onSetIsKnnSearch', d
+    setIsKnnSearch d and canKnnSearch
+
   onDelete ?= ({id}) ->    # setConfirmationModalOpen false
     meteorApply
       method: deleteMethodName
@@ -196,13 +210,13 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
         severity: 'success'
         summary: 'Erfolg'
         detail: t "The entry has been deleted"
-  
+
   onChangeField ?= ({_id, changeData}) ->
     meteorApply
       method: setValueMethodName
       data: {_id, changeData}
     .catch console.error
-   
+
   onExportTable = ->
     if canExport
       meteorApply
@@ -236,6 +250,7 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
             rows, loadMoreRows, onRowClick,
             canSort, sortColumn, sortDirection, onChangeSort
             canSearch, search, onChangeSearch,
+            canKnnSearch, isKnnSearch, onSetIsKnnSearch
             canAdd, mayAdd, onAdd
             canDelete, mayDelete, onDelete
             canEdit, mayEdit, onSubmit

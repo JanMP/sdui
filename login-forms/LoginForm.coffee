@@ -3,7 +3,6 @@ import {Accounts} from 'meteor/accounts-base'
 import React, {useState} from 'react'
 import {useTracker} from 'meteor/react-meteor-data'
 import {Schema} from 'meteor/janmp:sdui'
-# import SimpleSchemaBridge from 'uniforms-bridge-simple-schema-2'
 import {AutoForm} from '../forms/uniforms-custom/select-implementation'
 import {Button} from 'primereact/button'
 import {PasswordField} from '../forms/uniforms-custom/select-implementation'
@@ -71,7 +70,7 @@ SignInForm = ->
     Meteor.loginWithPassword email, password, (error) ->
       if error
         alert 'Login fehlgeschlagen: ' + error
- 
+
   <AutoForm
     schema={loginSchema.bridge}
     submitField={-> <Button className="mt-4" label="Login" />}
@@ -115,7 +114,7 @@ export LoginForm = ({allowResetPassword = false}) ->
 
   toggleLoginOrSignup = ->
     if formToShow is 'sign-up' then setFormToShow 'sign-in' else setFormToShow 'sign-up'
-  
+
 
   <div className="p-component w-16rem">
     <Form />

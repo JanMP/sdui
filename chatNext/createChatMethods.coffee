@@ -78,14 +78,14 @@ export createChatMethods = ({
       return false
     userIsInSession {sessionId}
 
-  addSession = ({title, userIds}) ->
+  addSession = ({title, userIds, model}) ->
     if await sessionsPerDayLimitReached()
       throw new Meteor.Error "Tut uns Leid, wir erlauben momentan nur #{getUsageLimits()?.maxSessionsPerDay} Chats pro Tag. Bitte versuche es morgen nochmal."
     await currentUserMustBeInRole addSessionRole
     return unless Meteor.isServer
     title ?= '[no title]'
     userIds ?= [Meteor.userId()]
-    sessionId = await sessionListCollection.insertAsync {title, userIds, createdAt: new Date()}
+    sessionId = await sessionListCollection.insertAsync {title, userIds, model, createdAt: new Date()}
     onNewSession {sessionId}
     sessionId
 
@@ -208,6 +208,12 @@ export createChatMethods = ({
       sessionListCollection.updateAsync {_id: sessionId},
         $set:
           archived: true
+
+  deleteSessionData = ({sessionId}) ->
+    if (existingSession = await sessionListCollection?.findOneAsync sessionId)?
+      messageCollection.removeAsync {sessionId}
+      metaDataCollection.removeAsync {sessionId}
+      sessionListCollection.removeAsync {_id: sessionId}
 
   new ValidatedMethod
     name: "#{sourceName}.deleteSession"

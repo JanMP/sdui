@@ -1,28 +1,30 @@
 import React from 'react'
 import {Accounts} from 'meteor/accounts-base'
-import {SimpleSchema} from 'meteor/janmp:sdui'
-import SimpleSchemaBridge from 'uniforms-bridge-simple-schema-2'
+import {Schema} from '../schema/Schema.coffee'
 import {AutoForm, SubmitField, PasswordField} from '../forms/uniforms-custom/select-implementation'
 
+# TODO: we don't seem to use this form anywhere, check if we handdle password reset at all
+# TODO: test this form, to check if the switch to Schema
 
-passwordSchema = new SimpleSchema
-  password:
-    type: String
-    label: 'Passwort'
-    regEx: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/
-    uniforms: PasswordField
+passwordSchema = new Schema
+  type: 'object'
+  properties:
+    password:
+      title: 'Passwort'
+      type: 'string'
+      pattern: '^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$'
+      uniforms: PasswordField
 
-passwordSchemaBridge = new SimpleSchemaBridge passwordSchema
 
 export SetPasswordForm = ({token}) ->
-  
+
   setPassword = ({password}) ->
     Accounts.resetPassword token, password, (error) ->
       if error
         alert 'Fehler beim Zurücksetzen des Passworts: ' + error?.message
 
   <AutoForm
-    schema={passwordSchemaBridge}
+    schema={passwordSchema.bridge}
     submitField={-> <SubmitField value="Passwort setzen" />}
     onSubmit={setPassword}
   />

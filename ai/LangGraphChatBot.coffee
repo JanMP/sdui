@@ -8,7 +8,7 @@ logReturn = (x) ->
   x
 
 export class LangGraphChatBot
-  
+
   constructor: ({
     settings,
     graphName,
@@ -27,7 +27,7 @@ export class LangGraphChatBot
       throw new Meteor.Error 'LangGraphChatBot: sessionCollection is required'
     unless botUserData?
       throw new Meteor.Error 'LangGraphChatBot: botUserData is required'
-    
+
     @client = new (LangGraphSDK.Client)(settings)
     @graphName = graphName
     @messageCollection = messageCollection
@@ -36,14 +36,16 @@ export class LangGraphChatBot
     @botUserData = botUserData
 
 
-  upsertThreadId: ({sessionId}) ->
-    savedThreadId = (await @sessionCollection.findOneAsync sessionId)?.threadId
+  getCallParams: ({sessionId}) ->
+    unless (session = await @sessionCollection.findOneAsync sessionId)?
+      throw new Meteor.Error 'LangGraphChatBot: session not found'
+    savedThreadId = session.threadId
     threadId = savedThreadId ? (await @client.threads.create())?.thread_id
     if not savedThreadId?
       @sessionCollection.updateAsync sessionId,
         $set:
           threadId: threadId
-    threadId
+    {threadId, model: session.model ? 'openai/gpt-4.1'}
 
 
   createMessageStub: ({sessionId, text = '', followMessageId = undefined, followDelay = 1}) ->
@@ -117,7 +119,7 @@ export class LangGraphChatBot
       createdAt: new Date()
       workInProgress: false
       usage: usage
-  
+
 
   processStream: ({sessionId, response, messageStubId}) ->
     content = ''
@@ -150,7 +152,7 @@ export class LangGraphChatBot
             console.error "Error in stream:", chunk
             await @createLogMessage {sessionId, text: "Error in stream", error: chunk.data}
           else
-            unless Meteor.isDevelopment
+            if Meteor.isDevelopment
               console.log "LangGraph Stream: unhandled event type:", chunk.event
             # console.log "#{"#".repeat 20} unknown chunk #{"#".repeat 20}"
             # console.log JSON.stringify chunk, null, 2
@@ -161,11 +163,13 @@ export class LangGraphChatBot
 
   call: ({sessionId, messageStubId, text}) ->
     try
-      threadId = await @upsertThreadId {sessionId}
-      console.log "call", {sessionId, messageStubId, text, threadId}
+      {threadId, model} = await @getCallParams {sessionId}
+      # console.log "call", {sessionId, messageStubId, text, threadId}
       response = @client.runs.stream threadId, @graphName,
         input:
           messages: text
+        config:
+          configurable: {model}
         streamMode: "messages"
 
       @processStream {sessionId, response, messageStubId}

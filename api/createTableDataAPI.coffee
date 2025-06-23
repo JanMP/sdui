@@ -16,7 +16,7 @@ export createTableDataAPI = (params) ->
     sourceName, sourceSchema, collection
     useObjectIds
     listSchema, formSchema
-    canEdit, canSearch, canSort, canAdd, canDelete, canExport
+    canEdit, canSearch, canKnnSearch, canSort, canAdd, canDelete, canExport
     viewTableRole, editRole, addRole, deleteRole, exportTableRole
     getPreSelectPipeline, getProcessorPipeline,
     getRowsPipeline, getExportPipeline
@@ -44,9 +44,16 @@ export createTableDataAPI = (params) ->
 
   sdai = if sdAiSettings?
     new SdAi {sdAiSettings..., sourceName, collection}
-  
+
+  if canKnnSearch and not sdai
+    throw new Error 'canKnnSearch is true but no sdai immplemented'
+
+  if canKnnSearch and usePubSub
+    throw new Error 'canKnnSearch is not supported with usePubSub'
+
   usePubSub ?= false
   canSearch ?= true
+  canKnnSearch ?= false
   canSort ?= true
 
   perLoad ?= 500
@@ -75,7 +82,7 @@ export createTableDataAPI = (params) ->
     console.warn "[createTableDataAPI #{sourceName}]:
       no exportTableRole defined, using '#{viewTableRole}' instead."
   exportTableRole ?= viewTableRole
-  
+
   getPreSelectPipeline ?= -> []
   getProcessorPipeline ?= -> []
 
@@ -98,7 +105,7 @@ export createTableDataAPI = (params) ->
 
   if Meteor.isClient # setup local collections for publications
     rowsCollection = new Mongo.Collection "#{sourceName}.rows"
-  
+
   publishTableData {
     viewTableRole, sourceName, collection,
     getRowsPipeline,
@@ -122,6 +129,7 @@ export createTableDataAPI = (params) ->
     collection, rowsCollection
     canEdit
     canSearch
+    canKnnSearch
     canSort
     canAdd
     canDelete
