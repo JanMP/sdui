@@ -2,6 +2,7 @@
 import {Meteor} from 'meteor/meteor'
 import _ from 'lodash'
 import LangGraphSDK from '@langchain/langgraph-sdk'
+import {getToolsForLangGraph} from '../api/getToolDefinitions.coffee'
 
 logReturn = (x) ->
   console.log x
@@ -36,7 +37,7 @@ export class LangGraphChatBot
     @botUserData = botUserData
 
 
-  getCallParams: ({sessionId}) ->
+  getCallParams: ({sessionId, agentRole = 'agent'}) ->
     unless (session = await @sessionCollection.findOneAsync sessionId)?
       throw new Meteor.Error 'LangGraphChatBot: session not found'
     savedThreadId = session.threadId
@@ -45,7 +46,13 @@ export class LangGraphChatBot
       @sessionCollection.updateAsync sessionId,
         $set:
           threadId: threadId
-    {threadId, model: session.model ? 'openai/gpt-4.1'}
+    
+    # Get tools for the agent role
+    tools = getToolsForLangGraph(agentRole)
+    if Meteor.isDevelopment
+      console.log "LangGraphChatBot: Got #{tools.length} tools for role '#{agentRole}'"
+    
+    {threadId, model: session.model ? 'openai/gpt-4.1', tools}
 
 
   createMessageStub: ({sessionId, text = '', followMessageId = undefined, followDelay = 1}) ->
@@ -161,15 +168,17 @@ export class LangGraphChatBot
       throw error
 
 
-  call: ({sessionId, messageStubId, text}) ->
+  call: ({sessionId, messageStubId, text, agentRole = 'agent'}) ->
     try
-      {threadId, model} = await @getCallParams {sessionId}
+      {threadId, model, tools} = await @getCallParams {sessionId, agentRole}
       # console.log "call", {sessionId, messageStubId, text, threadId}
       response = @client.runs.stream threadId, @graphName,
         input:
           messages: text
         config:
-          configurable: {model}
+          configurable: 
+            model: model
+            tools: tools
         streamMode: "messages"
 
       @processStream {sessionId, response, messageStubId}

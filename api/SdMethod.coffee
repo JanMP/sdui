@@ -2,6 +2,7 @@ import {Meteor} from 'meteor/meteor'
 import {ValidatedMethod} from 'meteor/mdg:validated-method'
 import {Schema} from 'meteor/janmp:sdui'
 import {currentUserMustBeInRole} from '../common/roleChecks.coffee'
+import {registerSdMethod} from './SdMethodRegistry.coffee'
 
 
 export class SdMethod
@@ -54,6 +55,10 @@ export class SdMethod
           catch error
             throw new Meteor.Error 'Tool execution failed', error.message,
               details: error.details  # Include error details if available
+
+    # Register this instance in the tool registry if it has tool configuration
+    if @toolName?
+      registerSdMethod(this)
 
   ###*
     @param {Object} args - The arguments to pass to the method

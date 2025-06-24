@@ -33,3 +33,16 @@ export {DateDisplayTableComponentWithNullString} from './tables/DateDisplayTable
 export {runTests} from './runTests.coffee'
 export {LangGraphChatBot} from './ai/LangGraphChatBot.coffee'
 export {invokeLangGraphAgent} from './ai/invokeLangGraphAgent.coffee'
+export {SdMethod} from './api/SdMethod.coffee'
+export {
+  SdMethodRegistry, registerSdMethod, getToolDefinitions, 
+  getToolDefinition, getToolDefinitionsByRole, getAvailableAgentRoles,
+  getRegistryStats, clearRegistry
+} from './api/SdMethodRegistry.coffee'
+export {
+  extractJsonSchema, getToolsForLangGraph, getToolsForSession,
+  getToolsAsJson, validateToolDefinition
+} from './api/getToolDefinitions.coffee'
+
+# Load test registry (self-conditional based on development mode)
+import './test-registry.coffee'
