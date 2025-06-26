@@ -4,10 +4,10 @@ import {Meteor} from 'meteor/meteor'
 import {getToolDefinitions, getToolDefinitionsByRole} from './SdMethodRegistry.coffee'
 
 ###*
-Extract JSON-Schema from Schema instance
-@param {Schema} schemaInstance - The Schema instance to extract from
-@returns {Object} JSON-Schema object
-###
+  Extract JSON-Schema from Schema instance
+  @param {Schema} schemaInstance - The Schema instance to extract from
+  @returns {Object} JSON-Schema object
+  ###
 export extractJsonSchema = (schemaInstance) ->
   # Your Schema class already contains JSON-Schema in _schema!
   unless schemaInstance?._schema?
@@ -17,10 +17,10 @@ export extractJsonSchema = (schemaInstance) ->
   schemaInstance._schema
 
 ###*
-Get tool definitions formatted for LangGraph SDK
-@param {String} [roleFilter] - Optional role to filter tools by
-@returns {Array} Array of tool definitions in LangGraph format
-###
+  Get tool definitions formatted for LangGraph SDK
+  @param {String} [roleFilter] - Optional role to filter tools by
+  @returns {Array} Array of tool definitions in LangGraph format
+  ###
 export getToolsForLangGraph = (roleFilter = null) ->
   try
     # Get registered tool definitions
@@ -58,13 +58,13 @@ export getToolsForLangGraph = (roleFilter = null) ->
     []
 
 ###*
-Get tools for a specific session context
-@param {Object} options - Options object
-@param {String} options.sessionId - Session ID for context
-@param {String} options.agentRole - Agent role for filtering
-@param {Object} options.userRoles - User roles for additional filtering
-@returns {Array} Array of applicable tool definitions
-###
+  Get tools for a specific session context
+  @param {Object} options - Options object
+  @param {String} options.sessionId - Session ID for context
+  @param {String} options.agentRole - Agent role for filtering
+  @param {Object} options.userRoles - User roles for additional filtering
+  @returns {Array} Array of applicable tool definitions
+  ###
 export getToolsForSession = ({sessionId, agentRole, userRoles} = {}) ->
   try
     # Start with role-based filtering
@@ -84,10 +84,10 @@ export getToolsForSession = ({sessionId, agentRole, userRoles} = {}) ->
     []
 
 ###*
-For backward compatibility or debugging - return as JSON string
-@param {String} [roleFilter] - Optional role to filter tools by
-@returns {String} JSON string of tool definitions
-###
+  For backward compatibility or debugging - return as JSON string
+  @param {String} [roleFilter] - Optional role to filter tools by
+  @returns {String} JSON string of tool definitions
+  ###
 export getToolsAsJson = (roleFilter = null) ->
   try
     tools = getToolsForLangGraph(roleFilter)

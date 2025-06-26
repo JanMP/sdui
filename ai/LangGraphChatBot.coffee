@@ -4,9 +4,6 @@ import _ from 'lodash'
 import LangGraphSDK from '@langchain/langgraph-sdk'
 import {getToolsForLangGraph} from '../api/getToolDefinitions.coffee'
 
-logReturn = (x) ->
-  console.log x
-  x
 
 export class LangGraphChatBot
 
@@ -37,7 +34,11 @@ export class LangGraphChatBot
     @botUserData = botUserData
 
 
-  getCallParams: ({sessionId, agentRole = 'agent'}) ->
+  getCallParams: ({sessionId, agentRole}) ->
+    unless agentRole?
+      throw new Meteor.Error 'LangGraphChatBot: agentRole is required'
+    unless sessionId?
+      throw new Meteor.Error 'LangGraphChatBot: sessionId is required'
     unless (session = await @sessionCollection.findOneAsync sessionId)?
       throw new Meteor.Error 'LangGraphChatBot: session not found'
     savedThreadId = session.threadId
@@ -46,12 +47,10 @@ export class LangGraphChatBot
       @sessionCollection.updateAsync sessionId,
         $set:
           threadId: threadId
-    
+
     # Get tools for the agent role
     tools = getToolsForLangGraph(agentRole)
-    if Meteor.isDevelopment
-      console.log "LangGraphChatBot: Got #{tools.length} tools for role '#{agentRole}'"
-    
+
     {threadId, model: session.model ? 'openai/gpt-4.1', tools}
 
 
@@ -168,7 +167,15 @@ export class LangGraphChatBot
       throw error
 
 
-  call: ({sessionId, messageStubId, text, agentRole = 'agent'}) ->
+  call: ({sessionId, messageStubId, text, agentRole}) ->
+    unless sessionId?
+      throw new Meteor.Error 'LangGraphChatBot: sessionId is required'
+    unless messageStubId?
+      throw new Meteor.Error 'LangGraphChatBot: messageStubId is required'
+    unless text? and text.length
+      throw new Meteor.Error 'LangGraphChatBot: text is required'
+    unless agentRole?
+      throw new Meteor.Error 'LangGraphChatBot: agentRole is required'
     try
       {threadId, model, tools} = await @getCallParams {sessionId, agentRole}
       # console.log "call", {sessionId, messageStubId, text, threadId}
@@ -176,7 +183,7 @@ export class LangGraphChatBot
         input:
           messages: text
         config:
-          configurable: 
+          configurable:
             model: model
             tools: tools
         streamMode: "messages"

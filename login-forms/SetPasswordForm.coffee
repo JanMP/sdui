@@ -3,7 +3,7 @@ import {Accounts} from 'meteor/accounts-base'
 import {Schema} from '../schema/Schema.coffee'
 import {AutoForm, SubmitField, PasswordField} from '../forms/uniforms-custom/select-implementation'
 
-# TODO: we don't seem to use this form anywhere, check if we handdle password reset at all
+# NOTE: Password reset is handled by ResetPasswordPage.coffee with equivalent validation
 # TODO: test this form, to check if the switch to Schema
 
 passwordSchema = new Schema
