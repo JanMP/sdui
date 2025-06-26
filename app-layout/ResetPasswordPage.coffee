@@ -9,11 +9,12 @@ schema = new Schema
   properties:
     password:
       type: 'string'
-      # regEx: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/
+      pattern: '^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$'
       maxLength: 80
       uniforms:
         label: 'Neues Passwort'
         type: 'password'
+        help: 'Mindestens 8 Zeichen mit Groß-, Kleinbuchstaben und Zahlen'
   required: ['password']
 
 schemaBridge = schema.bridge
