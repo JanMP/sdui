@@ -30,7 +30,7 @@ if Meteor.isServer
     role: 'user'
     tool:
       name: 'testLangGraphTool_agent'  # Different from method name, LangGraph-compliant
-      agentRole: scope: 'langgraphtest', role: 'agent'  # Updated to use scoped role format
+      agentRole: 'langgraphtest:agent'  # Use string format for scoped role
     run: (args) ->
       console.log 'TestLangGraphTool called with:', args
       return {
