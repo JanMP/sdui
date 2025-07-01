@@ -48,11 +48,17 @@ export getToolDefinition = (methodName) ->
 
 ###*
 Get tool definitions filtered by agent role
-@param {String} agentRole - The agent role to filter by
+@param {String|Object} agentRole - The agent role to filter by
 @returns {Array} Array of tool definitions for the specified role
 ###
 export getToolDefinitionsByRole = (agentRole) ->
-  Array.from(SdMethodRegistry.values()).filter((method) -> method.agentRole is agentRole)
+  Array.from(SdMethodRegistry.values()).filter (method) ->
+    # Handle object comparison for roles like {scope: 'langgraphtest', role: 'agent'}
+    if typeof method.agentRole is 'object' and typeof agentRole is 'object' and method.agentRole?.role? and agentRole?.role?
+      method.agentRole.role is agentRole.role and method.agentRole.scope is agentRole.scope
+    else
+      # Fallback to reference/string equality
+      method.agentRole is agentRole
 
 ###*
 Get all available agent roles
