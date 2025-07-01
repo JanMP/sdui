@@ -1,6 +1,6 @@
 Package.describe({
   name: 'janmp:sdui',
-  version: '1.0.0',
+  version: '1.1.0',
   // Brief, one-line summary of the package.
   summary: 'Some high level React components and setup for backend.',
   // URL to the Git repository containing the source code for this package.
@@ -11,10 +11,10 @@ Package.describe({
 });
 
 Package.onUse(function(api) {
-  api.versionsFrom(['2.16', '3.0-rc.4']);
+  api.versionsFrom(['2.16', '3.3']);
   api.use('ecmascript');
   api.use('coffeescript@2.7.1-rc300.0');
-  api.use('typescript');
+  api.use('typescript@5.6.3');
   api.use('zodern:types@1.0.13');
   api.use('reactive-var');
   api.use('alanning:roles@4.0.0');
