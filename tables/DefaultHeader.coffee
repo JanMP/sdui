@@ -3,6 +3,7 @@ import {SearchInput} from './SearchInput.coffee'
 import {SortSelect} from './SortSelect.coffee'
 import useSize from '@react-hook/size'
 import {Button} from 'primereact/button'
+import {Dialog} from 'primereact/dialog'
 import {Toolbar} from 'primereact/toolbar'
 import * as types from '../customTypes.ts'
 
@@ -21,6 +22,8 @@ export DefaultHeader = ({
   AdditionalHeaderButtonsLeft = -> null
   AdditionalHeaderButtonsRight = -> null
 }) ->
+
+  [showExportDialog, setShowExportDialog] = useState false
 
 
   # workaround until we can use container queries
@@ -68,7 +71,7 @@ export DefaultHeader = ({
             icon="pi pi-download"
             severity="secondary"
             rounded text
-            onClick={onExportTable}
+            onClick={-> setShowExportDialog true}
             disabled={not mayExport}
           />
       }
@@ -77,13 +80,50 @@ export DefaultHeader = ({
           <Button
             icon="pi pi-plus"
             rounded text
-            onClick={onAdd} disabled={not mayAdd}
+            onClick={onAdd}
+            disabled={not mayAdd}
           />
       }
       <AdditionalHeaderButtonsRight/>
     </>
 
 
-  <div ref={toolbarRef}>
-    <Toolbar start={startContent} center={centerContent} end={endContent} pt={pt}/>
-  </div>
+  <>
+    <div ref={toolbarRef}>
+      <Toolbar start={startContent} center={centerContent} end={endContent} pt={pt}/>
+    </div>
+    
+    <Dialog
+      header="Export Table Data"
+      visible={showExportDialog}
+      onHide={-> setShowExportDialog false}
+      style={width: '400px'}
+      modal
+    >
+      <div className="flex flex-column gap-3">
+        <p>Choose the format for your export:</p>
+        
+        <div className="flex flex-column gap-2">
+          <Button
+            icon="pi pi-file"
+            label="Export as CSV"
+            className="p-button-outlined"
+            onClick={->
+              onExportTable('csv')
+              setShowExportDialog false
+            }
+          />
+          
+          <Button
+            icon="pi pi-code"
+            label="Export as JSON"
+            className="p-button-outlined"
+            onClick={->
+              onExportTable('json')
+              setShowExportDialog false
+            }
+          />
+        </div>
+      </div>
+    </Dialog>
+  </>

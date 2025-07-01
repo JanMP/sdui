@@ -137,7 +137,7 @@ export interface additionalDataTableDisplayOptions {
   mayDelete?: boolean
   mayEdit?: boolean
   mayExport?: boolean
-  onExportTable?: () => void
+  onExportTable?: (format?: 'csv' | 'json') => void
   isLoading?: boolean
   overscanRowCount?: number
   customComponents: customComponents
@@ -155,7 +155,7 @@ export interface DataTableHeaderOptions {
   onChangeSearch?: (searchString: string) => void
   canExport?: boolean
   mayExport?: boolean
-  onExportTable?: () => void
+  onExportTable?: (format?: 'csv' | 'json') => void
   canAdd?: boolean
   mayAdd?: boolean
   onAdd?: () => void
