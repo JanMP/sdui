@@ -3,98 +3,122 @@
 
 import {Meteor} from 'meteor/meteor'
 
-# Global registry to track SdMethod instances
-export SdMethodRegistry = new Map()
-
 ###*
-Registration function called by SdMethod constructor
-@param {Object} sdMethodInstance - The SdMethod instance to register
-###
-export registerSdMethod = (sdMethodInstance) ->
-  unless sdMethodInstance.name?
-    console.warn 'SdMethod registration: instance missing name'
-    return
+  Central registry class for managing SdMethod instances with tool configurations
 
-  # Only register if it has tool configuration
-  if sdMethodInstance.toolName?
-    registryEntry =
-      name: sdMethodInstance.name
-      toolName: sdMethodInstance.toolName
-      schema: sdMethodInstance.schema
-      role: sdMethodInstance.role
-      agentRole: sdMethodInstance.agentRole
-      description: sdMethodInstance.schema?._schema?.description
-      method: sdMethodInstance  # Keep reference to original method
+  This class provides a centralized way to register, retrieve, and manage
+  SdMethod instances that have tool configurations. It maintains a registry
+  of methods and provides various utility functions for filtering and accessing them.
 
-    SdMethodRegistry.set sdMethodInstance.name, registryEntry
+  @example
+  # Using the default instance
+  registry = new SdMethodRegistry()
+  registry.registerSdMethod(sdMethodInstance)
+  tools = registry.getToolDefinitions()
 
-    if Meteor.isDevelopment
-      console.log "SdMethod registered as tool: #{sdMethodInstance.name} -> #{sdMethodInstance.toolName}"
+  # Or use the exported instance
+  defaultRegistry.registerSdMethod(sdMethodInstance)
+  ###
+export class SdMethodRegistry
 
-###*
-Get all method definitions that have tool configurations
-@returns {Array} Array of tool definition objects
-###
-export getToolDefinitions = ->
-  Array.from(SdMethodRegistry.values())
+  ###*
+    Constructor for SdMethodRegistry
 
-###*
-Get a specific tool definition by method name
-@param {String} methodName - The name of the method
-@returns {Object|undefined} Tool definition or undefined if not found
-###
-export getToolDefinition = (methodName) ->
-  SdMethodRegistry.get(methodName)
+    Initializes a new Map to store registered SdMethod instances.
+    ###
+  constructor: ->
+    @registry = new Map()
 
-###*
-Get tool definitions filtered by agent role
-@param {String|Object} agentRole - The agent role to filter by
-@returns {Array} Array of tool definitions for the specified role
-###
-export getToolDefinitionsByRole = (agentRole) ->
-  Array.from(SdMethodRegistry.values()).filter (method) ->
-    # Handle object comparison for roles like {scope: 'langgraphtest', role: 'agent'}
-    if typeof method.agentRole is 'object' and typeof agentRole is 'object' and method.agentRole?.role? and agentRole?.role?
-      method.agentRole.role is agentRole.role and method.agentRole.scope is agentRole.scope
-    else
-      # Fallback to reference/string equality
-      method.agentRole is agentRole
+  ###*
+    Registration function called by SdMethod constructor
 
-###*
-Get all available agent roles
-@returns {Array} Array of unique agent roles
-###
-export getAvailableAgentRoles = ->
-  roles = Array.from(SdMethodRegistry.values()).map((method) -> method.agentRole)
-  Array.from(new Set(roles)).filter(Boolean)
+    @param {Object} sdMethodInstance - The SdMethod instance to register
+    @returns {void}
+    ###
+  register: (sdMethodInstance) ->
+    unless sdMethodInstance.name?
+      console.warn 'SdMethod registration: instance missing name'
+      return
 
-###*
-Get registry statistics for debugging
-@returns {Object} Statistics about registered methods
-###
-export getRegistryStats = ->
-  entries = Array.from(SdMethodRegistry.values())
+    # Only register if it has tool configuration
+    if sdMethodInstance.toolName?
+      registryEntry =
+        name: sdMethodInstance.name
+        toolName: sdMethodInstance.toolName
+        schema: sdMethodInstance.schema
+        role: sdMethodInstance.role
+        agentRole: sdMethodInstance.agentRole
+        description: sdMethodInstance.schema?._schema?.description
+        method: sdMethodInstance  # Keep reference to original method
 
-  stats =
-    totalMethods: entries.length
-    byRole: {}
-    methodNames: entries.map((entry) -> entry.name)
-    toolNames: entries.map((entry) -> entry.toolName)
+      @registry.set sdMethodInstance.name, registryEntry
 
-  # Count by role
-  for entry in entries
-    role = entry.agentRole ? 'unknown'
-    stats.byRole[role] = (stats.byRole[role] ? 0) + 1
+      if Meteor.isDevelopment
+        console.log "SdMethod registered as tool: #{sdMethodInstance.name} -> #{sdMethodInstance.toolName}"
 
-  stats
+  ###*
+    Get all method definitions that have tool configurations
+    @returns {Array} Array of tool definition objects
+    ###
+  getToolDefinitions: ->
+    Array.from(@registry.values())
 
-###*
-Clear the registry (mainly for testing)
-###
-export clearRegistry = ->
-  SdMethodRegistry.clear()
+  ###*
+    Get a specific tool definition by method name
+    @param {String} methodName - The name of the method
+    @returns {Object|undefined} Tool definition or undefined if not found
+    ###
+  getToolDefinition: (methodName) ->
+    @registry.get(methodName)
 
-if Meteor.isDevelopment
-  # Export registry for debugging in development
-  global.SdMethodRegistry = SdMethodRegistry
-  global.getRegistryStats = getRegistryStats
+  ###*
+    Get tool definitions filtered by agent role
+    @param {String|Object} agentRole - The agent role to filter by
+    @returns {Array} Array of tool definitions for the specified role
+    ###
+  getToolDefinitionsByRole: (agentRole) ->
+    console.log "getToolDefinitionsByRole called with:", agentRole
+    Array.from(@registry.values())
+    .filter (method) ->
+      # Handle object comparison for roles like {scope: 'langgraphtest', role: 'agent'}
+      if typeof method.agentRole is 'object' and typeof agentRole is 'object'
+        method.agentRole.role is agentRole.role and method.agentRole.scope is agentRole.scope
+      else
+        # Fallback to reference/string equality
+        method.agentRole is agentRole
+    .map (method) ->
+      method_name: method.toolName
+      json_schema: method.schema._schema
+      description: method.description or method.schema?._schema?.description or "Meteor method: #{method.name}"
+      role: method.agentRole
+      instruction: if method.agentRole? then "Role required: #{JSON.stringify method.agentRole}"
+
+  ###*
+    Get registry statistics for debugging
+    @returns {Object} Statistics about registered methods
+    ###
+  getStats: ->
+    entries = Array.from(@registry.values())
+
+    stats =
+      totalMethods: entries.length
+      byRole: {}
+      methodNames: entries.map((entry) -> entry.name)
+      toolNames: entries.map((entry) -> entry.toolName)
+
+    # Count by role
+    for entry in entries
+      role = entry.agentRole ? 'unknown'
+      stats.byRole[role] = (stats.byRole[role] ? 0) + 1
+
+    stats
+
+  ###*
+    Clear the registry (mainly for testing)
+    @returns {void}
+    ###
+  clearRegistry: ->
+    @registry.clear()
+
+# Export both the class and a default instance
+export defaultSdMethodRegistry = new SdMethodRegistry()

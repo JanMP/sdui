@@ -2,11 +2,39 @@
 import {Meteor} from 'meteor/meteor'
 import _ from 'lodash'
 import LangGraphSDK from '@langchain/langgraph-sdk'
-import {getToolsForLangGraph} from '../api/getToolDefinitions.coffee'
+import {defaultSdMethodRegistry} from '../api/SdMethodRegistry.coffee'
 
+###*
+  LangGraphChatBot class for handling chat interactions with LangGraph
 
+  This class provides a complete interface for managing chat sessions, messages,
+  and interactions with LangGraph. It handles streaming responses, message management,
+  metadata tracking, and error handling.
+
+  @example
+  chatBot = new LangGraphChatBot({
+    settings: {apiKey: 'your-api-key', endpoint: 'https://api.langgraph.com'},
+    graphName: 'my-graph',
+    messageCollection: Messages,
+    sessionListCollection: Sessions,
+    metaDataCollection: MetaData,
+    botUserData: {id: 'bot-user-id'}
+  })
+###
 export class LangGraphChatBot
 
+  ###*
+    Constructor for LangGraphChatBot
+
+    @param {Object} options - Configuration object
+    @param {Object} options.settings - LangGraph SDK settings and API configuration
+    @param {string} options.graphName - Name of the LangGraph graph to use
+    @param {Object} options.messageCollection - Meteor collection for storing messages
+    @param {Object} options.sessionListCollection - Meteor collection for storing sessions
+    @param {Object} options.metaDataCollection - Meteor collection for storing metadata
+    @param {Object} options.botUserData - Bot user data object with id property
+    @throws {Meteor.Error} When required parameters are missing
+  ###
   constructor: ({
     settings,
     graphName,
@@ -33,7 +61,18 @@ export class LangGraphChatBot
     @sessionCollection = sessionListCollection
     @botUserData = botUserData
 
+  ###*
+    Get call parameters for LangGraph API including thread ID, model, and tools
 
+    This method retrieves or creates a thread ID for the session and prepares
+    the necessary parameters for making API calls to LangGraph.
+
+    @param {Object} options - Configuration object
+    @param {string} options.sessionId - The session ID to get parameters for
+    @param {string} options.agentRole - The agent role to determine available tools
+    @returns {Promise<Object>} Object containing threadId, model, and tools
+    @throws {Meteor.Error} When required parameters are missing or session not found
+  ###
   getCallParams: ({sessionId, agentRole}) ->
     unless agentRole?
       throw new Meteor.Error 'LangGraphChatBot: agentRole is required'
@@ -49,11 +88,24 @@ export class LangGraphChatBot
           threadId: threadId
 
     # Get tools for the agent role
-    tools = getToolsForLangGraph(agentRole)
+    tools = defaultSdMethodRegistry.getToolDefinitionsByRole agentRole
+    console.log {agentRole, tools}
 
     {threadId, model: session.model ? 'openai/gpt-4.1', tools}
 
+  ###*
+    Create a message stub for streaming responses
 
+    Creates a placeholder message that will be updated as the streaming response
+    is received. Can be positioned after a specific message with a delay.
+
+    @param {Object} options - Configuration object
+    @param {string} options.sessionId - The session ID to create the message stub for
+    @param {string} [options.text=''] - Initial text content for the message stub
+    @param {string} [options.followMessageId] - ID of message to follow (for ordering)
+    @param {number} [options.followDelay=1] - Delay in milliseconds after follow message
+    @returns {Promise<string>} The ID of the created message stub
+  ###
   createMessageStub: ({sessionId, text = '', followMessageId = undefined, followDelay = 1}) ->
     createdAt = if followMessageId?
       followMessage = await @messageCollection.findOneAsync followMessageId
@@ -84,20 +136,53 @@ export class LangGraphChatBot
       metadata: metadata
       createdAt: new Date()
 
+  ###*
+    Update metadata item with additional data
+
+    Updates an existing metadata item with new data and sets the updated timestamp.
+
+    @param {Object} options - Configuration object
+    @param {string} options.sessionId - The session ID of the metadata item
+    @param {string} options.itemId - The item ID of the metadata item
+    @param {Object} options.data - The data to update the metadata item with
+    @returns {Promise<void>}
+  ###
   updateMetaDataItem: ({sessionId, itemId, data}) ->
     @metaDataCollection.updateAsync {sessionId, itemId},
       $set:
         data: data
         updatedAt: new Date()
 
+  ###*
+    Update message stub with new text content
 
+    Updates a message stub with new text content and optional tools data
+    while keeping the workInProgress flag as true.
+
+    @param {Object} options - Configuration object
+    @param {string} options.messageStubId - The ID of the message stub to update
+    @param {string} options.text - The new text content for the message stub
+    @param {Object} [options.tools] - Optional tools data to include
+    @returns {Promise<void>}
+  ###
   updateMessageStub: ({messageStubId, text, tools = undefined}) ->
     @messageCollection.updateAsync messageStubId,
       $set:
         text: text
         tools: tools
 
+  ###*
+    Finalize message stub and mark as complete
 
+    Finalizes a message stub by updating its content and marking it as no longer
+    in progress. This indicates the message is complete and ready for display.
+
+    @param {Object} options - Configuration object
+    @param {string} options.messageStubId - The ID of the message stub to finalize
+    @param {string} options.text - The final text content for the message
+    @param {Object} options.tools - Tools data to include with the message
+    @returns {Promise<void>}
+  ###
   finalizeMessageStub: ({messageStubId, text, tools}) ->
     @messageCollection.updateAsync messageStubId,
       $set:
@@ -126,7 +211,19 @@ export class LangGraphChatBot
       workInProgress: false
       usage: usage
 
+  ###*
+    Process streaming response from LangGraph
 
+    Handles the streaming response from LangGraph API, processing different event types
+    and updating message stubs and metadata as the response is received.
+
+    @param {Object} options - Configuration object
+    @param {string} options.sessionId - The session ID for the stream
+    @param {AsyncIterable} options.response - The streaming response from LangGraph
+    @param {string} options.messageStubId - The ID of the message stub to update
+    @returns {Promise<void>}
+    @throws {Error} When stream processing fails
+  ###
   processStream: ({sessionId, response, messageStubId}) ->
     content = ''
     streamMetaData = {}
@@ -166,7 +263,21 @@ export class LangGraphChatBot
       console.error "Stream handling error:", error
       throw error
 
+  ###*
+    Make a call to LangGraph with streaming response
 
+    Initiates a call to LangGraph with the provided text and agent role,
+    handling the streaming response and updating the message stub in real-time.
+
+    @param {Object} options - Configuration object
+    @param {string} options.sessionId - The session ID for the call
+    @param {string} options.messageStubId - The ID of the message stub to update
+    @param {string} options.text - The text message to send to LangGraph
+    @param {string} options.agentRole - The agent role to use for the call
+    @returns {Promise<void>}
+    @throws {Meteor.Error} When required parameters are missing
+    @throws {Error} When the LangGraph API call fails
+  ###
   call: ({sessionId, messageStubId, text, agentRole}) ->
     unless sessionId?
       throw new Meteor.Error 'LangGraphChatBot: sessionId is required'

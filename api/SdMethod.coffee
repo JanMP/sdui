@@ -2,7 +2,7 @@ import {Meteor} from 'meteor/meteor'
 import {ValidatedMethod} from 'meteor/mdg:validated-method'
 import {Schema} from 'meteor/janmp:sdui'
 import {currentUserMustBeInRole} from '../common/roleChecks.coffee'
-import {registerSdMethod} from './SdMethodRegistry.coffee'
+import {defaultSdMethodRegistry, SdMethodRegistry} from './SdMethodRegistry.coffee'
 
 
 export class SdMethod
@@ -14,6 +14,7 @@ export class SdMethod
   @param {Object} [options.tool] - Optional tool configuration
   @param {String} [options.tool.name] - The name of the tool
   @param {String} options.tool.agentRole - The role required to run the tool
+  @param {SdMethodRegistry} [options.tool.registry] - Optional registry to register the tool. Defaults to `defaultRegistry`.
   @param {Function} options.run - The function to run when the method is called
   ###
   constructor: (options) -> # Fixed typo: was "costructor"
@@ -26,9 +27,13 @@ export class SdMethod
     unless (@run = options.run)?
       throw new Meteor.Error 'run is required'
     if options.tool?
-      @toolName = options.tool.name ? @name + '.tool'
+      @toolName = options.tool.name ? @name + '_tool'
       unless (@agentRole = options.tool.agentRole)?
         throw new Meteor.Error 'tool.agentRole is required'
+      if options.tool.registry?
+        @registry = options.tool.registry
+      else
+        @registry = defaultSdMethodRegistry  # Use the global registry if none provided
 
     @_method = new ValidatedMethod
       name: @name
@@ -55,10 +60,8 @@ export class SdMethod
           catch error
             throw new Meteor.Error 'Tool execution failed', error.message,
               details: error.details  # Include error details if available
-
-    # Register this instance in the tool registry if it has tool configuration
-    if @toolName?
-      registerSdMethod(this)
+      # Register the method in the registry
+      @registry?.register this
 
   ###*
     @param {Object} args - The arguments to pass to the method
