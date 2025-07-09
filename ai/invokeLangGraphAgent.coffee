@@ -3,10 +3,11 @@ import LangGraphSDK from '@langchain/langgraph-sdk'
 
 
 ###*
-  * @param {object} params
-  * @param {object} params.settings - The settings object for the LangGraph SDK.
-  * @param {string} params.agent - The agent to be invoked.
-  * @param {object} params.input - The input to be passed to the agent.
+  Simple Wrapper do hide away some of the boilerplate code for invoking LangGraph agents.
+  @param {object} params
+  @param {object} params.settings - The settings object for the LangGraph SDK.
+  @param {string} params.agent - The agent to be invoked.
+  @param {object} params.input - The input to be passed to the agent.
   ###
 export invokeLangGraphAgent = ({settings, agent, input}) ->
   unless settings?
