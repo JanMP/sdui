@@ -11,9 +11,13 @@ export class SdAi
     @param {Object} options.embeddingModelSettings
     @param {(object) => string} options.getEmbeddingContext
     @param {(object) => object} [options.getFilterFlags]
+    @param {any} [options.agentRole] - Optional agent role for tools
+    @param {Function} [options.toolPostProcess] - Optional post-processing function for tools
     ###
   constructor: (options) ->
     @options = options
+    @agentRole = @options.agentRole
+    @toolPostProcess = @options.toolPostProcess ? (args) -> args
 
     @embeddingModel = new TextEmbeddingModel @options.embeddingModelSettings
     unless (@embeddingModel) instanceof TextEmbeddingModel

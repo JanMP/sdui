@@ -16,6 +16,8 @@ formSchema, makeFormDataFetchMethodRunFkt, makeSubmitMethodRunFkt, makeDeleteMet
 checkDisableDeleteForRow, checkDisableEditForRow
 sdai}) ->
 
+  cleanedSourceName = sourceName.replace /\./g, '_'
+
   # The Collection might be using ObjectIds instead of String Ids on Mongo
   transformIdToMongo = (id) ->
     # return id # this is intentional, this should work without transformIdToMongo
@@ -93,6 +95,11 @@ sdai}) ->
         limit: type: 'number'
         skip: type: 'number'
     role: viewTableRole
+    tool:
+      if sdai?.agentRole
+        name: "#{cleanedSourceName}_searchKnn"
+        agentRole: sdai.agentRole
+        postProcess: sdai.toolPostProcess
     run: ({search, limit}) ->
       return unless Meteor.isServer
       console.log "#{sourceName}.getRowsKnn", {search, limit}
@@ -107,6 +114,7 @@ sdai}) ->
       .then transformRowIdsToMiniMongo
       .catch (error) ->
         console.error "#{sourceName}.getRowsKnn", error
+
 
   if canExport
     new SdMethod
@@ -165,9 +173,15 @@ sdai}) ->
         else
           await currentUserMustBeInRole addRole
         return unless Meteor.isServer
-        submitMethodRun
-          id: model._id
-          data: _.omit model, '_id'
+        try
+          result = await submitMethodRun
+            id: model._id
+            data: _.omit model, '_id'
+          if sdai? then sdai.updateEmbeddingForDocumentWithId id: result.insertedId or model._id
+          result
+        catch error
+          console.error "#{sourceName}.submit", error
+          new Meteor.Error '[submit-error]', error.message
 
     new SdMethod
       name: "#{sourceName}.fetchEditorData"
@@ -198,7 +212,13 @@ sdai}) ->
         # console.log "#{sourceName}.setValue", {_id, changeData}
         await editRowMustNotBeDisabled id: _id
         return unless Meteor.isServer
-        await collection.updateAsync {_id}, $set: changeData
+        try
+          result = await collection.updateAsync {_id}, $set: changeData
+          if sdai? then sdai.updateEmbeddingForDocumentWithId id: _id
+          result
+        catch error
+          console.error "#{sourceName}.setValue", error
+          new Meteor.Error '[setValue-error]', error.message
 
   if canDelete
     new SdMethod

@@ -14,10 +14,12 @@ export class SdMethod
   @param {Object} [options.tool] - Optional tool configuration
   @param {String} [options.tool.name] - The name of the tool
   @param {String} options.tool.agentRole - The role required to run the tool
+  @param {Function} [options.tool.postProcess] - Optional post-processing function for the tool
   @param {SdMethodRegistry} [options.tool.registry] - Optional registry to register the tool. Defaults to `defaultRegistry`.
   @param {Function} options.run - The function to run when the method is called
   ###
   constructor: (options) -> # Fixed typo: was "costructor"
+    @toolPostProcess = options.tool?.postProcess ? (args) -> args
     unless (@name = options.name)?
       throw new Meteor.Error 'name is required'
     unless (@schema = options.schema)?
@@ -56,7 +58,7 @@ export class SdMethod
           try
             await currentUserMustBeInRole @agentRole
             # Run the tool with the validated arguments
-            await @run args  # Add await if run returns a promise
+            await @toolPostProcess @run args  # Add await if run returns a promise
           catch error
             throw new Meteor.Error 'Tool execution failed', error.message,
               details: error.details  # Include error details if available
