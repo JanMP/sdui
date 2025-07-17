@@ -227,7 +227,7 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
           severity: 'success'
           summary: 'Erfolg'
           detail: t "Export data received from Server."
-        
+
         # Format selection
         switch format
           when 'csv'
@@ -236,7 +236,7 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
               dataString: csvString
               fileName: (title ? sourceName) + '.csv'
               mimeType: 'text/csv;charset=utf-8'
-          
+
           when 'json'
             # Filter columns same as CSV
             exportColumns = getColumnsToExport schema: listSchema
@@ -245,13 +245,13 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
               exportColumns.forEach (col) ->
                 filteredRow[col] = row[col] if row[col]?
               filteredRow
-            
+
             jsonString = JSON.stringify filteredRows, null, 2
             downloadAsFile
               dataString: jsonString
               fileName: (title ? sourceName) + '.json'
               mimeType: 'application/json;charset=utf-8'
-          
+
           else
             throw new Error "Unsupported export format: #{format}"
       .catch (error) ->
