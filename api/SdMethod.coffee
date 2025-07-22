@@ -41,7 +41,7 @@ export class SdMethod
       name: @name
       validate: @schema.methodValidator
       run: (args) =>  # Use fat arrow to preserve 'this' context
-        console.log "Running method #{@name} with args:", args
+        # console.log "Running method #{@name} with args:", args
         try
           await currentUserMustBeInRole @role
           # Run the method with the validated arguments
