@@ -1,0 +1,114 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "dachzeile": {
+      "type": "string",
+      "description": "Eine kurze alternative Überschrift, die die Meldung in drei Worten zusammenfasst."
+    },
+    "ueberschrift": {
+      "type": "string",
+      "description": "Hauptüberschrift des Artikels. Sollte Antizipation wecken, negativ sein ohne Clickbait, informativ sein und das Thema nicht vollständig auflösen."
+    },
+    "metatitle": {
+      "type": "string",
+      "description": "SEO-optimierter Titel für Metadaten, nicht länger als 70 Zeichen."
+    },
+    "metadescription": {
+      "type": "string",
+      "description": "SEO-optimierte Zusammenfassung der Meldung für Metadaten, maximal 156 Zeichen."
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 3,
+      "maxItems": 3,
+      "description": "Die drei wichtigsten Schlagwörter zum Artikel."
+    },
+    "teaser": {
+      "type": "string",
+      "description": "Einleitender Teaser-Text mit 120 bis 160 Zeichen."
+    },
+    "explained": {
+      "type": "object",
+      "description": "Der Content der für den Platzhalter [EXPLAINED] verwendet wird.",
+      "properties": {
+        "begriff": {
+          "type": "string",
+          "description": "Der zu erklärende Fachbegriff."
+        },
+        "erklaerung": {
+          "type": "string",
+          "description": "Erklärung des Fachbegriffs in drei Sätzen für Laien."
+        }
+      },
+      "required": ["begriff", "erklaerung"]
+    },
+    "quickread": {
+      "type": "object",
+      "description": "Der Content, der für den Platzhalter [QUICKREAD] verwendet wird. 3 kurze Sätze, die das wesentliche vermitteln.",
+      "properties": {
+        "punkt1": {
+          "type": "string",
+          "description": "Erster Punkt der Quickread-Zusammenfassung."
+        },
+        "punkt2": {
+          "type": "string",
+          "description": "Zweiter Punkt der Quickread-Zusammenfassung."
+        },
+        "punkt3": {
+          "type": "string",
+          "description": "Dritter Punkt der Quickread-Zusammenfassung."
+        }
+      },
+      "required": ["punkt1", "punkt2", "punkt3"]
+    },
+    "links": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "Der anzuzeigende Text für den Link."
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "Die URL, auf die der Link verweist."
+          }
+        },
+        "required": ["text", "url"]
+      },
+      "description": "Relevante interne und externe Links für weiterführende Informationen. GIB AUSSCHLIESLICH LINKS AN, DIE DU IM CONTEXT VORGEFUNDEN HAST!"
+    },
+    "bilder": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "beschreibung": {
+            "type": "string",
+            "description": "Beschreibung des benötigten Bildes."
+          }
+        },
+        "required": ["beschreibung"]
+      },
+      "description": "Beschreibungen für passende Bilder, die den Artikel unterstützen würden."
+    }
+  },
+  "required": [
+    "dachzeile",
+    "ueberschrift",
+    "metatitle",
+    "metadescription",
+    "tags",
+    "teaser",
+    "quickread",
+    "explained",
+    "links",
+    "bilder"
+  ]
+}
