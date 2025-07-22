@@ -234,7 +234,7 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
             csvString = Papa.unparse rows, columns: getColumnsToExport schema: listSchema
             downloadAsFile
               dataString: csvString
-              fileName: (title ? sourceName) + '.csv'
+              fileName: (sourceName) + '.csv'
               mimeType: 'text/csv;charset=utf-8'
 
           when 'json'
@@ -249,7 +249,7 @@ export MeteorTableDataHandler = ({dataOptions, DisplayComponent, customComponent
             jsonString = JSON.stringify filteredRows, null, 2
             downloadAsFile
               dataString: jsonString
-              fileName: (title ? sourceName) + '.json'
+              fileName: (sourceName) + '.json'
               mimeType: 'application/json;charset=utf-8'
 
           else
