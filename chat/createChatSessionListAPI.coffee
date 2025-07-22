@@ -85,6 +85,5 @@ export createChatSessionListAPI = ({sourceName, sessionListCollection, viewChatR
     canSort: true
     initialSortColumn: 'createdAt'
     initialSortDirection: 'DESC'
-
     getPreSelectPipeline: getPreSelectPipeline
     getProcessorPipeline: getSessionListProcessorPipeline

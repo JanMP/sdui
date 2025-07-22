@@ -103,8 +103,8 @@ export createTableDataAPI = (params) ->
 
   getObservers ?= -> []
 
-  if Meteor.isClient # setup local collections for publications
-    rowsCollection = new Mongo.Collection "#{sourceName}.rows"
+  rowsCollection = if Meteor.isClient # setup local collections for publications
+    new Mongo.Collection "#{sourceName}.rows"
 
   publishTableData {
     viewTableRole, sourceName, collection,
