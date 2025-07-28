@@ -32,7 +32,7 @@ ListItemContent = ({rowData, measure}) ->
         <div>
           {
             rowData.similarArticles
-            .filter (article) -> article._id isnt rowData._id
+            .filter (article) -> article.score isnt 1
             .map (article) ->
               <div className="mt-3 px-4" key={article._id}>
                 <div className="">{(article.score * 100).toFixed 1}%</div>
