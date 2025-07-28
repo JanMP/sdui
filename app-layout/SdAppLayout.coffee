@@ -12,10 +12,10 @@ import {ResetPasswordPage} from './ResetPasswordPage.coffee'
 import {VerifyEmailPage} from './VerifyEmailPage.coffee'
 import {RoleGuard, AccessDeniedPage} from './RoleGuard.coffee'
 import {useCurrentUserIsInRole} from '../common/roleChecks.coffee'
+import _ from 'lodash'
 
 isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test navigator.userAgent
 
-import _ from 'lodash'
 
 defaultRoutes = [
   label: 'Login', path: '/login', element: <LoginPage/>
@@ -29,7 +29,7 @@ defaultRoutes = [
 
 MainMenu = ({sourceArray, sidebarIsVisible, onCloseSidebar}) ->
   navigate = useNavigate()
-  
+
   classNameForPath = (path) ->
     if location.pathname is path
       'border-primary-500 border-1'
@@ -37,7 +37,6 @@ MainMenu = ({sourceArray, sidebarIsVisible, onCloseSidebar}) ->
       ''
 
   processMenuItems = (items, parentPath) ->
-    
     _(items).map (item) ->
       if item.path
         if parentPath
@@ -141,7 +140,7 @@ export SdAppLayout = ({dataOptions}) ->
           <BreadCrumbForPath sourceArray={sourceArray}/>
           <MainRoutes sourceArray={sourceArray}/>
         </div>
-        
+
       </div>
     </div>
 
