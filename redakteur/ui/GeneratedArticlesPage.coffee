@@ -9,8 +9,9 @@ import _ from 'lodash'
 
 export createGeneratedArticlesPage = ({
 sourceName
+path
 dataOptions
-createionParamsSchema
+creationParamsSchema
 }) ->
 
   PromptDisplay = ->
@@ -41,7 +42,7 @@ createionParamsSchema
 
   PublishButton = ({article, onReload}) ->
     <ActionButton
-      method='macredakteur.generatedArticles.publish'
+      method="#{sourceName}.generatedArticles.publish"
       data={id: article?._id}
       label='Publish'
       icon='pi pi-send'
@@ -128,7 +129,7 @@ createionParamsSchema
     </div>
 
 
-  createGeneratedArticlesPage = ->
+  GeneratedArticlesPage = ->
     navigate = useNavigate()
     params = useParams()
     toast = useToast()
@@ -138,14 +139,14 @@ createionParamsSchema
     [reloadTrigger, setReloadTrigger] = useState 0
 
     onRowClick = ({rowData}) ->
-      navigate "/macredakteur/produced-articles/#{rowData._id}"
+      navigate "/#{path}/produced-articles/#{rowData._id}"
 
     onAdd = ->
       setPromptDisplayIsOpen true
 
     onHideArticleDisplay = ->
       setArticleDisplayIsOpen false
-      navigate "/#{sourceName}/produced-articles"
+      navigate "/#{path}/produced-articles"
 
     onHidePromptDisplay = ->
       setPromptDisplayIsOpen false

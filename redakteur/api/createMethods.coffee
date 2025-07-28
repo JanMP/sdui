@@ -1,32 +1,29 @@
 import {Meteor} from 'meteor/meteor'
 import {ValidatedMethod} from 'meteor/mdg:validated-method'
-import {Schema, SdMethod} from 'meteor/janmp:sdui'
-import {RSSParser} from 'rss-parser'
+import {invokeLangGraphAgent, Schema, SdMethod, generateUUID} from 'meteor/janmp:sdui'
+import RSSParser from 'rss-parser'
 import {articleToPromptTag} from './articleToPromptTag.coffee'
+import _ from 'lodash'
+
 
 export createMethods = ({
 sourceName
 articleCategories
 articleGenerationSchema
-generateArticleMainPrompt
+articleGenerationMainPrompt
 retentionDays
 creationParamsSchema
 generatedArticlesDataOptions
 promptsDataOptions
 researchedArticlesDataOptions
 rssFeedsDataOptions
+publishGeneratedArticle
 }) ->
 
+  GeneratedArticles = generatedArticlesDataOptions.collection
+  Prompts = promptsDataOptions.collection
   ResearchedArticles = researchedArticlesDataOptions.collection
-
-
-  metaDataValidate = (new Schema articleGenerationSchema).validate
-  writeMetaDataTool =
-    type: 'function'
-    function:
-      name: 'writeMetaData'
-      description: 'Write the structured meta data for the article'
-      parameters: articleGenerationSchema
+  RssFeeds = rssFeedsDataOptions.collection
 
   retentionDays ?= 21
 
@@ -34,63 +31,52 @@ rssFeedsDataOptions
     now = new Date()
     new Date(now.setDate(now.getDate() - sinceDaysAgo))
 
-  # mainTextLLM = if Meteor.isServer
-  #   setupChatModel Meteor.settings["#{sourceName}.writeArticleLLM"]
-  # structuredMetaDataLLM = if Meteor.isServer
-  #   setupChatModel Meteor.settings["#{sourceName}.writeMetaDataLLM" ? Meteor.settings"#{sourceName}.writeArticleLLM"]
-  #   .bindTools [writeMetaDataTool], tool_choice: 'writeMetaData'
+  getFeeds = -> RssFeeds.find({use: true}).fetchAsync()
 
   ###*
     @param {Object} params
     @param {String} params.context
-    @param {String} [params.writePrompt]
-    @param {String} [params.stylePrompt]
+    @param {String} [params.mainPrompt]
+    @param {String} [params.articleTypePrompt]
     @param {String} [params.baseArticleId]
     ###
-  writeArticleWithContext = ({context, writePrompt = defaultWritePrompt, stylePrompt = "", baseArticleId}) ->
+  writeArticleWithContext = ({context, mainPrompt = articleGenerationMainPrompt, articleTypePrompt, baseArticleId}) ->
     return unless Meteor.isServer
     try
-      mainTextContext = [
-        new SystemMessage writePrompt + '/n/n' + stylePrompt
-        new HumanMessage context
-      ]
-      mainText  = (await mainTextLLM.invoke mainTextContext)?.content ? '[missing mainText]'
 
-      metaDataContext = [
-        mainTextContext...
-        new AIMessage mainText
-        new HumanMessage 'Now generate the meta data for the article.'
-      ]
+      prompt =
+        if articleTypePrompt
+          """
+            #{mainPrompt}
 
-      for tries in [1..5]
-        result = await structuredMetaDataLLM.invoke metaDataContext
-        metaData = result?.tool_calls?[0]?.args
-        break if metaDataValidate metaData
-        console.log '[writeArticle] metaData not valid, retrying', tries
+            # Zusätzliche Anweisungen für diese Aufgabe:
+            #{articleTypePrompt}
+          """
+        else
+          mainPrompt
 
-        # Don't directly wrap the entire result in an AIMessage
-        # Instead, use a human message to communicate the validation errors
-        errorMessage = "The metadata was invalid. Please try again with these requirements: " + JSON.stringify(metaDataValidate.errors)
-        metaDataContext.push new HumanMessage errorMessage
+      {result} = await invokeLangGraphAgent
+        settings: Meteor.settings.langsmith
+        agent: 'write_article_redakteur'
+        input: {context, prompt}
 
-      generatedArticle = {metaData..., haupttext: mainText}
       await GeneratedArticles.insertAsync
         uuid: generateUUID()
-        title: generatedArticle?.ueberschrift
-        teaser: generatedArticle?.teaser
-        content: generatedArticle?.haupttext
+        title: result?.ueberschrift
+        teaser: result?.teaser
+        content: result?.haupttext
         createdAt: new Date()
-        rawOutput: generatedArticle
+        rawOutput: result
         basedOnArticleId: baseArticleId
-        articleLinks: generatedArticle?.links
+        articleLinks: result?.links
         context: context
     catch error
       console.error "[writeArticle] error: #{error}"
       throw error
 
-  writeArticleBasedonArticle = ({baseArticle, minArticles = 2}) ->
 
-    enoughSimilarArticles = baseArticle.similarArticles.length >= minArticles
+  writeArticleBasedonArticle = ({baseArticle, minArticles = 1}) ->
+    enoughSimilarArticles = baseArticle?.similarArticles?.length >= minArticles
     useWithoutCorroboration = baseArticle.feedMetaData.useWithoutCorroboration
     return unless enoughSimilarArticles or useWithoutCorroboration
 
@@ -112,14 +98,11 @@ rssFeedsDataOptions
       similarArticles
       .map articleToPromptTag
       .join '\n'
-    # console.log 'articleTags', articleTags
+
     writeArticleWithContext
       context: articleTags
       stylePrompt: stylePrompt
       baseArticleId: baseArticle._id
-
-
-
 
 
   writeArticles = ({sinceDaysAgo}) ->
@@ -128,7 +111,6 @@ rssFeedsDataOptions
       ResearchedArticles.findOneAsync
         usable: true
         used: false
-        "similarArticles.0": "$exists": true
         pubDate: $gte: minDate
       ,
         sort: pubDate: -1
@@ -141,7 +123,7 @@ rssFeedsDataOptions
     article = await getNextArticle({minDate})
     while article?
       try
-        await writeArticleBasedonArticle(baseArticle: article, minArticles: 3)
+        await writeArticleBasedonArticle(baseArticle: article, minArticles: 0)
         # we mark the articles as used
         usedArticleIds = article.similarArticles?.map ({_id}) -> _id
         await ResearchedArticles.updateAsync {_id: $in: usedArticleIds ? []}, {$set: used: true}, {multi: true}
@@ -152,42 +134,31 @@ rssFeedsDataOptions
         await ResearchedArticles.updateAsync {_id: article._id}, {$set: used: true}
         article = await getNextArticle({minDate})
 
-  # categorizer = if Meteor.isServer
-  #   setupChatModel Meteor.settings.MacRedakteur.catetgorizeArticleLLM
-  #   .withStructuredOutput z.object
-  #     usable: z.boolean()
-  #     articleCategory: z.enum(articleCategories)
 
   categorizeArticle = (article) ->
     return unless Meteor.isServer
     return if article.articleCategory? # we already did this
 
-    prompt =
-      [
-        new SystemMessage """
-          You are a helpful assistant that categorizes articles.
-          You will be given the title and content of an article.
-          1. Determine if the article is usable for publication in a Magazine about the topics Apple, Macintosh or Iphone. Exclude articles that are aimed at the US market or any kind of Deals.
-          2. Determine the primary category of the article.
-          """
-      ,
-        new HumanMessage """
-          Title:
-          #{article.title}
-          Content:
-          #{article.content}
-          """
-      ]
-
     try
-      output = await categorizer.invoke prompt
-      await ResearchedArticles.updateAsync _id: article._id,
-        $set:
-          usable: output.usable
-          articleCategory: output.articleCategory
-          used: false
+      {result} = await invokeLangGraphAgent
+        settings: Meteor.settings.langsmith
+        agent: 'categorize_article_redakteur'
+        input:
+          title: article.title
+          content: article.content
+          articleCategories: articleCategories
+
+      console.log '[categorizeArticle] result', result
+
+      if result?
+        await ResearchedArticles.updateAsync {_id: article._id},
+          $set:
+            usable: result.usable ? false
+            articleCategory: result.articleCategory or undefined
+            used: false
     catch error
       console.error '[categorizeArticle] ', error
+      throw new Meteor.Error '[categorizeArticle]', error.message
 
 
   importRssFeed = ({feed}) ->
@@ -212,7 +183,7 @@ rssFeedsDataOptions
   addSimilarArticles = (article) ->
     unless article.sdai?.vector
       throw new Meteor.Error '[addSimilarArticles] article needs a vector'
-    await sdai.knnFindDocuments
+    await researchedArticlesDataOptions?.sdai.knnFindDocuments
       vector: article.sdai.vector
       limit: 20
     .then (similarArticles) ->
@@ -226,8 +197,6 @@ rssFeedsDataOptions
       await ResearchedArticles.updateAsync {_id: article._id}, {$set: {similarArticles}}
     .catch (error) -> console.error '[addSimilarArticles] ', error
 
-  getFeeds = -> RssFeeds.find({use: true}).fetchAsync()
-
 
   updateFeeds = ->
     console.log 'updateFeeds'
@@ -235,6 +204,7 @@ rssFeedsDataOptions
       feeds = await getFeeds()
       for feed in feeds
         await importRssFeed {feed}
+      console.log '[updateFeeds] imported feeds'
       articlesToProcess =
         await ResearchedArticles.find(usable: $exists: false).fetchAsync()
         .catch (error) ->
@@ -245,7 +215,7 @@ rssFeedsDataOptions
           console.log '[updateFeeds] process: ', article.title
           await categorizeArticle article
           # we assume articles didn't change, so we are fine with only updating embedding the first time
-          await sdai.updateEmbeddingForDocumentWithId id: article._id
+          await researchedArticlesDataOptions?.sdai?.updateEmbeddingForDocumentWithId id: article._id
         catch error
           console.error '[updateFeeds] ', error
       # Pass 2: add similar articles to each usable but unused article
@@ -263,7 +233,13 @@ rssFeedsDataOptions
         catch error
           console.error '[updateFeeds] ', error
       # Pass 3 Filter changes with every interation
-    await writeArticles sinceDaysAgo: 14
+
+    await writeArticles sinceDaysAgo: 21
+
+
+  if Meteor.isServer and false
+    updateFeeds()
+
 
   new ValidatedMethod
     name: "#{sourceName}.generatedArticles.publish"
@@ -280,23 +256,19 @@ rssFeedsDataOptions
         unless article
           throw new Meteor.Error 'not-found', 'Article not found'
         console.log data = {uuid: article.uuid, article.rawOutput...}
-        fetch 'https://www.maclife.de/api/v2/ai/article',
-          method: 'POST'
-          headers:
-            Authorization: 'Bearer a9d10999fa718ba8a243'
-            'Content-Type': 'application/json'
-          body: JSON.stringify data
+        publishGeneratedArticle data
         .then (response) ->
           await GeneratedArticles.updateAsync id,
             $set: published: true
-        .then console.log
+
 
 
   new ValidatedMethod
     name: "#{sourceName}.generatedArticles.create"
     validate: creationParamsSchema.methodValidator
     run: ({prompt, articleType}) ->
-      stylePrompt = await Prompts.findOneAsync {promptType: articleType}
+      return unless Meteor.isServer
+      articleTypePrompt = await Prompts.findOneAsync {promptType: articleType}
       sdai = researchedArticlesDataOptions?.sdai
       vector =  await sdai.embeddingFromContext context: prompt
       articlesForPrompt = await sdai.knnFindDocuments {vector, limit: 20}
@@ -304,15 +276,13 @@ rssFeedsDataOptions
         articlesForPrompt
         .map articleToPromptTag
         .join '\n\n'
-      writePrompt = """
-        #{defaultWritePrompt}
+      mainPrompt = """
+        #{articleGenerationMainPrompt}
 
         # Zusätzliche Anweisungen für diese Aufgabe:
         #{prompt}
       """
-      writeArticleWithContext {context, writePrompt, stylePrompt}
-
-
+      writeArticleWithContext {context, mainPrompt, articleTypePrompt}
 
 
   new ValidatedMethod

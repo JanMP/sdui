@@ -6,9 +6,12 @@ import {createResearchedArticlesTableAPI} from './ResearchedArticles.coffee'
 import {createRssFeedsTableAPI} from './RssFeeds.coffee'
 import {createMethods} from './createMethods.coffee'
 
-import defaultArticleGenerationSchema from './articleGenerationSchema.JSON'
-import defaultGenerateArticleMainPrompt from './generate-article-prompt.coffee'
 
+defaultPublishGeneratedArticle = ({data}) ->
+  console.log 'Default publishGeneratedArticle called with data:', data
+  # This is a placeholder function that is called by the publish method.
+  # In practice it should e.g. just do a fetch to a specific endpoint and send the data.
+  # The Method takes care of the data loading and marking the article as published.
 
 defaultArticleCategories = [
   'News'
@@ -19,13 +22,23 @@ defaultArticleCategories = [
 
 export createRedakteurAPI = ({
 sourceName
-articleCategories = defaultArticleCategories
-articleGenerationSchema = defaultArticleGenerationSchema
-generateArticleMainPrompt = defaultGenerateArticleMainPrompt
-retentionDays = 21
 viewTableRole
 editRole
+articleCategories = defaultArticleCategories
+articleGenerationSchemaDefinition
+articleGenerationMainPrompt
+publishGeneratedArticle = defaultPublishGeneratedArticle
+retentionDays = 21
 }) ->
+
+  unless articleGenerationSchemaDefinition?
+    throw new Error 'articleGenerationSchemaDefinition is required'
+
+  unless articleGenerationMainPrompt?
+    throw new Error 'articleGenerationMainPrompt is required'
+
+  articleGenerationSchema = new Schema articleGenerationSchemaDefinition
+
 
   generatedArticlesDataOptions = createGeneratedArticlesTableAPI {sourceName, viewTableRole, editRole}
   promptsDataOptions = createPromptsTableAPI {sourceName, viewTableRole, editRole, articleCategories}
@@ -51,13 +64,14 @@ editRole
     sourceName
     articleCategories
     articleGenerationSchema
-    generateArticleMainPrompt
+    articleGenerationMainPrompt
     retentionDays
     creationParamsSchema
     generatedArticlesDataOptions
     promptsDataOptions
     researchedArticlesDataOptions
     rssFeedsDataOptions
+    publishGeneratedArticle
   }
 
   {
@@ -65,4 +79,5 @@ editRole
     promptsDataOptions
     researchedArticlesDataOptions
     rssFeedsDataOptions
+    creationParamsSchema
   }

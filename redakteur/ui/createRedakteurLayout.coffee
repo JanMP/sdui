@@ -10,7 +10,11 @@ export createRedakteurLayout = ({sourceName, label, path, role, dataOptions}) ->
   RssFeedsPage = createRssFeedsPage({dataOptions: dataOptions.rssFeedsDataOptions})
   PromptsPage = createPromptsPage({dataOptions: dataOptions.promptsDataOptions})
   ResearchedArticlesPage = createResearchedArticlesPage({dataOptions: dataOptions.researchedArticlesDataOptions})
-  GeneratedArticlesPage = createGeneratedArticlesPage({dataOptions: dataOptions.generatedArticlesDataOptions})
+  GeneratedArticlesPage = createGeneratedArticlesPage {
+    sourceName, path,
+    dataOptions: dataOptions.generatedArticlesDataOptions,
+    creationParamsSchema: dataOptions.creationParamsSchema
+  }
 
   label: label
   path: path
