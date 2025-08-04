@@ -1,13 +1,15 @@
 import {Meteor} from 'meteor/meteor'
-import {ValidatedMethod} from 'meteor/mdg:validated-method'
 import {invokeLangGraphAgent, Schema, SdMethod, generateUUID} from 'meteor/janmp:sdui'
 import RSSParser from 'rss-parser'
 import {articleToPromptTag} from './articleToPromptTag.coffee'
+import {Jobs} from 'meteor/msavin:sjobs'
 import _ from 'lodash'
 
 
 export createMethods = ({
 sourceName
+viewTableRole
+editRole
 articleCategories
 articleGenerationSchema
 articleGenerationMainPrompt
@@ -18,6 +20,7 @@ promptsDataOptions
 researchedArticlesDataOptions
 rssFeedsDataOptions
 publishGeneratedArticle
+createJobsSchedule
 }) ->
 
   GeneratedArticles = generatedArticlesDataOptions.collection
@@ -241,14 +244,13 @@ publishGeneratedArticle
     updateFeeds()
 
 
-  new ValidatedMethod
+  new SdMethod
     name: "#{sourceName}.generatedArticles.publish"
-    validate:
-      new Schema
-        type: 'object'
-        properties:
-          id: type: 'string'
-      .methodValidator
+    schema: new Schema
+      type: 'object'
+      properties:
+        id: type: 'string'
+    role: editRole
     run: ({id}) ->
       return unless Meteor.isServer
       try
@@ -263,9 +265,10 @@ publishGeneratedArticle
 
 
 
-  new ValidatedMethod
+  new SdMethod
     name: "#{sourceName}.generatedArticles.create"
-    validate: creationParamsSchema.methodValidator
+    schema: creationParamsSchema
+    role: editRole
     run: ({prompt, articleType}) ->
       return unless Meteor.isServer
       articleTypePrompt = await Prompts.findOneAsync {promptType: articleType}
@@ -285,14 +288,27 @@ publishGeneratedArticle
       writeArticleWithContext {context, mainPrompt, articleTypePrompt}
 
 
-  new ValidatedMethod
+  new SdMethod
     name: "#{sourceName}.generatedArticles.getArticleById"
-    validate:
-      new Schema
-        type: 'object'
-        properties:
-          id: type: 'string'
-      .methodValidator
+    schema: new Schema
+      type: 'object'
+      properties:
+        id: type: 'string'
+    role: viewTableRole
     run: ({id}) ->
       return unless Meteor.isServer
       GeneratedArticles.findOneAsync id
+
+  if Meteor.isServer
+    Jobs.register
+      "#{sourceName}.updateFeeds": ->
+        console.log "#{new Date()} - Starting Job #{sourceName}.updateFeeds"
+        updateFeeds()
+        .then =>
+          console.log "#{new Date()} - Finishing Job #{sourceName}.updateFeeds"
+          schedule = createJobsSchedule()
+          @replicate schedule
+          @remove()
+        .catch (error) =>
+          @reschedule in: minutes: 20
+          console.error "[#{sourceName}.updateFeeds] ", error.message

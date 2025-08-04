@@ -20,6 +20,20 @@ defaultArticleCategories = [
   'Other'
 ]
 
+###*
+  Creates the Redakteur API with the given options.
+  @param {Object} options - Options for the API.
+  @param {String} options.sourceName - the sdui sourceName
+  @param {Object} options.viewTableRole - the role for viewing the table
+  @param {Object} options.editRole - the role for editing the table
+  @param {Array} [options.articleCategories] - the article categories to use
+  @param {Object} options.articleGenerationSchemaDefinition - the schema definition for article generation
+  @param {String} options.articleGenerationMainPrompt - the main prompt for article generation
+  @param {Boolean|Function} [options.publishGeneratedArticle] - function to publish generated articles, defaults to a no-op function
+  @param {Number} [options.retentionDays] - number of days to retain generated articles, defaults to 21 days
+  @param {Function} [options.createJobsSchedule] - function to create the jobs schedule
+  @returns {Object} - the created Redakteur API
+  ###
 export createRedakteurAPI = ({
 sourceName
 viewTableRole
@@ -29,6 +43,7 @@ articleGenerationSchemaDefinition
 articleGenerationMainPrompt
 publishGeneratedArticle = defaultPublishGeneratedArticle
 retentionDays = 21
+createJobsSchedule
 }) ->
 
   unless articleGenerationSchemaDefinition?
@@ -39,6 +54,11 @@ retentionDays = 21
 
   articleGenerationSchema = new Schema articleGenerationSchemaDefinition
 
+  createJobsSchedule ?= ->
+    in: days: 1
+    on:
+      hour: 6
+      minute: 0
 
   generatedArticlesDataOptions = createGeneratedArticlesTableAPI {sourceName, viewTableRole, editRole}
   promptsDataOptions = createPromptsTableAPI {sourceName, viewTableRole, editRole, articleCategories}
@@ -62,6 +82,8 @@ retentionDays = 21
 
   createMethods {
     sourceName
+    viewTableRole
+    editRole
     articleCategories
     articleGenerationSchema
     articleGenerationMainPrompt
@@ -72,6 +94,7 @@ retentionDays = 21
     researchedArticlesDataOptions
     rssFeedsDataOptions
     publishGeneratedArticle
+    createJobsSchedule
   }
 
   {
