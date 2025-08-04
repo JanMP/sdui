@@ -2,7 +2,7 @@ import {Meteor} from 'meteor/meteor'
 import {Accounts} from 'meteor/accounts-base'
 import React, {useState} from 'react'
 import {useTracker} from 'meteor/react-meteor-data'
-import {Schema} from 'meteor/janmp:sdui'
+import {Schema, useToast} from 'meteor/janmp:sdui'
 import {AutoForm} from '../forms/uniforms-custom/select-implementation'
 import {Button} from 'primereact/button'
 import {PasswordField} from '../forms/uniforms-custom/select-implementation'
@@ -65,11 +65,20 @@ emailSchema = new Schema
 
 
 SignInForm = ->
+  toast = useToast()
   login = ({email, password}) ->
     # console.log 'login', {email, password}
     Meteor.loginWithPassword email, password, (error) ->
       if error
-        alert 'Login fehlgeschlagen: ' + error
+        toast.show
+          severity: 'error'
+          summary: 'Fehler'
+          detail: error.message
+      else
+        toast.show
+          severity: 'success'
+          summary: 'Erfolg'
+          detail: 'Login erfolgreich'
 
   <AutoForm
     schema={loginSchema.bridge}
@@ -79,10 +88,19 @@ SignInForm = ->
 
 
 SignUpForm = ->
+  toast = useToast()
   signup = (model) ->
     Accounts.createUser model, (error) ->
       if error
-        alert 'User Account konnte nicht angelegt werden: ' + error?.message
+        toast.show
+          severity: 'error'
+          summary: 'Fehler'
+          detail: error?.message
+      else
+        toast.show
+          severity: 'success'
+          summary: 'Erfolg'
+          detail: 'Account erfolgreich angelegt'
 
   <AutoForm
     schema={signupSchema.bridge}
@@ -91,10 +109,19 @@ SignUpForm = ->
   />
 
 EmailForm = ->
+  toast = useToast()
   resetPassword = ({email}) ->
     Accounts.forgotPassword {email}, (error) ->
       if error
-        alert 'Fehler beim Zurücksetzen des Passowrds' + error?.message
+        toast.show
+          severity: 'error'
+          summary: 'Fehler'
+          detail: 'Fehler beim Zurücksetzen des Passworts: ' + error?.message
+      else
+        toast.show
+          severity: 'success'
+          summary: 'Erfolg'
+          detail: 'Passwort zurücksetzen E-Mail gesendet'
 
   <AutoForm
     schema={emailSchema.bridge}
@@ -118,7 +145,7 @@ export LoginForm = ({allowResetPassword = false}) ->
 
   <div className="p-component w-16rem">
     <Form />
-    { <div className="text-center mt-4">
+    {<div className="text-center mt-4">
       <a onClick={-> setFormToShow 'reset-password'}>Ich habe mein Passwort vergessen</a>
     </div> if allowResetPassword and formToShow isnt 'reset-password'}
     {<div className="text-center mt-4">
