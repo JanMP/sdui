@@ -14,8 +14,7 @@ export class SdAi
     @param {any} [options.agentRole] - Optional agent role for tools
     @param {Function} [options.toolPostProcess] - Optional post-processing function for tools
     ###
-  constructor: (options) ->
-    @options = options
+  constructor: (@options) ->
     @agentRole = @options.agentRole
     @toolPostProcess = @options.toolPostProcess ? (args) -> args
 
