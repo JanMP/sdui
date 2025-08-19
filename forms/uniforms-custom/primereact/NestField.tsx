@@ -1,6 +1,6 @@
 import React from 'react';
 import { HTMLFieldProps, connectField, filterDOMProps } from 'uniforms';
-
+import {Fieldset} from 'primereact/fieldset';
 import AutoField from './AutoField';
 
 export type NestFieldProps = HTMLFieldProps<
@@ -17,13 +17,12 @@ function Nest({
   ...props
 }: NestFieldProps) {
   return (
-    <div {...filterDOMProps(props)}>
-      {label && <label>{label}</label>}
+    <Fieldset legend={label} {...filterDOMProps(props)} className="mt-4">
       {children ||
         fields.map(field => (
           <AutoField key={field} name={field} {...itemProps} />
         ))}
-    </div>
+    </Fieldset>
   );
 }
 
