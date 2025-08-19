@@ -28,7 +28,7 @@ export createTableDataAPI = (params) ->
     perLoad,
     setupNewItem
     onSubmit
-    onDelete # CHECK if we use this, and remove or add to type declaration
+    onDelete
     checkDisableEditForRow
     checkDisableDeleteForRow
     usePubSub
@@ -125,7 +125,7 @@ export createTableDataAPI = (params) ->
 
   #return props for the ui component
   {
-    sourceName, listSchema, formSchema,
+    sourceName, sourceSchema, listSchema, formSchema,
     collection, rowsCollection
     canEdit
     canSearch
