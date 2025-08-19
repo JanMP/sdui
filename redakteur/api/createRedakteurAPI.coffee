@@ -4,6 +4,7 @@ import {createGeneratedArticlesTableAPI} from './GeneratedArticles.coffee'
 import {createPromptsTableAPI} from './Prompts.coffee'
 import {createResearchedArticlesTableAPI} from './ResearchedArticles.coffee'
 import {createRssFeedsTableAPI} from './RssFeeds.coffee'
+import {createWorkspaceAPI} from './Workspace.coffee'
 import {createMethods} from './createMethods.coffee'
 
 
@@ -26,6 +27,7 @@ defaultArticleCategories = [
   @param {String} options.sourceName - the sdui sourceName
   @param {Object} options.viewTableRole - the role for viewing the table
   @param {Object} options.editRole - the role for editing the table
+  @param {Object} options.agentRole - the role for agent operations
   @param {Array} [options.articleCategories] - the article categories to use
   @param {Object} options.articleGenerationSchemaDefinition - the schema definition for article generation
   @param {String} options.articleGenerationMainPrompt - the main prompt for article generation
@@ -38,6 +40,7 @@ export createRedakteurAPI = ({
 sourceName
 viewTableRole
 editRole
+agentRole
 articleCategories = defaultArticleCategories
 articleGenerationSchemaDefinition
 articleGenerationMainPrompt
@@ -46,6 +49,14 @@ retentionDays = 21
 createJobsSchedule
 }) ->
 
+  unless sourceName?
+    throw new Error 'sourceName is required'
+  unless viewTableRole?
+    throw new Error 'viewTableRole is required'
+  unless editRole?
+    throw new Error 'editRole is required'
+  unless agentRole?
+    throw new Error 'agentRole is required'
   unless articleGenerationSchemaDefinition?
     throw new Error 'articleGenerationSchemaDefinition is required'
 
@@ -64,6 +75,7 @@ createJobsSchedule
   promptsDataOptions = createPromptsTableAPI {sourceName, viewTableRole, editRole, articleCategories}
   researchedArticlesDataOptions = createResearchedArticlesTableAPI {sourceName, viewTableRole, editRole}
   rssFeedsDataOptions = createRssFeedsTableAPI {sourceName, viewTableRole, editRole}
+  workspaceApi = createWorkspaceAPI {sourceName, articleGenerationSchema, viewRole: viewTableRole, editRole, agentRole, tableDataOptions: generatedArticlesDataOptions}
 
   # schema for the add generatedArticle form
   creationParamsSchema = new Schema
@@ -103,4 +115,5 @@ createJobsSchedule
     researchedArticlesDataOptions
     rssFeedsDataOptions
     creationParamsSchema
+    workspaceApi
   }

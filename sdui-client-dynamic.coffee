@@ -33,6 +33,7 @@ export {createJobsTableDataAPI} from './jobstable/createJobsTableDataAPI.coffee'
 export {AppStatusPage, appIsOn} from './app-status/AppStatusPage.coffee'
 export {generateUUID} from './common/generateUUID.coffee'
 export {ErrorBoundary} from './common/ErrorBoundary.coffee'
+export {SdWorkspaceAPI} from './workspace/SdWorkspaceAPI.coffee'
 # export {createFilesAPI, filesAPISourceSchema} from './api/createFilesAPI.coffee'
 
 # server only (eventually)
@@ -72,4 +73,5 @@ export GravatarField = suspend lazy -> import('./forms/GravatarField.coffee').th
 export FormattedJSON = suspend lazy -> import('./misc-components/FormattedJSON.coffee').then (m) -> default: m.FormattedJSON
 export SdUserTable = suspend lazy -> import('./usertable/SdUserTable.coffee').then (m) -> default: m.SdUserTable
 export SdJobsTable = suspend lazy -> import('./jobstable/SdJobsTable.coffee').then (m) -> default: m.SdJobsTable
+export SdWorkspace = suspend lazy -> import('./workspace/SdWorkspace.coffee').then (m) -> default: m.SdWorkspace
 export {runTests} from './runTests.coffee'

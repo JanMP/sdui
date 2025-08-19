@@ -1,6 +1,5 @@
 import {Meteor} from 'meteor/meteor'
 import {Mongo} from 'meteor/mongo'
-import {ValidatedMethod} from 'meteor/mdg:validated-method'
 import {createTableDataAPI, LongTextField, Schema} from 'meteor/janmp:sdui'
 
 ###*

@@ -3,6 +3,7 @@ import {createGeneratedArticlesPage} from './GeneratedArticlesPage'
 import {createResearchedArticlesPage} from './ResearchedArticlesPage'
 import {createPromptsPage} from './PromptsPage'
 import {createRssFeedsPage} from './RssFeedsPage'
+import {createWorkspacePage} from './WorkspacePage'
 
 
 
@@ -15,6 +16,7 @@ export createRedakteurLayout = ({sourceName, label, path, role, dataOptions}) ->
     dataOptions: dataOptions.generatedArticlesDataOptions,
     creationParamsSchema: dataOptions.creationParamsSchema
   }
+  WorkspacePage = createWorkspacePage({workspaceApi: dataOptions.workspaceApi})
 
   label: label
   path: path
@@ -31,4 +33,6 @@ export createRedakteurLayout = ({sourceName, label, path, role, dataOptions}) ->
     label: 'Produzierte Artikel', icon: 'pi pi-fw pi-table', path: 'produced-articles', element: <GeneratedArticlesPage />
   ,
     disabled: true, hideOnDisabled: true, label: 'Produzierter Artikel', icon: 'pi pi-fw pi-table', path: 'produced-articles/:articleId', element: <GeneratedArticlesPage />
+  ,
+    disabled: false, hideOnDisabled: true, label: 'Workspace', icon: 'pi pi-fw pi-pencil', path: 'workspace', element: <WorkspacePage />
   ]

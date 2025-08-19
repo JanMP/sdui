@@ -21,7 +21,9 @@ export createGeneratedArticlesTableAPI = ({sourceName, viewTableRole}) ->
       title: type: 'string'
       teaser: type: 'string'
       content: type: 'string'
-      createdAt: instanceof: 'Date'
+      createdAt:
+        type: 'object'
+        instanceof: 'Date'
       basedOnArticleId: type: 'string'
       published: type: 'boolean'
       rawOutput: type: 'object' # this contains all the generated data
