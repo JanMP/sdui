@@ -44,10 +44,9 @@ function ListDel({ disabled, name, readOnly, ...props }: ListDelFieldProps) {
     <Button
       {...filterDOMProps(props)}
       onClick={onAction}
-      icon="pi pi-delete-left"
+      icon="pi pi-minus"
       severity="danger"
       rounded
-      text
      />
   );
 }

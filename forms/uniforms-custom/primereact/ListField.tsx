@@ -18,14 +18,14 @@ function List({
   value,
   ...props
 }: ListFieldProps) {
-  
+
   const {t} = useTranslation()
 
   return (
-    <div {...filterDOMProps(props)} className="u-list-field">
+    <div {...filterDOMProps(props)} className="u-list-field border-surface-500 border-bottom-2 mb-2">
       {label && (
-        <div>
-          <div className="flex flex-row justify-content-between align-items-center border-primary border-bottom-1 mb-2">
+        <div className="my-4">
+          <div className="flex flex-row justify-content-between align-items-center border-surface-500 border-bottom-2">
             <div className="text-lg">{t(label)}</div>
             <div>
               <ListAddField initialCount={initialCount} name="$" />

@@ -9,7 +9,7 @@ export class SdMethod
   ###*
   @param {Object} options - Configuration options for the SdMethod
   @param {String} options.name - The name of the method
-  @param {Schema} options.schema - The schema for the method
+  @param {Schema} [options.schema] - The schema for the method
   @param {String} options.role - The role required to run the method (note: should be 'role', not 'userRole')
   @param {Object} [options.tool] - Optional tool configuration
   @param {String} [options.tool.name] - The name of the tool
@@ -19,11 +19,11 @@ export class SdMethod
   @param {Function} options.run - The function to run when the method is called
   ###
   constructor: (options) -> # Fixed typo: was "costructor"
+    # Persist provided schema for validation/registry usage
+    @schema = options.schema
     @toolPostProcess = options.tool?.postProcess ? (args) -> args
     unless (@name = options.name)?
       throw new Meteor.Error 'name is required'
-    unless (@schema = options.schema)?
-      throw new Meteor.Error 'schema is required'
     unless (@role = options.role)?
       throw new Meteor.Error 'role is required'
     unless (@run = options.run)?
@@ -39,7 +39,7 @@ export class SdMethod
 
     @_method = new ValidatedMethod
       name: @name
-      validate: @schema.methodValidator
+      validate: @schema?.methodValidator ? null
       run: (args) =>  # Use fat arrow to preserve 'this' context
         # console.log "Running method #{@name} with args:", args
         try
@@ -53,7 +53,7 @@ export class SdMethod
     if @toolName?
       @_tool = new ValidatedMethod
         name: @toolName
-        validate: @schema.methodValidator
+        validate: @schema?.methodValidator ? null
         run: (args) =>
           try
             await currentUserMustBeInRole @agentRole
@@ -69,8 +69,7 @@ export class SdMethod
     @param {Object} args - The arguments to pass to the method
     @returns {Promise} - A promise that resolves when the method is executed
     ###
-  call: (args) => @_method.callAsync @name, args
-
+  call: (args) => Meteor.callAsync @name, args
 
 
 

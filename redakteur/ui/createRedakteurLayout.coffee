@@ -3,6 +3,7 @@ import {createGeneratedArticlesPage} from './GeneratedArticlesPage'
 import {createResearchedArticlesPage} from './ResearchedArticlesPage'
 import {createPromptsPage} from './PromptsPage'
 import {createRssFeedsPage} from './RssFeedsPage'
+import {createResarchedArticlesStatisticsPage} from './ResearchedArticlesStatisticsPage'
 import {createWorkspacePage} from './WorkspacePage'
 
 
@@ -16,6 +17,7 @@ export createRedakteurLayout = ({sourceName, label, path, role, dataOptions}) ->
     dataOptions: dataOptions.generatedArticlesDataOptions,
     creationParamsSchema: dataOptions.creationParamsSchema
   }
+  ResearchedArticlesStatisticsPage = createResarchedArticlesStatisticsPage({dataOptions: dataOptions.researchedArticlesStatisticsDataOptions})
   WorkspacePage = createWorkspacePage({workspaceApi: dataOptions.workspaceApi})
 
   label: label
@@ -35,4 +37,6 @@ export createRedakteurLayout = ({sourceName, label, path, role, dataOptions}) ->
     disabled: true, hideOnDisabled: true, label: 'Produzierter Artikel', icon: 'pi pi-fw pi-table', path: 'produced-articles/:articleId', element: <GeneratedArticlesPage />
   ,
     disabled: false, hideOnDisabled: true, label: 'Workspace', icon: 'pi pi-fw pi-pencil', path: 'workspace', element: <WorkspacePage />
+  ,
+    label: 'Statistiken zu recherchierten Artikeln', icon: 'pi pi-fw pi-table', path: 'researched-articles-statistics', element: <ResearchedArticlesStatisticsPage />
   ]

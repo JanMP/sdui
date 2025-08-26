@@ -48,9 +48,9 @@ function ListAdd({
     <Button
       {...filterDOMProps(props)}
       onClick={onAction}
+      severity="success"
       icon="pi pi-plus"
       rounded
-      text
     />
   );
 }

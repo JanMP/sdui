@@ -6,6 +6,7 @@ import {createResearchedArticlesTableAPI} from './ResearchedArticles.coffee'
 import {createRssFeedsTableAPI} from './RssFeeds.coffee'
 import {createWorkspaceAPI} from './Workspace.coffee'
 import {createMethods} from './createMethods.coffee'
+import {createResearchedArticlesStatisticsTableAPI} from './ResearchedArticlesStatistics.coffee'
 
 
 defaultPublishGeneratedArticle = ({data}) ->
@@ -75,6 +76,7 @@ createJobsSchedule
   promptsDataOptions = createPromptsTableAPI {sourceName, viewTableRole, editRole, articleCategories}
   researchedArticlesDataOptions = createResearchedArticlesTableAPI {sourceName, viewTableRole, editRole}
   rssFeedsDataOptions = createRssFeedsTableAPI {sourceName, viewTableRole, editRole}
+  researchedArticlesStatisticsDataOptions = createResearchedArticlesStatisticsTableAPI {sourceDataOptions: researchedArticlesDataOptions}
   workspaceApi = createWorkspaceAPI {sourceName, articleGenerationSchema, viewRole: viewTableRole, editRole, agentRole, tableDataOptions: generatedArticlesDataOptions}
 
   # schema for the add generatedArticle form
@@ -113,6 +115,7 @@ createJobsSchedule
     generatedArticlesDataOptions
     promptsDataOptions
     researchedArticlesDataOptions
+    researchedArticlesStatisticsDataOptions
     rssFeedsDataOptions
     creationParamsSchema
     workspaceApi

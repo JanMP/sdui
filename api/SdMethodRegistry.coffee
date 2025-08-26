@@ -89,7 +89,7 @@ export class SdMethodRegistry
     .map (method) ->
       method_name: method.toolName
       json_schema: method.schema._schema
-      description: method.description or method.schema?._schema?.description or "Meteor method: #{method.name}"
+      description: method.description or method.schema._schema?.description or "Meteor method: #{method.name}"
       role: method.agentRole
       instruction: if method.agentRole? then "Role required: #{JSON.stringify method.agentRole}"
 
