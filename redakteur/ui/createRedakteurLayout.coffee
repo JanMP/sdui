@@ -1,8 +1,10 @@
+import { createResearchedArticlesStatisticsTableAPI } from '../api/ResearchedArticlesStatistics.coffee'
 import React from 'react'
 import {createGeneratedArticlesPage} from './GeneratedArticlesPage'
 import {createResearchedArticlesPage} from './ResearchedArticlesPage'
 import {createPromptsPage} from './PromptsPage'
 import {createRssFeedsPage} from './RssFeedsPage'
+import {createResarchedArticlesStatisticsPage} from './ResearchedArticlesStatisticsPage'
 
 
 
@@ -15,6 +17,7 @@ export createRedakteurLayout = ({sourceName, label, path, role, dataOptions}) ->
     dataOptions: dataOptions.generatedArticlesDataOptions,
     creationParamsSchema: dataOptions.creationParamsSchema
   }
+  ResearchedArticlesStatisticsPage = createResarchedArticlesStatisticsPage({dataOptions: dataOptions.researchedArticlesStatisticsDataOptions})
 
   label: label
   path: path
@@ -31,4 +34,6 @@ export createRedakteurLayout = ({sourceName, label, path, role, dataOptions}) ->
     label: 'Produzierte Artikel', icon: 'pi pi-fw pi-table', path: 'produced-articles', element: <GeneratedArticlesPage />
   ,
     disabled: true, hideOnDisabled: true, label: 'Produzierter Artikel', icon: 'pi pi-fw pi-table', path: 'produced-articles/:articleId', element: <GeneratedArticlesPage />
+  ,
+    label: 'Statistiken zu recherchierten Artikeln', icon: 'pi pi-fw pi-table', path: 'researched-articles-statistics', element: <ResearchedArticlesStatisticsPage />
   ]
