@@ -60,7 +60,7 @@ createJobsSchedule
 
       {result} = await invokeLangGraphAgent
         settings: Meteor.settings.langsmith
-        agent: 'write_article_redakteur'
+        agent: 'redakteur_agent'
         input: {context, prompt}
 
       await GeneratedArticles.insertAsync
