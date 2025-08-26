@@ -7,8 +7,8 @@ import classnames from 'classnames'
 
 export SearchInput = ({value, onChange, canKnnSearch, isKnnSearch, onSetIsKnnSearch, className = 'search-input'}) ->
 
-  canKnnSearch ?= true
-  isKnnSearch ?= true
+  canKnnSearch ?= false
+  isKnnSearch ?= false
   onSetIsKnnSearch ?= () -> console.warn 'onSetIsKnnSearch not set'
 
   [showWarning, setShowWarning] = useState false
