@@ -192,7 +192,7 @@ createJobsSchedule
     .then (similarArticles) ->
       # we don't filter out the article itself, we'd later have to add it back into the context
       _(similarArticles)
-      .map (item) -> _.pick item, ['_id', 'title', 'link', 'pubDate', 'score']
+      .map (item) -> _.pick item, ['_id', 'title', 'link', 'pubDate', 'score', 'feedMetaData']
       .filter ({pubDate}) -> pubDate <= article.pubDate
       .filter ({score}) -> score > 0.9
       .value()
