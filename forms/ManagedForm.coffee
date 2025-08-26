@@ -45,6 +45,8 @@ allowUnchangedSubmit = false}) ->
           validate="onChange"
           children={children}
           disabled={disabled}
+          showInlineError={true}
+          errorsField={-> null}
         />
      </div>
       <div className="pt-4 flex justify-content-end gap-2">

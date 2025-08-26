@@ -17,7 +17,7 @@ export default connectFieldPlus = (Component) ->
     outerClassName = "flex flex-column#{if label then ' pt-3' else ''}"
     if fieldClassName?
       outerClassName += ' | ' + fieldClassName
-    
+
     if props.tooltip?
       props.tooltipOptions ?=
         position: 'top'
@@ -40,7 +40,7 @@ export default connectFieldPlus = (Component) ->
     # useEffect ->
     #   console.log props
     # , [props]
-   
+
     <div className={outerClassName}>
       {
         unless label?
@@ -67,6 +67,10 @@ export default connectFieldPlus = (Component) ->
                 <label htmlFor={props.id}>{translatedLabel}</label>
                 <Component {props...}/>
               </div>
+      }
+      {
+        if error and props.showInlineError
+          <div className="p-error">{error?.message}</div>
       }
     </div>
 
