@@ -50,12 +50,15 @@ allowUnchangedSubmit = false}) ->
         />
      </div>
       <div className="pt-4 flex justify-content-end gap-2">
-        {showResetButton and <ActionButton
-          onAction={-> form.reset()}
-          className="p-button-warning"
-          label={t 'sdui:reset', 'Zurücksetzen'}
-          disabled={not hasChanged}
-        />}
+        {
+          if showResetButton
+            <ActionButton
+              onAction={-> form.reset()}
+              className="p-button-warning"
+              label={t 'sdui:reset', 'Zurücksetzen'}
+              disabled={not hasChanged}
+            />
+        }
         <ActionButton
           onAction={onAction}
           className="p-button-primary"
