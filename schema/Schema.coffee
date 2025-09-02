@@ -31,9 +31,35 @@ export class Schema
       @validator = (model) =>
         @validate model
         if @validate.errors?.length
-          localize.de @validate.errors.filter (e) -> e.keyword isnt 'errorMessage'
-          console.log @validate.errors
-          details: @validate.errors
+          # Localize, but skip custom errorMessage keyword
+          localize.de @validate.errors #.filter (e) -> e.keyword isnt 'errorMessage'
+          # Map to include field titles in messages for UI
+          formatted = @validate.errors
+            # .filter (e) -> e.keyword isnt 'errorMessage'
+            .map (error) =>
+              {node, path} = @_targetFromError error
+              title = node?.title ? (error.params?.missingProperty ? @_lastPathToken error.instancePath)
+              fieldPath = path.join '.'
+              # console.log 'Validation Error', error
+              message =
+                if title
+                  error.message
+                  .replace 'muss die Validierung "instanceof" bestehen', 'muss ausgefüllt werden'
+                  .replace "Attribut #{fieldPath}", "Feld #{title}"
+                else
+                  error.message
+              # Keep original fields, enhance message and attach helpers
+              {
+                keyword: error.keyword
+                instancePath: error.instancePath
+                schemaPath: error.schemaPath
+                params: error.params
+                message: message
+                # Helpful extras that consumers can use
+                name: fieldPath
+                fieldTitle: title
+              }
+          details: formatted
         else if (message = @modelValidator model)?
           details: [{
             instancePath: ''
@@ -41,13 +67,20 @@ export class Schema
             keyword: 'model'
             params: {}
             message
+            name: ''
+            fieldTitle: 'Model'
           }]
       @methodValidator = (model) =>
         @validate model
         if @validate.errors?.length
           localize.de @validate.errors.filter (e) -> e.keyword isnt 'errorMessage'
-          translatedError = @validate.errors.map (error) ->
-            name: error.instancePath.replace '/', ''
+          errors = @validate.errors.filter (e) -> e.keyword isnt 'errorMessage'
+          translatedError = errors.map (error) =>
+            {node, path} = @_targetFromError error
+            title = node?.title ? (error.params?.missingProperty ? @_lastPathToken error.instancePath)
+            fieldPath = path.join '.'
+            # Use title as the visible name; keep message as type
+            name: title ? fieldPath
             type: error.message
           throw new ValidationError translatedError
         else if (message = @modelValidator model)?
@@ -57,6 +90,46 @@ export class Schema
       @firstLevelSchemaKeys = (key for key of @_schema.properties)
     catch error
       throw new Meteor.Error error.message
+
+  # --- helpers to resolve schema node and labels from AJV errors ---
+
+  _splitPath: (instancePath) ->
+    # AJV instancePath is a JSON pointer like /a/0/b
+    (instancePath ? '').split('/').filter (p) -> Boolean p
+
+  _lastPathToken: (instancePath) ->
+    tokens = @_splitPath instancePath
+    tokens[tokens.length - 1]
+
+  _targetFromError: (error) ->
+    tokens = @_splitPath error.instancePath
+    node = @_schema
+    path = []
+
+    for t in tokens
+      # Skip array indices
+      continue if /^\d+$/.test t
+      # Traverse arrays
+      if node?.type is 'array' and node?.items?
+        node = node.items
+      # Traverse object properties
+      if node?.properties?[t]
+        node = node.properties[t]
+        path.push t
+      else if node?.items?.properties?[t]
+        node = node.items.properties[t]
+        path.push t
+
+    # Required errors report the parent path and provide the missing property
+    if error.keyword is 'required'
+      missing = error.params?.missingProperty
+      if node?.properties?[missing]
+        node = node.properties[missing]
+      else if node?.items?.properties?[missing]
+        node = node.items.properties[missing]
+      path.push missing if missing?
+
+    {node, path}
 
   idType =
     oneOf: [
