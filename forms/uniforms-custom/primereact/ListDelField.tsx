@@ -44,6 +44,7 @@ function ListDel({ disabled, name, readOnly, ...props }: ListDelFieldProps) {
     <Button
       {...filterDOMProps(props)}
       onClick={onAction}
+      style={{ transform: 'scale(0.5)', transformOrigin: 'center' }}
       icon="pi pi-minus"
       severity="danger"
       rounded

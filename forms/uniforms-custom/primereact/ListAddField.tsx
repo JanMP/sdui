@@ -48,6 +48,7 @@ function ListAdd({
     <Button
       {...filterDOMProps(props)}
       onClick={onAction}
+      style={{ transform: 'scale(0.5)', transformOrigin: 'center' }}
       severity="success"
       icon="pi pi-plus"
       rounded
