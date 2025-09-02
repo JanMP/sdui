@@ -7,6 +7,7 @@ export default connectFieldPlus = (Component) ->
 
   WrappedComponent = ({
     label, labelPosition
+    required
     error
     fieldClassName
     props...
@@ -37,9 +38,10 @@ export default connectFieldPlus = (Component) ->
         t props?.name , label
       else ""
 
-    # useEffect ->
-    #   console.log props
-    # , [props]
+    labelSpan =
+      if required
+        <span className="text-red-500">*</span>
+      else null
 
     <div className={outerClassName}>
       {
@@ -50,21 +52,21 @@ export default connectFieldPlus = (Component) ->
             when 'floating'
               <span className="p-float-label">
                 <Component {props...}/>
-                <label htmlFor={props.id}>{translatedLabel}</label>
+                <label htmlFor={props.id}>{translatedLabel}{labelSpan}</label>
               </span>
             when 'left'
               <div className="flex align-items-center gap-2">
-                <label className="text-right w-10rem" htmlFor={props.id}>{translatedLabel}</label>
+                <label className="text-right w-10rem" htmlFor={props.id}>{translatedLabel}{labelSpan}</label>
                 <Component {props...}/>
               </div>
             when 'right'
               <div className="flex align-items-center gap-2">
                 <Component {props...}/>
-                <label htmlFor={props.id}>{translatedLabel}</label>
+                <label htmlFor={props.id}>{translatedLabel}{labelSpan}</label>
               </div>
             else
               <div className="flex flex-column">
-                <label htmlFor={props.id}>{translatedLabel}</label>
+                <label htmlFor={props.id}>{translatedLabel}{labelSpan}</label>
                 <Component {props...}/>
               </div>
       }
