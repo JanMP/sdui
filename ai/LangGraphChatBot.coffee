@@ -2,7 +2,7 @@
 import {Meteor} from 'meteor/meteor'
 import _ from 'lodash'
 import LangGraphSDK from '@langchain/langgraph-sdk'
-import {defaultSdMethodRegistry} from '../api/SdMethodRegistry.coffee'
+import {defaultSdToolRegistry} from '../api/SdToolRegistry.coffee'
 
 ###*
   LangGraphChatBot class for handling chat interactions with LangGraph
@@ -88,7 +88,7 @@ export class LangGraphChatBot
           threadId: threadId
 
     # Get tools for the agent role
-    tools = defaultSdMethodRegistry.getToolDefinitionsByRole agentRole
+    tools = defaultSdToolRegistry.getToolDefinitionsByRole agentRole
     console.log {agentRole, tools}
 
     {threadId, model: session.model ? 'openai/gpt-4.1', tools}

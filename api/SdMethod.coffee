@@ -2,7 +2,7 @@ import {Meteor} from 'meteor/meteor'
 import {ValidatedMethod} from 'meteor/mdg:validated-method'
 import {Schema} from 'meteor/janmp:sdui'
 import {currentUserMustBeInRole} from '../common/roleChecks.coffee'
-import {defaultSdMethodRegistry, SdMethodRegistry} from './SdMethodRegistry.coffee'
+import {defaultSdToolRegistry, SdToolRegistry} from './SdToolRegistry.coffee'
 
 
 export class SdMethod
@@ -14,8 +14,9 @@ export class SdMethod
   @param {Object} [options.tool] - Optional tool configuration
   @param {String} [options.tool.name] - The name of the tool
   @param {String} options.tool.agentRole - The role required to run the tool
+  @param {Object} [options.tool.sessionIdField] - The name of the field that should hold the session id
   @param {Function} [options.tool.postProcess] - Optional post-processing function for the tool
-  @param {SdMethodRegistry} [options.tool.registry] - Optional registry to register the tool. Defaults to `defaultRegistry`.
+  @param {SdToolRegistry} [options.tool.registry] - Optional registry to register the tool. Defaults to `defaultRegistry`.
   @param {Function} options.run - The function to run when the method is called
   ###
   constructor: (options) -> # Fixed typo: was "costructor"
@@ -35,7 +36,7 @@ export class SdMethod
       if options.tool.registry?
         @registry = options.tool.registry
       else
-        @registry = defaultSdMethodRegistry  # Use the global registry if none provided
+        @registry = defaultSdToolRegistry  # Use the global registry if none provided
 
     @_method = new ValidatedMethod
       name: @name

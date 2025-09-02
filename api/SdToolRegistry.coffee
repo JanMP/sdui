@@ -1,6 +1,3 @@
-# SdMethodRegistry.coffee
-# Central registry for all SdMethod instances with tool configurations
-
 import {Meteor} from 'meteor/meteor'
 
 ###*
