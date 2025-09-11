@@ -47,7 +47,7 @@ export class SdToolRegistry
         agentRole: sdMethodInstance.agentRole
         sessionIdField: sdMethodInstance.sessionIdField
         description: sdMethodInstance.schema?._schema?.description
-        method: sdMethodInstance  # Keep reference to original method
+        # method: sdMethodInstance  # Keep reference to original method
 
       @registry.set sdMethodInstance.name, registryEntry
 
