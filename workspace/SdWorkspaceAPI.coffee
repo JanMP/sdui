@@ -9,132 +9,182 @@ idType =
   , type: 'object'
   ]
 
-workspaceSchema = new Schema
-  type: 'object'
-  properties:
-    _id: idType
-    sourceSourceName: type: 'string'
-    sourceId: idType
-    createdAt:
-      type: 'object'
-      instanceof: 'Date'
-    updatedAt:
-      type: 'object'
-      instanceof: 'Date'
-    data: type: 'object'
+
+export class WorkspaceDataHandler
+  ###*
+    @param {Object} options
+    @param {SdWorkspaceAPI} options.api - Instance of SdWorkspaceAPI
+    ###
+  constructor: (@options) ->
+    @api = @options.api
+    @id = null
+    @document = null
+
+  newDocument: ->
+    @id = await @api.newDocumentMethod.call()
+    @fetchDocument()
+
+  loadDocument: ({id}) ->
+    @id = id
+    await @api.loadDocumentMethod.call sourceId: id
+    @fetchDocument()
+
+  fetchDocument: ->
+    unless @id
+      throw new Meteor.Error 'Workspace document not loaded'
+    @document= await @api.fetchDocumentMethod.call id: @id
+    console.log "Fetched workspace document", @document
+    @document
+
+  setDocument: (data) =>
+    console.log this
+    unless @id
+      throw new Meteor.Error 'Workspace document not loaded'
+    unless @document?.data
+      throw new Meteor.Error 'Workspace document has no data'
+    await @api.setDocumentMethod.call id: @id, data: data
+
 
 export class SdWorkspaceAPI
 
   ###*
     @param {Object} options
-    @param {String} options.sourceName - Name of the source
-    @param {Mongo.Collection} options.collection - Collection to use
-    @param {Schema} options.articleGenerationSchema - Schema of the field containing the data
-    @param {any} options.viewRole - Role required to view data
-    @param {any} options.editRole - Role required to edit data
-    @param {any} options.agentRole - Role required for agent operations
-    @param {Object} [options.tableDataOptions] - Options for connected TableDataAPI
+    @param {Object} [options.sourceDataOptions] - Options of connected TableDataAPI
     ###
   constructor: (@options) ->
-    unless (@sourceName = @options.sourceName)?
-      throw new Error 'sourceName is required'
-    unless (@collection = @options.collection) instanceof Mongo.Collection
-      throw new Error 'collection is not set'
-    unless (@articleGenerationSchema = @options.articleGenerationSchema) instanceof Schema
-      throw new Error 'articleGenerationSchema is required'
-    unless (@viewRole = @options.viewRole)?
-      throw new Error 'viewRole is required'
-    unless ( @editRole = @options.editRole)?
-      throw new Error 'editRole is required'
-    unless (@agentRole = @options.agentRole)?
-      throw new Error 'agentRole is required'
-    @tableDataOptions = @options.tableDataOptions
+    @sourceDataOptions = @options.sourceDataOptions
+
+    @sourceSourceName = @sourceDataOptions.sourceName
+    @sourceName = "#{@sourceSourceName}.workspace"
+    @publicationName = "#{@sourceName}.forId"
+    @sourceCollection = @sourceDataOptions.collection
+
+    @dataSchema = @sourceDataOptions.formSchema
+
+    @viewRole = @sourceDataOptions.viewTableRole
+    @editRole = @sourceDataOptions.editRole
+    @agentRole = @sourceDataOptions.agentRole
+
+    @collection = new Mongo.Collection "#{@sourceDataOptions.collection._name}.workspace"
+
+    @workspaceSchema = new Schema
+      type: 'object'
+      properties:
+        _id: idType
+        sourceId: idType
+        createdAt:
+          type: 'object'
+          instanceof: 'Date'
+        updatedAt:
+          type: 'object'
+          instanceof: 'Date'
+        data: @dataSchema._schema
 
     @createMethods()
     @createPublications()
+
 
   ###*
     Create the contents of a new workspace item.
     Overwrite this method to customize the initial content.
     @return {Object}
     ###
-  setupNewItem: -> {}
+  setupNewItem: ->
+    headline: 'New Workspace Document'
+    content: 'enter stuff here'
 
-  ###*
-    Create a new workspace item from a table row.
-    Defaults to (row) -> row.rawOutput to work with the Redakteur API.
-    Overwrite this method to use with table rows other than Redakteur articles.
-    @param {Object} row - The document to create the workspace from
-    @return {Object} - The document to insert into the workspace collection
-    ###
-  documentFromRow: (row) -> row.rawOutput
+  newDocument: =>
+    return unless Meteor.isServer
+    console.log 'Creating new workspace document'
+    await @collection.insertAsync
+      createdAt: new Date()
+      updatedAt: new Date()
+      data: await @setupNewItem()
+
+  loadDocument: ({sourceId}) =>
+    return unless Meteor.isServer
+    document = await @sourceCollection.findOneAsync(_id: sourceId)
+    console.log "Loading source document #{sourceId} into workspace", document
+    @collection.insertAsync
+      sourceId: sourceId
+      createdAt: new Date()
+      updatedAt: new Date()
+      data: document
+
+  fetchDocument: ({id}) =>
+    return unless Meteor.isServer
+    @collection.findOneAsync sourceId: id
+
+  setDocument: ({id, data}) =>
+    return unless Meteor.isServer
+    await @collection.updateAsync
+      _id: id
+    ,
+      $set:
+        data: data
+        updatedAt: new Date()
 
   createMethods: ->
-    @_newWorkSpace = new SdMethod
-      name: "#{@sourceName}.newWorkspace"
+    @newDocumentMethod = new SdMethod
+      name: "#{@sourceName}.newDocument"
       schema: new Schema {}
       role: @editRole
       agentRole: @agentRole
-      run: =>
-        newItem = @setupNewItem()
-        @collection.insertAsync newItem
+      run: @newDocument
 
-    @_newWorkspaceFromDocument = new SdMethod
-      name: "#{@sourceName}.newWorkspaceFromDocument"
+    @loadDocumentMethod = new SdMethod
+      name: "#{@sourceName}.loadDocument"
       schema:
         new Schema
           type: 'object'
           properties:
-            document:
-              description: 'Document to create a workspace from'
-              type: 'object'
-            sourceSourceName:
-              description: 'Source name of the document'
-              type: 'string'
             sourceId:
-              description: 'Id of the row to create a workspace from'
+              description: 'Id of the row to create a workspace document from'
               oneOf: [
                 type: 'string'
               , type: 'object'
               ]
-          required: ['document']
+          required: ['sourceId']
+      role: @viewRole
+      run: @loadDocument
+
+    @fetchDocumentMethod = new SdMethod
+      name: "#{@sourceName}.fetchDocument"
+      schema:
+        new Schema
+          type: 'object'
+          properties:
+            id:
+              description: 'Id of the workspace document to fetch'
+              oneOf: [
+                type: 'string'
+              , type: 'object'
+              ]
+          required: ['id']
+      role: @viewRole
+      run: @fetchDocument
+
+    @setDocumentMethod = new SdMethod
+      name: "#{@sourceName}.setDocument"
+      schema:
+        new Schema
+          type: 'object'
+          properties:
+            id:
+              description: 'Id of the workspace document to update'
+              oneOf: [
+                type: 'string'
+              , type: 'object'
+              ]
+            data: @dataSchema._schema
+          required: ['id', 'data']
       role: @editRole
       agentRole: @agentRole
-      run: ({document, sourceSourceName, sourceId}) ->
-        @collection.insertAsync
-          sourceSourceName: sourceSourceName
-          sourceId: sourceId
-          createdAt: new Date()
-          updatedAt: new Date()
-          data: document
-
-    if @tableDataOptions
-      @_newWorkSpaceFromTableRow = new SdMethod
-        name: "#{@sourceName}.newWorkspaceFromTableRow"
-        schema:
-          new Schema
-            type: 'object'
-            properties:
-              rowId:
-                description: 'Id of the row to create a workspace from'
-                oneOf: [
-                  type: 'string'
-                , type: 'object'
-                ]
-            required: ['rowId']
-        role: @editRole
-        agentRole: @agentRole
-        run: ({rowId}) ->
-          row = await @tableDataOptions.collection.findOneAsync _id: rowId
-          unless row?
-            throw new Meteor.Error "Row with id #{rowId} not found in collection #{@tableDataOptions.collection._name}"
-          @collection.insertAsync
-            sourceSourceName: @sourceName
-            sourceId: rowId
-            createdAt: new Date()
-            updatedAt: new Date()
-            data: @documentFromRow(row)
+      run: @setDocument
 
   createPublications: ->
-    # TODO: implement publications
-
+    return unless Meteor.isServer
+    collection = @collection
+    Meteor.publish @publicationName, ({id}) ->
+      return @ready() unless id?
+      collection.find _id: id
