@@ -32,11 +32,11 @@ export DefaultMetaDataDisplay = ({metaData}) ->
                         switch call?.name
                           when 'brightdata_Unlocker'
                             #link to url
-                            <a href={call?.args?.url} target="_blank" rel="noopener noreferrer">
+                            <a key={index} href={call?.args?.url} target="_blank" rel="noopener noreferrer">
                               {call?.args?.url}
                             </a>
                           else
-                            <div>
+                            <div key={index}>
                               <div className="text-xs text-blue-500">{call?.name}:</div>
                               <div className="ml-4 text-xs text-blue-400">{JSON.stringify call.args}</div>
                             </div>
