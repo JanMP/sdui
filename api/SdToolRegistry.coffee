@@ -9,17 +9,17 @@ import {Meteor} from 'meteor/meteor'
 
   @example
   # Using the default instance
-  registry = new SdMethodRegistry()
+  registry = new SdToolRegistry()
   registry.registerSdMethod(sdMethodInstance)
   tools = registry.getToolDefinitions()
 
   # Or use the exported instance
   defaultRegistry.registerSdMethod(sdMethodInstance)
   ###
-export class SdMethodRegistry
+export class SdToolRegistry
 
   ###*
-    Constructor for SdMethodRegistry
+    Constructor for SdToolRegistry
 
     Initializes a new Map to store registered SdMethod instances.
     ###
@@ -118,4 +118,4 @@ export class SdMethodRegistry
     @registry.clear()
 
 # Export both the class and a default instance
-export defaultSdMethodRegistry = new SdMethodRegistry()
+export defaultSdToolRegistry = new SdToolRegistry()
