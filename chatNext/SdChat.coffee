@@ -20,7 +20,7 @@ DefaultSessionListItem  = ({sessionId}) ->
 
 defaultProcessMessageText = ({text, metaData, addLinkedMetaData}) ->
   return '' unless typeof text is 'string'
-  
+
   # Handle images first: ![alt text](image.jpg)
   imageReplacer = (match, altText, imageUrl) ->
     metaDataItem = metaData?.find((m) -> m.data?.url is imageUrl)
@@ -30,7 +30,7 @@ defaultProcessMessageText = ({text, metaData, addLinkedMetaData}) ->
       "<img src='#{imageUrl}' alt='#{altText}' id='#{id}' style='max-width: 100%; height: auto; border-radius: 4px; margin: 8px 0;' />"
     else
       "<img src='#{imageUrl}' alt='#{altText}' style='max-width: 100%; height: auto; border-radius: 4px; margin: 8px 0;' />"
-  
+
   # Handle regular links: [title](url)
   linkReplacer = (match, title, url) ->
     metaDataItem = metaData?.find((m) -> m.data?.url is url)
@@ -40,7 +40,7 @@ defaultProcessMessageText = ({text, metaData, addLinkedMetaData}) ->
       "<a class='text-primary-500' id='#{id}' href='#{url}' target='_blank'>#{title}</a>"
     else
       "<a class='text-blue-500' href='#{url}' target='_blank'>#{title}</a>"
-  
+
   text
   ?.replace /!\[(.+?)\]\((.+?)\)/g, imageReplacer  # Process images first
   ?.replace /\[(.+?)\]\((.+?)\)/g, linkReplacer   # Then process links

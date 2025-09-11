@@ -8,10 +8,10 @@ formatDate = (date) ->
   DateTime.fromJSDate(date).toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS)
 
 export DefaultMetaDataDisplay = ({metaData}) ->
-  console.log 'metaData', metaData?.sort (a, b) -> b.createdAt - a.createdAt
+  # console.log 'metaData', metaData?.sort (a, b) -> b.createdAt - a.createdAt
 
   scrollAreaRef = useRef null
- 
+
   <div className="absolute top-0 right-0 bottom-0 left-0 overflow-y-auto overflow-x-hidden" ref={scrollAreaRef}>
     {
       metaData

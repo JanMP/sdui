@@ -10,7 +10,7 @@ export class SdMethod
   @param {Object} options - Configuration options for the SdMethod
   @param {String} options.name - The name of the method
   @param {Schema} [options.schema] - The schema for the method
-  @param {String} options.role - The role required to run the method (note: should be 'role', not 'userRole')
+  @param {String} options.role - The role required to run the method
   @param {Object} [options.tool] - Optional tool configuration
   @param {String} [options.tool.name] - The name of the tool
   @param {String} options.tool.agentRole - The role required to run the tool

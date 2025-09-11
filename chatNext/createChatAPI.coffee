@@ -84,10 +84,10 @@ export createChatAPI = ({
   # check required props and setup defaults for optional props
   unless sourceName?
     throw new Error 'no sourceName given'
-  
+
   unless messageCollection?
     throw new Error 'no messageCollection given'
-  
+
   unless sessionListCollection? or isSingleSessionChat
     throw new Error 'no sessionListCollection given'
   if not viewChatRole? and Meteor.isServer
@@ -98,7 +98,6 @@ export createChatAPI = ({
     console.warn "[createChatAPI #{sourceName}]:
       no addSessionRole defined, using '#{viewChatRole}' instead."
   addSessionRole ?= viewChatRole
-
   bots ?= [] # id, username, email
 
   sessionListDataOptions =
