@@ -33,8 +33,21 @@ allowUnchangedSubmit = false}) ->
     onChangeModel newModel
 
   <ErrorBoundary>
-    <div className="flex-auto overflow-hidden flex flex-column justify-content-between gap-2">
-     <div className="flex-shrink-1 overflow-y-scroll p-2">
+    <div
+      className="flex flex-column justify-content-between gap-2"
+      style={
+        height: '100%'
+        maxHeight: '100%'
+        overflow: 'hidden'
+      }
+    >
+     <div
+       className="overflow-y-scroll p-2"
+       style={
+         flex: '1'
+         minHeight: '0'
+       }
+     >
        <AutoForm
           ref={(ref) -> form = ref}
           schema={schemaBridge}
