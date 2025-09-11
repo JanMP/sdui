@@ -13,6 +13,7 @@ import _ from 'lodash'
   @param {Mongo.Collection} options.sessionListCollection
   @param {Mongo.Collection} [options.metaDataCollection]
   @param {Boolean} [options.isSingleSessionChat]
+  @param {Boolean} [options.isDocumentChat]
   @param {String} [options.viewChatRole]
   @param {String} [options.addSessionRole]
   @param {Function} [options.reactToNewMessage]
@@ -23,6 +24,7 @@ export createChatMethods = ({
   sourceName
   messageCollection, sessionListCollection, metaDataCollection
   isSingleSessionChat,
+  isDocumentChat,
   viewChatRole, addSessionRole,
   reactToNewMessage, onNewSession
   getUsageLimits
@@ -187,6 +189,8 @@ export createChatMethods = ({
         properties:
           title:
             type: 'string'
+          documentId:
+            type: 'string'
           userIds:
             type: 'array'
             items: type: 'string'
@@ -248,6 +252,30 @@ export createChatMethods = ({
       if (existingSession = await getExistingSession())?
         return existingSession._id
       addSession {}
+
+  getExistingSessionForDocumentId = ({documentId}) ->
+    query =
+      userIds: [Meteor.userId()]
+      documentId: documentId
+      archived: {$ne: true}
+    sessionListCollection
+    ?.findOneAsync query, sort: createdAt: -1
+
+  new ValidatedMethod
+    name: "#{sourceName}.initialSessionForDocumentId"
+    validate:
+      new Schema
+        type: 'object'
+        properties:
+          documentId: type: 'string'
+        required: ['documentId']
+      .methodValidator
+    run: ({documentId}) ->
+      await currentUserMustBeInRole addSessionRole
+      return unless Meteor.isServer
+      if (existingSession = await getExistingSessionForDocumentId {documentId})?
+        return existingSession._id
+      addSession {documentId, title: "Chat about document #{documentId}"}
 
   # TODO: verhindern dass Neon uns weiter die DB zumüllt
   new ValidatedMethod

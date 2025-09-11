@@ -25,6 +25,8 @@ export createChatSessionListAPI = ({sourceName, sessionListCollection, viewChatR
       userIds:
         type: 'array'
         items: type: 'string'
+      documentId:
+        type: 'string'
       createdAt:
         type: 'object'
         instanceof: 'Date'

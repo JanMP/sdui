@@ -47,17 +47,19 @@ defaultProcessMessageText = ({text, metaData, addLinkedMetaData}) ->
   ?.replace /\[(.+?)\]\(([^\)]+?)$/g, (match, title, url) -> "[#{title}]() ... <span class='pi pi-spin text-primary-200 pi-spinner'/></span>"
 
 
-export SdChat = ({dataOptions, className = "", customComponents = {}, processMessageText, showTools = true}) ->
+export SdChat = ({dataOptions, className = "", customComponents = {}, processMessageText, showTools = true, documentId = null}) ->
 
-  {SessionListItem, Message, MetaDataDisplay} = customComponents
+  {SessionListItem, Message, MetaDataDisplay, WorkspaceDisplay} = customComponents
   SessionListItem ?= DefaultSessionListItem
   Message ?= DefaultMessage
   MetaDataDisplay ?= DefaultMetaDataDisplay
-
+  WorkspaceDisplay ?= -> <div className="text-red-500 text-lg p-8">No WorkspaceDisplay component provided</div>
 
   processMessageText ?= defaultProcessMessageText
 
-  {bots, sourceName, sessionListDataOptions, isSingleSessionChat, metaDataCollection} = dataOptions
+  {bots, sourceName, sessionListDataOptions, isSingleSessionChat, isDocumentChat, metaDataCollection} = dataOptions
+
+  if isDocumentChat then isSingleSessionChat = false
 
   [inputValue, setInputValue] = useState ''
   [sessionId, setSessionId] = useState null
@@ -205,20 +207,21 @@ export SdChat = ({dataOptions, className = "", customComponents = {}, processMes
       }
     >
       {
-        if isSingleSessionChat
-          <ActionButton
-            label="Neuer Chat"
-            icon="pi pi-fw pi-refresh"
-            className="p-button-rounded p-button-sm p-button-outlined p-button-primary"
-            onAction={resetSingleSession}
-            disabled={noMoreSessionsToday}
-          />
-        else
-          <ActionButton
-            icon="pi pi-fw pi-bars"
-            className="p-button-text p-button-primary"
-            onAction={onToggleSessionList}
-          />
+        unless isDocumentChat
+          if isSingleSessionChat
+            <ActionButton
+              label="Neuer Chat"
+              icon="pi pi-fw pi-refresh"
+              className="p-button-rounded p-button-sm p-button-outlined p-button-primary"
+              onAction={resetSingleSession}
+              disabled={noMoreSessionsToday}
+            />
+          else
+            <ActionButton
+              icon="pi pi-fw pi-bars"
+              className="p-button-text p-button-primary"
+              onAction={onToggleSessionList}
+            />
       }
       <div className="p-2 text-sm">
         Noch übrig:
@@ -255,28 +258,36 @@ export SdChat = ({dataOptions, className = "", customComponents = {}, processMes
     </div>
 
   {areas, columns} =
-    if isSingleSessionChat
+    if isDocumentChat
       if metaDataIsOpen
-        areas: "'content metadata'"
-        columns: '2fr 1fr'
+        areas: "'document content metadata'"
+        columns: '2fr 2fr 1fr'
       else
-        areas: "'content'"
-        columns: '1fr'
+        areas: "'document content'"
+        columns: '1fr 1fr'
     else
-      if sessionListIsOpen
-        if metaDataIsOpen
-          areas: "'sidebar content metadata'"
-          columns: '16rem 2fr 1fr'
-        else
-          areas: "'sidebar content'"
-          columns: '16rem 3fr'
-      else
+      if isSingleSessionChat
         if metaDataIsOpen
           areas: "'content metadata'"
-          columns: '3fr 1fr'
+          columns: '2fr 1fr'
         else
           areas: "'content'"
-          columns: '3fr'
+          columns: '1fr'
+      else
+        if sessionListIsOpen
+          if metaDataIsOpen
+            areas: "'sidebar content metadata'"
+            columns: '16rem 2fr 1fr'
+          else
+            areas: "'sidebar content'"
+            columns: '16rem 3fr'
+        else
+          if metaDataIsOpen
+            areas: "'content metadata'"
+            columns: '3fr 1fr'
+          else
+            areas: "'content'"
+            columns: '3fr'
 
   # CSS Grid layout with variables
   containerStyle =
@@ -319,8 +330,13 @@ export SdChat = ({dataOptions, className = "", customComponents = {}, processMes
   # return
   <div className={className} style={containerStyle}>
     {
-      unless isSingleSessionChat or not sessionListIsOpen
-        sessionListDisplay
+      switch
+        when isDocumentChat
+          <WorkspaceDisplay documentId={documentId} />
+        when not isSingleSessionChat and sessionListIsOpen
+          sessionListDisplay
+        else
+          null
     }
     <div style={contentStyle}>
       {header}

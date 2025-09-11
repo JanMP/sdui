@@ -11,6 +11,7 @@ import {Tacker} from 'meteor/tracker'
   @param {Mongo.Collection} options.sessionListCollection
   @param {Mongo.Collection} [options.metaDataCollection]
   @param {Boolean} [options.isSingleSessionChat]
+  @param {Boolean} [options.isDocumentChat]
   @param {String} [options.viewChatRole]
   @param {Function} [options.getUsageLimits]
   @param {Number} [options.messagesLimit] - max number of messages to be published
@@ -18,7 +19,8 @@ import {Tacker} from 'meteor/tracker'
 export createChatPublications = ({
   sourceName,
   messageCollection, sessionListCollection, metaDataCollection
-  isSingleSessionChat,
+  isSingleSessionChat
+  isDocumentChat
   viewChatRole
   getUsageLimits
   messagesLimit = 100

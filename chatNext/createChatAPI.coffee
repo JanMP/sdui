@@ -70,6 +70,7 @@ export createChatAPI = ({
   metaDataCollection
   usageLimitCollection
   isSingleSessionChat
+  isDocumentChat = false
   viewChatRole, addSessionRole,
   bots, reactToNewMessage, onNewSession
   messagesLimit = 100
@@ -114,6 +115,7 @@ export createChatAPI = ({
     sessionListCollection
     metaDataCollection
     isSingleSessionChat
+    isDocumentChat
     viewChatRole
     addSessionRole
     reactToNewMessage
@@ -127,9 +129,10 @@ export createChatAPI = ({
     sessionListCollection
     metaDataCollection
     isSingleSessionChat
+    isDocumentChat
     viewChatRole
     getUsageLimits
     messagesLimit
   }
 
-  {sourceName, messageCollection, sessionListCollection, metaDataCollection, usageLimitCollection, sessionListDataOptions, isSingleSessionChat, bots}
+  {sourceName, messageCollection, sessionListCollection, metaDataCollection, usageLimitCollection, sessionListDataOptions, isSingleSessionChat, isDocumentChat, bots}
