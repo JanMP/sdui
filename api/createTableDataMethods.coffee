@@ -91,16 +91,20 @@ sdai}) ->
     schema: new Schema
       type: 'object'
       properties:
-        search: type: 'string'
-        limit: type: 'number'
-        skip: type: 'number'
+        search:
+          type: 'string'
+          description: "The query string for the knn search."
+        limit:
+          type: 'integer'
+          description: "The maximum number of results to return (defaults to 5)."
+      required: ['search']
     role: viewTableRole
     tool:
       if sdai?.agentRole
         name: "#{cleanedSourceName}_searchKnn"
         agentRole: sdai.agentRole
         postProcess: sdai.toolPostProcess
-    run: ({search, limit}) ->
+    run: ({search, limit = 5}) ->
       return unless Meteor.isServer
       console.log "#{sourceName}.getRowsKnn", {search, limit}
       vector = await sdai.embeddingFromContext context: search
