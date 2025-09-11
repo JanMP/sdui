@@ -1,5 +1,9 @@
-import React from 'react'
-import {SdWorkspace} from 'meteor/janmp:sdui'
+import React, {useEffect, useState} from 'react'
+import {SdWorkspace, WorkspaceInstance} from 'meteor/janmp:sdui'
 
-export createWorkspacePage = ({workspaceApi}) -> ->
-  <SdWorkspace api={workspaceApi} />
+export createWorkspacePage =
+  ({workspaceApi}) ->
+    handler = new WorkspaceInstance api: workspaceApi
+    ->
+
+      <SdWorkspace handler={handler} />

@@ -10,7 +10,7 @@ idType =
   ]
 
 
-export class WorkspaceDataHandler
+export class WorkspaceInstance
   ###*
     @param {Object} options
     @param {SdWorkspaceAPI} options.api - Instance of SdWorkspaceAPI

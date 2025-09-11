@@ -1,13 +1,11 @@
-import {LongTextField, Schema} from 'meteor/janmp:sdui'
+import {LongTextField, Schema, SdWorkspaceAPI} from 'meteor/janmp:sdui'
 
 import {createGeneratedArticlesTableAPI} from './GeneratedArticles.coffee'
 import {createPromptsTableAPI} from './Prompts.coffee'
 import {createResearchedArticlesTableAPI} from './ResearchedArticles.coffee'
 import {createRssFeedsTableAPI} from './RssFeeds.coffee'
-import {createWorkspaceAPI} from './Workspace.coffee'
 import {createMethods} from './createMethods.coffee'
 import {createResearchedArticlesStatisticsTableAPI} from './ResearchedArticlesStatistics.coffee'
-
 
 defaultPublishGeneratedArticle = ({data}) ->
   console.log 'Default publishGeneratedArticle called with data:', data
@@ -30,7 +28,7 @@ defaultArticleCategories = [
   @param {Object} options.editRole - the role for editing the table
   @param {Object} options.agentRole - the role for agent operations
   @param {Array} [options.articleCategories] - the article categories to use
-  @param {Object} options.articleGenerationSchemaDefinition - the schema definition for article generation
+  @param {Schema} options.articleGenerationSchema - the schema for article generation
   @param {String} options.articleGenerationMainPrompt - the main prompt for article generation
   @param {Boolean|Function} [options.publishGeneratedArticle] - function to publish generated articles, defaults to a no-op function
   @param {Number} [options.retentionDays] - number of days to retain generated articles, defaults to 21 days
@@ -43,7 +41,7 @@ viewTableRole
 editRole
 agentRole
 articleCategories = defaultArticleCategories
-articleGenerationSchemaDefinition
+articleGenerationSchema
 articleGenerationMainPrompt
 publishGeneratedArticle = defaultPublishGeneratedArticle
 retentionDays = 21
@@ -58,13 +56,11 @@ createJobsSchedule
     throw new Error 'editRole is required'
   unless agentRole?
     throw new Error 'agentRole is required'
-  unless articleGenerationSchemaDefinition?
-    throw new Error 'articleGenerationSchemaDefinition is required'
+  unless articleGenerationSchema?
+    throw new Error 'articleGenerationSchema is required'
 
   unless articleGenerationMainPrompt?
     throw new Error 'articleGenerationMainPrompt is required'
-
-  articleGenerationSchema = new Schema articleGenerationSchemaDefinition
 
   createJobsSchedule ?= ->
     in: days: 1
@@ -72,12 +68,12 @@ createJobsSchedule
       hour: 6
       minute: 0
 
-  generatedArticlesDataOptions = createGeneratedArticlesTableAPI {sourceName, viewTableRole, editRole}
+  generatedArticlesDataOptions = createGeneratedArticlesTableAPI {sourceName, viewTableRole, articleGenerationSchema}
   promptsDataOptions = createPromptsTableAPI {sourceName, viewTableRole, editRole, articleCategories}
   researchedArticlesDataOptions = createResearchedArticlesTableAPI {sourceName, viewTableRole, editRole}
   rssFeedsDataOptions = createRssFeedsTableAPI {sourceName, viewTableRole, editRole}
   researchedArticlesStatisticsDataOptions = createResearchedArticlesStatisticsTableAPI {sourceDataOptions: researchedArticlesDataOptions}
-  workspaceApi = createWorkspaceAPI {sourceName, articleGenerationSchema, viewRole: viewTableRole, editRole, agentRole, tableDataOptions: generatedArticlesDataOptions}
+  workspaceApi = new SdWorkspaceAPI sourceDataOptions: generatedArticlesDataOptions
 
   # schema for the add generatedArticle form
   creationParamsSchema = new Schema
