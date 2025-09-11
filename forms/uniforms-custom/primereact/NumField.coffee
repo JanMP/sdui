@@ -18,5 +18,5 @@ export default connectFieldPlus ({
     value={value}
     onValueChange={(e) -> onChange e.value}
     useGrouping={useGrouping}
-    {props...}
+    {(filterDOMProps props)...}
   />

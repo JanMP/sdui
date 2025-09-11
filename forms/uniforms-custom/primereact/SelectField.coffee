@@ -17,7 +17,7 @@ Select = ({
   optionsFromaAllowedValues = allowedValues?.map (v) ->
     label: v
     value: v
-    
+
   props.options ?= optionsFromaAllowedValues
 
   <Dropdown
@@ -25,7 +25,7 @@ Select = ({
     onChange={(e) -> onChange e.value}
     style={minWidh: '100%', maxWidth: '100%'}
     value={value}
-    {props...}
+    {(filterDOMProps props)...}
   />
 
 export default connectFieldPlus Select

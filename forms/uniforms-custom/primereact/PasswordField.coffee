@@ -17,5 +17,5 @@ export default connectFieldPlus ({
     onChange={(e) -> onChange e.target.value}
     toggleMask={true}
     feedback={true}
-    {props...}
+    {(filterDOMProps props)...}
   />

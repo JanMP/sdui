@@ -16,9 +16,9 @@ export default connectFieldPlus ({
   <div>
     {
       allowedValues.map (item) ->
-      
+
         idString = "#{id}-#{item}"
-        
+
         <div className="radio-button-field" key={item}>
           <RadioButton
             checked={item is value}
@@ -27,7 +27,7 @@ export default connectFieldPlus ({
             name={name}
             onChange={-> onChange item}
             value={item}
-            {props...}
+            {(filterDOMProps props)...}
           />
           <label htmlFor={idString}>{item}</label>
         </div>
