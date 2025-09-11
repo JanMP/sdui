@@ -297,6 +297,7 @@ export class LangGraphChatBot
           configurable:
             model: model
             tools: tools
+            meteor_session_id: sessionId
         streamMode: "messages"
 
       @processStream {sessionId, response, messageStubId}

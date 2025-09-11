@@ -33,6 +33,7 @@ export class SdMethod
       @toolName = options.tool.name ? @name + '_tool'
       unless (@agentRole = options.tool.agentRole)?
         throw new Meteor.Error 'tool.agentRole is required'
+      @sessionIdField = options.tool.sessionIdField ? null
       if options.tool.registry?
         @registry = options.tool.registry
       else

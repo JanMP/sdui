@@ -45,6 +45,7 @@ export class SdToolRegistry
         schema: sdMethodInstance.schema
         role: sdMethodInstance.role
         agentRole: sdMethodInstance.agentRole
+        sessionIdField: sdMethodInstance.sessionIdField
         description: sdMethodInstance.schema?._schema?.description
         method: sdMethodInstance  # Keep reference to original method
 
@@ -88,6 +89,7 @@ export class SdToolRegistry
       json_schema: method.schema._schema
       description: method.description or method.schema._schema?.description or "Meteor method: #{method.name}"
       role: method.agentRole
+      session_id_field: method.sessionIdField
       instruction: if method.agentRole? then "Role required: #{JSON.stringify method.agentRole}"
 
   ###*
