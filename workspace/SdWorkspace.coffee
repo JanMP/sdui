@@ -1,29 +1,69 @@
-import React, {useEffect, useState} from 'react'
-import {useSubscribe, useTracker} from 'meteor/react-meteor-data'
-import {ManagedForm} from 'meteor/janmp:sdui'
+import {Meteor} from 'meteor/meteor'
+import React, {useEffect, useMemo, useState} from 'react'
+import {useTracker} from 'meteor/react-meteor-data'
+import {ActionButton, ManagedForm, FormattedJSON} from 'meteor/janmp:sdui'
+import {TabView, TabPanel} from 'primereact/tabview'
+import _ from 'lodash'
 
-export SdWorkspace = ({handler, documentId}) ->
+export SdWorkspace = ({workspaceAPI, sessionId, documentId, onReset, CustomDisplay}) ->
 
-  isLoading = useSubscribe handler.api.publicationName, id: handler.id
-
-  document = useTracker -> (handler.api.collection.find sourceId: documentId)?[0]
-
+  subscribedModel = useTracker ->
+    if workspaceAPI? and sessionId?
+      handle = Meteor.subscribe workspaceAPI.publicationName, {sessionId}
+      if handle.ready()
+        (workspaceAPI.collection.findOne {sessionId})?.data
 
   useEffect ->
-    console.log 'SdWorkspace', documentId
-    switch
-      when documentId is 'new'
-        handler.newDocument()
-      else
-        handler.loadDocument documentId
+    if workspaceAPI? and sessionId? and documentId?
+      workspaceAPI.setupWorkspaceMethod.call {sessionId, documentId}
     undefined
-  , [documentId]
+  , [workspaceAPI, sessionId, documentId]
 
+  saveModelToWorkspace = (data) ->
+    if workspaceAPI? and sessionId?
+      workspaceAPI.setDocumentMethod.call {sessionId, data}
 
-  <div className="p-component p-card w-full h-full flex flex-column p-4">
-    <ManagedForm
-      schemaBridge={handler.api.dataSchema.bridge}
-      model={document?.data}
-      onSubmit={handler.setDocument}
-    />
+  onSubmit = (data) ->
+    if workspaceAPI? and sessionId?
+      workspaceAPI.collection.update {sessionId},
+        $set:
+          data: data
+          updatedAt: new Date()
+      workspaceAPI.saveDocumentMethod.call {sessionId}
+
+  <div className="w-full h-full flex flex-column">
+    <div className="p-3">
+      <ActionButton
+        onAction={onReset}
+        label="Reset Workspace"
+        icon="pi pi-refresh"
+        className="p-button-outlined"
+      />
+    </div>
+    <div className="h-full">
+
+      <TabView>
+        <TabPanel header="Form">
+          <ManagedForm
+            schemaBridge={workspaceAPI.dataSchema.bridge}
+            model={subscribedModel ? {}}
+            onSubmit={saveModelToWorkspace}
+          />
+        </TabPanel>
+        <TabPanel header="Raw">
+          <FormattedJSON data={subscribedModel ? {}} />
+        </TabPanel>
+
+        {
+          if CustomDisplay?
+            <TabPanel header="Custom">
+              <CustomDisplay
+                data={subscribedModel ? {}}
+              />
+            </TabPanel>
+        }
+
+      </TabView>
+
+    </div>
   </div>

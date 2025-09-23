@@ -61,37 +61,50 @@ export class LangGraphChatBot
     @sessionCollection = sessionListCollection
     @botUserData = botUserData
 
+    messageDelay = 200
+    metaDelay = 200
+
+    # Debounced single-item updaters. We usually stream only one assistant
+    # message & a handful of meta items at a time, so per-bot debounce is fine.
+    @_debouncedUpdateMessage = _.debounce (({messageStubId, text, tools}) =>
+      return unless messageStubId?
+      @messageCollection.updateAsync messageStubId,
+        $set:
+          text: text
+          tools: tools
+    ), messageDelay, {leading: true, trailing: true, maxWait: 1000}
+
+    @_debouncedUpdateMeta = _.debounce ((list) =>
+      # list is an array of {sessionId,itemId,data}
+      for {sessionId, itemId, data} in list
+        @metaDataCollection.updateAsync {sessionId, itemId},
+          $set:
+            data: data
+            updatedAt: new Date()
+    ), metaDelay, {trailing: true, maxWait: 1500}
+    @_pendingMetaArray = []
+
   ###*
     Get call parameters for LangGraph API including thread ID, model, and tools
-
-    This method retrieves or creates a thread ID for the session and prepares
-    the necessary parameters for making API calls to LangGraph.
 
     @param {Object} options - Configuration object
     @param {string} options.sessionId - The session ID to get parameters for
     @param {string} options.agentRole - The agent role to determine available tools
     @returns {Promise<Object>} Object containing threadId, model, and tools
-    @throws {Meteor.Error} When required parameters are missing or session not found
   ###
   getCallParams: ({sessionId, agentRole}) ->
-    unless agentRole?
-      throw new Meteor.Error 'LangGraphChatBot: agentRole is required'
-    unless sessionId?
-      throw new Meteor.Error 'LangGraphChatBot: sessionId is required'
+    unless agentRole? then throw new Meteor.Error 'LangGraphChatBot: agentRole is required'
+    unless sessionId? then throw new Meteor.Error 'LangGraphChatBot: sessionId is required'
     unless (session = await @sessionCollection.findOneAsync sessionId)?
       throw new Meteor.Error 'LangGraphChatBot: session not found'
     savedThreadId = session.threadId
     threadId = savedThreadId ? (await @client.threads.create())?.thread_id
-    if not savedThreadId?
+    unless savedThreadId?
       @sessionCollection.updateAsync sessionId,
         $set:
           threadId: threadId
-
-    # Get tools for the agent role
     tools = defaultSdToolRegistry.getToolDefinitionsByRole agentRole
-    console.log {agentRole, tools}
-
-    {threadId, model: session.model ? 'openai/gpt-4.1', tools}
+    {threadId, model: session.model ? 'openai/gpt-5', tools}
 
   ###*
     Create a message stub for streaming responses
@@ -148,10 +161,13 @@ export class LangGraphChatBot
     @returns {Promise<void>}
   ###
   updateMetaDataItem: ({sessionId, itemId, data}) ->
-    @metaDataCollection.updateAsync {sessionId, itemId},
-      $set:
-        data: data
-        updatedAt: new Date()
+    @_pendingMetaArray.push {sessionId, itemId, data}
+    # keep only latest per (sessionId|itemId)
+    dedup = {}
+    for entry in @_pendingMetaArray
+      dedup[entry.sessionId + '|' + entry.itemId] = entry
+    @_pendingMetaArray = Object.values dedup
+    @_debouncedUpdateMeta @_pendingMetaArray
 
   ###*
     Update message stub with new text content
@@ -166,10 +182,7 @@ export class LangGraphChatBot
     @returns {Promise<void>}
   ###
   updateMessageStub: ({messageStubId, text, tools = undefined}) ->
-    @messageCollection.updateAsync messageStubId,
-      $set:
-        text: text
-        tools: tools
+    @_debouncedUpdateMessage {messageStubId, text, tools}
 
   ###*
     Finalize message stub and mark as complete
@@ -184,6 +197,7 @@ export class LangGraphChatBot
     @returns {Promise<void>}
   ###
   finalizeMessageStub: ({messageStubId, text, tools}) ->
+    @_debouncedUpdateMessage.flush?()
     @messageCollection.updateAsync messageStubId,
       $set:
         text: text
@@ -225,71 +239,40 @@ export class LangGraphChatBot
     @throws {Error} When stream processing fails
   ###
   processStream: ({sessionId, response, messageStubId}) ->
-    content = ''
     streamMetaData = {}
-
-    # Process each chunk from the response
     try
       for await chunk from response
         switch chunk.event
-          when "messages/metadata"
-            # console.log "#{"#".repeat 20} metadata #{"#".repeat 20}"
-            # console.log JSON.stringify chunk, null, 2
+          when 'messages/metadata'
             streamMetaData = {streamMetaData..., chunk.data...}
             for itemId, {metadata} of chunk.data
-              unless metadata?.langgraph_node is 'final_response'
-                await @createMetaDataItem {sessionId, itemId, metadata}
-          when "messages/partial", "messages/complete"
+              continue if metadata?.langgraph_node is 'final_response'
+              await @createMetaDataItem {sessionId, itemId, metadata}
+          when 'messages/partial', 'messages/complete'
             for dataItem in chunk.data
               {id, content} = dataItem
               metadata = streamMetaData[id]?.metadata
-              # console.log dataItem
               if metadata?.langgraph_node is 'final_response'
                 await @updateMessageStub {messageStubId, text: content}
               else
-                # if chunk.event is 'messages/complete'
-                #   console.log "#{"#".repeat 20} chunk #{"#".repeat 20}"
-                #   console.log JSON.stringify {chunk, id, metadata}, null, 2
-                await @updateMetaDataItem {sessionId, itemId: id, data: dataItem}
-          when "error"
-            console.error "Error in stream:", chunk
-            await @createLogMessage {sessionId, text: "Error in stream", error: chunk.data}
+                @updateMetaDataItem {sessionId, itemId: id, data: dataItem}
+          when 'error'
+            console.error 'Error in stream:', chunk
+            await @createLogMessage {sessionId, text: 'Error in stream', error: chunk.data}
           else
             if Meteor.isDevelopment
-              console.log "LangGraph Stream: unhandled event type:", chunk.event
-            # console.log "#{"#".repeat 20} unknown chunk #{"#".repeat 20}"
-            # console.log JSON.stringify chunk, null, 2
+              console.log 'LangGraph Stream: unhandled event type:', chunk.event
     catch error
-      console.error "Stream handling error:", error
+      console.error 'Stream handling error:', error
       throw error
 
-  ###*
-    Make a call to LangGraph with streaming response
-
-    Initiates a call to LangGraph with the provided text and agent role,
-    handling the streaming response and updating the message stub in real-time.
-
-    @param {Object} options - Configuration object
-    @param {string} options.sessionId - The session ID for the call
-    @param {string} options.messageStubId - The ID of the message stub to update
-    @param {string} options.text - The text message to send to LangGraph
-    @param {string} options.agentRole - The agent role to use for the call
-    @returns {Promise<void>}
-    @throws {Meteor.Error} When required parameters are missing
-    @throws {Error} When the LangGraph API call fails
-  ###
   call: ({sessionId, messageStubId, text, agentRole}) ->
-    unless sessionId?
-      throw new Meteor.Error 'LangGraphChatBot: sessionId is required'
-    unless messageStubId?
-      throw new Meteor.Error 'LangGraphChatBot: messageStubId is required'
-    unless text? and text.length
-      throw new Meteor.Error 'LangGraphChatBot: text is required'
-    unless agentRole?
-      throw new Meteor.Error 'LangGraphChatBot: agentRole is required'
+    unless sessionId? then throw new Meteor.Error 'LangGraphChatBot: sessionId is required'
+    unless messageStubId? then throw new Meteor.Error 'LangGraphChatBot: messageStubId is required'
+    unless text? and text.length then throw new Meteor.Error 'LangGraphChatBot: text is required'
+    unless agentRole? then throw new Meteor.Error 'LangGraphChatBot: agentRole is required'
     try
       {threadId, model, tools} = await @getCallParams {sessionId, agentRole}
-      # console.log "call", {sessionId, messageStubId, text, threadId}
       response = @client.runs.stream threadId, @graphName,
         input:
           messages: text
@@ -298,9 +281,8 @@ export class LangGraphChatBot
             model: model
             tools: tools
             meteor_session_id: sessionId
-        streamMode: "messages"
-
+        streamMode: 'messages'
       @processStream {sessionId, response, messageStubId}
     catch error
-      console.error "LangGraphChatBot error:", error
+      console.error 'LangGraphChatBot error:', error
       await @createLogMessage {sessionId, error: error}

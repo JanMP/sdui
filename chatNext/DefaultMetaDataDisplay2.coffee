@@ -21,9 +21,14 @@ export DefaultMetaDataDisplay = ({metaData}) ->
           {
             switch item.metadata.langgraph_node
               when 'reasoner'
+                markdown =
+                  if typeof item?.data?.content is 'string'
+                    item?.data?.content
+                  else
+                    item?.data?.content?[0]?.text
                 <Card className="w-full mb-1" key={item._id} title="Reasoner" subTitle={formatDate item?.createdAt}>
                   <MarkdownDisplay
-                    markdown={item?.data?.content?[0]?.text}
+                    markdown={markdown ? 'No reasoning output.'}
                     contentClass="text-xs"
                   />
                   <div>
@@ -74,6 +79,10 @@ export DefaultMetaDataDisplay = ({metaData}) ->
                     >
                       Viewing Website...
                     </Card>
+              when 'reasoner_talkback'
+                <Card className="w-full mb-1 text-center text-blue-500" key={item._id} >
+                  Remind Reasoner to always use a tool.
+                </Card>
               else
                 <Card className="w-full mb-1" key={item._id}
                   title ="Unknown Agent Node #{item.metadata._langgraph_node}" subTitle={formatDate item?.createdAt}

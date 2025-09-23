@@ -4,6 +4,7 @@ import {createChatMethods} from './createChatMethods'
 import {createChatPublications} from './createChatPublications'
 import {Schema} from '../schema/Schema.coffee'
 import {createChatSessionListAPI} from './createChatSessionListAPI'
+import {WorkspaceAPI} from '../workspace/WorkspaceAPI.coffee'
 
 export chatSchema = new Schema
   type: 'object'
@@ -54,6 +55,8 @@ export chatMetaDataSchema = new Schema
   @param {Mongo.Collection} [options.metaDataCollection]
   @param {Mongo.Collection} [options.usageLimitCollection]
   @param {Boolean} [options.isSingleSessionChat]
+  @param {Boolean} [options.isDocumentChat=false]
+  @param {WorkspaceAPI} [options.workspaceAPI] - if isDocumentChat=true, the connected WorkspaceAPI
   @param {Object} [options.viewChatRole]
   @param {Object} [options.addSessionRole]
   @param {Array} [options.bots]
@@ -71,6 +74,7 @@ export createChatAPI = ({
   usageLimitCollection
   isSingleSessionChat
   isDocumentChat = false
+  workspaceAPI
   viewChatRole, addSessionRole,
   bots, reactToNewMessage, onNewSession
   messagesLimit = 100
@@ -89,17 +93,23 @@ export createChatAPI = ({
   unless messageCollection?
     throw new Error 'no messageCollection given'
 
-  unless sessionListCollection? or isSingleSessionChat
+  unless sessionListCollection?
     throw new Error 'no sessionListCollection given'
+
   if not viewChatRole? and Meteor.isServer
     console.warn "[createChatAPI #{sourceName}]:
       no viewChatRole defined, using 'any' instead."
   viewChatRole ?= 'any'
+
   if not addSessionRole? and Meteor.isServer
     console.warn "[createChatAPI #{sourceName}]:
       no addSessionRole defined, using '#{viewChatRole}' instead."
   addSessionRole ?= viewChatRole
   bots ?= [] # id, username, email
+
+  if isDocumentChat and not workspaceAPI?
+    throw new Error 'isDocumentChat=true requires a connected workspaceAPI'
+
 
   sessionListDataOptions =
     createChatSessionListAPI {
@@ -135,4 +145,4 @@ export createChatAPI = ({
     messagesLimit
   }
 
-  {sourceName, messageCollection, sessionListCollection, metaDataCollection, usageLimitCollection, sessionListDataOptions, isSingleSessionChat, isDocumentChat, bots}
+  {sourceName, messageCollection, sessionListCollection, metaDataCollection, usageLimitCollection, sessionListDataOptions, isSingleSessionChat, isDocumentChat, workspaceAPI, bots}

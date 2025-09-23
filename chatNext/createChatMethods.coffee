@@ -33,6 +33,10 @@ export createChatMethods = ({
   reactToNewMessage ?= ({text, messageId, sessionId}) -> Promise.resolve('no reactToNewMessage function given')
   onNewSession ?= ({sessionId}) -> console.log 'onNewSession', {sessionId}
 
+  ###*
+    Check if the user has reached their usage limits
+    @return {Promise<Boolean>}
+    ###
   messagesPerDayLimitReached =  ->
     return false unless (limit = getUsageLimits?()?.maxMessagesPerDay)?
     messagesByUserToday =
@@ -44,6 +48,10 @@ export createChatMethods = ({
       .countAsync()
     messagesByUserToday >= limit
 
+  ###*
+    Check if the user has reached their usage limits
+    @return {Promise<Boolean>}
+    ###
   sessionsPerDayLimitReached =  ->
     return false unless (limit = getUsageLimits?()?.maxSessionsPerDay)?
     sessionsByUserToday =
@@ -56,6 +64,12 @@ export createChatMethods = ({
       ).uniq().value().length
     sessionsByUserToday >= limit
 
+  ###*
+    Check if the user has reached their usage limits
+    @param {Object} options
+    @param {String} options.sessionId
+    @return {Promise<Boolean>}
+    ###
   messagesPerSessionLimitReached = ({sessionId}) ->
     return false unless (limit = getUsageLimits?()?.maxMessagesPerSession)?
     messagesPerSession =
@@ -66,13 +80,31 @@ export createChatMethods = ({
       .countAsync()
     messagesPerSession >= limit
 
+  ###*
+    Check if the text is too long
+    @param {Object} options
+    @param {String} options.text
+    @return {Boolean}
+    ###
   textTooLong = ({text}) ->
-    return false unless getUsageLimits()?.maxMessageLength?
-    text.length > getUsageLimits().maxMessageLength
+    return false unless getUsageLimits?()?.maxMessageLength?
+    text.length > getUsageLimits?().maxMessageLength
 
+  ###*
+    Check if the user is in the session
+    @param {Object} options
+    @param {String} options.sessionId
+    @return {Promise<Boolean>}
+    ###
   userIsInSession = ({sessionId}) ->
     Meteor.userId() in (await sessionListCollection?.findOneAsync(sessionId)?.userIds ? [])
 
+  ###*
+    Check if the user is in the session of the message
+    @param {Object} options
+    @param {String} options.messageId
+    @return {Promise<Boolean>}
+    ###
   userIsInSessionOfMessage = ({messageId}) ->
     sessionId = (await messageCollection?.findOneAsync(messageId))?.sessionId
     unless sessionId?
@@ -80,15 +112,26 @@ export createChatMethods = ({
       return false
     userIsInSession {sessionId}
 
-  addSession = ({title, userIds, model}) ->
+  ###*
+    Internal function to add a new session
+    @param {Object} options
+    @param {String} [options.title]
+    @param {Array<String>} [options.userIds]
+    @param {String} [options.documentId]
+    @param {String} [options.model]
+    @return {Promise<string|undefined>} sessionId
+    ###
+  addSession = ({title, userIds, documentId, model}) ->
     if await sessionsPerDayLimitReached()
       throw new Meteor.Error "Tut uns Leid, wir erlauben momentan nur #{getUsageLimits()?.maxSessionsPerDay} Chats pro Tag. Bitte versuche es morgen nochmal."
     await currentUserMustBeInRole addSessionRole
     return unless Meteor.isServer
     title ?= '[no title]'
+    model?= 'cerebras/gpt-oss-120b' #'mistralai/mistral-medium-2508'
+
     userIds ?= [Meteor.userId()]
-    sessionId = await sessionListCollection.insertAsync {title, userIds, model, createdAt: new Date()}
-    onNewSession {sessionId}
+    sessionId = await sessionListCollection.insertAsync {title, userIds, documentId, model, createdAt: new Date()}
+    onNewSession?({sessionId})
     sessionId
 
   new ValidatedMethod
@@ -113,7 +156,7 @@ export createChatMethods = ({
       if await messagesPerSessionLimitReached {sessionId}
         throw new Meteor.Error "Tut uns Leid, wir erlauben momentan nur #{getUsageLimits()?.maxMessagesPerSession} Nachrichten pro Chat."
       if textTooLong {text}
-        throw new Meteor.Error "Tut uns Leid, wir erlauben momentan nur #{usageLimits.maxMessageLength} Zeichen pro Nachricht. Bitte versuche es nochmal mit einer kürzeren Nachricht."
+        throw new Meteor.Error "Tut uns Leid, wir erlauben momentan nur #{getUsageLimits()?.maxMessageLength} Zeichen pro Nachricht. Bitte versuche es nochmal mit einer kürzeren Nachricht."
       newMessage =
         userId: Meteor.userId()
         sessionId: sessionId
@@ -262,7 +305,7 @@ export createChatMethods = ({
     ?.findOneAsync query, sort: createdAt: -1
 
   new ValidatedMethod
-    name: "#{sourceName}.initialSessionForDocumentId"
+    name: "#{sourceName}.sessionForDocumentId"
     validate:
       new Schema
         type: 'object'
@@ -275,6 +318,22 @@ export createChatMethods = ({
       return unless Meteor.isServer
       if (existingSession = await getExistingSessionForDocumentId {documentId})?
         return existingSession._id
+      addSession {documentId, title: "Chat about document #{documentId}"}
+
+  new ValidatedMethod
+    name: "#{sourceName}.newSessionForDocumentId"
+    validate:
+      new Schema
+        type: 'object'
+        properties:
+          documentId: type: 'string'
+        required: ['documentId']
+      .methodValidator
+    run: ({documentId}) ->
+      await currentUserMustBeInRole addSessionRole
+      return unless Meteor.isServer
+      if (existingSession = await getExistingSessionForDocumentId {documentId})?
+        await archiveSessionData {sessionId: existingSession._id}
       addSession {documentId, title: "Chat about document #{documentId}"}
 
   # TODO: verhindern dass Neon uns weiter die DB zumüllt

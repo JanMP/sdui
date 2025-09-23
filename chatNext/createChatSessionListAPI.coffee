@@ -35,12 +35,12 @@ export createChatSessionListAPI = ({sourceName, sessionListCollection, viewChatR
       model:
         type: 'string'
         enum: [
-          "anthropic/claude-3-5-haiku-latest",
           "anthropic/claude-sonnet-4-20250514",
           "google_genai/gemini-2.5-flash",
+          "openai/gpt-5",
+          "cerebras/gpt-oss-120b"
           "mistralai/mistral-small-latest",
           # "mistralai/magistral-medium-2506",
-          "openai/gpt-4.1",
         ]
     required: ['title', 'model']
 
@@ -100,6 +100,7 @@ export createChatSessionListAPI = ({sourceName, sessionListCollection, viewChatR
     listSchema: listSchema
     formSchema: formSchema
     viewTableRole: viewChatRole
+    addRole: addSessionRole
     canAdd: true
     canDelete: true
     canEdit: false

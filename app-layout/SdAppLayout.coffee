@@ -138,7 +138,9 @@ export SdAppLayout = ({dataOptions}) ->
 
         <div className="h-full" style={display: 'grid', gridTemplateRows: 'auto 1fr', gridGap: '5px'}>
           <BreadCrumbForPath sourceArray={sourceArray}/>
-          <MainRoutes sourceArray={sourceArray}/>
+          <div className="h-full max-h-full overflow-auto">
+            <MainRoutes sourceArray={sourceArray}/>
+          </div>
         </div>
 
       </div>

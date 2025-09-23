@@ -49,7 +49,7 @@ defaultProcessMessageText = ({text, metaData, addLinkedMetaData}) ->
 
 export SdChat = ({dataOptions, className = "", customComponents = {}, processMessageText, showTools = true, documentId = null}) ->
 
-  {SessionListItem, Message, MetaDataDisplay, WorkspaceDisplay} = customComponents
+  {SessionListItem, Message, MetaDataDisplay, WorkspaceDisplay, WorkspaceCustomDisplay} = customComponents
   SessionListItem ?= DefaultSessionListItem
   Message ?= DefaultMessage
   MetaDataDisplay ?= DefaultMetaDataDisplay
@@ -57,7 +57,7 @@ export SdChat = ({dataOptions, className = "", customComponents = {}, processMes
 
   processMessageText ?= defaultProcessMessageText
 
-  {bots, sourceName, sessionListDataOptions, isSingleSessionChat, isDocumentChat, metaDataCollection} = dataOptions
+  {sourceName, messageCollection, sessionListCollection, metaDataCollection, usageLimitCollection, sessionListDataOptions, isSingleSessionChat, isDocumentChat, workspaceAPI, bots} = dataOptions
 
   if isDocumentChat then isSingleSessionChat = false
 
@@ -82,10 +82,10 @@ export SdChat = ({dataOptions, className = "", customComponents = {}, processMes
   usageLimitsIsLoading = useSubscribe "#{sourceName}.usageLimits", {sessionId}
 
   session = useTracker ->
-    (dataOptions?.sessionListDataOptions?.rowsCollection?.findOne sessionId) ? {}
+    (sessionListCollection.findOne sessionId) ? {}
 
   currentLimits = useTracker ->
-    dataOptions?.usageLimitCollection?.findOne()
+    usageLimitCollection?.findOne()
 
   getInitialSession = ->
     meteorApply
@@ -93,9 +93,29 @@ export SdChat = ({dataOptions, className = "", customComponents = {}, processMes
       data: {}
     .then setSessionId
 
+  getSessionForDocumentId = ({documentId}) ->
+    meteorApply
+      method: "#{sourceName}.sessionForDocumentId"
+      data: {documentId}
+    .then (sessionId) ->
+      setSessionId sessionId
+      # Load workspace document
+
+  getNewSessionForDocumentId = ({documentId}) ->
+    console.log "getNewSessionForDocumentId", documentId
+    meteorApply
+      method: "#{sourceName}.newSessionForDocumentId"
+      data: {documentId}
+    .then (sessionId) ->
+      setSessionId sessionId
+      # Load workspace document
+
   useEffect ->
     unless sessionId?
-      getInitialSession()
+      if isDocumentChat and documentId?
+        getSessionForDocumentId {documentId}
+      else
+        getInitialSession()
     undefined
   , []
 
@@ -109,18 +129,18 @@ export SdChat = ({dataOptions, className = "", customComponents = {}, processMes
 
   messages =
     useTracker ->
-      dataOptions.messageCollection.find {sessionId},
+      messageCollection?.find {sessionId},
         sort: createdAt: -1
         limit: 100
       .fetch()
       .reverse()
       .map (message) ->
-        user = bots.find (bot) -> bot.id is message.userId
+        user = bots?.find (bot) -> bot.id is message.userId
         user ?=
           if message.userId is Meteor.userId()
             username: Meteor.user()?.username
             email: Meteor.user()?.emails?[0]?.address
-        user ?= session.users.find (user) -> user.userId is message.userId
+        user ?= session.users?.find (user) -> user.userId is message.userId
         text = processMessageText {text: message.text, metaData, addLinkedMetaData}
         {message..., text,  username: user?.username, email: user?.email, customImage: user?.customImage}
 
@@ -164,10 +184,10 @@ export SdChat = ({dataOptions, className = "", customComponents = {}, processMes
     .catch handleError
 
   # SessionList hook
-  addSession = (model = {}) ->
+  addSession = (formModel = {}) ->
     meteorApply
       method: "#{sourceName}.addSession"
-      data: model
+      data: formModel
     .then setSessionId
     .catch handleError
 
@@ -327,12 +347,28 @@ export SdChat = ({dataOptions, className = "", customComponents = {}, processMes
     padding: 'var(--grid-gap)'
     overflow: 'none'
 
+  documentStyle =
+    gridArea: 'document'
+    position: 'relative'
+    padding: 'var(--grid-gap)'
+    overflow: 'none'
+
   # return
   <div className={className} style={containerStyle}>
     {
       switch
         when isDocumentChat
-          <WorkspaceDisplay documentId={documentId} />
+          <div className="relative" style={documentStyle}>
+            <div className="absolute top-0 left-0 right-0 bottom-0 overflow-y-auto">
+              <WorkspaceDisplay
+                workspaceAPI={workspaceAPI}
+                sessionId={sessionId}
+                documentId={documentId}
+                onReset={-> getNewSessionForDocumentId {documentId}}
+                CustomDisplay={WorkspaceCustomDisplay}
+              />
+            </div>
+          </div>
         when not isSingleSessionChat and sessionListIsOpen
           sessionListDisplay
         else
