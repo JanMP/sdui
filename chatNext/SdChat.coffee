@@ -63,6 +63,8 @@ export SdChat = ({dataOptions, className = "", customComponents = {}, processMes
 
   [inputValue, setInputValue] = useState ''
   [sessionId, setSessionId] = useState null
+  [workspaceIsLocked, setWorkspaceIsLocked] = useState false
+  [saveWorkspaceTrigger, setSaveWorkspaceTrigger] = useState 0
 
   [sessionListIsOpen, setSessionListIsOpen] = useState true
   onToggleSessionList = -> setSessionListIsOpen (x) -> not x
@@ -150,6 +152,32 @@ export SdChat = ({dataOptions, className = "", customComponents = {}, processMes
     return
   , [messages]
 
+  # Monitor bot messages to unlock workspace when bot finishes streaming
+  useEffect ->
+    return unless isDocumentChat and workspaceIsLocked and messages.length > 0
+    
+    # Find the last bot message
+    lastBotMessage = messages
+      .reverse()
+      .find (message) -> bots?.some (bot) -> bot.id is message.userId
+    
+    # If bot message exists and is no longer in progress, unlock
+    if lastBotMessage? and not lastBotMessage.workInProgress
+      console.log 'Bot finished streaming, unlocking workspace'
+      setWorkspaceIsLocked false
+    
+    # Handle error case: if last message has error, also unlock
+    if lastBotMessage?.error?
+      console.log 'Bot encountered error, unlocking workspace'
+      setWorkspaceIsLocked false
+      toast.show
+        severity: 'error'
+        summary: 'Agent Error'
+        detail: 'The agent encountered an error. Workspace has been unlocked.'
+    
+    undefined
+  , [messages, workspaceIsLocked, isDocumentChat, bots]
+
   handleError = (error) ->
     toast.show
       severity: 'error'
@@ -160,19 +188,36 @@ export SdChat = ({dataOptions, className = "", customComponents = {}, processMes
   addMessage = (event) ->
     event.preventDefault()
     return if inputValue is ''
-    if messageIsTooLong
-      toast.show
-        severity: 'error'
-        summary: 'Fehler'
-        detail: "Deine Nachricht ist zu lang. Bitte kürze sie auf #{maxMessageLength} Zeichen."
-      return
-    setInputValue ''
-    meteorApply
-      method: "#{sourceName}.addMessage"
-      data:
-        text: inputValue
-        sessionId: sessionId
-    .catch handleError
+    do =>
+      if messageIsTooLong
+        toast.show
+          severity: 'error'
+          summary: 'Fehler'
+          detail: "Deine Nachricht ist zu lang. Bitte kürze sie auf #{maxMessageLength} Zeichen."
+        return
+      
+      # For document chat: trigger workspace save and lock before sending message
+      if isDocumentChat
+        # Lock the workspace immediately
+        setWorkspaceIsLocked true
+        
+        # Trigger workspace save by incrementing the trigger
+        setSaveWorkspaceTrigger (prev) -> prev + 1
+        
+        # Small delay to allow the save to complete before sending message
+        await new Promise (resolve) -> setTimeout resolve, 100
+      
+      setInputValue ''
+      meteorApply
+        method: "#{sourceName}.addMessage"
+        data:
+          text: inputValue
+          sessionId: sessionId
+      .catch (error) ->
+        # Unlock workspace if message send fails
+        if isDocumentChat
+          setWorkspaceIsLocked false
+        handleError error
 
   setFeedBackHandlerForMessage = (messageId) -> (feedback) ->
     console.log 'setFeedBackHandlerForMessage', {messageId, feedback}
@@ -353,6 +398,31 @@ export SdChat = ({dataOptions, className = "", customComponents = {}, processMes
     padding: 'var(--grid-gap)'
     overflow: 'none'
 
+  # Workspace lock/unlock handlers
+  handleWorkspaceLock = ->
+    # This will be called by SdWorkspace but we handle locking in addMessage
+    Promise.resolve()
+
+  handleWorkspaceUnlock = ->
+    setWorkspaceIsLocked false
+
+  handleSaveWorkspace = (data) ->
+    # This is called when SdWorkspace saves data - just for notification
+    console.log 'Workspace data saved:', data
+
+  handleSaveToSource = (overwrite) ->
+    return unless workspaceAPI? and sessionId?
+    try
+      await workspaceAPI.saveDocumentMethod.call {sessionId}
+      return Promise.resolve()
+    catch error
+      console.error 'Error in handleSaveToSource:', error
+      toast.show
+        severity: 'error'
+        summary: 'Fehler'
+        detail: "Failed to save document: #{error.message or 'Unknown error'}"
+      return Promise.reject error
+
   # return
   <div className={className} style={containerStyle}>
     {
@@ -364,8 +434,15 @@ export SdChat = ({dataOptions, className = "", customComponents = {}, processMes
                 workspaceAPI={workspaceAPI}
                 sessionId={sessionId}
                 documentId={documentId}
-                onReset={-> getNewSessionForDocumentId {documentId}}
+                onReset={ -> getNewSessionForDocumentId {documentId} }
                 CustomDisplay={WorkspaceCustomDisplay}
+                isLocked={workspaceIsLocked}
+                lockReason="Agent is processing your request..."
+                onLock={handleWorkspaceLock}
+                onUnlock={handleWorkspaceUnlock}
+                onSaveWorkspace={handleSaveWorkspace}
+                onSaveToSource={handleSaveToSource}
+                saveWorkspaceTrigger={saveWorkspaceTrigger}
               />
             </div>
           </div>
@@ -398,7 +475,7 @@ export SdChat = ({dataOptions, className = "", customComponents = {}, processMes
             onChange={(e) -> setInputValue e.target.value}
             style={width: '100%'}
             className={if messageIsTooLong then 'p-invalid' else ''}
-            disabled={noMoreMessagesToday or noMoreMessagesThisSession}
+            disabled={noMoreMessagesToday or noMoreMessagesThisSession or workspaceIsLocked}
           />
           <span className="p-inputgroup-addon">
             <i className="pi pi-send" />
