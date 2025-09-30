@@ -77,6 +77,7 @@ meteor test-packages ./ --driver-package meteortesting:mocha --grep "TextEmbeddi
 | `SdChatLog` | `createChatLogAPI` | Chat session management |
 | `SdAppLayout` | `createAppLayoutAPI` | Application routing & navigation |
 | `SdUserTable` | `createUserTableAPI` | User management interface |
+| `SdWorkspace` | `WorkspaceAPI` | Document workspace with form locking |
 
 ### Primary API Generators
 
@@ -129,6 +130,21 @@ bot = createChatBot
   getTools: ({sessionId}) -> [myTool1, myTool2]
   messageCollection: Messages
 ```
+
+#### WorkspaceAPI
+
+Creates document workspace with form locking for agent collaboration:
+
+```coffeescript
+workspaceAPI = new WorkspaceAPI
+  sourceDataOptions: myTableDataAPI  # Connected table data API
+  agentRole: {scope: 'app', role: 'agent'}  # Role for agent operations
+```
+
+**Generated Server Artifacts:**
+- Methods: `{sourceName}.workspace.setupWorkspace`, `{sourceName}.workspace.setDocument`, `{sourceName}.workspace.saveDocument`
+- Publications: `{sourceName}.workspace.forId`
+- Workspace collection with document versioning
 
 ## Schema System & Role-Based Access Control
 
@@ -291,9 +307,97 @@ new SdMethod
 - `forms/` - Form components and field types
 - `tables/` - Data display components (tables, lists, editors)
 - `ai/` - AI/LLM integration components
-- `workspace/` - Document workspace functionality
+- `workspace/` - Document workspace functionality with form locking
 - `common/` - Shared utilities and helpers
 - `schema/` - Custom Schema system
+
+## SdWorkspace Integration
+
+### Basic Usage
+
+```coffeescript
+# Set up workspace API
+workspaceAPI = new WorkspaceAPI
+  sourceDataOptions: myTableDataAPI
+  agentRole: {scope: 'app', role: 'agent'}
+
+# Set up document chat with workspace
+chatAPI = createChatAPI
+  sourceName: 'my-chat'
+  messageCollection: Messages
+  sessionListCollection: Sessions
+  isDocumentChat: true
+  workspaceAPI: workspaceAPI
+  bots: [myAgent]
+
+# Use in component
+<SdChatNext
+  dataOptions={chatAPI}
+  documentId={documentId}
+  customComponents={
+    WorkspaceDisplay: SdWorkspace
+  }
+/>
+```
+
+### Workspace Locking System
+
+The SdWorkspace component now includes an advanced locking system for agent collaboration:
+
+**Features:**
+- **Automatic Lock**: Form locks when user sends chat message
+- **Auto-save**: Current form data saved to workspace before locking
+- **Smart Unlock**: Form unlocks when agent completes response
+- **Manual Override**: Manual unlock button for error recovery
+- **Save Options**: "Save (Overwrite)" and "Save as New" buttons
+- **Validation**: Form validation before save operations
+- **Error Handling**: Comprehensive error handling with toast notifications
+
+**Integration Example:**
+
+```coffeescript
+<SdWorkspace
+  workspaceAPI={workspaceAPI}
+  sessionId={sessionId}
+  documentId={documentId}
+  isLocked={isFormLocked}  # Controlled by chat system
+  lockReason="Agent is processing your request..."
+  onUnlock={handleUnlock}
+  onSaveWorkspace={handleSaveToWorkspace}
+  onSaveToSource={handleSaveToSource}
+/>
+```
+
+### Breaking Changes (v2.0)
+
+**SdWorkspace Refactor:**
+- ❌ **REMOVED**: `ManagedForm` wrapper (replaced with direct `AutoForm`)
+- ✅ **ADDED**: Form locking system with `isLocked`, `onLock`, `onUnlock` props
+- ✅ **ADDED**: Explicit save operations with `onSaveToSource(overwrite: boolean)`
+- ✅ **ADDED**: Auto-save functionality with `onSaveWorkspace(data)`
+- ✅ **ADDED**: Confirmation dialogs for destructive operations
+- ✅ **ENHANCED**: Error handling with toast notifications
+
+**Migration Guide:**
+```coffeescript
+# OLD (v1.x)
+<SdWorkspace
+  workspaceAPI={workspaceAPI}
+  sessionId={sessionId}
+  documentId={documentId}
+/>
+
+# NEW (v2.x)
+<SdWorkspace
+  workspaceAPI={workspaceAPI}
+  sessionId={sessionId}
+  documentId={documentId}
+  isLocked={workspaceIsLocked}
+  onUnlock={-> setWorkspaceIsLocked false}
+  onSaveWorkspace={(data) -> workspaceAPI.setDocumentMethod.call {sessionId, data}}
+  onSaveToSource={(overwrite) -> workspaceAPI.saveDocumentMethod.call {sessionId}}
+/>
+```
 
 ### Configuration Files
 
