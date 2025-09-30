@@ -137,6 +137,7 @@ export class Schema
     , type: 'object'
     ]
 
+  # TODO add handling of required fields
   addProperty: (property) ->
     s = {@_schema...}
     s.properties = {s.properties..., property...}
@@ -144,11 +145,13 @@ export class Schema
 
   withId: -> @addProperty '_id': {title: 'ID', idType...}
 
+  # TODO add handling of required fields
   pick: (keys) ->
     s = {@_schema...}
     s.properties = _.pick @_schema.properties, keys
     new Schema s, @options
 
+  # TODO add handling of required fields
   omit: (keys) ->
     s = {@_schema...}
     s.properties = _.omit @_schema.properties, keys

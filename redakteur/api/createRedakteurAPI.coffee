@@ -1,4 +1,4 @@
-import {LongTextField, Schema, SdWorkspaceAPI} from 'meteor/janmp:sdui'
+import {LongTextField, Schema} from 'meteor/janmp:sdui'
 
 import {createGeneratedArticlesTableAPI} from './GeneratedArticles.coffee'
 import {createPromptsTableAPI} from './Prompts.coffee'
@@ -73,7 +73,6 @@ createJobsSchedule
   researchedArticlesDataOptions = createResearchedArticlesTableAPI {sourceName, viewTableRole, editRole}
   rssFeedsDataOptions = createRssFeedsTableAPI {sourceName, viewTableRole, editRole}
   researchedArticlesStatisticsDataOptions = createResearchedArticlesStatisticsTableAPI {sourceDataOptions: researchedArticlesDataOptions}
-  workspaceApi = new SdWorkspaceAPI sourceDataOptions: generatedArticlesDataOptions
 
   # schema for the add generatedArticle form
   creationParamsSchema = new Schema
@@ -114,5 +113,4 @@ createJobsSchedule
     researchedArticlesStatisticsDataOptions
     rssFeedsDataOptions
     creationParamsSchema
-    workspaceApi
   }

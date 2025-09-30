@@ -167,10 +167,15 @@ export class WorkspaceAPI
   setDocument: ({sessionId, data}) =>
     return unless Meteor.isServer
     # Agent sends document data directly - we handle internal data folder mapping
-    await @collection.updateAsync {sessionId},
+    # Use upsert to create document if it doesn't exist
+    await @collection.upsertAsync {sessionId},
       $set:
         data: data
         updatedAt: new Date()
+      $setOnInsert:
+        sessionId: sessionId
+        documentId: null
+        createdAt: new Date()
 
     # Return the updated document data (clean interface)
     return await @fetchDocument {sessionId}
