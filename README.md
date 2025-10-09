@@ -109,3 +109,24 @@ export List = ->
     - Content Editor: ![ContentEditorExample](component-images/contentEditorExample.png)
     - Table: ![tableExample](component-images/tableExample.png)
     - List: ![listExample](component-images/listExample.png)
+
+## Schema Class
+
+The `Schema` class is a wrapper around JSON Schema that provides validation and form generation capabilities via AJV and Uniforms. It includes several utility methods for schema manipulation:
+
+### Methods
+
+- **`addProperty(property)`**: Adds new properties to the schema while preserving the existing `required` array
+- **`pick(keys)`**: Creates a new schema with only the specified property keys, filtering the `required` array to include only picked keys
+- **`omit(keys)`**: Creates a new schema excluding the specified property keys, removing them from the `required` array
+- **`withId()`**: Adds an `_id` property to the schema
+
+All methods return a new Schema instance and maintain immutability by creating copies of the schema and required array.
+
+### Required Fields Handling
+
+As of the latest update, all schema manipulation methods properly handle the JSON Schema `required` array:
+- When adding properties, the existing required fields are preserved
+- When picking properties, only required fields that are also picked are kept
+- When omitting properties, any required fields that are omitted are removed from the required array
+- All operations maintain immutability and don't modify the original schema
