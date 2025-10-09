@@ -137,24 +137,32 @@ export class Schema
     , type: 'object'
     ]
 
-  # TODO add handling of required fields
+  # Add properties and handle required field tracking
   addProperty: (property) ->
     s = {@_schema...}
     s.properties = {s.properties..., property...}
+    # Handle required array for new properties
+    s.required = s.required?[..] ? []
     new Schema s, @options
 
   withId: -> @addProperty '_id': {title: 'ID', idType...}
 
-  # TODO add handling of required fields
+  # Pick properties and filter required array accordingly
   pick: (keys) ->
     s = {@_schema...}
     s.properties = _.pick @_schema.properties, keys
+    # Filter required array to only include picked keys
+    if s.required?
+      s.required = s.required.filter (key) -> key in keys
     new Schema s, @options
 
-  # TODO add handling of required fields
+  # Omit properties and remove from required array accordingly
   omit: (keys) ->
     s = {@_schema...}
     s.properties = _.omit @_schema.properties, keys
+    # Remove omitted keys from required array
+    if s.required?
+      s.required = s.required.filter (key) -> key not in keys
     new Schema s, @options
 
   getQuickTypeForKey: (key) ->

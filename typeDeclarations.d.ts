@@ -18,10 +18,11 @@ declare namespace SduiComponents {
 
   // ====== From: coffee-compiled/ai/invokeLangGraphAgent.d.ts ======
   // File: invokeLangGraphAgent
-  function invokeLangGraphAgent({ settings, agent, input }: {
+  function invokeLangGraphAgent({ settings, agent, input, config }: {
       settings: object;
       agent: string;
       input: object;
+      config?: object;
   }): Promise<any>;
 
   // ====== From: coffee-compiled/ai/LangGraphChatBot.d.ts ======
